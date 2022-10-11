@@ -34,7 +34,12 @@ module.exports = {
         allowNull: true
       },
       entity: {
-        type: Sequelize.ENUM("service_partner", "product_partner", "client"),
+        type: Sequelize.ENUM(
+          "service_partner",
+          "product_partner",
+          "private_client",
+          "corporate_client"
+        ),
         allowNull: true
       },
       address: {
