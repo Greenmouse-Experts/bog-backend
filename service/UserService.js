@@ -1,7 +1,35 @@
 const User = require("../models/User");
+const Profile = require("../models/UserProfile");
+const BankDetail = require("../models/BankDetail");
 
-exports.findUser = async email => {
-  const user = await User.findOne({ where: { email } });
+exports.findUser = async where => {
+  const user = await User.findOne({ where });
+  return user;
+};
+
+exports.getUserDetails = async where => {
+  const user = await User.findOne({
+    where,
+    attributes: {
+      exclude: ["password", "createdAt", "updatedAt", "deletedAt"]
+    },
+    include: [
+      {
+        model: Profile,
+        as: "profile",
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "deletedAt"]
+        }
+      },
+      {
+        model: BankDetail,
+        as: "bank_detail",
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "deletedAt"]
+        }
+      }
+    ]
+  });
   return user;
 };
 
@@ -16,9 +44,53 @@ exports.createNewUser = async (userData, transaction) => {
 };
 
 exports.updateUser = async (userData, transaction) => {
-  const user = await User.update(userData, {
+  await User.update(userData, {
     where: { id: userData.id },
     transaction
   });
-  return user;
+  return true;
+};
+
+exports.createProfile = async (userData, transaction) => {
+  const profile = await Profile.create(userData, { transaction });
+  return profile;
+};
+
+exports.updateUserProfile = async (userData, transaction) => {
+  await Profile.update(userData, {
+    where: { id: userData.id },
+    transaction
+  });
+  return true;
+};
+
+exports.getProfile = async where => {
+  const profile = await Profile.findOne({ where });
+  return profile;
+};
+
+exports.createBankDetails = async (data, transaction) => {
+  const bank = await BankDetail.create(data, { transaction });
+  return bank;
+};
+
+exports.updateBankDetails = async (data, transaction) => {
+  await BankDetail.update(data, {
+    where: { id: data.id },
+    transaction
+  });
+  return true;
+};
+
+exports.deleteBankDetails = async (data, transaction) => {
+  await BankDetail.update(data, {
+    where: { id: data.id },
+    transaction
+  });
+  return true;
+};
+
+exports.getBankDetails = async where => {
+  const bank = await BankDetail.findOne({ where });
+  return bank;
 };

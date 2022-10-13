@@ -1,60 +1,54 @@
 /* eslint-disable no-unused-vars */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const table = await queryInterface.createTable("users", {
+    const table = await queryInterface.createTable("user_profiles", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
         unique: true,
         primaryKey: true
       },
-      name: {
+      userId: {
+        type: Sequelize.UUID,
+        allowNull: false
+      },
+      company_address: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        unique: true
-      },
-      password: {
+      company_state: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      phone: {
+      company_city: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      isActive: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
-      },
-      token: {
+      company_street: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      userType: {
-        type: Sequelize.ENUM(
-          "professional",
-          "vendor",
-          "private_client",
-          "corporate_client"
-        ),
-        allowNull: true
-      },
-      address: {
+      company_name: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      state: {
+      cac_number: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      city: {
+      tin: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      street: {
+      years_of_experience: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      certificate_of_operation: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      professional_certificate: {
         type: Sequelize.STRING,
         allowNull: true
       },
@@ -66,6 +60,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("users");
+    return queryInterface.dropTable("user_profiles");
   }
 };

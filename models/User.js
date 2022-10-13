@@ -1,5 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const BankDetail = require("./BankDetail");
+const UserConnector = require("./UserConnector");
+const UserProfile = require("./UserProfile");
 
 const User = sequelise.define(
   "users",
@@ -35,10 +38,10 @@ const User = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true
     },
-    entity: {
+    userType: {
       type: Sequelize.ENUM(
-        "service_partner",
-        "product_partner",
+        "professional",
+        "vendor",
         "private_client",
         "corporate_client"
       ),
@@ -48,32 +51,41 @@ const User = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true
     },
-    company_name: {
+    state: {
       type: Sequelize.STRING,
       allowNull: true
     },
-    cac_number: {
+    city: {
       type: Sequelize.STRING,
       allowNull: true
     },
-    tin: {
-      type: Sequelize.STRING,
-      allowNull: true
-    },
-    years_of_experience: {
-      type: Sequelize.INTEGER,
-      allowNull: true
-    },
-    certificate_of_operation: {
-      type: Sequelize.STRING,
-      allowNull: true
-    },
-    professional_certificate: {
+    street: {
       type: Sequelize.STRING,
       allowNull: true
     }
   },
   { paranoid: true }
 );
+
+User.hasOne(BankDetail, {
+  foreignKey: "userId",
+  as: "bank_detail",
+  onDelete: "cascade",
+  hooks: true
+});
+
+User.hasOne(UserProfile, {
+  foreignKey: "userId",
+  as: "profile",
+  onDelete: "cascade",
+  hooks: true
+});
+
+User.hasMany(UserConnector, {
+  foreignKey: "userId",
+  as: "connectors",
+  onDelete: "cascade",
+  hooks: true
+});
 
 module.exports = User;

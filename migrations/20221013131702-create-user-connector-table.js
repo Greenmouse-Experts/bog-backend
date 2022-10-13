@@ -1,61 +1,51 @@
 /* eslint-disable no-unused-vars */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const table = await queryInterface.createTable("users", {
+    const table = await queryInterface.createTable("user_connectors", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
         unique: true,
         primaryKey: true
       },
-      name: {
+      userId: {
+        type: Sequelize.UUID,
+        allowNull: false
+      },
+      connector_type: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        unique: true
-      },
-      password: {
+      client_id: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      phone: {
+      client_secret: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      isActive: {
+      exchange_key: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      access_token: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      refresh_token: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      isEnabled: {
         type: Sequelize.BOOLEAN,
-        defaultValue: false
+        defaultValue: true
       },
-      token: {
-        type: Sequelize.STRING,
+      credentials: {
+        type: Sequelize.JSON,
         allowNull: true
       },
-      userType: {
-        type: Sequelize.ENUM(
-          "professional",
-          "vendor",
-          "private_client",
-          "corporate_client"
-        ),
-        allowNull: true
-      },
-      address: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      state: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      city: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      street: {
-        type: Sequelize.STRING,
+      expires_in: {
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       createdAt: { allowNull: false, type: Sequelize.DATE },
@@ -66,6 +56,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("users");
+    return queryInterface.dropTable("user_connectors");
   }
 };

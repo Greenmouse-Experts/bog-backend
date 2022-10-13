@@ -1,6 +1,5 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
-const User = require("./User");
 
 const BankDetail = sequelise.define(
   "bank_details",
@@ -31,12 +30,5 @@ const BankDetail = sequelise.define(
   },
   { paranoid: true }
 );
-
-User.hasOne(BankDetail, {
-  foreignKey: "userId",
-  as: "bank_detail",
-  onDelete: "cascade",
-  hooks: true
-});
 
 module.exports = BankDetail;
