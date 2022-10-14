@@ -41,7 +41,7 @@ module.exports = {
         defaultValue: true
       },
       credentials: {
-        type: Sequelize.JSON,
+        type: Sequelize.TEXT,
         allowNull: true
       },
       expires_in: {

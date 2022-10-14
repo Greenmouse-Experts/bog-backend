@@ -43,7 +43,7 @@ const UserConnector = sequelise.define(
       defaultValue: true
     },
     credentials: {
-      type: Sequelize.JSON,
+      type: Sequelize.TEXT,
       allowNull: true
     },
     expires_in: {
