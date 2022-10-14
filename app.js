@@ -7,11 +7,18 @@ const cors = require("cors");
 const morgan = require("morgan");
 const http = require("http");
 const cron = require("node-cron");
+const path = require("path");
 
 const server = http.createServer(app);
 require("./config/database/connection");
 
 const Routes = require("./routes");
+// set up public folder
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "uploads")));
+// Static Files
+// dashboard
+app.use("/uploads", express.static(`${__dirname}/uploads`));
 
 app.use(morgan("combined"));
 

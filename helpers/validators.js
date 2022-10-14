@@ -17,6 +17,7 @@ const registerValidation = () => {
   return [
     check("name", "Name is required").notEmpty(),
     check("email", "Please use a valid Email").isEmail(),
+    check("userType", "Enter The user type").notEmpty(),
     check(
       "password",
       "Please enter a password with 5 or more characters"
@@ -34,24 +35,22 @@ const loginValidation = () => {
   ];
 };
 
-const thriftGroupValidation = () => {
+const resetPasswordValidation = () => {
   return [
-    check("name", "Name is required").notEmpty(),
-    check("description", "Description is required").notEmpty(),
-    check("startAmount", "startAmount is required").isNumeric(),
-    check("capacity", "maximum capacity is required").isNumeric(),
-    check("isSearchAble", " Is Group searchable?").isBoolean()
+    check("email", "Please use a valid Email").isEmail(),
+    check("token", "Reset tooken is required").notEmpty(),
+    check(
+      "password",
+      "Please enter a password with 5 or more characters"
+    ).isLength({ min: 5 })
   ];
 };
 
-const joinGroupValidation = () => {
-  return [check("groupId", "Group Id is required").isUUID()];
-};
-
-const invitationValidation = () => {
+const changePasswordValidation = () => {
   return [
-    check("groupId", "Group Id is required").isUUID(),
-    check("email", "Email is required").isEmail()
+    check("oldPassword", "Please enter the Old Password").notEmpty(),
+    check("newPassword", "Please enter new Password").notEmpty(),
+    check("confirmPassword", "Confirm new Password").notEmpty()
   ];
 };
 
@@ -59,7 +58,6 @@ module.exports = {
   validate,
   registerValidation,
   loginValidation,
-  thriftGroupValidation,
-  joinGroupValidation,
-  invitationValidation
+  resetPasswordValidation,
+  changePasswordValidation
 };

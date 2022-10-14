@@ -56,9 +56,9 @@ exports.createProfile = async (userData, transaction) => {
   return profile;
 };
 
-exports.updateUserProfile = async (userData, transaction) => {
+exports.updateUserProfile = async (userData, where, transaction) => {
   await Profile.update(userData, {
-    where: { id: userData.id },
+    where,
     transaction
   });
   return true;
@@ -93,4 +93,17 @@ exports.deleteBankDetails = async (data, transaction) => {
 exports.getBankDetails = async where => {
   const bank = await BankDetail.findOne({ where });
   return bank;
+};
+
+exports.validateUserType = type => {
+  const userType = [
+    "professional",
+    "vendor",
+    "private_client",
+    "corporate_client"
+  ];
+  if (!userType.includes(type)) {
+    return false;
+  }
+  return true;
 };

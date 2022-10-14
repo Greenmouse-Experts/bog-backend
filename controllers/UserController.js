@@ -13,6 +13,13 @@ exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { email, userType } = req.body;
+      const isUserType = UserService.validateUserType(userType);
+      if (!isUserType) {
+        return res.status(400).send({
+          success: false,
+          message: "Invalid User Entity passed"
+        });
+      }
       const user = await UserService.findUser({ email });
 
       if (user) {
@@ -39,7 +46,7 @@ exports.registerUser = async (req, res, next) => {
         };
         await UserService.createProfile(data, t);
       }
-      t.commit();
+      // t.commit();
       const token = randomstring.generate(24);
       const message = helpers.verifyEmailMessage(email, token);
       await EmailService.sendMail(email, message, "Verify Email");
@@ -72,6 +79,12 @@ exports.loginUser = async (req, res, next) => {
           message: "Invalid User"
         });
       }
+      if (!user.isActive) {
+        return res.status(400).send({
+          success: false,
+          message: "Please Verify account"
+        });
+      }
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(404).send({
@@ -90,7 +103,8 @@ exports.loginUser = async (req, res, next) => {
       return res.status(201).send({
         success: true,
         message: "User Logged In Sucessfully",
-        token
+        token,
+        user
       });
     } catch (error) {
       t.rollback();
@@ -162,6 +176,7 @@ exports.updateUserAccount = async (req, res, next) => {
           message: "Invalid user"
         });
       }
+      data.id = userId;
       await UserService.updateUser(data, t);
       return res.status(201).send({
         success: true,
@@ -179,6 +194,7 @@ exports.updateUserProfile = async (req, res, next) => {
     try {
       const data = req.body;
       const userId = req.user.id;
+      console.log(req.files);
       const user = await UserService.findUserById(userId);
       if (!user) {
         return res.status(404).send({
@@ -186,22 +202,35 @@ exports.updateUserProfile = async (req, res, next) => {
           message: "Invalid user"
         });
       }
-      // "professional",
-      //   "vendor",
-      //   "private_client",
-      //   "corporate_client"
       let requestData;
-      const { bankData } = req.body;
+      const bankData = {
+        bank_name: req.body.bank_name,
+        account_number: req.body.account_number,
+        account_name: req.body.account_name
+      };
+      const where = {
+        userId
+      };
       if (user.userType === "professional") {
+        let operation;
+        let professional;
+        for (let i = 0; i < req.files.length; i++) {
+          if (req.files[i].fieldname === "operation") {
+            operation = req.files[i].path;
+          }
+          if (req.files[i].fieldname === "professional") {
+            professional = req.files[i].path;
+          }
+        }
         requestData = {
           userId,
           company_name: data.company_name,
           company_address: data.company_address,
-          certificate_of_operation: data.operation,
-          professional_certificate: data.certificate,
+          certificate_of_operation: operation,
+          professional_certificate: professional,
           years_of_experience: data.years
         };
-        await UserService.updateUserProfile(requestData, t);
+        await UserService.updateUserProfile(requestData, where, t);
       } else if (
         user.userType === "vendor" ||
         user.userType === "corporate_client"
@@ -214,7 +243,7 @@ exports.updateUserProfile = async (req, res, next) => {
           cac_number: data.cac_number,
           years_of_experience: data.years
         };
-        await UserService.updateUserProfile(requestData, t);
+        await UserService.updateUserProfile(requestData, where, t);
       }
       bankData.userId = userId;
       const bank = await UserService.getBankDetails({ userId });
@@ -229,6 +258,7 @@ exports.updateUserProfile = async (req, res, next) => {
         message: "Profile Updated Successfully"
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -239,9 +269,9 @@ exports.changePassword = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { id } = req.user;
-      const { oldPassword, password, confirmPassword } = req.body;
-      if (password !== confirmPassword) {
-        return res.status(500).send({
+      const { oldPassword, newPassword, confirmPassword } = req.body;
+      if (newPassword !== confirmPassword) {
+        return res.status(400).send({
           success: false,
           message: "Passwords do not match"
         });
@@ -255,7 +285,7 @@ exports.changePassword = async (req, res, next) => {
           message: "Incorrect Old Password"
         });
       }
-      const currentPassword = bcrypt.hashSync(password, 10);
+      const currentPassword = bcrypt.hashSync(newPassword, 10);
       const data = {
         password: currentPassword,
         id
@@ -263,8 +293,7 @@ exports.changePassword = async (req, res, next) => {
       await UserService.updateUser(data, t);
       return res.status(200).send({
         success: true,
-        message: "Password Changed Successfully",
-        user
+        message: "Password Changed Successfully"
       });
     } catch (error) {
       t.rollback();
@@ -276,7 +305,7 @@ exports.changePassword = async (req, res, next) => {
 exports.forgotPassword = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { email } = req.body;
+      const { email } = req.params;
 
       const user = await UserService.findUser({ email });
       if (!user) {
