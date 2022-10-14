@@ -12,7 +12,7 @@ const EmailService = require("../service/emailService");
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { email, userType } = req.body;
+      const { email, userType, name } = req.body;
       const isUserType = UserService.validateUserType(userType);
       if (!isUserType) {
         return res.status(400).send({
@@ -48,7 +48,7 @@ exports.registerUser = async (req, res, next) => {
       }
       // t.commit();
       const token = randomstring.generate(24);
-      const message = helpers.verifyEmailMessage(email, token);
+      const message = helpers.verifyEmailMessage(name, email, token);
       await EmailService.sendMail(email, message, "Verify Email");
       const data = {
         token,
