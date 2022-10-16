@@ -461,6 +461,7 @@ const mobileVerifyMessage = (name, token) => {
   </div>
   </body>
   </html>`;
+  return message;
 };
 const generateMobileToken = () => Math.floor(Math.random() * 90000) + 10000;
 
