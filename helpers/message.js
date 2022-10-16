@@ -463,7 +463,7 @@ const mobileVerifyMessage = (name, token) => {
   </html>`;
   return message;
 };
-const generateMobileToken = () => Math.floor(Math.random() * 90000) + 10000;
+const generateMobileToken = () => Math.floor(Math.random() * 900000) + 100000;
 
 const generateWebToken = () => randomstring.generate(24);
 
