@@ -3,7 +3,6 @@ require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
-const randomstring = require("randomstring");
 const sequelize = require("../config/database/connection");
 const UserService = require("../service/UserService");
 const helpers = require("../helpers/message");
@@ -46,9 +45,14 @@ exports.registerUser = async (req, res, next) => {
         };
         await UserService.createProfile(data, t);
       }
-      // t.commit();
-      const token = randomstring.generate(24);
-      const message = helpers.verifyEmailMessage(name, email, token);
+
+      let token = helpers.generateWebToken();
+      let message = helpers.verifyEmailMessage(name, email, token);
+      if (req.body.platform === "mobile") {
+        token = helpers.generateMobileToken();
+        message = helpers.mobileVerifyMessage(name, token);
+      }
+
       await EmailService.sendMail(email, message, "Verify Email");
       const data = {
         token,
@@ -194,7 +198,6 @@ exports.updateUserProfile = async (req, res, next) => {
     try {
       const data = req.body;
       const userId = req.user.id;
-      console.log(req.files);
       const user = await UserService.findUserById(userId);
       if (!user) {
         return res.status(404).send({
@@ -258,7 +261,6 @@ exports.updateUserProfile = async (req, res, next) => {
         message: "Profile Updated Successfully"
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -315,8 +317,12 @@ exports.forgotPassword = async (req, res, next) => {
         });
       }
 
-      const token = randomstring.generate(24);
-      const message = helpers.resetPasswordMessage(email, token);
+      let token = helpers.generateWebToken();
+      let message = helpers.resetPasswordMessage(email, token);
+      if (req.body.platform === "mobile") {
+        token = helpers.generateMobileToken();
+        message = helpers.resetPasswordMobileMessage(token);
+      }
       await EmailService.sendMail(email, message, "Reset Password");
       const data = {
         token,
@@ -362,4 +368,41 @@ exports.resetPassword = async (req, res, next) => {
       return next(error);
     }
   });
+};
+
+exports.resendCode = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await UserService.findUser({ email });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User found with this email"
+      });
+    }
+
+    let token = helpers.generateWebToken();
+    let message = helpers.verifyEmailMessage(user.name, email, token);
+    if (req.body.platform === "mobile") {
+      token = helpers.generateMobileToken();
+      message = helpers.mobileVerifyMessage(user.name, token);
+    }
+
+    await EmailService.sendMail(email, message, "Verify Email");
+    const data = {
+      token,
+      id: user.id
+    };
+    await UserService.updateUser(data);
+
+    return res.status(200).send({
+      success: true,
+      message: "Token Sent check email or mobile number"
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error"
+    });
+  }
 };

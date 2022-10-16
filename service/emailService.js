@@ -18,7 +18,7 @@ exports.sendMail = async (email, message, subject) => {
       from: process.env.EMAIL_FROM, // sender address
       to: `${email}`, // list of receivers
       subject, // Subject line
-      text: "Esusu Confam LTD", // plain text body
+      text: "BOG LTD", // plain text body
       html: message // html body
     };
     transporter.sendMail(mailOptions, async (err, info) => {
