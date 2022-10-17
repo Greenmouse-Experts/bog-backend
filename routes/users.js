@@ -32,7 +32,7 @@ router.route("/user/me").get(Auth, UserController.getLoggedInUser);
 
 router.route("/user/verify").get(UserController.verifyUser);
 
-router.route("/user/forgot-password/:email").get(UserController.forgotPassword);
+router.route("/user/forgot-password").get(UserController.forgotPassword);
 
 router
   .route("/user/change-password")
