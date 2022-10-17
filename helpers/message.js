@@ -6,13 +6,13 @@ require("dotenv").config();
 
 const resetPasswordMessage = (email, token) => {
   const message = `<html>
-    <head>
-      <title>Reset Password link for BOG</title>
-    </head>
-    <body>
-    <p>You requested to change your password, please ignore If you didn't make the request</p>
-    <a style="width: 100px; background: #FFA73B; color: #fff; height: 50px; padding: 12px 20px; text-decoration: none; margin-top: 30px;" href='${process.env.SITE_URL}/resetpassword?email=${email}&token=${token}'>RESET PASSWORD</a>
-    </body>
+  <head>
+    <title>Reset Password link for BOG</title>
+  </head>
+  <body>
+  <p>You requested to change your password, please ignore If you didn't make the request</p>
+  <td align="center" style="Margin:0;padding-left:10px;padding-right:10px;padding-top:35px;padding-bottom:35px"><span class="es-button-border" style="border-style:solid;border-color:#3F79AD;background:1px;border-width:1px;display:inline-block;border-radius:2px;width:auto"><a href="${process.env.SITE_URL}/resetpassword?email=${email}&token=${token}" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:20px;border-style:solid;border-color:#3F79AD;border-width:15px 30px;display:inline-block;background:#3F79AD;border-radius:2px;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;font-weight:normal;font-style:normal;line-height:24px;width:auto;text-align:center">RESET PASSWORD</a></span></td>
+  </body>
 </html>`;
   return message;
 };
