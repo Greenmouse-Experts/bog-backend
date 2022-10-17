@@ -142,7 +142,7 @@ exports.getLoggedInUser = async (req, res) => {
 exports.verifyUser = async (req, res, next) => {
   sequelize.transaction(async transaction => {
     try {
-      const { email, token } = req.params;
+      const { email, token } = req.query;
       const user = await UserService.findUser({ email, token });
       if (!user) {
         return res.status(404).send({

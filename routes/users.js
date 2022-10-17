@@ -30,7 +30,7 @@ router
 
 router.route("/user/me").get(Auth, UserController.getLoggedInUser);
 
-router.route("/user/verify/:email/:token").get(UserController.verifyUser);
+router.route("/user/verify").get(UserController.verifyUser);
 
 router.route("/user/forgot-password/:email").get(UserController.forgotPassword);
 
