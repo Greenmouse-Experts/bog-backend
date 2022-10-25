@@ -33,6 +33,33 @@ exports.getUserDetails = async where => {
   return user;
 };
 
+exports.getAllUsers = async where => {
+  const user = await User.findAll({
+    where,
+    attributes: {
+      exclude: ["password", "createdAt", "updatedAt", "deletedAt"]
+    },
+    order: [["createdAt", "DESC"]],
+    include: [
+      {
+        model: Profile,
+        as: "profile",
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "deletedAt"]
+        }
+      },
+      {
+        model: BankDetail,
+        as: "bank_detail",
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "deletedAt"]
+        }
+      }
+    ]
+  });
+  return user;
+};
+
 exports.findUserById = async id => {
   const user = await User.findByPk(id);
   return user;
@@ -100,7 +127,9 @@ exports.validateUserType = type => {
     "professional",
     "vendor",
     "private_client",
-    "corporate_client"
+    "corporate_client",
+    "admin",
+    "none"
   ];
   if (!userType.includes(type)) {
     return false;

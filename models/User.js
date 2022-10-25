@@ -43,7 +43,8 @@ const User = sequelise.define(
         "professional",
         "vendor",
         "private_client",
-        "corporate_client"
+        "corporate_client",
+        "admin"
       ),
       allowNull: true
     },
@@ -60,6 +61,14 @@ const User = sequelise.define(
       allowNull: true
     },
     street: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    level: {
+      type: Sequelize.INTEGER,
+      defaultValue: 1
+    },
+    photo: {
       type: Sequelize.STRING,
       allowNull: true
     }

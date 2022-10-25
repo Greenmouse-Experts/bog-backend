@@ -34,11 +34,13 @@ exports.registerUser = async (req, res, next) => {
         phone: req.body.phone,
         password: bcrypt.hashSync(req.body.password, 10),
         userType: req.body.userType,
-        address: req.body.address
+        address: req.body.address,
+        level: req.body.level
       };
 
       const newUser = await UserService.createNewUser(userData, t);
-      if (userType !== "private_client") {
+      const type = ["professional", "vendor", "corporate_client"];
+      if (type.includes(userType)) {
         const data = {
           userId: newUser.id,
           company_name: req.body.company_name
@@ -52,8 +54,9 @@ exports.registerUser = async (req, res, next) => {
         token = helpers.generateMobileToken();
         message = helpers.mobileVerifyMessage(name, token);
       }
-
-      await EmailService.sendMail(email, message, "Verify Email");
+      if (userType !== "admin") {
+        await EmailService.sendMail(email, message, "Verify Email");
+      }
       const data = {
         token,
         id: newUser.id
@@ -83,6 +86,12 @@ exports.loginUser = async (req, res, next) => {
           message: "Invalid User"
         });
       }
+      if (user.userType === "admin") {
+        return res.status(400).send({
+          success: false,
+          message: "This user is not available"
+        });
+      }
       if (!user.isActive) {
         return res.status(400).send({
           success: false,
@@ -102,11 +111,57 @@ exports.loginUser = async (req, res, next) => {
         }
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: 360000
+        expiresIn: 3600
       });
       return res.status(201).send({
         success: true,
         message: "User Logged In Sucessfully",
+        token,
+        user
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.loginAdmin = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { email, password } = req.body;
+      const user = await UserService.findUser({ email });
+
+      if (!user) {
+        return res.status(400).send({
+          success: false,
+          message: "Invalid User"
+        });
+      }
+      if (user.userType !== "admin") {
+        return res.status(400).send({
+          success: false,
+          message: "This Admin is not known"
+        });
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid User Details"
+        });
+      }
+      const payload = {
+        user: {
+          id: user.id
+        }
+      };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: 3600
+      });
+      return res.status(201).send({
+        success: true,
+        message: "Admin Logged In Sucessfully",
         token,
         user
       });
@@ -398,6 +453,37 @@ exports.resendCode = async (req, res) => {
     return res.status(200).send({
       success: true,
       message: "Token Sent check email or mobile number"
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error"
+    });
+  }
+};
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User Found"
+      });
+    }
+    if (user.level === 1) {
+      return res.status(401).send({
+        success: false,
+        message: "UnAuthorised access"
+      });
+    }
+    const where = {
+      level: 1
+    };
+    const users = await UserService.getAllUsers(where);
+    return res.status(200).send({
+      success: true,
+      users
     });
   } catch (error) {
     return res.status(500).send({

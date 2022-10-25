@@ -28,6 +28,10 @@ router
   .route("/user/login")
   .post(loginValidation(), validate, UserController.loginUser);
 
+router
+  .route("/admin/login")
+  .post(loginValidation(), validate, UserController.loginAdmin);
+
 router.route("/user/me").get(Auth, UserController.getLoggedInUser);
 
 router.route("/user/verify").get(UserController.verifyUser);
@@ -54,5 +58,7 @@ router
 router
   .route("/user/update-profile")
   .patch(Auth, upload.any(), UserController.updateUserProfile);
+
+router.route("/all/users").get(Auth, UserController.getAllUsers);
 
 module.exports = router;
