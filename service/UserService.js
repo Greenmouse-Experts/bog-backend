@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Profile = require("../models/UserProfile");
 const BankDetail = require("../models/BankDetail");
+const Referral = require("../models/Referral");
 
 exports.findUser = async where => {
   const user = await User.findOne({ where });
@@ -135,4 +136,35 @@ exports.validateUserType = type => {
     return false;
   }
   return true;
+};
+
+exports.createReferral = async (data, transaction) => {
+  const reference = await Referral.create(data, { transaction });
+  return reference;
+};
+
+exports.updateReferral = async (data, transaction) => {
+  await Referral.update(data, {
+    where: { id: data.id },
+    transaction
+  });
+  return true;
+};
+
+exports.deleteReferral = async (data, transaction) => {
+  await Referral.update(data, {
+    where: { id: data.id },
+    transaction
+  });
+  return true;
+};
+
+exports.findReferral = async where => {
+  const referral = await Referral.findOne({ where });
+  return referral;
+};
+
+exports.getReferrals = async where => {
+  const referrals = await Referral.findAll({ where });
+  return referrals;
 };

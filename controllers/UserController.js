@@ -2,6 +2,7 @@
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const randomstring = require("randomstring");
 const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
 const UserService = require("../service/UserService");
@@ -35,10 +36,28 @@ exports.registerUser = async (req, res, next) => {
         password: bcrypt.hashSync(req.body.password, 10),
         userType: req.body.userType,
         address: req.body.address,
-        level: req.body.level
+        level: req.body.level,
+        referralId: randomstring.generate(12)
       };
 
       const newUser = await UserService.createNewUser(userData, t);
+
+      // check if refferalId was passed
+      if (req.body.reference && req.body.reference !== "") {
+        const where = {
+          referralId: {
+            [Op.eq]: req.body.reference
+          }
+        };
+        const reference = await UserService.findUser(where);
+        if (reference) {
+          const referenceData = {
+            userId: reference.id,
+            referredId: newUser.id
+          };
+          await UserService.createReferral(referenceData, t);
+        }
+      }
       const type = ["professional", "vendor", "corporate_client"];
       if (type.includes(userType)) {
         const data = {

@@ -3,6 +3,7 @@ const sequelise = require("../config/database/connection");
 const BankDetail = require("./BankDetail");
 const UserConnector = require("./UserConnector");
 const UserProfile = require("./UserProfile");
+const Referral = require("./Referral");
 
 const User = sequelise.define(
   "users",
@@ -71,6 +72,22 @@ const User = sequelise.define(
     photo: {
       type: Sequelize.STRING,
       allowNull: true
+    },
+    fname: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    lname: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    referralId: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    aboutUs: {
+      type: Sequelize.STRING,
+      allowNull: true
     }
   },
   { paranoid: true }
@@ -93,6 +110,20 @@ User.hasOne(UserProfile, {
 User.hasMany(UserConnector, {
   foreignKey: "userId",
   as: "connectors",
+  onDelete: "cascade",
+  hooks: true
+});
+
+User.hasMany(Referral, {
+  foreignKey: "userId",
+  as: "referrals",
+  onDelete: "cascade",
+  hooks: true
+});
+
+User.belongsTo(Referral, {
+  foreignKey: "referredId",
+  as: "referred",
   onDelete: "cascade",
   hooks: true
 });
