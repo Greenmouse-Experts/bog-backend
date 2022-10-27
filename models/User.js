@@ -121,7 +121,7 @@ User.hasMany(Referral, {
   hooks: true
 });
 
-User.belongsTo(Referral, {
+Referral.belongsTo(User, {
   foreignKey: "referredId",
   as: "referred",
   onDelete: "cascade",

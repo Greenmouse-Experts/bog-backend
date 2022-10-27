@@ -37,7 +37,8 @@ exports.registerUser = async (req, res, next) => {
         userType: req.body.userType,
         address: req.body.address,
         level: req.body.level,
-        referralId: randomstring.generate(12)
+        referralId: randomstring.generate(12),
+        aboutUs: req.body.aboutUs
       };
 
       const newUser = await UserService.createNewUser(userData, t);
