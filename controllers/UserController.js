@@ -40,6 +40,8 @@ exports.registerUser = async (req, res, next) => {
 
       const userData = {
         name: req.body.name,
+        fname: req.body.fname,
+        lname: req.body.lname,
         email: req.body.email,
         phone: req.body.phone,
         password: bcrypt.hashSync(req.body.password, 10),
