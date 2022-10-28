@@ -1,3 +1,5 @@
+require("dotenv").config();
+const axios = require("axios");
 const User = require("../models/User");
 const Profile = require("../models/UserProfile");
 const BankDetail = require("../models/BankDetail");
@@ -167,4 +169,19 @@ exports.findReferral = async where => {
 exports.getReferrals = async where => {
   const referrals = await Referral.findAll({ where });
   return referrals;
+};
+
+exports.validateCaptcha = async captcha => {
+  try {
+    // req.connection.remoteAddress
+    const url = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.GOOGLE_CAPTCHA_SECRET}&response=${captcha}`;
+    const response = await axios.post(url);
+    console.log(response.data);
+    if (!response.data.success || response.data.success !== true) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
 };
