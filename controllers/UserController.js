@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
@@ -13,15 +14,17 @@ exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { email, userType, name, captcha } = req.body;
-      const validateCaptcha = await UserService.validateCaptcha(captcha);
-      // return res.send({ validateCaptcha });
-      if (!validateCaptcha) {
-        return res.status(400).send({
-          success: false,
-          message: "Please answer the captcha correctly",
-          validateCaptcha
-        });
+      if (!req.body.platform) {
+        const validateCaptcha = await UserService.validateCaptcha(captcha);
+        if (!validateCaptcha) {
+          return res.status(400).send({
+            success: false,
+            message: "Please answer the captcha correctly",
+            validateCaptcha
+          });
+        }
       }
+
       const isUserType = UserService.validateUserType(userType);
       if (!isUserType) {
         return res.status(400).send({
