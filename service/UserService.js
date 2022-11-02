@@ -176,7 +176,6 @@ exports.validateCaptcha = async captcha => {
     // req.connection.remoteAddress
     const url = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.GOOGLE_CAPTCHA_SECRET}&response=${captcha}`;
     const response = await axios.post(url);
-    console.log(response.data);
     if (!response.data.success || response.data.success !== true) {
       return false;
     }

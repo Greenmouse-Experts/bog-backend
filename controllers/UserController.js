@@ -269,6 +269,9 @@ exports.updateUserAccount = async (req, res, next) => {
           message: "Invalid user"
         });
       }
+      if (req.file) {
+        data.photo = req.file.path;
+      }
       data.id = userId;
       await UserService.updateUser(data, t);
       return res.status(201).send({
