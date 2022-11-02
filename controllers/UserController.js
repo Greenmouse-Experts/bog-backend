@@ -145,7 +145,7 @@ exports.loginUser = async (req, res, next) => {
         }
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: 3600
+        expiresIn: 36000
       });
       return res.status(201).send({
         success: true,
