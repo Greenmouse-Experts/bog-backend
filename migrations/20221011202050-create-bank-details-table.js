@@ -14,14 +14,17 @@ module.exports = {
       },
       account_number: {
         type: Sequelize.STRING,
-        allowNull: true,
-        unique: true
+        allowNull: true
       },
       account_name: {
         type: Sequelize.STRING,
         allowNull: true
       },
       bank_name: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      bank_code: {
         type: Sequelize.STRING,
         allowNull: true
       },

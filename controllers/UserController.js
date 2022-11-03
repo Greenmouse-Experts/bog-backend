@@ -297,12 +297,7 @@ exports.updateUserProfile = async (req, res, next) => {
           message: "Invalid user"
         });
       }
-      let requestData;
-      const bankData = {
-        bank_name: req.body.bank_name,
-        account_number: req.body.account_number,
-        account_name: req.body.account_name
-      };
+
       const where = {
         userId
       };
@@ -317,7 +312,7 @@ exports.updateUserProfile = async (req, res, next) => {
             professional = req.files[i].path;
           }
         }
-        requestData = {
+        const requestData = {
           userId,
           company_name: data.company_name,
           company_address: data.company_address,
@@ -330,7 +325,7 @@ exports.updateUserProfile = async (req, res, next) => {
         user.userType === "vendor" ||
         user.userType === "corporate_client"
       ) {
-        requestData = {
+        const requestData = {
           userId,
           company_name: data.company_name,
           company_address: data.company_address,
@@ -339,13 +334,6 @@ exports.updateUserProfile = async (req, res, next) => {
           years_of_experience: data.years
         };
         await UserService.updateUserProfile(requestData, where, t);
-      }
-      bankData.userId = userId;
-      const bank = await UserService.getBankDetails({ userId });
-      if (bank) {
-        await UserService.updateBankDetails(bankData, t);
-      } else {
-        await UserService.createBankDetails(bankData, t);
       }
 
       return res.status(201).send({
@@ -374,7 +362,7 @@ exports.changePassword = async (req, res, next) => {
       const user = await UserService.findUserById(id);
 
       if (!bcrypt.compareSync(oldPassword, user.password)) {
-        return res.status(500).send({
+        return res.status(400).send({
           success: false,
           message: "Incorrect Old Password"
         });
