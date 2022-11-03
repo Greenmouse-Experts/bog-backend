@@ -57,6 +57,7 @@ const changePasswordValidation = () => {
 const bankValidation = () => {
   return [
     check("bank_code", "Please Select a bank").notEmpty(),
+    check("bank_name", "Please Select a bank").notEmpty(),
     check("account_number", "Please enter Account number").notEmpty(),
     check("account_name", "Please enter Account name").notEmpty()
   ];

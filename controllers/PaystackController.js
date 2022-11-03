@@ -40,10 +40,10 @@ exports.saveBankDetail = async (req, res, next) => {
         account_number,
         bank_code
       );
-      if (!response.status) {
+      if (response.status === false) {
         return res.status(400).json({
           success: false,
-          message: "Account not valid"
+          message: response.message || "Bank Account not valid"
         });
       }
       const data = {

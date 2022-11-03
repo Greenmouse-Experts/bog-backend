@@ -15,9 +15,12 @@ const Service = {
         // console.log(res.data);
         return res.data;
       } catch (error) {
-        const externalError = new Error(error.response.data.message);
+        console.log(error.response.data);
+        const err = error.response.data;
+        const externalError = new Error(err);
         externalError.status = error.response.status;
-        throw externalError;
+        return err;
+        // throw externalError;
       }
     }
     // async createTransferReceipt(accountName, accountNumber, bankCode) {
