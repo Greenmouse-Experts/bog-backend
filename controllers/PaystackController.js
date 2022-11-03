@@ -69,3 +69,27 @@ exports.saveBankDetail = async (req, res, next) => {
     }
   });
 };
+
+exports.getBankDetail = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const userId = req.user.id;
+
+      const bankData = await BankDetail.findOne({ where: { userId } });
+      if (!bankData) {
+        return res.status(400).send({
+          success: false,
+          data: null,
+          message: "No bank saved for this user"
+        });
+      }
+      return res.status(201).send({
+        success: true,
+        data: bankData
+      });
+    } catch (error) {
+      t.rollback(next);
+      return next(error);
+    }
+  });
+};

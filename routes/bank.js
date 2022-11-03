@@ -8,6 +8,8 @@ const { validate, bankValidation } = require("../helpers/validators");
 
 router.route("/bank/allbanks").get(PaystackController.getBanks);
 
+router.route("/bank/get-bank").get(Auth, PaystackController.getBankDetail);
+
 router
   .route("/bank/save-bank")
   .post(bankValidation(), validate, Auth, PaystackController.saveBankDetail);

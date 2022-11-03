@@ -147,11 +147,12 @@ exports.loginUser = async (req, res, next) => {
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: 36000
       });
+      const data = await UserService.getUserDetails({ id: user.id });
       return res.status(201).send({
         success: true,
         message: "User Logged In Sucessfully",
         token,
-        user
+        user: data
       });
     } catch (error) {
       t.rollback();
