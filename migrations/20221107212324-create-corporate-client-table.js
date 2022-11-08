@@ -15,7 +15,7 @@ module.exports = {
       userType: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: "service_partner"
+        defaultValue: "corporate_client"
       },
       isVerified: {
         type: Sequelize.BOOLEAN,

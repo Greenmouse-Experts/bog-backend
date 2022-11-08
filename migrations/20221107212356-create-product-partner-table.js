@@ -12,6 +12,16 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false
       },
+      userType: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: "product_partner"
+      },
+      isVerified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+        defaultValue: false
+      },
       company_address: {
         type: Sequelize.STRING,
         allowNull: true
