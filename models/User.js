@@ -4,6 +4,10 @@ const BankDetail = require("./BankDetail");
 const UserConnector = require("./UserConnector");
 const UserProfile = require("./UserProfile");
 const Referral = require("./Referral");
+const PrivateClient = require("./PrivateClient");
+const CorporateClient = require("./CorporateClient");
+const ServicePartner = require("./ServicePartner");
+const ProductPartner = require("./ProductPartner");
 
 const User = sequelise.define(
   "users",
@@ -103,6 +107,34 @@ User.hasOne(BankDetail, {
 User.hasOne(UserProfile, {
   foreignKey: "userId",
   as: "profile",
+  onDelete: "cascade",
+  hooks: true
+});
+
+User.hasOne(PrivateClient, {
+  foreignKey: "userId",
+  as: "private_client",
+  onDelete: "cascade",
+  hooks: true
+});
+
+User.hasOne(CorporateClient, {
+  foreignKey: "userId",
+  as: "corporate_client",
+  onDelete: "cascade",
+  hooks: true
+});
+
+User.hasOne(ServicePartner, {
+  foreignKey: "userId",
+  as: "service_partner",
+  onDelete: "cascade",
+  hooks: true
+});
+
+User.hasOne(ProductPartner, {
+  foreignKey: "userId",
+  as: "product_partner",
   onDelete: "cascade",
   hooks: true
 });

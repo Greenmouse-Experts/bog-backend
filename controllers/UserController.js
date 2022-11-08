@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
@@ -9,6 +10,10 @@ const sequelize = require("../config/database/connection");
 const UserService = require("../service/UserService");
 const helpers = require("../helpers/message");
 const EmailService = require("../service/emailService");
+const ServicePartner = require("../models/ServicePartner");
+const ProductPartner = require("../models/ProductPartner");
+const PrivateClient = require("../models/PrivateClient");
+const CorporateClient = require("../models/CorporateClient");
 
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -32,70 +37,95 @@ exports.registerUser = async (req, res, next) => {
           message: "Invalid User Entity passed"
         });
       }
-      const user = await UserService.findUser({ email });
+      let user = await UserService.findUser({ email });
 
-      if (user) {
-        return res.status(400).send({
-          success: false,
-          message: "This Email is already in Use"
-        });
-      }
-
-      const userData = {
-        name: req.body.name,
-        fname: req.body.fname,
-        lname: req.body.lname,
-        email: req.body.email,
-        phone: req.body.phone,
-        password: bcrypt.hashSync(req.body.password, 10),
-        userType: req.body.userType,
-        address: req.body.address,
-        level: req.body.level,
-        referralId: randomstring.generate(12),
-        aboutUs: req.body.aboutUs
-      };
-
-      const newUser = await UserService.createNewUser(userData, t);
-
-      // check if refferalId was passed
-      if (req.body.reference && req.body.reference !== "") {
-        const where = {
-          referralId: {
-            [Op.eq]: req.body.reference
-          }
+      if (!user) {
+        const userData = {
+          name: req.body.name,
+          fname: req.body.fname,
+          lname: req.body.lname,
+          email: req.body.email,
+          phone: req.body.phone,
+          password: bcrypt.hashSync(req.body.password, 10),
+          userType: req.body.userType,
+          address: req.body.address,
+          level: req.body.level,
+          referralId: randomstring.generate(12),
+          aboutUs: req.body.aboutUs
         };
-        const reference = await UserService.findUser(where);
-        if (reference) {
-          const referenceData = {
-            userId: reference.id,
-            referredId: newUser.id
+
+        user = await UserService.createNewUser(userData, t);
+        let token = helpers.generateWebToken();
+        let message = helpers.verifyEmailMessage(name, email, token);
+        if (req.body.platform === "mobile") {
+          token = helpers.generateMobileToken();
+          message = helpers.mobileVerifyMessage(name, token);
+        }
+        if (userType !== "admin") {
+          await EmailService.sendMail(email, message, "Verify Email");
+        }
+        const data = {
+          token,
+          id: user.id
+        };
+        await UserService.updateUser(data, t);
+        // check if refferalId was passed
+        if (req.body.reference && req.body.reference !== "") {
+          const where = {
+            referralId: {
+              [Op.eq]: req.body.reference
+            }
           };
-          await UserService.createReferral(referenceData, t);
+          const reference = await UserService.findUser(where);
+          if (reference) {
+            const referenceData = {
+              userId: reference.id,
+              referredId: user.id
+            };
+            await UserService.createReferral(referenceData, t);
+          }
+        }
+        const isUser = await this.checkIfAccountExist(userType, user.id);
+        if (isUser) {
+          return res.status(400).send({
+            success: false,
+            message: "This Email is already in Use for this user entity"
+          });
+        }
+        if (userType !== "admin" || userType !== "other") {
+          const request = {
+            userId: user.id,
+            userType,
+            company_name: req.body.company_name
+          };
+          const result = await this.addUserProfile(request, t);
+        }
+      } else {
+        const isUser = await this.checkIfAccountExist(userType, user.id);
+        if (isUser) {
+          return res.status(400).send({
+            success: false,
+            message: "This Email is already in Use for this user entity"
+          });
+        }
+        if (userType !== "admin" || userType !== "other") {
+          const request = {
+            userId: user.id,
+            userType,
+            company_name: req.body.company_name
+          };
+          const result = await this.addUserProfile(request, t);
         }
       }
+
       const type = ["professional", "vendor", "corporate_client"];
       if (type.includes(userType)) {
         const data = {
-          userId: newUser.id,
+          userId: user.id,
           company_name: req.body.company_name
         };
         await UserService.createProfile(data, t);
       }
-
-      let token = helpers.generateWebToken();
-      let message = helpers.verifyEmailMessage(name, email, token);
-      if (req.body.platform === "mobile") {
-        token = helpers.generateMobileToken();
-        message = helpers.mobileVerifyMessage(name, token);
-      }
-      if (userType !== "admin") {
-        await EmailService.sendMail(email, message, "Verify Email");
-      }
-      const data = {
-        token,
-        id: newUser.id
-      };
-      await UserService.updateUser(data, t);
 
       return res.status(201).send({
         success: true,
@@ -517,4 +547,62 @@ exports.getAllUsers = async (req, res) => {
       message: "Server Error"
     });
   }
+};
+
+exports.addUserProfile = async (data, t) => {
+  try {
+    const { userType, userId, company_name } = data;
+    const where = {
+      userId
+    };
+    if (userType === "professional") {
+      const request = {
+        userId,
+        company_name,
+        userType: "service_partner"
+      };
+      await ServicePartner.create(request, { transaction: t });
+    } else if (userType === "vendor") {
+      const request = {
+        userId,
+        company_name,
+        userType: "product_partner"
+      };
+      await ProductPartner.create(request, { transaction: t });
+    } else if (userType === "private_client") {
+      const request = {
+        userId,
+        userType: "private_client"
+      };
+      await PrivateClient.create(request, { transaction: t });
+    } else if (userType === "corporate_client") {
+      const request = {
+        userId,
+        company_name,
+        userType: "corporate_client"
+      };
+      await CorporateClient.create(request, { transaction: t });
+    }
+    return true;
+  } catch (error) {
+    t.rollback();
+    return error;
+  }
+};
+
+exports.checkIfAccountExist = async (userType, userId) => {
+  const where = {
+    userId
+  };
+  let user;
+  if (userType === "professional") {
+    user = await ServicePartner.findOne({ where });
+  } else if (userType === "vendor") {
+    user = await ProductPartner.findOne({ where });
+  } else if (userType === "private_client") {
+    user = await PrivateClient.findOne({ where });
+  } else if (userType === "corporate_client") {
+    user = await CorporateClient.findOne({ where });
+  }
+  return user;
 };
