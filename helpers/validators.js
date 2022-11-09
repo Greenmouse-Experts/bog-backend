@@ -63,11 +63,16 @@ const bankValidation = () => {
   ];
 };
 
+const categoryValidation = () => {
+  return [check("name", "Please Enter category name").notEmpty()];
+};
+
 module.exports = {
   validate,
   registerValidation,
   loginValidation,
   resetPasswordValidation,
   changePasswordValidation,
-  bankValidation
+  bankValidation,
+  categoryValidation
 };
