@@ -83,9 +83,23 @@ exports.getSimilarProducts = async (req, res, next) => {
 exports.getAllCategories = async (req, res, next) => {
   try {
     const categories = await Category.findAll();
+    const data = await Promise.all(
+      categories.map(async category => {
+        const where = {
+          categoryId: category.id
+        };
+        const count = await Product.count({ where });
+        return {
+          id: category.id,
+          name: category.name,
+          description: category.description,
+          totalProducts: count
+        };
+      })
+    );
     return res.status(200).send({
       success: true,
-      data: categories
+      data
     });
   } catch (error) {
     return next(error);
