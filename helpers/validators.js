@@ -67,6 +67,20 @@ const categoryValidation = () => {
   return [check("name", "Please Enter category name").notEmpty()];
 };
 
+const productValidation = () => {
+  return [
+    check("categoryId", "Please Select the category of product").isUUID(),
+    check("name", "Please Enter a name").notEmpty(),
+    check("description", "Please Enter a description").notEmpty(),
+    check("price", "Please enter the product price").isNumeric(),
+    check("quantity", "Please enter the quanity available").isNumeric(),
+    check(
+      "unit",
+      "Please enter the unit measurement for this product"
+    ).notEmpty()
+  ];
+};
+
 module.exports = {
   validate,
   registerValidation,
@@ -74,5 +88,6 @@ module.exports = {
   resetPasswordValidation,
   changePasswordValidation,
   bankValidation,
-  categoryValidation
+  categoryValidation,
+  productValidation
 };

@@ -1,5 +1,7 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const ProductCategory = require("./ProductCategory");
+const ProductImage = require("./ProductImage");
 
 const Product = sequelise.define(
   "products",
@@ -13,6 +15,10 @@ const Product = sequelise.define(
     name: {
       allowNull: true,
       type: Sequelize.STRING
+    },
+    description: {
+      allowNull: true,
+      type: Sequelize.TEXT
     },
     categoryId: {
       type: Sequelize.UUID,
@@ -37,9 +43,31 @@ const Product = sequelise.define(
     image: {
       allowNull: true,
       type: Sequelize.STRING
+    },
+    showInShop: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
+    },
+    status: {
+      allowNull: true,
+      type: Sequelize.ENUM,
+      values: ["draft", "pending", "in_review", "approved", "disapproved"],
+      defaultValue: "pending"
     }
   },
   { paranoid: true }
 );
+
+Product.hasMany(ProductImage, {
+  foreignKey: "productId",
+  as: "product_image",
+  onDelete: "cascade",
+  hooks: true
+});
+
+Product.belongsTo(ProductCategory, {
+  foreignKey: "categoryId",
+  as: "category"
+});
 
 module.exports = Product;

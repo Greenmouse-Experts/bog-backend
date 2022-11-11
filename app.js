@@ -6,8 +6,9 @@ const app = express();
 const cors = require("cors");
 const morgan = require("morgan");
 const http = require("http");
-const cron = require("node-cron");
+// const cron = require("node-cron");
 const path = require("path");
+const bodyParser = require("body-parser");
 
 const server = http.createServer(app);
 require("./config/database/connection");
@@ -23,11 +24,14 @@ app.use("/uploads", express.static(`${__dirname}/uploads`));
 app.use(morgan("combined"));
 
 app.use(cors());
+// body parse
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.raw({}));
 app.use(express.json());
-
 app.use(
   express.urlencoded({
-    extended: false
+    extended: true
   })
 );
 

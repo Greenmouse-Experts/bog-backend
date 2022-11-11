@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const table = await queryInterface.createTable("products", {
+    const table = await queryInterface.createTable("product_images", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -12,11 +12,7 @@ module.exports = {
         allowNull: true,
         type: Sequelize.STRING
       },
-      description: {
-        allowNull: true,
-        type: Sequelize.TEXT
-      },
-      categoryId: {
+      productId: {
         type: Sequelize.UUID,
         allowNull: true
       },
@@ -24,31 +20,9 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: true
       },
-      price: {
-        allowNull: true,
-        type: Sequelize.DECIMAL
-      },
-      quantity: {
-        allowNull: true,
-        type: Sequelize.DECIMAL
-      },
-      unit: {
-        allowNull: true,
-        type: Sequelize.STRING
-      },
       image: {
         allowNull: true,
         type: Sequelize.STRING
-      },
-      showInShop: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
-      },
-      status: {
-        allowNull: true,
-        type: Sequelize.ENUM,
-        values: ["draft", "pending", "in_review", "approved", "disapproved"],
-        defaultValue: "pending"
       },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE },
@@ -58,6 +32,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("products");
+    return queryInterface.dropTable("product_images");
   }
 };
