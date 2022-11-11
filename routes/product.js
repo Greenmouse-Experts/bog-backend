@@ -8,8 +8,15 @@ const ProductController = require("../controllers/ProductContoller");
 const {
   validate,
   categoryValidation,
-  productValidation
+  productValidation,
+  productApprovalValidation
 } = require("../helpers/validators");
+
+router.route("/products/all").get(ProductController.getProducts);
+
+router
+  .route("/products/similar-products")
+  .get(ProductController.getSimilarProducts);
 
 router
   .route("/product/category")
@@ -25,8 +32,8 @@ router
 router
   .route("/products")
   .post(
-    // productValidation(),
-    // validate,
+    productValidation(),
+    validate,
     Auth,
     upload.array("photos", 5),
     ProductController.createProduct
@@ -38,5 +45,23 @@ router
   .patch(Auth, upload.array("photos", 5), ProductController.updateProduct)
   .delete(Auth, ProductController.deleteProduct)
   .get(ProductController.getSingleProducts);
+
+router
+  .route("/product/add-to-shop/:productId")
+  .patch(Auth, ProductController.addProductToShop);
+
+// Admin routes
+router
+  .route("/product/admin/get-products")
+  .get(Auth, ProductController.getProductsForAdmin);
+
+router
+  .route("/product/admin/approve-product")
+  .post(
+    productApprovalValidation(),
+    validate,
+    Auth,
+    ProductController.approveProduct
+  );
 
 module.exports = router;

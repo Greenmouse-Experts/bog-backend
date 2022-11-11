@@ -81,6 +81,13 @@ const productValidation = () => {
   ];
 };
 
+const productApprovalValidation = () => {
+  return [
+    check("productId", "Product id is required").isUUID(),
+    check("status", "Please approval status").notEmpty()
+  ];
+};
+
 module.exports = {
   validate,
   registerValidation,
@@ -89,5 +96,6 @@ module.exports = {
   changePasswordValidation,
   bankValidation,
   categoryValidation,
-  productValidation
+  productValidation,
+  productApprovalValidation
 };

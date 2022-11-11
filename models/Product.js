@@ -2,6 +2,7 @@ const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
 const ProductCategory = require("./ProductCategory");
 const ProductImage = require("./ProductImage");
+const User = require("./User");
 
 const Product = sequelise.define(
   "products",
@@ -68,6 +69,18 @@ Product.hasMany(ProductImage, {
 Product.belongsTo(ProductCategory, {
   foreignKey: "categoryId",
   as: "category"
+});
+
+Product.belongsTo(User, {
+  foreignKey: "creatorId",
+  as: "creator"
+});
+
+User.hasMany(Product, {
+  foreignKey: "creatorId",
+  as: "products",
+  onDelete: "cascade",
+  hooks: true
 });
 
 module.exports = Product;
