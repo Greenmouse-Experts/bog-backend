@@ -201,6 +201,7 @@ exports.createProduct = async (req, res, next) => {
     try {
       const { categoryId, name, price, quantity, unit, description } = req.body;
       const creatorId = req.user.id;
+      console.log(req.files);
       const request = {
         categoryId,
         name,
@@ -240,6 +241,7 @@ exports.createProduct = async (req, res, next) => {
         data: product
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -262,7 +264,7 @@ exports.updateProduct = async (req, res, next) => {
         });
       }
 
-      if (req.files) {
+      if (req.files.length > 0) {
         const photos = [];
         for (let i = 0; i < req.files.length; i++) {
           photos.push({
@@ -285,15 +287,38 @@ exports.updateProduct = async (req, res, next) => {
       }
 
       await Product.update(request, {
+        where: { id: productId }
+        // transaction: t
+      });
+
+      const result = await Product.findOne({
         where: { id: productId },
-        transaction: t
+        include: [
+          {
+            model: User,
+            as: "creator",
+            attributes: ["id", "name", "email", "phone", "photo"]
+          },
+          {
+            model: Category,
+            as: "category",
+            attributes: ["id", "name", "description"]
+          },
+          {
+            model: ProductImage,
+            as: "product_image",
+            attributes: ["id", "name", "image"]
+          }
+        ]
       });
 
       return res.status(200).send({
         success: true,
-        message: "Product updated successfully"
+        message: "Product updated successfully",
+        data: result
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -339,6 +364,11 @@ exports.getSingleProducts = async (req, res, next) => {
     const product = await Product.findOne({
       where: { id: req.params.productId },
       include: [
+        {
+          model: User,
+          as: "creator",
+          attributes: ["id", "name", "email", "phone", "photo"]
+        },
         {
           model: Category,
           as: "category",
@@ -439,7 +469,11 @@ exports.addProductToShop = async (req, res, next) => {
 exports.getProductsForAdmin = async (req, res, next) => {
   try {
     const where = {
-      status: "in_review"
+      [Op.or]: [
+        { status: "in_review" },
+        { status: "approved" },
+        { status: "disapproved" }
+      ]
     };
     if (req.query.status) {
       where.status = req.query.status;

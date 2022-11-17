@@ -88,6 +88,13 @@ const productApprovalValidation = () => {
   ];
 };
 
+const orderValidation = () => {
+  return [
+    check("products", "Product is required").isArray(),
+    check("shippingAddress", "Shipping address is required").notEmpty(),
+  ];
+};
+
 module.exports = {
   validate,
   registerValidation,
@@ -97,5 +104,6 @@ module.exports = {
   bankValidation,
   categoryValidation,
   productValidation,
-  productApprovalValidation
+  productApprovalValidation,
+  orderValidation
 };

@@ -32,17 +32,17 @@ router
 router
   .route("/products")
   .post(
-    productValidation(),
-    validate,
+    // productValidation(),
+    // validate,
     Auth,
-    upload.array("photos", 5),
+    upload.any(),
     ProductController.createProduct
   )
   .get(Auth, ProductController.getAllProducts);
 
 router
   .route("/product/:productId")
-  .patch(Auth, upload.array("photos", 5), ProductController.updateProduct)
+  .patch(Auth, upload.any(), ProductController.updateProduct)
   .delete(Auth, ProductController.deleteProduct)
   .get(ProductController.getSingleProducts);
 
