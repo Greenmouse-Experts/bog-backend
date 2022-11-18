@@ -30,7 +30,7 @@ router
 
 router.route("/user/switch-account").post(Auth, UserController.switchAccount);
 
-router.route("/user/get-accounts").get(Auth, UserController.switchAccount);
+router.route("/user/get-accounts").get(Auth, UserController.getAccounts);
 
 router
   .route("/admin/login")

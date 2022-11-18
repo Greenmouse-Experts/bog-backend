@@ -1,3 +1,4 @@
+/* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable camelcase */
 /* eslint-disable no-plusplus */
@@ -304,7 +305,7 @@ exports.switchAccount = async (req, res, next) => {
   });
 };
 
-exports.switchAccount = async (req, res, next) => {
+exports.getAccounts = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const userId = req.user.id;
@@ -327,16 +328,19 @@ exports.switchAccount = async (req, res, next) => {
           attributes
         })
       };
+      const data = [];
       for (const key in accounts) {
         if (accounts[key] === null || accounts[key] === undefined) {
           delete accounts[key];
         }
+        data.push(accounts[key]);
       }
+      const filtered = data.filter(where => where != null);
 
       return res.status(201).send({
         success: true,
         message: "User Logged In Sucessfully",
-        accounts
+        accounts: filtered
       });
     } catch (error) {
       t.rollback();
