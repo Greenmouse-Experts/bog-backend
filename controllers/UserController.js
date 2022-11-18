@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable camelcase */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-unused-vars */
@@ -14,21 +15,23 @@ const ServicePartner = require("../models/ServicePartner");
 const ProductPartner = require("../models/ProductPartner");
 const PrivateClient = require("../models/PrivateClient");
 const CorporateClient = require("../models/CorporateClient");
+const BankDetail = require("../models/BankDetail");
+const User = require("../models/User");
 
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { email, userType, name, captcha } = req.body;
-      if (!req.body.platform) {
-        const validateCaptcha = await UserService.validateCaptcha(captcha);
-        if (!validateCaptcha) {
-          return res.status(400).send({
-            success: false,
-            message: "Please answer the captcha correctly",
-            validateCaptcha
-          });
-        }
-      }
+      // if (!req.body.platform) {
+      //   const validateCaptcha = await UserService.validateCaptcha(captcha);
+      //   if (!validateCaptcha) {
+      //     return res.status(400).send({
+      //       success: false,
+      //       message: "Please answer the captcha correctly",
+      //       validateCaptcha
+      //     });
+      //   }
+      // }
 
       const isUserType = UserService.validateUserType(userType);
       if (!isUserType) {
@@ -177,12 +180,163 @@ exports.loginUser = async (req, res, next) => {
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: 36000
       });
-      const data = await UserService.getUserDetails({ id: user.id });
+      let profile;
+      const data = JSON.parse(
+        JSON.stringify(await UserService.getUserDetails({ id: user.id }))
+      );
+      if (req.body.userType && req.body.userType !== "") {
+        const { userType } = req.body;
+        const userId = user.id;
+        const attributes = {
+          exclude: ["createdAt", "updatedAt", "deletedAt"]
+        };
+        if (userType === "professional") {
+          profile = JSON.parse(
+            JSON.stringify(
+              await ServicePartner.findOne({ where: { userId }, attributes })
+            )
+          );
+        } else if (userType === "vendor") {
+          profile = JSON.parse(
+            JSON.stringify(
+              await ProductPartner.findOne({ where: { userId }, attributes })
+            )
+          );
+        } else if (userType === "private_client") {
+          profile = JSON.parse(
+            JSON.stringify(
+              await PrivateClient.findOne({ where: { userId }, attributes })
+            )
+          );
+        } else if (userType === "corporate_client") {
+          profile = JSON.parse(
+            JSON.stringify(
+              await CorporateClient.findOne({ where: { userId }, attributes })
+            )
+          );
+        }
+        data.profile = profile;
+      }
+
       return res.status(201).send({
         success: true,
         message: "User Logged In Sucessfully",
         token,
         user: data
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.switchAccount = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType } = req.body;
+      const userId = req.user.id;
+      const where = { id: userId };
+      const user = JSON.parse(
+        JSON.stringify(await UserService.getUserDetails(where))
+      );
+      if (!user) {
+        return res.status(400).send({
+          success: false,
+          message: "Invalid User"
+        });
+      }
+      if (user.userType === "admin") {
+        return res.status(400).send({
+          success: false,
+          message: "This user is not available"
+        });
+      }
+      let profile;
+      const attributes = {
+        exclude: ["createdAt", "updatedAt", "deletedAt"]
+      };
+      if (userType === "professional") {
+        profile = JSON.parse(
+          JSON.stringify(
+            await ServicePartner.findOne({ where: { userId }, attributes })
+          )
+        );
+      } else if (userType === "vendor") {
+        profile = JSON.parse(
+          JSON.stringify(
+            await ProductPartner.findOne({ where: { userId }, attributes })
+          )
+        );
+      } else if (userType === "private_client") {
+        profile = JSON.parse(
+          JSON.stringify(
+            await PrivateClient.findOne({ where: { userId }, attributes })
+          )
+        );
+      } else if (userType === "corporate_client") {
+        profile = JSON.parse(
+          JSON.stringify(
+            await CorporateClient.findOne({ where: { userId }, attributes })
+          )
+        );
+      }
+      user.profile = profile;
+
+      const payload = {
+        user: {
+          id: user.id
+        }
+      };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: 36000
+      });
+      return res.status(201).send({
+        success: true,
+        message: "User Logged In Sucessfully",
+        token,
+        user
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.switchAccount = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const userId = req.user.id;
+      const attributes = ["id", "userId", "userType"];
+      const accounts = {
+        service_partner: await ServicePartner.findOne({
+          where: { userId },
+          attributes
+        }),
+        product_partner: await ProductPartner.findOne({
+          where: { userId },
+          attributes
+        }),
+        private_client: await PrivateClient.findOne({
+          where: { userId },
+          attributes
+        }),
+        corporate_client: await CorporateClient.findOne({
+          where: { userId },
+          attributes
+        })
+      };
+      for (const key in accounts) {
+        if (accounts[key] === null || accounts[key] === undefined) {
+          delete accounts[key];
+        }
+      }
+
+      return res.status(201).send({
+        success: true,
+        message: "User Logged In Sucessfully",
+        accounts
       });
     } catch (error) {
       t.rollback();
@@ -239,13 +393,51 @@ exports.loginAdmin = async (req, res, next) => {
 
 exports.getLoggedInUser = async (req, res) => {
   try {
-    const user = await UserService.getUserDetails({ id: req.user.id });
+    const user = JSON.parse(
+      JSON.stringify(await UserService.getUserDetails({ id: req.user.id }))
+    );
     if (!user) {
       return res.status(404).send({
         success: false,
         message: "No User Found",
         user: null
       });
+    }
+    let profile;
+    if (req.query.userType) {
+      const { userType } = req.query;
+      const userId = req.user.id;
+      const attributes = {
+        exclude: ["createdAt", "updatedAt", "deletedAt"]
+      };
+      if (userType === "professional") {
+        profile = JSON.parse(
+          JSON.stringify(
+            await ServicePartner.findOne({ where: { userId }, attributes })
+          )
+        );
+      } else if (userType === "vendor") {
+        profile = JSON.parse(
+          JSON.stringify(
+            await ProductPartner.findOne({ where: { userId }, attributes })
+          )
+        );
+      } else if (userType === "private_client") {
+        profile = JSON.parse(
+          JSON.stringify(
+            await PrivateClient.findOne({ where: { userId }, attributes })
+          )
+        );
+      } else if (userType === "corporate_client") {
+        profile = JSON.parse(
+          JSON.stringify(
+            await CorporateClient.findOne({ where: { userId }, attributes })
+          )
+        );
+      }
+      if (profile) {
+        user.profile = profile;
+      }
     }
     return res.status(200).send({
       success: true,

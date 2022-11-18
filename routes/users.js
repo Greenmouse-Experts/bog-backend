@@ -28,6 +28,10 @@ router
   .route("/user/login")
   .post(loginValidation(), validate, UserController.loginUser);
 
+router.route("/user/switch-account").post(Auth, UserController.switchAccount);
+
+router.route("/user/get-accounts").get(Auth, UserController.switchAccount);
+
 router
   .route("/admin/login")
   .post(loginValidation(), validate, UserController.loginAdmin);
