@@ -216,7 +216,10 @@ exports.loginUser = async (req, res, next) => {
             )
           );
         }
-        data.profile = profile;
+        if (profile) {
+          data.profile = profile;
+          data.userType = userType;
+        }
       }
 
       return res.status(201).send({
@@ -441,6 +444,7 @@ exports.getLoggedInUser = async (req, res) => {
       }
       if (profile) {
         user.profile = profile;
+        user.userType = userType;
       }
     }
     return res.status(200).send({
