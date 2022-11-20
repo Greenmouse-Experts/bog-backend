@@ -25,6 +25,10 @@ const ProductImage = sequelise.define(
     image: {
       allowNull: true,
       type: Sequelize.STRING
+    },
+    url: {
+      allowNull: true,
+      type: Sequelize.STRING
     }
   },
   { paranoid: true }

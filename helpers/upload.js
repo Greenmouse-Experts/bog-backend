@@ -18,6 +18,7 @@ const filter = (req, file, cb) => {
   if (
     file.mimetype === "image/jpeg" ||
     file.mimetype === "image/jpg" ||
+    file.mimetype === "image/svg" ||
     file.mimetype === "image/png"
   ) {
     cb(null, true);

@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
 const { Op } = require("sequelize");
@@ -6,6 +7,7 @@ const Category = require("../models/ProductCategory");
 const Product = require("../models/Product");
 const ProductImage = require("../models/ProductImage");
 const User = require("../models/User");
+const cloudinary = require("../helpers/cloudinary");
 
 exports.getProducts = async (req, res, next) => {
   try {
@@ -29,7 +31,7 @@ exports.getProducts = async (req, res, next) => {
         {
           model: ProductImage,
           as: "product_image",
-          attributes: ["id", "name", "image"]
+          attributes: ["id", "name", "image", "url"]
         }
       ],
       order: [["createdAt", "DESC"]]
@@ -66,7 +68,7 @@ exports.getSimilarProducts = async (req, res, next) => {
         {
           model: ProductImage,
           as: "product_image",
-          attributes: ["id", "name", "image"]
+          attributes: ["id", "name", "image", "url"]
         }
       ],
       order: [["createdAt", "DESC"]]
@@ -201,7 +203,7 @@ exports.createProduct = async (req, res, next) => {
     try {
       const { categoryId, name, price, quantity, unit, description } = req.body;
       const creatorId = req.user.id;
-      console.log(req.files);
+
       const request = {
         categoryId,
         name,
@@ -215,14 +217,18 @@ exports.createProduct = async (req, res, next) => {
 
       const photos = [];
       for (let i = 0; i < req.files.length; i++) {
+        const result = await cloudinary.uploader.upload(req.files[i].path);
+        const docPath = result.secure_url;
+        console.log(result);
         photos.push({
           name: req.files[i].originalname,
           image: req.files[i].path,
-          creatorId
+          creatorId,
+          url: docPath
         });
       }
       if (photos.length > 0) {
-        request.image = photos[0].image;
+        request.image = photos[0].url;
         request.product_image = photos;
       }
       const product = await Product.create(request, {
@@ -267,11 +273,14 @@ exports.updateProduct = async (req, res, next) => {
       if (req.files.length > 0) {
         const photos = [];
         for (let i = 0; i < req.files.length; i++) {
+          const result = await cloudinary.uploader.upload(req.files[i].path);
+          const docPath = result.secure_url;
           photos.push({
             name: req.files[i].originalname,
             image: req.files[i].path,
             creatorId,
-            productId
+            productId,
+            url: docPath
           });
         }
         const images = await ProductImage.findAll({
@@ -307,7 +316,7 @@ exports.updateProduct = async (req, res, next) => {
           {
             model: ProductImage,
             as: "product_image",
-            attributes: ["id", "name", "image"]
+            attributes: ["id", "name", "image", "url"]
           }
         ]
       });
@@ -345,7 +354,7 @@ exports.getAllProducts = async (req, res, next) => {
         {
           model: ProductImage,
           as: "product_image",
-          attributes: ["id", "name", "image"]
+          attributes: ["id", "name", "image", "url"]
         }
       ],
       order: [["createdAt", "DESC"]]
@@ -377,7 +386,7 @@ exports.getSingleProducts = async (req, res, next) => {
         {
           model: ProductImage,
           as: "product_image",
-          attributes: ["id", "name", "image"]
+          attributes: ["id", "name", "image", "url"]
         }
       ]
     });
