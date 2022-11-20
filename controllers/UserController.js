@@ -23,16 +23,16 @@ exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { email, userType, name, captcha } = req.body;
-      // if (!req.body.platform) {
-      //   const validateCaptcha = await UserService.validateCaptcha(captcha);
-      //   if (!validateCaptcha) {
-      //     return res.status(400).send({
-      //       success: false,
-      //       message: "Please answer the captcha correctly",
-      //       validateCaptcha
-      //     });
-      //   }
-      // }
+      if (!req.body.platform) {
+        const validateCaptcha = await UserService.validateCaptcha(captcha);
+        if (!validateCaptcha) {
+          return res.status(400).send({
+            success: false,
+            message: "Please answer the captcha correctly",
+            validateCaptcha
+          });
+        }
+      }
 
       const isUserType = UserService.validateUserType(userType);
       if (!isUserType) {
@@ -759,14 +759,14 @@ exports.addUserProfile = async (data, t) => {
       const request = {
         userId,
         company_name,
-        userType: "service_partner"
+        userType: "professional"
       };
       await ServicePartner.create(request, { transaction: t });
     } else if (userType === "vendor") {
       const request = {
         userId,
         company_name,
-        userType: "product_partner"
+        userType: "vendor"
       };
       await ProductPartner.create(request, { transaction: t });
     } else if (userType === "private_client") {
