@@ -88,7 +88,9 @@ exports.getAllCategories = async (req, res, next) => {
     const data = await Promise.all(
       categories.map(async category => {
         const where = {
-          categoryId: category.id
+          categoryId: category.id,
+          status: "approved"
+
         };
         const count = await Product.count({ where });
         return {
