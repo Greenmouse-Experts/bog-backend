@@ -90,7 +90,6 @@ exports.getAllCategories = async (req, res, next) => {
         const where = {
           categoryId: category.id,
           status: "approved"
-
         };
         const count = await Product.count({ where });
         return {
@@ -205,7 +204,7 @@ exports.createProduct = async (req, res, next) => {
     try {
       const { categoryId, name, price, quantity, unit, description } = req.body;
       const creatorId = req.user.id;
-
+      console.log(req.files);
       const request = {
         categoryId,
         name,

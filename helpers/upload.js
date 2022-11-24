@@ -19,11 +19,15 @@ const filter = (req, file, cb) => {
     file.mimetype === "image/jpeg" ||
     file.mimetype === "image/jpg" ||
     file.mimetype === "image/svg" ||
+    file.mimetype === "image/svg+xml" ||
     file.mimetype === "image/png"
   ) {
     cb(null, true);
   } else {
-    cb({ error: "You can not upload this type of image" }, false);
+    cb(
+      { success: false, message: "You can not upload this type of image" },
+      false
+    );
   }
 };
 
