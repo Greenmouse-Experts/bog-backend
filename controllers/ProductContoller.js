@@ -501,7 +501,7 @@ exports.getProductsForAdmin = async (req, res, next) => {
         {
           model: ProductImage,
           as: "product_image",
-          attributes: ["id", "name", "image"]
+          attributes: ["id", "name", "image", "url"]
         }
       ],
       order: [["updatedAt", "DESC"]]
