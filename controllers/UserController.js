@@ -312,44 +312,53 @@ exports.getAccounts = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const userId = req.user.id;
-      const attributes = ["id", "userId", "userType"];
-      const accounts = {
-        service_partner: await ServicePartner.findOne({
-          where: { userId },
-          attributes
-        }),
-        product_partner: await ProductPartner.findOne({
-          where: { userId },
-          attributes
-        }),
-        private_client: await PrivateClient.findOne({
-          where: { userId },
-          attributes
-        }),
-        corporate_client: await CorporateClient.findOne({
-          where: { userId },
-          attributes
-        })
-      };
-      const data = [];
-      for (const key in accounts) {
-        if (accounts[key] === null || accounts[key] === undefined) {
-          delete accounts[key];
-        }
-        data.push(accounts[key]);
-      }
-      const filtered = data.filter(where => where != null);
+      const accounts = await this.getAccountsData(userId);
 
       return res.status(201).send({
         success: true,
-        message: "User Logged In Sucessfully",
-        accounts: filtered
+        accounts
       });
     } catch (error) {
       t.rollback();
       return next(error);
     }
   });
+};
+
+exports.getAccountsData = async userId => {
+  try {
+    const attributes = ["id", "userId", "userType"];
+    const accounts = {
+      service_partner: await ServicePartner.findOne({
+        where: { userId },
+        attributes
+      }),
+      product_partner: await ProductPartner.findOne({
+        where: { userId },
+        attributes
+      }),
+      private_client: await PrivateClient.findOne({
+        where: { userId },
+        attributes
+      }),
+      corporate_client: await CorporateClient.findOne({
+        where: { userId },
+        attributes
+      })
+    };
+    const data = [];
+    for (const key in accounts) {
+      if (accounts[key] === null || accounts[key] === undefined) {
+        delete accounts[key];
+      }
+      data.push(accounts[key]);
+    }
+    const filtered = data.filter(where => where != null);
+
+    return filtered;
+  } catch (error) {
+    return error;
+  }
 };
 
 exports.loginAdmin = async (req, res, next) => {
@@ -736,10 +745,40 @@ exports.getAllUsers = async (req, res) => {
     const where = {
       level: 1
     };
-    const users = await UserService.getAllUsers(where);
+    const userData = await UserService.getAllUsers(where);
+    const users = await Promise.all(
+      userData.map(async customer => {
+        const accounts = await this.getAccountsData(customer.id);
+        return {
+          user: customer,
+          accounts: JSON.parse(JSON.stringify(accounts))
+        };
+      })
+    );
     return res.status(200).send({
       success: true,
       users
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error"
+    });
+  }
+};
+
+exports.findSingleUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const userData = await UserService.findUserDetail({ id: userId });
+    const accounts = await this.getAccountsData(userId);
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        user: userData,
+        accounts
+      }
     });
   } catch (error) {
     return res.status(500).send({

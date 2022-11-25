@@ -40,7 +40,34 @@ exports.getAllUsers = async where => {
   const user = await User.findAll({
     where,
     attributes: {
-      exclude: ["password", "createdAt", "updatedAt", "deletedAt"]
+      exclude: ["password", "deletedAt"]
+    },
+    order: [["createdAt", "DESC"]],
+    include: [
+      {
+        model: Profile,
+        as: "profile",
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "deletedAt"]
+        }
+      },
+      {
+        model: BankDetail,
+        as: "bank_detail",
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "deletedAt"]
+        }
+      }
+    ]
+  });
+  return user;
+};
+
+exports.findUserDetail = async where => {
+  const user = await User.findOne({
+    where,
+    attributes: {
+      exclude: ["password", "deletedAt"]
     },
     order: [["createdAt", "DESC"]],
     include: [

@@ -65,4 +65,6 @@ router
 
 router.route("/all/users").get(Auth, UserController.getAllUsers);
 
+router.route("/users/get-user/:userId").get(UserController.findSingleUser);
+
 module.exports = router;

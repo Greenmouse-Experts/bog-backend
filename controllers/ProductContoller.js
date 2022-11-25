@@ -204,7 +204,6 @@ exports.createProduct = async (req, res, next) => {
     try {
       const { categoryId, name, price, quantity, unit, description } = req.body;
       const creatorId = req.user.id;
-      console.log(req.files);
       const request = {
         categoryId,
         name,
@@ -220,7 +219,6 @@ exports.createProduct = async (req, res, next) => {
       for (let i = 0; i < req.files.length; i++) {
         const result = await cloudinary.uploader.upload(req.files[i].path);
         const docPath = result.secure_url;
-        console.log(result);
         photos.push({
           name: req.files[i].originalname,
           image: req.files[i].path,
@@ -248,7 +246,6 @@ exports.createProduct = async (req, res, next) => {
         data: product
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -415,18 +412,18 @@ exports.deleteProduct = async (req, res, next) => {
           message: "Invalid Product"
         });
       }
-      if (creatorId !== product.creatorId) {
-        return res.status(400).send({
-          success: false,
-          message: "Unauthorised request"
-        });
-      }
-      if (product.showInShop || product.status === "approved") {
-        return res.status(400).send({
-          success: false,
-          message: "Product in store can't be deleted"
-        });
-      }
+      // if (creatorId !== product.creatorId) {
+      //   return res.status(400).send({
+      //     success: false,
+      //     message: "Unauthorised request"
+      //   });
+      // }
+      // if (product.showInShop || product.status === "approved") {
+      //   return res.status(400).send({
+      //     success: false,
+      //     message: "Product in store can't be deleted"
+      //   });
+      // }
       await Product.destroy({ where: { id: productId }, transaction: t });
       return res.status(200).send({
         success: true,
