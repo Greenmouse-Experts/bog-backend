@@ -91,7 +91,21 @@ const productApprovalValidation = () => {
 const orderValidation = () => {
   return [
     check("products", "Product is required").isArray(),
-    check("shippingAddress", "Shipping address is required").notEmpty(),
+    check("shippingAddress", "Shipping address is required").notEmpty()
+  ];
+};
+
+const updateOrderValidation = () => {
+  return [
+    check("orderId", "Order Id is required").isUUID(),
+    check("status", "Order status is required").notEmpty()
+  ];
+};
+
+const updateOrderRequestValidation = () => {
+  return [
+    check("requestId", "Request Id is required").isUUID(),
+    check("status", "Order status is required").notEmpty()
   ];
 };
 
@@ -105,5 +119,7 @@ module.exports = {
   categoryValidation,
   productValidation,
   productApprovalValidation,
-  orderValidation
+  orderValidation,
+  updateOrderValidation,
+  updateOrderRequestValidation
 };

@@ -6,11 +6,13 @@ const User = require("../models/User");
 const Order = require("../models/Order");
 const utility = require("../helpers/utility");
 const Product = require("../models/Product");
+const Payment = require("../models/Payment");
+const OrderItem = require("../models/OrderItem");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
     const where = {
-      ownerId: req.user.id
+      userId: req.user.id
     };
     if (req.query.status) {
       where.status = req.query.status;
@@ -18,7 +20,20 @@ exports.getMyOrders = async (req, res, next) => {
 
     const orders = await Order.findAll({
       where,
-      order: [["createdAt", "DESC"]]
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: OrderItem,
+          as: "order_items",
+          include: [
+            {
+              model: User,
+              as: "product_owner",
+              attributes: ["id", "fname", "lname", "email", "phone"]
+            }
+          ]
+        }
+      ]
     });
 
     return res.status(200).send({
@@ -39,7 +54,7 @@ exports.getOrderRequest = async (req, res, next) => {
       where.status = req.query.status;
     }
 
-    const orders = await Order.findAll({
+    const orders = await OrderItem.findAll({
       where,
       order: [["createdAt", "DESC"]],
       include: [
@@ -64,20 +79,51 @@ exports.createOrder = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const ownerId = req.user.id;
-      const { shippingAddress, paymentInfo, products } = req.body;
+      const {
+        shippingAddress,
+        paymentInfo,
+        products,
+        deliveryFee,
+        discount,
+        totalAmount
+      } = req.body;
+      const orderSlug = `ORD-${utility.generateOrderId}`;
+      const orderData = {
+        orderSlug,
+        userId: ownerId,
+        deliveryFee,
+        discount,
+        totalAmount
+      };
+      const paymentData = {
+        userId: ownerId,
+        payment_reference: paymentInfo.reference,
+        amount: paymentInfo.amount,
+        payment_category: "Order"
+      };
+
+      await Payment.create(paymentData, { transaction: t });
       const orders = await Promise.all(
         products.map(async product => {
-          const orderId = `ORD-${utility.generateOrderId}`;
-          const prodData = await Product.findByPk(product.id, {
-            attributes: ["id", "name", "creatorId", "price", "unit", "image"]
+          const prodData = await Product.findByPk(product.productId, {
+            attributes: [
+              "id",
+              "name",
+              "creatorId",
+              "price",
+              "unit",
+              "image",
+              "description"
+            ]
           });
-          const totalAmount = product.quantity * Number(prodData.price);
-
+          const amount = product.quantity * Number(prodData.price);
+          const trackingId = `TRD-${utility.generateOrderId}`;
           return {
-            orderId,
+            status: "paid",
+            trackingId,
             ownerId,
             productOwner: prodData.creatorId,
-            totalAmount,
+            amount,
             shippingAddress,
             paymentInfo,
             quantity: product.quantity,
@@ -86,19 +132,128 @@ exports.createOrder = async (req, res, next) => {
               name: prodData.name,
               price: prodData.price,
               unit: prodData.unit,
-              image: prodData.image
+              image: prodData.image,
+              description: prodData.description
             }
           };
         })
       );
+      orderData.order_items = orders;
+      const order = await Order.create(orderData, {
+        include: [
+          {
+            model: OrderItem,
+            as: "order_items"
+          }
+        ],
+        transaction: t
+      });
       return res.status(200).send({
         success: true,
         message: "Order Request submitted",
-        orders
+        order
       });
     } catch (error) {
       t.rollback();
       return next(error);
     }
   });
+};
+
+exports.updateOrder = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { orderId, status } = req.body;
+      const order = await Order.findOne({ where: { id: orderId } });
+      if (!order) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Order"
+        });
+      }
+
+      const data = {
+        status,
+        ...req.body
+      };
+      await Order.update(data, { where: { id: orderId }, transaction: t });
+
+      return res.status(200).send({
+        success: true,
+        message: "Order updated"
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.updateOrderRequest = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { requestId, status } = req.body;
+      const order = await OrderItem.findOne({
+        where: { id: requestId },
+        attributes: ["id"]
+      });
+      if (!order) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Order"
+        });
+      }
+
+      const data = {
+        status,
+        ...req.body
+      };
+      await OrderItem.update(data, {
+        where: { id: requestId },
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        message: "Order Request updated"
+      });
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.getAllOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.findAll({
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: OrderItem,
+          as: "order_items",
+          include: [
+            {
+              model: User,
+              as: "product_owner",
+              attributes: ["id", "fname", "lname", "email", "phone"]
+            },
+            {
+              model: User,
+              as: "user",
+              attributes: ["id", "fname", "lname", "email", "phone"]
+            }
+          ]
+        }
+      ]
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: orders
+    });
+  } catch (error) {
+    return next(error);
+  }
 };

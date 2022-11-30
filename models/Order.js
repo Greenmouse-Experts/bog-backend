@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const OrderItem = require("./OrderItem");
 const User = require("./User");
 
 const Order = sequelise.define(
@@ -11,89 +12,39 @@ const Order = sequelise.define(
       unique: true,
       primaryKey: true
     },
-    orderId: {
+    orderSlug: {
       type: Sequelize.STRING,
       allowNull: true
     },
-    trackingId: {
-      type: Sequelize.STRING,
-      allowNull: true
-    },
-    status: {
-      allowNull: true,
-      type: Sequelize.ENUM,
-      values: [
-        "paid",
-        "awaiting_shipment",
-        "shipped",
-        "delivered",
-        "cancelled",
-        "refunded",
-        "declined",
-        "completed"
-      ]
-    },
-    ownerId: {
+    userId: {
       type: Sequelize.UUID,
       allowNull: true
     },
-    productOwner: {
-      type: Sequelize.UUID,
+    discount: {
+      type: Sequelize.FLOAT,
       allowNull: true
     },
-    shippingAddress: {
-      allowNull: true,
-      type: Sequelize.TEXT,
-      get() {
-        const data = this.getDataValue("shippingAddress");
-        return JSON.parse(data);
-      },
-      set(value) {
-        this.setDataValue("shippingAddress", JSON.stringify(value));
-      }
-    },
-    product: {
-      allowNull: true,
-      type: Sequelize.TEXT,
-      get() {
-        const data = this.getDataValue("product");
-        return JSON.parse(data);
-      },
-      set(value) {
-        this.setDataValue("product", JSON.stringify(value));
-      }
-    },
-    paymentInfo: {
-      allowNull: true,
-      type: Sequelize.TEXT,
-      get() {
-        const data = this.getDataValue("paymentInfo");
-        return JSON.parse(data);
-      },
-      set(value) {
-        this.setDataValue("paymentInfo", JSON.stringify(value));
-      }
-    },
-    quantity: {
+    deliveryFee: {
       type: Sequelize.FLOAT,
       allowNull: true
     },
     totalAmount: {
       type: Sequelize.FLOAT,
       allowNull: true
+    },
+    status: {
+      allowNull: true,
+      type: Sequelize.ENUM,
+      values: ["pending", "approved", "cancelled", "completed"],
+      defaultValue: "pending"
     }
   },
   { paranoid: true }
 );
 
-Order.belongsTo(User, {
-  foreignKey: "ownerId",
-  as: "user"
-});
-
-Order.belongsTo(User, {
-  foreignKey: "productOwner",
-  as: "product_owner"
+Order.hasMany(OrderItem, {
+  foreignKey: "orderId",
+  as: "order_items"
 });
 
 module.exports = Order;
