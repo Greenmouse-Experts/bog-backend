@@ -208,6 +208,7 @@ exports.updateOrderRequest = async (req, res, next) => {
         status,
         ...req.body
       };
+      console.log(data);
       await OrderItem.update(data, {
         where: { id: requestId },
         transaction: t

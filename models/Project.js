@@ -1,10 +1,9 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
-const OrderItem = require("./OrderItem");
 const User = require("./User");
 
-const Order = sequelise.define(
-  "orders",
+const Project = sequelise.define(
+  "projects",
   {
     id: {
       type: Sequelize.UUID,
@@ -12,44 +11,42 @@ const Order = sequelise.define(
       unique: true,
       primaryKey: true
     },
-    orderSlug: {
-      type: Sequelize.STRING,
-      allowNull: true
-    },
     userId: {
       type: Sequelize.UUID,
       allowNull: true
     },
-    discount: {
-      type: Sequelize.FLOAT,
+    title: {
+      type: Sequelize.STRING,
       allowNull: true
     },
-    deliveryFee: {
-      type: Sequelize.FLOAT,
+    description: {
+      type: Sequelize.STRING,
       allowNull: true
     },
-    totalAmount: {
-      type: Sequelize.FLOAT,
-      allowNull: true
+    projectTypes: {
+      allowNull: false,
+      type: Sequelize.ENUM,
+      values: [
+        "land_survey",
+        "construction_drawing",
+        "building_approval",
+        "geotechnical_investigation",
+        "contractor"
+      ]
     },
     status: {
       allowNull: true,
       type: Sequelize.ENUM,
-      values: ["pending", "approved", "cancelled", "completed"],
+      values: ["pending", "approved", "ongoing", "cancelled", "completed"],
       defaultValue: "pending"
     }
   },
   { paranoid: true }
 );
 
-Order.hasMany(OrderItem, {
-  foreignKey: "orderId",
-  as: "order_items"
-});
-
-User.hasMany(Order, {
+User.hasMany(Project, {
   foreignKey: "userId",
-  as: "user_orders"
+  as: "survey_project"
 });
 
-module.exports = Order;
+module.exports = Project;
