@@ -16,11 +16,15 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: true
       },
+      clientName: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       propertyName: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      propertyLocation: {
+      projectLocation: {
         type: Sequelize.STRING,
         allowNull: true
       },
@@ -28,23 +32,32 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
-      isResidential: {
-        type: Sequelize.BOOLEAN,
-        allowNull: true,
-        defaultValue: false
-      },
-      propertyType: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
       projectType: {
+        type: Sequelize.ENUM,
+        allowNull: true,
+        values: [
+          "residential",
+          "commercial",
+          "religious",
+          "industrial",
+          "educational"
+        ]
+      },
+      buildingType: {
         type: Sequelize.STRING,
         allowNull: true
       },
       status: {
         allowNull: true,
         type: Sequelize.ENUM,
-        values: ["pending", "approved", "ongoing", "cancelled", "completed"],
+        values: [
+          "pending",
+          "assigned",
+          "approved",
+          "ongoing",
+          "cancelled",
+          "completed"
+        ],
         defaultValue: "pending"
       },
       surveyPlan: {

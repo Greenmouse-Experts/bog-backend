@@ -1,5 +1,9 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const BuildingProject = require("./BuildingProject");
+const ContractorProject = require("./ContractorProject");
+const DrawingProject = require("./DrawingProject");
+const LandSurveyProject = require("./LandSurveyProject");
 const User = require("./User");
 
 const Project = sequelise.define(
@@ -46,7 +50,37 @@ const Project = sequelise.define(
 
 User.hasMany(Project, {
   foreignKey: "userId",
-  as: "survey_project"
+  as: "projects",
+  onDelete: "cascade",
+  hooks: true
+});
+
+Project.hasMany(LandSurveyProject, {
+  foreignKey: "projectId",
+  as: "survey_project",
+  onDelete: "cascade",
+  hooks: true
+});
+
+Project.hasMany(ContractorProject, {
+  foreignKey: "projectId",
+  as: "contractor_project",
+  onDelete: "cascade",
+  hooks: true
+});
+
+Project.hasMany(DrawingProject, {
+  foreignKey: "projectId",
+  as: "drawing_project",
+  onDelete: "cascade",
+  hooks: true
+});
+
+Project.hasMany(BuildingProject, {
+  foreignKey: "projectId",
+  as: "building_project",
+  onDelete: "cascade",
+  hooks: true
 });
 
 module.exports = Project;

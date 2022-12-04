@@ -109,6 +109,28 @@ const updateOrderRequestValidation = () => {
   ];
 };
 
+const landSurveyRequestValidation = () => {
+  return [
+    check("title", "Project title is required").notEmpty(),
+    check("propertyName", "Property Name is required").notEmpty(),
+    check("propertyLocation", "property Location is required").notEmpty(),
+    check("propertyLga", "property Lga is required").notEmpty(),
+    check("landSize", "land Size is required").notEmpty(),
+    check("propertyType", "property Type is required").notEmpty(),
+    check("surveyType", "survey Type is required").notEmpty()
+  ];
+};
+
+const contractorRequestValidation = () => {
+  return [
+    check("title", "Project title is required").notEmpty(),
+    check("clientName", "Client Name is required").notEmpty(),
+    check("projectLocation", "project Location is required").notEmpty(),
+    check("projectType", "project Type is required").notEmpty(),
+    check("buildingType", "Building Type is required").notEmpty()
+  ];
+};
+
 module.exports = {
   validate,
   registerValidation,
@@ -121,5 +143,7 @@ module.exports = {
   productApprovalValidation,
   orderValidation,
   updateOrderValidation,
-  updateOrderRequestValidation
+  updateOrderRequestValidation,
+  landSurveyRequestValidation,
+  contractorRequestValidation
 };

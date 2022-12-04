@@ -32,11 +32,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
-      isResidential: {
-        type: Sequelize.BOOLEAN,
-        allowNull: true,
-        defaultValue: false
-      },
       propertyType: {
         type: Sequelize.STRING,
         allowNull: true
