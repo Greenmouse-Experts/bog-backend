@@ -45,6 +45,38 @@ exports.getMyOrders = async (req, res, next) => {
   }
 };
 
+exports.getOrderDetails = async (req, res, next) => {
+  try {
+    const where = {
+      id: req.params.orderId
+    };
+
+    const orders = await Order.findOne({
+      where,
+      include: [
+        {
+          model: OrderItem,
+          as: "order_items",
+          include: [
+            {
+              model: User,
+              as: "product_owner",
+              attributes: ["id", "fname", "lname", "email", "phone"]
+            }
+          ]
+        }
+      ]
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: orders
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 exports.getOrderRequest = async (req, res, next) => {
   try {
     const where = {
