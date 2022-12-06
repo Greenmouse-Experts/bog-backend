@@ -66,4 +66,21 @@ router
   .route("/projects/building-approval/update-request")
   .patch(Auth, upload.any(), ProjectController.updateBuildingApprovalRequest);
 
+// Geotechnical Project
+router
+  .route("/projects/geotechnical/request")
+  .post(
+    Auth,
+    upload.any(),
+    ProjectController.requestForGeoTechnicalInvestigation
+  );
+
+router
+  .route("/projects/geotechnical/update-request")
+  .patch(
+    Auth,
+    upload.any(),
+    ProjectController.updateGeoTechnicalInvestigationRequest
+  );
+
 module.exports = router;

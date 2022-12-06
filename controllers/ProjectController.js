@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
 require("dotenv").config();
 const { Op } = require("sequelize");
@@ -9,6 +10,7 @@ const LandSurveyProject = require("../models/LandSurveyProject");
 const DrawingProject = require("../models/DrawingProject");
 const BuildingProject = require("../models/BuildingProject");
 const ContractorProject = require("../models/ContractorProject");
+const GeoTechnical = require("../models/GeoTechnical");
 
 // Projects
 exports.getProjectRequest = async (req, res, next) => {
@@ -157,6 +159,9 @@ exports.getProjectTypeData = async (projectId, type) => {
     case "contractor":
       data = await ContractorProject.findOne({ where: { projectId } });
       return data;
+    case "geotechnical_investigation":
+      data = await GeoTechnical.findOne({ where: { projectId } });
+      return data;
     default:
       return data;
   }
@@ -175,6 +180,9 @@ exports.deleteProjectTypeData = async (projectId, type, t) => {
       return true;
     case "contractor":
       await ContractorProject.destroy({ where: { projectId }, transaction: t });
+      return true;
+    case "geotechnical_investigation":
+      await GeoTechnical.destroy({ where: { projectId }, transaction: t });
       return true;
     default:
       return true;
@@ -528,45 +536,6 @@ exports.buildingApprovalProjectsRequest = async (req, res, next) => {
         for (let i = 0; i < req.files.length; i++) {
           const name = req.files[i].fieldname;
           request[name] = req.files[i].path;
-          //   if (req.files[i].fieldname === "surveyPlan") {
-          //     request.surveyPlan = req.files[i].path;
-          //   }
-          //   if (req.files[i].fieldname === "structuralPlan") {
-          //     request.structuralPlan = req.files[i].path;
-          //   }
-          //   if (req.files[i].fieldname === "architecturalPlan") {
-          //     request.architecturalPlan = req.files[i].path;
-          //   }
-          //   if (req.files[i].fieldname === "mechanicalPlan") {
-          //     request.mechanicalPlan = req.files[i].path;
-          //   }
-          //   if (req.files[i].fieldname === "electricalPlan") {
-          //     request.electricalPlan = req.files[i].path;
-          //   }
-          //   if (req.files[i].fieldname === "soilTestReport") {
-          //     request.soilTestReport = req.files[i].path;
-          //   }
-          //   if (req.files[i].fieldname === "sitePlan") {
-          //     request.sitePlan = req.files[i].path;
-          //   }
-          //   if (req.files[i].fieldname === "siteAnalysisReport") {
-          //     request.siteAnalysisReport = req.files[i].path;
-          //   }
-          //   if (req.files[i].fieldname === "environmentImpactReport") {
-          //     request.environmentImpactReport = req.files[i].path;
-          //   }
-          //   if (req.files[i].fieldname === "clearanceCertificate") {
-          //     request.clearanceCertificate = req.files[i].path;
-          //   }
-          //   if (req.files[i].fieldname === "supervisorLetter") {
-          //     request.supervisorLetter = req.files[i].path;
-          //   }
-          //   if (req.files[i].fieldname === "structuralCalculationSheet") {
-          //     request.structuralCalculationSheet = req.files[i].path;
-          //   }
-          //   if (req.files[i].fieldname === "deedOfAgreement") {
-          //     request.deedOfAgreement = req.files[i].path;
-          //   }
         }
       }
 
@@ -634,6 +603,82 @@ exports.updateBuildingApprovalRequest = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         message: "Building request updated successfully"
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+// Geotechnical Request
+exports.requestForGeoTechnicalInvestigation = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const userId = req.user.id;
+      const request = req.body;
+      const projectData = {
+        title: req.body.title,
+        userId,
+        projectTypes: "geotechnical_investigation"
+      };
+      const project = await this.createProject(projectData, t);
+      request.userId = userId;
+      request.projectId = project.id;
+      if (req.files.length > 0) {
+        for (let i = 0; i < req.files.length; i++) {
+          const name = req.files[i].fieldname;
+          request[name] = req.files[i].path;
+        }
+      }
+      const data = await GeoTechnical.create(request, {
+        transaction: t
+      });
+      return res.status(200).send({
+        success: true,
+        data
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.updateGeoTechnicalInvestigationRequest = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const request = req.body;
+      const { requestId, title } = req.body;
+      const survey = await GeoTechnical.findOne({
+        where: { id: requestId }
+      });
+      if (!survey) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Investigation"
+        });
+      }
+      if (title && title !== "") {
+        await Project.update(
+          { title },
+          { where: { id: survey.projectId }, transaction: t }
+        );
+      }
+      if (req.files.length > 0) {
+        for (let i = 0; i < req.files.length; i++) {
+          const name = req.files[i].fieldname;
+          request[name] = req.files[i].path;
+        }
+      }
+
+      await GeoTechnical.update(request, {
+        where: { id: requestId },
+        transaction: t
+      });
+      return res.status(200).send({
+        success: true,
+        message: "Geotechnical Investigation updated successfully"
       });
     } catch (error) {
       t.rollback();
