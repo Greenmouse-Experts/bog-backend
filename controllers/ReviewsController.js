@@ -3,7 +3,7 @@ require("dotenv").config();
 const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
 const ProductReview = require('../models/Reviews');
-const ServiceReview = require('../models/Reviews');
+const ServiceReview = require('../models/ServiceReview');
 const Product = require("../models/Product");
 const PartnerModel = require("../models/ServicePartner");
 
@@ -107,7 +107,7 @@ exports.deleteReview = async (req, res, next) => {
       where = { id: reviewId }
       console.log(reviewId, userId)
 
-      const isExist = await productReview.findOne({where});
+      const isExist = await ProductReview.findOne({where});
       if (!isExist) {
         return res.status(404).send({
           success: false,
@@ -115,7 +115,7 @@ exports.deleteReview = async (req, res, next) => {
         });
       }
       
-      await productReview.destroy({
+      await ProductReview.destroy({
         where: { id: reviewId}, transaction: t
       });
       return res.status(200).send({
@@ -132,7 +132,7 @@ exports.deleteReview = async (req, res, next) => {
 
 
 
-/*---------Partner Reviews-------- */
+/*---------Service Reviews-------- */
 
 // create reviews
 exports.createPartnerReview = async(req, res, next) => {
@@ -141,7 +141,7 @@ exports.createPartnerReview = async(req, res, next) => {
       const ownerId = req.user.id;
       req.body.userId = ownerId
           
-      const myReview = await partnerReview.create(req.body, {
+      const myReview = await ServiceReview.create(req.body, {
         include: [
           {
             model: Product,
@@ -170,7 +170,7 @@ exports.updatePartnerReview = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { reviewId, ...others } = req.body;
-      const review = await partnerReview.findOne({ where: { id: reviewId } });
+      const review = await ServiceReview.findOne({ where: { id: reviewId } });
       if (!review) {
         return res.status(404).send({
           success: false,
@@ -178,7 +178,7 @@ exports.updatePartnerReview = async (req, res, next) => {
         });
       }
 
-      await partnerReview.update(others, { where: { id: reviewId }, transaction: t });
+      await ServiceReview.update(others, { where: { id: reviewId }, transaction: t });
 
       return res.status(200).send({
         success: true,
@@ -198,7 +198,7 @@ exports.getAllPartnerReview = async (req, res, next) => {
       partnerId: req.query.partnerId,
     };
     console.log(where)
-    const reviews = await partnerReview.findAll({
+    const reviews = await ServiceReview.findAll({
       where,
       order: [["createdAt", "DESC"]],
     });
@@ -223,7 +223,7 @@ exports.deletePartnerReview = async (req, res, next) => {
       where = { id: reviewId }
       console.log(reviewId, userId)
 
-      const isExist = await partnerReview.findOne({where});
+      const isExist = await ServiceReview.findOne({where});
       if (!isExist) {
         return res.status(404).send({
           success: false,
@@ -231,7 +231,7 @@ exports.deletePartnerReview = async (req, res, next) => {
         });
       }
       
-      await partnerReview.destroy({
+      await ServiceReview.destroy({
         where: { id: reviewId}, transaction: t
       });
       return res.status(200).send({
