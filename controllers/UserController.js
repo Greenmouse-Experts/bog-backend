@@ -23,7 +23,7 @@ exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { email, userType, name, captcha } = req.body;
-      if (!req.body.platform) {
+      if (!req.body.platform && userType !== "admin") {
         const validateCaptcha = await UserService.validateCaptcha(captcha);
         if (!validateCaptcha) {
           return res.status(400).send({
