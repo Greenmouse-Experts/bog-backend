@@ -1,12 +1,16 @@
 /* eslint-disable no-unused-vars */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const table = await queryInterface.createTable("partner_reviews", {
+    const table = await queryInterface.createTable("service_reviews", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
         unique: true,
         primaryKey: true
+      },
+      star: {
+        allowNull: true,
+        type: Sequelize.INTEGER
       },
       review: {
         allowNull: true,
@@ -16,7 +20,7 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: true
       },
-      partnerId: {
+      productId: {
         type: Sequelize.UUID,
         allowNull: true
       },
@@ -28,6 +32,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("partner_reviews");
+    return queryInterface.dropTable("service_reviews");
   }
 };

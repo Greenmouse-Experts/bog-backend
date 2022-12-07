@@ -2,7 +2,8 @@
 require("dotenv").config();
 const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
-const { productReview, partnerReview } = require('../models/Reviews');
+const ProductReview = require('../models/Reviews');
+const ServiceReview = require('../models/Reviews');
 const Product = require("../models/Product");
 const PartnerModel = require("../models/ServicePartner");
 
@@ -14,7 +15,7 @@ exports.createReview = async(req, res, next) => {
       const ownerId = req.user.id;
       req.body.userId = ownerId
           
-      const myReview = await productReview.create(req.body, {
+      const myReview = await ProductReview.create(req.body, {
         include: [
           {
             model: Product,
@@ -43,7 +44,7 @@ exports.updateReview = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { reviewId, ...others } = req.body;
-      const review = await productReview.findOne({ where: { id: reviewId } });
+      const review = await ProductReview.findOne({ where: { id: reviewId } });
       if (!review) {
         return res.status(404).send({
           success: false,
@@ -51,7 +52,7 @@ exports.updateReview = async (req, res, next) => {
         });
       }
 
-      await productReview.update(others, { where: { id: reviewId }, transaction: t });
+      await ProductReview.update(others, { where: { id: reviewId }, transaction: t });
 
       return res.status(200).send({
         success: true,
@@ -74,7 +75,7 @@ exports.getAllProductReview = async (req, res, next) => {
       where.userId = req.query.userId;
     }
     console.log(where)
-    const reviews = await productReview.findAll({
+    const reviews = await ProductReview.findAll({
       where,
       order: [["createdAt", "DESC"]],
       include: [
