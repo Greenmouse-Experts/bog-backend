@@ -8,6 +8,7 @@ const Product = require("../models/Product");
 const ProductImage = require("../models/ProductImage");
 const User = require("../models/User");
 const cloudinary = require("../helpers/cloudinary");
+const Reviews = require("../models/Reviews");
 
 exports.getProducts = async (req, res, next) => {
   try {
@@ -69,6 +70,11 @@ exports.getSimilarProducts = async (req, res, next) => {
           model: ProductImage,
           as: "product_image",
           attributes: ["id", "name", "image", "url"]
+        },
+        {
+          model: Reviews,
+          as: "product_reviews",
+          attributes: ["id", "star", "reviews", "userId"]
         }
       ],
       order: [["createdAt", "DESC"]]

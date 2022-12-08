@@ -8,6 +8,10 @@ const utility = require("../helpers/utility");
 const Product = require("../models/Product");
 const Payment = require("../models/Payment");
 const OrderItem = require("../models/OrderItem");
+// services
+const invoiceService = require("../service/invoiceService");
+const { sendMail } = require("../service/attachmentEmailService");
+const helpers = require("../helpers/message");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -115,7 +119,11 @@ exports.getOrderRequest = async (req, res, next) => {
 exports.createOrder = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
+      const userId = req.user.id;
       const ownerId = req.user.id;
+      const user = await User.findByPk(userId, {
+        attributes: ["email", "name"]
+      });
       const {
         shippingAddress,
         paymentInfo,
@@ -127,13 +135,13 @@ exports.createOrder = async (req, res, next) => {
       const orderSlug = `ORD-${utility.generateOrderId}`;
       const orderData = {
         orderSlug,
-        userId: ownerId,
+        userId,
         deliveryFee,
         discount,
         totalAmount
       };
       const paymentData = {
-        userId: ownerId,
+        userId,
         payment_reference: paymentInfo.reference,
         amount: paymentInfo.amount,
         payment_category: "Order"
@@ -158,6 +166,7 @@ exports.createOrder = async (req, res, next) => {
           return {
             status: "paid",
             trackingId,
+            userId,
             ownerId,
             productOwner: prodData.creatorId,
             amount,
@@ -185,16 +194,41 @@ exports.createOrder = async (req, res, next) => {
         ],
         transaction: t
       });
+
+      // console.log(orderData.order_items);
+      // if (await invoiceService.createInvoice(orderData, userId)) {
+      await invoiceService.createInvoice(orderData, orderSlug, user);
+      const files = [
+        {
+          path: `uploads/invoice/${orderSlug}.pdf`,
+          filename: `${orderSlug}.pdf`
+        }
+      ];
+      const message = helpers.invoiceMessage(user.name);
+      sendMail(user.email, message, "BOG Invoice", files);
+      // }
       return res.status(200).send({
         success: true,
         message: "Order Request submitted",
         order
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
   });
+};
+
+// generate invoice on save
+
+exports.generateOrderInvoice = async (orders, res, next) => {
+  try {
+    invoiceService.createInvoice(orders, "Holla4550");
+    return true;
+  } catch (error) {
+    return next(error);
+  }
 };
 
 exports.updateOrder = async (req, res, next) => {
@@ -245,7 +279,6 @@ exports.updateOrderRequest = async (req, res, next) => {
         status,
         ...req.body
       };
-      console.log(data);
       await OrderItem.update(data, {
         where: { id: requestId },
         transaction: t
@@ -256,7 +289,6 @@ exports.updateOrderRequest = async (req, res, next) => {
         message: "Order Request updated"
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
       return next(error);
     }

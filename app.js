@@ -68,7 +68,6 @@ app.use((err, req, res, next) => {
 app.use((req, res) => {
   return res.status(404).send({ success: false, message: "Route not found" });
 });
-
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`server started on port ${PORT}`);

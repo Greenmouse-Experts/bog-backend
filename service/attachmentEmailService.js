@@ -4,7 +4,7 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: process.env.EMAIL_PORT,
-  secure: process.env.EMAIL_SECURE, // true for 465, false for other ports
+  secure: false, // true for 465, false for other ports
   auth: {
     user: process.env.EMAIL_USERNAME, // generated ethereal user
     pass: process.env.EMAIL_PASSWORD // generated ethereal password
@@ -12,6 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.sendMail = async (email, message, subject, files = []) => {
+  console.log(files);
   try {
     // send mail with defined transport object
     const mailOptions = {

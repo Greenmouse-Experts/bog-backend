@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js",
+    "dev": "supervisor app.js",
+    "serve": "nodemon app.js",
     "migrate": "npx sequelize db:migrate"
   },
   "keywords": [],
@@ -17,18 +18,23 @@
     "body-parser": "^1.20.1",
     "cloudinary": "^1.32.0",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
+    "easyinvoice": "^2.3.3",
     "express": "^4.18.2",
     "express-validator": "^6.14.2",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^2.3.3",
+    "nice-invoice": "^1.1.8",
     "node-cron": "^3.0.2",
     "nodemailer": "^6.8.0",
+    "pdf-creator-node": "^2.3.5",
     "randomstring": "^1.2.2",
     "sequelize": "^6.25.0",
-    "sequelize-cli": "^6.5.1"
+    "sequelize-cli": "^6.5.1",
+    "supervisor": "^0.12.0"
   },
   "devDependencies": {
     "eslint": "^6.1.0",
