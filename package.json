@@ -16,6 +16,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": "14.1.0"
+  },
   "bugs": {
     "url": "https://github.com/Greenmouse-Experts/BOG_Backend/issues"
   },
