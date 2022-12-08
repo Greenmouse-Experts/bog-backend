@@ -11,7 +11,7 @@ const OrderItem = require("../models/OrderItem");
 // services
 const invoiceService = require("../service/invoiceService");
 const { sendMail } = require("../service/attachmentEmailService");
-const { invoiceMessage } = require("../helpers/message");
+const helpers = require("../helpers/message");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -197,15 +197,15 @@ exports.createOrder = async (req, res, next) => {
 
       // console.log(orderData.order_items);
       // if (await invoiceService.createInvoice(orderData, userId)) {
-        const files = [
-          { path: `uploads/invoice/${userId}.pdf`, filename: `${userId}.pdf` }
-        ]
-        sendMail(
-          'stephanyemmitty@gmail.com',
-          invoiceMessage,
-          "BOG Invoice",
-          files
-        )
+      await invoiceService.createInvoice(orderData, orderSlug, user);
+      const files = [
+        {
+          path: `uploads/invoice/${orderSlug}.pdf`,
+          filename: `${orderSlug}.pdf`
+        }
+      ];
+      const message = helpers.invoiceMessage(user.name);
+      sendMail(user.email, message, "BOG Invoice", files);
       // }
       return res.status(200).send({
         success: true,
@@ -213,6 +213,7 @@ exports.createOrder = async (req, res, next) => {
         order
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -224,6 +225,7 @@ exports.createOrder = async (req, res, next) => {
 exports.generateOrderInvoice = async (orders, res, next) => {
   try {
     invoiceService.createInvoice(orders, "Holla4550");
+    return true;
   } catch (error) {
     return next(error);
   }
