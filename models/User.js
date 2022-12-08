@@ -98,10 +98,10 @@ const User = sequelise.define(
 );
 
 User.hasOne(BankDetail, {
-    foreignKey: "userId",
-    as: "bank_detail",
-    onDelete: "cascade",
-    hooks: true
+  foreignKey: "userId",
+  as: "bank_detail",
+  onDelete: "cascade",
+  hooks: true
 });
 
 User.hasOne(UserProfile, {

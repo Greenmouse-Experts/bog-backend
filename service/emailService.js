@@ -19,7 +19,7 @@ exports.sendMail = async (email, message, subject) => {
       to: `${email}`, // list of receivers
       subject, // Subject line
       text: "BOG LTD", // plain text body
-      html: message, // html body
+      html: message // html body
     };
     transporter.sendMail(mailOptions, async (err, info) => {
       if (err) {

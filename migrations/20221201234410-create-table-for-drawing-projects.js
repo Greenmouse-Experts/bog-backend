@@ -18,11 +18,15 @@ module.exports = {
           type: Sequelize.UUID,
           allowNull: true
         },
+        clientName: {
+          type: Sequelize.STRING,
+          allowNull: true
+        },
         propertyName: {
           type: Sequelize.STRING,
           allowNull: true
         },
-        propertyLocation: {
+        projectLocation: {
           type: Sequelize.STRING,
           allowNull: true
         },
@@ -30,16 +34,29 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true
         },
-        isResidential: {
-          type: Sequelize.BOOLEAN,
-          allowNull: true,
-          defaultValue: false
-        },
-        propertyType: {
-          type: Sequelize.STRING,
-          allowNull: true
-        },
         projectType: {
+          type: Sequelize.ENUM,
+          allowNull: true,
+          values: [
+            "residential",
+            "commercial",
+            "religious",
+            "industrial",
+            "educational"
+          ]
+        },
+        drawingType: {
+          type: Sequelize.ENUM,
+          allowNull: true,
+          values: [
+            "architectural",
+            "structural",
+            "mechanical",
+            "electrical",
+            "all"
+          ]
+        },
+        buildingType: {
           type: Sequelize.STRING,
           allowNull: true
         },
@@ -62,6 +79,10 @@ module.exports = {
           allowNull: true
         },
         mechanicalPlan: {
+          type: Sequelize.STRING,
+          allowNull: true
+        },
+        electricalPlan: {
           type: Sequelize.STRING,
           allowNull: true
         },

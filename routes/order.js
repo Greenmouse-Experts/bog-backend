@@ -14,6 +14,10 @@ const {
 router.route("/orders/my-orders").get(Auth, OrderController.getMyOrders);
 
 router
+  .route("/orders/order-detail/:orderId")
+  .get(Auth, OrderController.getOrderDetails);
+
+router
   .route("/orders/submit-order")
   .post(orderValidation(), validate, Auth, OrderController.createOrder);
 

@@ -45,7 +45,7 @@ const OrderItem = sequelise.define(
       allowNull: true,
       type: Sequelize.TEXT,
       get() {
-        const data = this.getDataValue("shippingAddress")
+        const data = this.getDataValue("shippingAddress");
         return JSON.parse(data);
       },
       set(value) {

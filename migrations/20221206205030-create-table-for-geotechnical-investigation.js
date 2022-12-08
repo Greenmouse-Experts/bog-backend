@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const table = await queryInterface.createTable("contractor_projects", {
+    const table = await queryInterface.createTable("geotechnical_projects", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -20,11 +20,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
-      propertyName: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      projectLocation: {
+      propertyLocation: {
         type: Sequelize.STRING,
         allowNull: true
       },
@@ -32,47 +28,55 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
-      projectType: {
-        type: Sequelize.ENUM,
-        allowNull: true,
-        values: [
-          "residential",
-          "commercial",
-          "religious",
-          "industrial",
-          "educational"
-        ]
-      },
-      buildingType: {
+      landSize: {
         type: Sequelize.STRING,
         allowNull: true
+      },
+      propertyType: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      siteHasBuilding: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+        defaultValue: false
       },
       status: {
         allowNull: true,
         type: Sequelize.ENUM,
-        values: [
-          "pending",
-          "assigned",
-          "approved",
-          "ongoing",
-          "cancelled",
-          "completed"
-        ],
+        values: ["pending", "approved", "ongoing", "cancelled", "completed"],
         defaultValue: "pending"
       },
-      surveyPlan: {
+      propertyPicture: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      structuralPlan: {
+      noOfIntentendedBorehole: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      depthOfBorehole: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      architecturalPlan: {
+      noOfCpt: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      mechanicalPlan: {
+      tonnageOfCpt: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      typeOfCpt: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      anySpecialInvestigation: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+        defaultValue: false
+      },
+      comment: {
         type: Sequelize.STRING,
         allowNull: true
       },
@@ -84,6 +88,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("contractor_projects");
+    return queryInterface.dropTable("geotechnical_projects");
   }
 };

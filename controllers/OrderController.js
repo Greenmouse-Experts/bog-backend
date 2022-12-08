@@ -12,7 +12,6 @@ const OrderItem = require("../models/OrderItem");
 const invoiceService = require("../service/invoiceService");
 const { sendMail } = require("../service/emailService");
 
-
 exports.getMyOrders = async (req, res, next) => {
   try {
     const where = {
@@ -25,6 +24,38 @@ exports.getMyOrders = async (req, res, next) => {
     const orders = await Order.findAll({
       where,
       order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: OrderItem,
+          as: "order_items",
+          include: [
+            {
+              model: User,
+              as: "product_owner",
+              attributes: ["id", "fname", "lname", "email", "phone"]
+            }
+          ]
+        }
+      ]
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: orders
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getOrderDetails = async (req, res, next) => {
+  try {
+    const where = {
+      id: req.params.orderId
+    };
+
+    const orders = await Order.findOne({
+      where,
       include: [
         {
           model: OrderItem,
@@ -83,6 +114,7 @@ exports.createOrder = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const userId = req.user.id;
+      const ownerId = req.user.id;
       const {
         shippingAddress,
         paymentInfo,
@@ -94,13 +126,15 @@ exports.createOrder = async (req, res, next) => {
       const orderSlug = `ORD-${utility.generateOrderId}`;
       const orderData = {
         orderSlug,
-        userId: userId,
+        userId,
+        userId: ownerId,
         deliveryFee,
         discount,
         totalAmount
       };
       const paymentData = {
-        userId: userId,
+        userId,
+        userId: ownerId,
         payment_reference: paymentInfo.reference,
         amount: paymentInfo.amount,
         payment_category: "Order"
@@ -126,6 +160,7 @@ exports.createOrder = async (req, res, next) => {
             status: "paid",
             trackingId,
             userId,
+            ownerId,
             productOwner: prodData.creatorId,
             amount,
             shippingAddress,
@@ -151,16 +186,16 @@ exports.createOrder = async (req, res, next) => {
           }
         ],
         transaction: t
-      })
+      });
 
       // console.log(orderData.order_items);
       if (await invoiceService.createInvoice(orderData, userId)) {
         sendMail(
-          'stephanyemmitty@gmail.com',
+          "stephanyemmitty@gmail.com",
           `../uploads/invoice/${userId}.pdf`,
-          "BOG Invoice")
+          "BOG Invoice"
+        );
       }
-        
       return res.status(200).send({
         success: true,
         message: "Order Request submitted",
@@ -176,12 +211,12 @@ exports.createOrder = async (req, res, next) => {
 // generate invoice on save
 
 exports.generateOrderInvoice = async (orders, res, next) => {
-    try {
-      invoiceService.createInvoice(orders, 'Holla4550')
-    } catch (error) {
-      return next(error);
-    }
-}
+  try {
+    invoiceService.createInvoice(orders, "Holla4550");
+  } catch (error) {
+    return next(error);
+  }
+};
 
 exports.updateOrder = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -231,7 +266,6 @@ exports.updateOrderRequest = async (req, res, next) => {
         status,
         ...req.body
       };
-      console.log(data);
       await OrderItem.update(data, {
         where: { id: requestId },
         transaction: t
@@ -242,7 +276,6 @@ exports.updateOrderRequest = async (req, res, next) => {
         message: "Order Request updated"
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
       return next(error);
     }

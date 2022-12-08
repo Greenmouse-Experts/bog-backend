@@ -2,8 +2,8 @@ const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
 const User = require("./User");
 
-const DrawingProject = sequelise.define(
-  "constructor_drawing_projects",
+const GeoTechnical = sequelise.define(
+  "geotechnical_projects",
   {
     id: {
       type: Sequelize.UUID,
@@ -23,11 +23,7 @@ const DrawingProject = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true
     },
-    propertyName: {
-      type: Sequelize.STRING,
-      allowNull: true
-    },
-    projectLocation: {
+    propertyLocation: {
       type: Sequelize.STRING,
       allowNull: true
     },
@@ -35,25 +31,18 @@ const DrawingProject = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true
     },
-    projectType: {
-      type: Sequelize.ENUM,
-      allowNull: true,
-      values: [
-        "residential",
-        "commercial",
-        "religious",
-        "industrial",
-        "educational"
-      ]
-    },
-    drawingType: {
-      type: Sequelize.ENUM,
-      allowNull: true,
-      values: ["architectural", "structural", "mechanical", "electrical", "all"]
-    },
-    buildingType: {
+    landSize: {
       type: Sequelize.STRING,
       allowNull: true
+    },
+    propertyType: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    siteHasBuilding: {
+      type: Sequelize.BOOLEAN,
+      allowNull: true,
+      defaultValue: false
     },
     status: {
       allowNull: true,
@@ -61,23 +50,36 @@ const DrawingProject = sequelise.define(
       values: ["pending", "approved", "ongoing", "cancelled", "completed"],
       defaultValue: "pending"
     },
-    surveyPlan: {
+    propertyPicture: {
       type: Sequelize.STRING,
       allowNull: true
     },
-    structuralPlan: {
+    noOfIntentendedBorehole: {
+      type: Sequelize.INTEGER,
+      allowNull: true
+    },
+    depthOfBorehole: {
       type: Sequelize.STRING,
       allowNull: true
     },
-    architecturalPlan: {
+    noOfCpt: {
       type: Sequelize.STRING,
       allowNull: true
     },
-    mechanicalPlan: {
+    tonnageOfCpt: {
       type: Sequelize.STRING,
       allowNull: true
     },
-    electricalPlan: {
+    typeOfCpt: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    anySpecialInvestigation: {
+      type: Sequelize.BOOLEAN,
+      allowNull: true,
+      defaultValue: false
+    },
+    comment: {
       type: Sequelize.STRING,
       allowNull: true
     }
@@ -85,9 +87,9 @@ const DrawingProject = sequelise.define(
   { paranoid: true }
 );
 
-User.hasMany(DrawingProject, {
+User.hasMany(GeoTechnical, {
   foreignKey: "userId",
-  as: "drawings"
+  as: "geotechnical_project"
 });
 
-module.exports = DrawingProject;
+module.exports = GeoTechnical;
