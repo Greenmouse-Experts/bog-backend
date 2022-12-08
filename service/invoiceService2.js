@@ -3,10 +3,8 @@ const fs = require("fs");
 
 exports.createInvoice = async (orderData, invoiceName) => {
   const data = {
-    // Customize enables you to provide your own templates
-    // Please review the documentation for instructions and examples
     customize: {
-      //  "template": fs.readFileSync('template.html', 'base64') // Must be base64 encoded html
+      "template": fs.readFileSync('template.html', 'base64')
     },
     images: {
       // The logo on top of your invoice
@@ -106,3 +104,6 @@ exports.createInvoice = async (orderData, invoiceName) => {
     // easyinvoice.download('myInvoice.pdf', result.pdf);
   });
 };
+
+
+// https://res.cloudinary.com/yhomi1996/image/upload/v1665783638/bog_moijdl.png

@@ -36,7 +36,7 @@ exports.createInvoice = async (data, invoiceName, user) => {
     footer: {
       text: `Copyright @ BOG ${new Date().getFullYear()}`
     },
-    currency_symbol: "₦",
+    currency_symbol: "NGN",
     date: {
       billing_date: "08 August 2020",
       due_date: "10 September 2020"

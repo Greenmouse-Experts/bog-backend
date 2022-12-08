@@ -19,14 +19,13 @@ const resetPasswordMessage = (email, token) => {
 
 const invoiceMessage = () => {
   const message = `<html>
-    <head>
-      <title>Invoice of your order for BOG</title>
-    </head>
-    <body>
-    <p>Thanks for shopping with us</p>
-    
-    </body>
-</html>`;
+      <head>
+          <title>Invoice of your order for BOG</title>
+      </head>
+      <body>
+          <p>Thanks for shopping with us</p>
+      </body>
+  </html>`;
   return message;
 };
 
