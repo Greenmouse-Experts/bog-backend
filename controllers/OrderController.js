@@ -10,7 +10,8 @@ const Payment = require("../models/Payment");
 const OrderItem = require("../models/OrderItem");
 // services
 const invoiceService = require("../service/invoiceService");
-const { sendMail } = require("../service/emailService");
+const { sendMail } = require("../service/attachmentEmailService");
+const { invoiceMessage } = require("../helpers/message");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -195,9 +196,17 @@ exports.createOrder = async (req, res, next) => {
       });
 
       // console.log(orderData.order_items);
-      if (await invoiceService.createInvoice(orderData, userId)) {
-        sendMail(user.email, `../uploads/invoice/${userId}.pdf`, "BOG Invoice");
-      }
+      // if (await invoiceService.createInvoice(orderData, userId)) {
+        const files = [
+          { path: `uploads/invoice/${userId}.pdf`, filename: `${userId}.pdf` }
+        ]
+        sendMail(
+          'stephanyemmitty@gmail.com',
+          invoiceMessage,
+          "BOG Invoice",
+          files
+        )
+      // }
       return res.status(200).send({
         success: true,
         message: "Order Request submitted",

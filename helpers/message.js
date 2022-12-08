@@ -17,6 +17,19 @@ const resetPasswordMessage = (email, token) => {
   return message;
 };
 
+const invoiceMessage = () => {
+  const message = `<html>
+    <head>
+      <title>Invoice of your order for BOG</title>
+    </head>
+    <body>
+    <p>Thanks for shopping with us</p>
+    
+    </body>
+</html>`;
+  return message;
+};
+
 const resetPasswordMobileMessage = token => {
   const message = `<html>
     <head>
@@ -473,5 +486,6 @@ module.exports = {
   mobileVerifyMessage,
   generateMobileToken,
   generateWebToken,
-  resetPasswordMobileMessage
+  resetPasswordMobileMessage,
+  invoiceMessage
 };

@@ -14,7 +14,7 @@ exports.createInvoice = async (data, invoiceName, user) => {
     price: parseInt(items.product.price),
     tax: "10%"
   }));
-  console.log(myProduct);
+  
   const invoiceDetail = {
     shipping: {
       name: user.name,
@@ -43,6 +43,7 @@ exports.createInvoice = async (data, invoiceName, user) => {
     }
   };
 
+  console.log(invoiceDetail);
   nodeInvoice(invoiceDetail, `uploads/invoice/${invoiceName}.pdf`);
   return true;
 };

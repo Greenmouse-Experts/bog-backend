@@ -125,7 +125,7 @@ exports.deleteReview = async (req, res, next) => {
 /* ---------Service Reviews-------- */
 
 // create reviews
-exports.createPartnerReview = async (req, res, next) => {
+exports.createServiceReview = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const ownerId = req.user.id;
@@ -149,7 +149,7 @@ exports.createPartnerReview = async (req, res, next) => {
 
 // update review
 
-exports.updatePartnerReview = async (req, res, next) => {
+exports.updateServiceReview = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { reviewId, ...others } = req.body;
@@ -178,7 +178,7 @@ exports.updatePartnerReview = async (req, res, next) => {
 };
 
 // get all product review
-exports.getAllPartnerReview = async (req, res, next) => {
+exports.getAllServiceReview = async (req, res, next) => {
   try {
     const where = {
       partnerId: req.query.partnerId
@@ -200,7 +200,7 @@ exports.getAllPartnerReview = async (req, res, next) => {
 
 // delete reviews
 
-exports.deletePartnerReview = async (req, res, next) => {
+exports.deleteServiceReview = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { reviewId } = req.query;
