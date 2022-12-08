@@ -2,7 +2,7 @@
 /* eslint-disable radix */
 const nodeInvoice = require("nice-invoice");
 
-exports.createInvoice = async (data, invoiceName) => {
+exports.createInvoice = async (data, invoiceName, user) => {
   const { order_items, orderSlug, totalAmount, deliveryFee } = data;
   if (!order_items && order_items.length < 1) {
     return false;
@@ -17,7 +17,7 @@ exports.createInvoice = async (data, invoiceName) => {
   console.log(myProduct);
   const invoiceDetail = {
     shipping: {
-      name: "Stephen Olayemi",
+      name: user.name,
       city: order_items[0].shippingAddress.city,
       state: order_items[0].shippingAddress.state,
       country: order_items[0].shippingAddress.country,

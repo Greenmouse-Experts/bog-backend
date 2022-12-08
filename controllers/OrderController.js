@@ -120,6 +120,9 @@ exports.createOrder = async (req, res, next) => {
     try {
       const userId = req.user.id;
       const ownerId = req.user.id;
+      const user = await User.findByPk(userId, {
+        attributes: ["email", "name"]
+      });
       const {
         shippingAddress,
         paymentInfo,
@@ -132,14 +135,12 @@ exports.createOrder = async (req, res, next) => {
       const orderData = {
         orderSlug,
         userId,
-        userId: ownerId,
         deliveryFee,
         discount,
         totalAmount
       };
       const paymentData = {
         userId,
-        userId: ownerId,
         payment_reference: paymentInfo.reference,
         amount: paymentInfo.amount,
         payment_category: "Order"
@@ -195,11 +196,7 @@ exports.createOrder = async (req, res, next) => {
 
       // console.log(orderData.order_items);
       if (await invoiceService.createInvoice(orderData, userId)) {
-        sendMail(
-          "stephanyemmitty@gmail.com",
-          `../uploads/invoice/${userId}.pdf`,
-          "BOG Invoice"
-        );
+        sendMail(user.email, `../uploads/invoice/${userId}.pdf`, "BOG Invoice");
       }
       return res.status(200).send({
         success: true,

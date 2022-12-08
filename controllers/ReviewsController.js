@@ -2,28 +2,21 @@
 require("dotenv").config();
 const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
-const ProductReview = require('../models/Reviews');
-const ServiceReview = require('../models/ServiceReview');
+const ProductReview = require("../models/Reviews");
+const ServiceReview = require("../models/ServiceReview");
 const Product = require("../models/Product");
 const PartnerModel = require("../models/ServicePartner");
 
-
 // create reviews
-exports.createReview = async(req, res, next) => {
-    sequelize.transaction(async t => {
+exports.createReview = async (req, res, next) => {
+  sequelize.transaction(async t => {
     try {
-      const ownerId = req.user.id;
-      req.body.userId = ownerId
-          
+      const userId = req.user.id;
+      req.body.userId = userId;
+
       const myReview = await ProductReview.create(req.body, {
-        include: [
-          {
-            model: Product,
-            as: "product_info"
-          }
-        ],
         transaction: t
-      })
+      });
 
       return res.status(200).send({
         success: true,
@@ -34,9 +27,8 @@ exports.createReview = async(req, res, next) => {
       t.rollback();
       return next(error);
     }
-  })
-}
-
+  });
+};
 
 // update review
 
@@ -52,7 +44,10 @@ exports.updateReview = async (req, res, next) => {
         });
       }
 
-      await ProductReview.update(others, { where: { id: reviewId }, transaction: t });
+      await ProductReview.update(others, {
+        where: { id: reviewId },
+        transaction: t
+      });
 
       return res.status(200).send({
         success: true,
@@ -69,12 +64,12 @@ exports.updateReview = async (req, res, next) => {
 exports.getAllProductReview = async (req, res, next) => {
   try {
     const where = {
-      productId: req.query.productId,
+      productId: req.query.productId
     };
     if (req.query.userId) {
       where.userId = req.query.userId;
     }
-    console.log(where)
+
     const reviews = await ProductReview.findAll({
       where,
       order: [["createdAt", "DESC"]],
@@ -83,7 +78,7 @@ exports.getAllProductReview = async (req, res, next) => {
           model: Product,
           as: "product_info",
           attributes: ["id", "name", "price", "image"]
-        },
+        }
       ]
     });
 
@@ -96,27 +91,25 @@ exports.getAllProductReview = async (req, res, next) => {
   }
 };
 
-
 // delete reviews
 
 exports.deleteReview = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { reviewId } = req.query;
-      const userId = req.user.id;
-      where = { id: reviewId }
-      console.log(reviewId, userId)
+      const where = { id: reviewId };
 
-      const isExist = await ProductReview.findOne({where});
+      const isExist = await ProductReview.findOne({ where });
       if (!isExist) {
         return res.status(404).send({
           success: false,
           message: "Review Not Found"
         });
       }
-      
+
       await ProductReview.destroy({
-        where: { id: reviewId}, transaction: t
+        where: { id: reviewId },
+        transaction: t
       });
       return res.status(200).send({
         success: true,
@@ -129,27 +122,18 @@ exports.deleteReview = async (req, res, next) => {
   });
 };
 
-
-
-
-/*---------Service Reviews-------- */
+/* ---------Service Reviews-------- */
 
 // create reviews
-exports.createPartnerReview = async(req, res, next) => {
-    sequelize.transaction(async t => {
+exports.createPartnerReview = async (req, res, next) => {
+  sequelize.transaction(async t => {
     try {
       const ownerId = req.user.id;
-      req.body.userId = ownerId
-          
+      req.body.userId = ownerId;
+
       const myReview = await ServiceReview.create(req.body, {
-        include: [
-          {
-            model: Product,
-            as: "product_info"
-          }
-        ],
         transaction: t
-      })
+      });
 
       return res.status(200).send({
         success: true,
@@ -160,9 +144,8 @@ exports.createPartnerReview = async(req, res, next) => {
       t.rollback();
       return next(error);
     }
-  })
-}
-
+  });
+};
 
 // update review
 
@@ -178,7 +161,10 @@ exports.updatePartnerReview = async (req, res, next) => {
         });
       }
 
-      await ServiceReview.update(others, { where: { id: reviewId }, transaction: t });
+      await ServiceReview.update(others, {
+        where: { id: reviewId },
+        transaction: t
+      });
 
       return res.status(200).send({
         success: true,
@@ -195,12 +181,12 @@ exports.updatePartnerReview = async (req, res, next) => {
 exports.getAllPartnerReview = async (req, res, next) => {
   try {
     const where = {
-      partnerId: req.query.partnerId,
+      partnerId: req.query.partnerId
     };
-    console.log(where)
+
     const reviews = await ServiceReview.findAll({
       where,
-      order: [["createdAt", "DESC"]],
+      order: [["createdAt", "DESC"]]
     });
 
     return res.status(200).send({
@@ -212,27 +198,25 @@ exports.getAllPartnerReview = async (req, res, next) => {
   }
 };
 
-
 // delete reviews
 
 exports.deletePartnerReview = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { reviewId } = req.query;
-      const userId = req.user.id;
-      where = { id: reviewId }
-      console.log(reviewId, userId)
+      const where = { id: reviewId };
 
-      const isExist = await ServiceReview.findOne({where});
+      const isExist = await ServiceReview.findOne({ where });
       if (!isExist) {
         return res.status(404).send({
           success: false,
           message: "Review Not Found"
         });
       }
-      
+
       await ServiceReview.destroy({
-        where: { id: reviewId}, transaction: t
+        where: { id: reviewId },
+        transaction: t
       });
       return res.status(200).send({
         success: true,
@@ -244,4 +228,3 @@ exports.deletePartnerReview = async (req, res, next) => {
     }
   });
 };
-

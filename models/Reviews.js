@@ -15,7 +15,7 @@ const ProductReview = sequelise.define(
     userId: {
       allowNull: true,
       type: Sequelize.UUID
-      },
+    },
     productId: {
       allowNull: true,
       type: Sequelize.UUID
@@ -25,18 +25,18 @@ const ProductReview = sequelise.define(
       type: Sequelize.INTEGER
     },
     review: {
-        allowNull: true,
-        type: Sequelize.STRING,
+      allowNull: true,
+      type: Sequelize.STRING
     }
   },
   { paranoid: true }
 );
 
 Product.hasMany(ProductReview, {
-    foreignKey: "productId",
-    as: "product_reviews",
-    onDelete: "cascade",
-    hooks: true
+  foreignKey: "productId",
+  as: "product_reviews",
+  onDelete: "cascade",
+  hooks: true
 });
 
-module.exports =  ProductReview;
+module.exports = ProductReview;
