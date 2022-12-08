@@ -40,4 +40,8 @@ router
 
 router.route("/orders/all").get(Auth, OrderController.getAllOrders);
 
+//Router
+// router.route("/orders/generateInvoice").get(Auth, OrderController.generateOrderInvoice);
+
+
 module.exports = router;
