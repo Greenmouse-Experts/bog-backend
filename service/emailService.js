@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-exports.sendMail = async (email, message, subject) => {
+exports.sendMail = async (email, message, subject, files = []) => {
   try {
     // send mail with defined transport object
     const mailOptions = {
@@ -19,7 +19,8 @@ exports.sendMail = async (email, message, subject) => {
       to: `${email}`, // list of receivers
       subject, // Subject line
       text: "BOG LTD", // plain text body
-      html: message // html body
+      html: message, // html body
+      attachments: files
     };
     transporter.sendMail(mailOptions, async (err, info) => {
       if (err) {
