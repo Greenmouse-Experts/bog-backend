@@ -197,15 +197,14 @@ exports.createOrder = async (req, res, next) => {
 
       // console.log(orderData.order_items);
       // if (await invoiceService.createInvoice(orderData, userId)) {
-        const files = [
-          { path: `uploads/invoice/${userId}.pdf`, filename: `${userId}.pdf` }
-        ]
-        sendMail(
-          'stephanyemmitty@gmail.com',
-          invoiceMessage,
-          "BOG Invoice",
-          files
-        )
+      await invoiceService.createInvoice(orderData, orderSlug, user);
+      const files = [
+        {
+          path: `uploads/invoice/${orderSlug}.pdf`,
+          filename: `${orderSlug}.pdf`
+        }
+      ];
+      sendMail(user.email, invoiceMessage, "BOG Invoice", files);
       // }
       return res.status(200).send({
         success: true,
@@ -213,6 +212,7 @@ exports.createOrder = async (req, res, next) => {
         order
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
