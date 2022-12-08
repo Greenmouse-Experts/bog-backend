@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable radix */
+const dayjs = require("dayjs");
 const nodeInvoice = require("nice-invoice");
 
 exports.createInvoice = async (data, invoiceName, user) => {
@@ -14,7 +15,7 @@ exports.createInvoice = async (data, invoiceName, user) => {
     price: parseInt(items.product.price),
     tax: "10%"
   }));
-  
+
   const invoiceDetail = {
     shipping: {
       name: user.name,
@@ -29,21 +30,20 @@ exports.createInvoice = async (data, invoiceName, user) => {
     order_number: orderSlug,
     header: {
       company_name: "BOG",
-      company_logo: "uploads/1zhCsxYT-mail-email.jpg",
+      company_logo: "bog_logo.png",
       company_address:
-        "Nice Invoice. 123 William Street 1th Floor New York, NY 123456"
+        "BOG. 2 metal box road, off acme road, Ogba Industrial Estate Rd, Ogba, Lagos"
     },
     footer: {
       text: `Copyright @ BOG ${new Date().getFullYear()}`
     },
-    currency_symbol: "NGN",
+    currency_symbol: `N`,
     date: {
-      billing_date: "08 August 2020",
-      due_date: "10 September 2020"
+      billing_date: dayjs().format("DD-MM-YYYY"),
+      due_date: dayjs().format("DD-MM-YYYY")
     }
   };
 
-  console.log(invoiceDetail);
   nodeInvoice(invoiceDetail, `uploads/invoice/${invoiceName}.pdf`);
   return true;
 };
