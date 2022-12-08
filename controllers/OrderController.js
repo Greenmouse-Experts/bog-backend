@@ -64,6 +64,11 @@ exports.getOrderDetails = async (req, res, next) => {
               attributes: ["id", "fname", "lname", "email", "phone"]
             }
           ]
+        },
+        {
+          model: User,
+          as: "client",
+          attributes: ["id", "fname", "lname", "email", "phone"]
         }
       ]
     });

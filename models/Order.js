@@ -51,5 +51,9 @@ User.hasMany(Order, {
   foreignKey: "userId",
   as: "user_orders"
 });
+Order.belongsTo(User, {
+  foreignKey: "userId",
+  as: "client"
+});
 
 module.exports = Order;
