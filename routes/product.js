@@ -18,6 +18,8 @@ router
   .route("/products/similar-products")
   .get(ProductController.getSimilarProducts);
 
+  router.route("/products/delete-old").get(ProductController.deleteOldProduct);
+
 router
   .route("/product/category")
   .post(categoryValidation(), validate, ProductController.createCategory)
@@ -63,5 +65,7 @@ router
     Auth,
     ProductController.approveProduct
   );
+
+
 
 module.exports = router;
