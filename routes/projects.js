@@ -24,7 +24,7 @@ router
 
 router
   .route("/projects/delete/:requestId")
-  .delete(Auth, ProjectController.getProjectRequest);
+  .delete(Auth, ProjectController.deleteProjectRequest);
 
 // Land Survey
 router
