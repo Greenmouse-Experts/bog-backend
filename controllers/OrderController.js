@@ -9,7 +9,7 @@ const Product = require("../models/Product");
 const Payment = require("../models/Payment");
 const OrderItem = require("../models/OrderItem");
 // services
-const invoiceService = require("../service/invoiceService");
+const invoiceService = require("../service/invoiceService2");
 const { sendMail } = require("../service/attachmentEmailService");
 const helpers = require("../helpers/message");
 
@@ -197,7 +197,7 @@ exports.createOrder = async (req, res, next) => {
 
       // console.log(orderData.order_items);
       // if (await invoiceService.createInvoice(orderData, userId)) {
-      await invoiceService.createInvoice(orderData, orderSlug, user);
+      await invoiceService.createInvoice(orderData, user);
       const files = [
         {
           path: `uploads/invoice/${orderSlug}.pdf`,
@@ -205,7 +205,7 @@ exports.createOrder = async (req, res, next) => {
         }
       ];
       const message = helpers.invoiceMessage(user.name);
-      sendMail(user.email, message, "BOG Invoice", files);
+      // sendMail(user.email, message, "BOG Invoice", files);
       // }
       return res.status(200).send({
         success: true,

@@ -1,74 +1,67 @@
 const easyinvoice = require("easyinvoice");
 const fs = require("fs");
 
-exports.createInvoice = async (orderData, invoiceName) => {
+exports.createInvoice = async (orderData, user) => {
+  const { order_items, orderSlug, totalAmount, deliveryFee } = orderData;
+  if (!order_items && order_items.length < 1)   {
+    return false;
+  }
+  const myProduct = order_items.map(items => ({
+    description: items.product.name.substring(0, 27),
+    quantity: items.quantity,
+    price: parseInt(items.product.price),
+    taxrate: 10,
+  }));
   const data = {
     customize: {
-      "template": fs.readFileSync('template.html', 'base64')
+      // "template": fs.readFileSync('template.html', 'base64')
     },
     images: {
       // The logo on top of your invoice
-      logo: "https://public.easyinvoice.cloud/img/logo_en_original.png",
+      // logo: "../uploads/bog_moijdl.png"
+      logo: "https://res.cloudinary.com/yhomi1996/image/upload/v1665783638/bog_moijdl.png",
       // The invoice background
-      background: "https://public.easyinvoice.cloud/img/watermark-draft.jpg"
+      // https://public.easyinvoice.cloud/img/watermark-draft.jpg
+      // background: ""
     },
     // Your own data
     sender: {
-      company: "Sample Corp",
+      company: "BOG LTD",
       address: "Sample Street 123",
       zip: "1234 AB",
-      city: "Sampletown",
-      country: "Samplecountry"
+      city: "Lagos",
+      country: "Nigeria"
       // "custom1": "custom value 1",
       // "custom2": "custom value 2",
       // "custom3": "custom value 3"
     },
     // Your recipient
     client: {
-      company: "Client Corp",
-      address: "Clientstreet 456",
-      zip: "4567 CD",
-      city: "Clientcity",
-      country: "Clientcountry"
+      company: user.name,
+      zip: order_items[0].shippingAddress.postal_code,
+      "state": order_items[0].shippingAddress.state,
+      city: order_items[0].shippingAddress.city,
+      country: order_items[0].shippingAddress.country,
       // "custom1": "custom value 1",
       // "custom2": "custom value 2",
       // "custom3": "custom value 3"
     },
     information: {
       // Invoice number
-      number: "2021.0001",
+      number: orderSlug,
       // Invoice data
-      date: "12-12-2021",
+      date: new Date().getDate(),
       // Invoice due date
       "due-date": "31-12-2021"
     },
     // The products you would like to see on your invoice
     // Total values are being calculated automatically
-    products: [
-      {
-        quantity: 2,
-        description: "Product 1",
-        "tax-rate": 6,
-        price: 33.87
-      },
-      {
-        quantity: 4.1,
-        description: "Product 2",
-        "tax-rate": 6,
-        price: 12.34
-      },
-      {
-        quantity: 4.5678,
-        description: "Product 3",
-        "tax-rate": 21,
-        price: 6324.453456
-      }
-    ],
+    products: myProduct,
     // The message you would like to display on the bottom of your invoice
     "bottom-notice": "Kindly pay your invoice within 15 days.",
     // Settings to customize your invoice
     settings: {
-      currency: "USD" // See documentation 'Locales and Currency' for more info. Leave empty for no currency.
+      currency: "NGN" // See documentation 'Locales and Currency' for more info. Leave empty for no currency.
       // "locale": "nl-NL", // Defaults to en-US, used for number formatting (See documentation 'Locales and Currency')
       // "tax-notation": "gst", // Defaults to 'vat'
       // "margin-top": 25, // Defaults to '25'
@@ -94,16 +87,14 @@ exports.createInvoice = async (orderData, invoiceName) => {
       // "total": "Totaal" // Defaults to 'Total'
     }
   };
-
+  console.log(data);
   // Create your invoice! Easy!
-  easyinvoice.createInvoice(data, async function(result) {
-    console.log(data);
+  easyinvoice.createInvoice(data, function(result) {
     // The response will contain a base64 encoded PDF file
     // console.log('PDF base64 string: ', result.pdf);
-    await fs.writeFileSync("invoice.pdf", result.pdf, "base64");
+    fs.writeFileSync(`uploads/invoice/${orderSlug}.pdf`, result.pdf, "base64");
     // easyinvoice.download('myInvoice.pdf', result.pdf);
   });
+
+  return true;
 };
-
-
-// https://res.cloudinary.com/yhomi1996/image/upload/v1665783638/bog_moijdl.png
