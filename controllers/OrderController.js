@@ -197,16 +197,17 @@ exports.createOrder = async (req, res, next) => {
 
       // console.log(orderData.order_items);
       // if (await invoiceService.createInvoice(orderData, userId)) {
-      await invoiceService.createInvoice(orderData, user);
-      const files = [
-        {
-          path: `uploads/invoice/${orderSlug}.pdf`,
-          filename: `${orderSlug}.pdf`
-        }
-      ];
-      const message = helpers.invoiceMessage(user.name);
-      // sendMail(user.email, message, "BOG Invoice", files);
-      // }
+      const invoice = await invoiceService.createInvoice(orderData, user);
+      if (invoice) {
+        const files = [
+          {
+            path: `uploads/invoice/${orderSlug}.pdf`,
+            filename: `${orderSlug}.pdf`
+          }
+        ];
+        const message = helpers.invoiceMessage(user.name);
+        sendMail(user.email, message, "BOG Invoice", files);
+      }
       return res.status(200).send({
         success: true,
         message: "Order Request submitted",
