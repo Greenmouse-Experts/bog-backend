@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const multer = require("multer");
 const randomstring = require("randomstring");
 
