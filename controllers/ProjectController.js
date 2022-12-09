@@ -11,6 +11,7 @@ const DrawingProject = require("../models/DrawingProject");
 const BuildingProject = require("../models/BuildingProject");
 const ContractorProject = require("../models/ContractorProject");
 const GeoTechnical = require("../models/GeoTechnical");
+const utility = require("../helpers/utility");
 
 // Projects
 exports.getProjectRequest = async (req, res, next) => {
@@ -107,6 +108,8 @@ exports.viewProjectRequest = async (req, res, next) => {
 
 exports.createProject = async (data, transaction) => {
   try {
+    const projectSlug = `PRJ-${utility.generateOrderId}`;
+    data.projectSlug = projectSlug;
     const result = await Project.create(data, { transaction });
     return result;
   } catch (error) {

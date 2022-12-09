@@ -23,6 +23,10 @@ const Project = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true
     },
+    projectSlug: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
     description: {
       type: Sequelize.STRING,
       allowNull: true
