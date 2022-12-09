@@ -34,7 +34,8 @@
     "randomstring": "^1.2.2",
     "sequelize": "^6.25.0",
     "sequelize-cli": "^6.5.1",
-    "supervisor": "^0.12.0"
+    "supervisor": "^0.12.0",
+    "nice-invoice": "^1.1.8"
   },
   "devDependencies": {
     "eslint": "^6.1.0",
