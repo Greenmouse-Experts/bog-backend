@@ -449,7 +449,6 @@ exports.deleteOldProduct = async (req, res, next) => {
       const products = await Product.findAll({ order: [["createdAt", "ASC"]] });
       const data = products
         .map(product => {
-          console.log(product.image.startsWith("upload"));
           if (product.image.startsWith("upload")) {
             return product;
           }

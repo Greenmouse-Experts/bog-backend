@@ -72,7 +72,7 @@ exports.getOrderDetails = async (req, res, next) => {
         {
           model: User,
           as: "client",
-          attributes: ["id", "fname", "lname", "email", "phone"]
+          attributes: ["id", "fname", "lname", "email", "phone", "photo"]
         }
       ]
     });
@@ -102,7 +102,7 @@ exports.getOrderRequest = async (req, res, next) => {
         {
           model: User,
           as: "user",
-          attributes: ["id", "fname", "lname", "email", "phone"]
+          attributes: ["id", "fname", "lname", "email", "phone", "photo"]
         }
       ]
     });
