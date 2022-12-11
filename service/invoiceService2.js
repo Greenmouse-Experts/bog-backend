@@ -18,7 +18,7 @@ exports.createInvoice = async (orderData, user) => {
     },
     images: {
       // The logo on top of your invoice
-      // logo: "../uploads/bog_moijdl.png"
+      // logo: "uploads/bog_moijdl.png"
       logo: "https://res.cloudinary.com/yhomi1996/image/upload/v1665783638/bog_moijdl.png",
       // The invoice background
       // https://public.easyinvoice.cloud/img/watermark-draft.jpg
@@ -87,8 +87,8 @@ exports.createInvoice = async (orderData, user) => {
       // "total": "Totaal" // Defaults to 'Total'
     }
   };
-  console.log(data);
   // Create your invoice! Easy!
+  console.log(data);
   easyinvoice.createInvoice(data, function(result) {
     // The response will contain a base64 encoded PDF file
     // console.log('PDF base64 string: ', result.pdf);
