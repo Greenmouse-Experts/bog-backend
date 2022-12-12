@@ -5,7 +5,7 @@ const easyinvoice = require("easyinvoice");
 const fs = require("fs");
 
 exports.createInvoice = async (orderData, user) => {
-  const { order_items, orderSlug, totalAmount, deliveryFee } = orderData;
+  const { order_items, orderSlug, contact } = orderData;
   if (!order_items && order_items.length < 1) {
     return false;
   }
@@ -42,10 +42,10 @@ exports.createInvoice = async (orderData, user) => {
     // Your recipient
     client: {
       company: user.name,
-      zip: order_items[0].shippingAddress.postal_code,
-      state: order_items[0].shippingAddress.state,
-      city: order_items[0].shippingAddress.city,
-      country: order_items[0].shippingAddress.country
+      zip: contact.postal_code,
+      state: contact.state,
+      city: contact.city,
+      country: contact.country
       // "custom1": "custom value 1",
       // "custom2": "custom value 2",
       // "custom3": "custom value 3"

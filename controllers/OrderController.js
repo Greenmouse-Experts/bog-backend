@@ -12,6 +12,7 @@ const OrderItem = require("../models/OrderItem");
 const invoiceService = require("../service/invoiceService2");
 const { sendMail } = require("../service/attachmentEmailService");
 const helpers = require("../helpers/message");
+const ContactDetails = require("../models/ContactDetails");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -26,6 +27,10 @@ exports.getMyOrders = async (req, res, next) => {
       where,
       order: [["createdAt", "DESC"]],
       include: [
+        {
+          model: ContactDetails,
+          as: "contact"
+        },
         {
           model: OrderItem,
           as: "order_items",
@@ -58,6 +63,10 @@ exports.getOrderDetails = async (req, res, next) => {
     const orders = await Order.findOne({
       where,
       include: [
+        {
+          model: ContactDetails,
+          as: "contact"
+        },
         {
           model: OrderItem,
           as: "order_items",
@@ -103,6 +112,16 @@ exports.getOrderRequest = async (req, res, next) => {
           model: User,
           as: "user",
           attributes: ["id", "fname", "lname", "email", "phone", "photo"]
+        },
+        {
+          model: Order,
+          as: "order",
+          include: [
+            {
+              model: ContactDetails,
+              as: "contact"
+            }
+          ]
         }
       ]
     });
@@ -148,6 +167,10 @@ exports.createOrder = async (req, res, next) => {
       };
 
       await Payment.create(paymentData, { transaction: t });
+      const contact = {
+        ...shippingAddress,
+        userId
+      };
       const orders = await Promise.all(
         products.map(async product => {
           const prodData = await Product.findByPk(product.productId, {
@@ -184,18 +207,24 @@ exports.createOrder = async (req, res, next) => {
           };
         })
       );
+
       orderData.order_items = orders;
+      orderData.contact = contact;
       const order = await Order.create(orderData, {
         include: [
           {
             model: OrderItem,
             as: "order_items"
+          },
+          {
+            model: ContactDetails,
+            as: "contact"
           }
         ],
         transaction: t
       });
 
-      // console.log(orderData.order_items);
+      console.log(orderData);
       // if (await invoiceService.createInvoice(orderData, userId)) {
       const invoice = await invoiceService.createInvoice(orderData, user);
       if (invoice) {
@@ -301,6 +330,10 @@ exports.getAllOrders = async (req, res, next) => {
     const orders = await Order.findAll({
       order: [["createdAt", "DESC"]],
       include: [
+        {
+          model: ContactDetails,
+          as: "contact"
+        },
         {
           model: OrderItem,
           as: "order_items",
