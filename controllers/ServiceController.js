@@ -81,7 +81,7 @@ exports.deleteCategory = async (req, res, next) => {
       await ServiceType.destroy({ where: { id: typeId }, transaction: t });
       return res.status(200).send({
         success: true,
-        message: "Category deleted successfully"
+        message: "Service type deleted successfully"
       });
     } catch (error) {
       t.rollback();

@@ -122,6 +122,14 @@ const BlogValidation = () => {
   ];
 };
 
+const ServiceTypeValidation = () => {
+  return [
+    check("title", "Title is required").notEmpty(),
+    check("description", "No category selected").notEmpty(),
+    check("slug", "Status is required").notEmpty(),
+  ];
+};
+
 const landSurveyRequestValidation = () => {
   return [
     check("title", "Project title is required").notEmpty(),
@@ -159,6 +167,7 @@ module.exports = {
   updateOrderRequestValidation,
   BlogCategoryValidation,
   BlogValidation,
+  ServiceTypeValidation,
   landSurveyRequestValidation,
   contractorRequestValidation
 };

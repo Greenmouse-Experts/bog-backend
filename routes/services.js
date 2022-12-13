@@ -5,10 +5,9 @@ const Auth = require("../middleware/auth");
 const ServiceController = require("../controllers/ServiceController");
 const { validate } = require("../helpers/validators");
 
-
 router
     .route("/service/type/create")
-    .post(Auth, ServiceController.CreateServiceType);
+    .post(validate, Auth, ServiceController.CreateServiceType);
 router
   .route("/service/type/update")
   .post(validate, Auth, ServiceController.updateServiceType);

@@ -19,7 +19,7 @@ router
 
 router
   .route("/blog/get-category-blogs/:categoryId")
-  .get(Auth, BlogController.getCategoryBlogs);
+  .get(validate, Auth, BlogController.getCategoryBlogs);
 
 
 router
