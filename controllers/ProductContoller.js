@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
@@ -436,6 +437,34 @@ exports.deleteProduct = async (req, res, next) => {
         message: "Product deleted successfully"
       });
     } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.deleteOldProduct = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const products = await Product.findAll({ order: [["createdAt", "ASC"]] });
+      const data = products
+        .map(product => {
+          if (product.image.startsWith("upload")) {
+            return product;
+          }
+          return null;
+        })
+        .filter(prod => prod != null);
+      const Ids = data.map(product => product.id);
+
+      await Product.destroy({ where: { id: Ids }, transaction: t });
+      return res.status(200).send({
+        success: true,
+        message: "Product deleted successfully",
+        data
+      });
+    } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }

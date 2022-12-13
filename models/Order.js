@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const ContactDetails = require("./ContactDetails");
 const OrderItem = require("./OrderItem");
 const User = require("./User");
 
@@ -47,6 +48,11 @@ Order.hasMany(OrderItem, {
   as: "order_items"
 });
 
+OrderItem.belongsTo(Order, {
+  foreignKey: "orderId",
+  as: "order"
+});
+
 User.hasMany(Order, {
   foreignKey: "userId",
   as: "user_orders"
@@ -54,6 +60,11 @@ User.hasMany(Order, {
 Order.belongsTo(User, {
   foreignKey: "userId",
   as: "client"
+});
+
+Order.hasOne(ContactDetails, {
+  foreignKey: "orderId",
+  as: "contact"
 });
 
 module.exports = Order;

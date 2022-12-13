@@ -40,6 +40,8 @@ router.route("/user/me").get(Auth, UserController.getLoggedInUser);
 
 router.route("/user/verify").get(UserController.verifyUser);
 
+router.route("/user/resend-token").post(UserController.resendCode);
+
 router.route("/user/forgot-password").get(UserController.forgotPassword);
 
 router

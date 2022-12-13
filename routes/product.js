@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const express = require("express");
 
 const router = express.Router();
@@ -17,6 +18,8 @@ router.route("/products/all").get(ProductController.getProducts);
 router
   .route("/products/similar-products")
   .get(ProductController.getSimilarProducts);
+
+router.route("/products/delete-old").get(ProductController.deleteOldProduct);
 
 router
   .route("/product/category")
