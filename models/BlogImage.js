@@ -1,8 +1,9 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const Blog = require("./Blog");
 
-const ServiceType = sequelise.define(
-  "service_types",
+const BlogImage = sequelise.define(
+  "blog_images",
   {
     id: {
       type: Sequelize.UUID,
@@ -10,15 +11,11 @@ const ServiceType = sequelise.define(
       unique: true,
       primaryKey: true
     },
-    title: {
+    blogId: {
       allowNull: true,
       type: Sequelize.UUID
     },
-    description: {
-      allowNull: true,
-      type: Sequelize.TEXT
-    },
-    slug: {
+    image: {
       allowNull: true,
       type: Sequelize.STRING
     }
@@ -26,4 +23,9 @@ const ServiceType = sequelise.define(
   { paranoid: true }
 );
 
-module.exports = ServiceType;
+Blog.hasMany(BlogImage, {
+  foreignKey: "blogId",
+  as: "images"
+});
+
+module.exports = BlogImage;

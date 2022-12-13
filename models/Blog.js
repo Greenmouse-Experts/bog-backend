@@ -18,11 +18,13 @@ const Blog = sequelise.define(
       allowNull: true,
       type: Sequelize.STRING
     },
+    body: {
+      allowNull: true,
+      type: Sequelize.TEXT
+    },
     status: {
-        type: Sequelize.ENUM(
-            "draft", "published", "review", "cancel"
-        ),
-        allowNull: true
+      type: Sequelize.ENUM("draft", "published", "review", "cancel"),
+      allowNull: true
     }
   },
   { paranoid: true }

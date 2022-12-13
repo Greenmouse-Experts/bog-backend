@@ -6,16 +6,16 @@ const ServiceController = require("../controllers/ServiceController");
 const { validate } = require("../helpers/validators");
 
 router
-    .route("/service/type/create")
-    .post(validate, Auth, ServiceController.CreateServiceType);
+  .route("/service/type/create")
+  .post(Auth, ServiceController.CreateServiceType);
 router
   .route("/service/type/update")
-  .post(validate, Auth, ServiceController.updateServiceType);
+  .patch(Auth, ServiceController.updateServiceType);
 
-router
-  .route("/service/type/get")
-  .get(Auth, ServiceController.getServiceTypes);
-  
+router.route("/service/type").get(ServiceController.getServiceTypes);
+
+router.route("/service/type/:typeId").get(ServiceController.findServiceType);
+
 router
   .route("/service/type/delete/:typeId")
   .delete(Auth, ServiceController.deleteCategory);
