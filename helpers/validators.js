@@ -109,6 +109,19 @@ const updateOrderRequestValidation = () => {
   ];
 };
 
+const BlogCategoryValidation = () => {
+  return [
+    check("name", "name of category is required").notEmpty()
+  ];
+};
+const BlogValidation = () => {
+  return [
+    check("title", "Title is required").notEmpty(),
+    check("categoryId", "No category selected").notEmpty(),
+    check("status", "Status is required").notEmpty(),
+  ];
+};
+
 const landSurveyRequestValidation = () => {
   return [
     check("title", "Project title is required").notEmpty(),
@@ -144,6 +157,8 @@ module.exports = {
   orderValidation,
   updateOrderValidation,
   updateOrderRequestValidation,
+  BlogCategoryValidation,
+  BlogValidation,
   landSurveyRequestValidation,
   contractorRequestValidation
 };

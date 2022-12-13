@@ -1,16 +1,19 @@
+/* eslint-disable radix */
+/* eslint-disable no-unused-vars */
+/* eslint-disable camelcase */
 const easyinvoice = require("easyinvoice");
 const fs = require("fs");
 
 exports.createInvoice = async (orderData, user) => {
   const { order_items, orderSlug, totalAmount, deliveryFee } = orderData;
-  if (!order_items && order_items.length < 1)   {
+  if (!order_items && order_items.length < 1) {
     return false;
   }
   const myProduct = order_items.map(items => ({
     description: items.product.name.substring(0, 27),
     quantity: items.quantity,
     price: parseInt(items.product.price),
-    taxrate: 10,
+    "tax-rate": items.taxrate || 0
   }));
   const data = {
     customize: {
@@ -18,8 +21,9 @@ exports.createInvoice = async (orderData, user) => {
     },
     images: {
       // The logo on top of your invoice
-      // logo: "uploads/bog_moijdl.png"
-      logo: "https://res.cloudinary.com/yhomi1996/image/upload/v1665783638/bog_moijdl.png",
+      // logo: "../uploads/bog_moijdl.png"
+      logo:
+        "https://res.cloudinary.com/yhomi1996/image/upload/v1665783638/bog_moijdl.png"
       // The invoice background
       // https://public.easyinvoice.cloud/img/watermark-draft.jpg
       // background: ""
@@ -39,9 +43,9 @@ exports.createInvoice = async (orderData, user) => {
     client: {
       company: user.name,
       zip: order_items[0].shippingAddress.postal_code,
-      "state": order_items[0].shippingAddress.state,
+      state: order_items[0].shippingAddress.state,
       city: order_items[0].shippingAddress.city,
-      country: order_items[0].shippingAddress.country,
+      country: order_items[0].shippingAddress.country
       // "custom1": "custom value 1",
       // "custom2": "custom value 2",
       // "custom3": "custom value 3"
@@ -50,9 +54,7 @@ exports.createInvoice = async (orderData, user) => {
       // Invoice number
       number: orderSlug,
       // Invoice data
-      date: new Date().getDate(),
-      // Invoice due date
-      "due-date": "31-12-2021"
+      date: new Date().getDate()
     },
     // The products you would like to see on your invoice
     // Total values are being calculated automatically
@@ -88,13 +90,11 @@ exports.createInvoice = async (orderData, user) => {
     }
   };
   // Create your invoice! Easy!
-  console.log(data);
-  easyinvoice.createInvoice(data, function(result) {
-    // The response will contain a base64 encoded PDF file
-    // console.log('PDF base64 string: ', result.pdf);
-    fs.writeFileSync(`uploads/invoice/${orderSlug}.pdf`, result.pdf, "base64");
-    // easyinvoice.download('myInvoice.pdf', result.pdf);
-  });
+  const result = await easyinvoice.createInvoice(data);
+  // The response will contain a base64 encoded PDF file
+  // console.log('PDF base64 string: ', result.pdf);
+  fs.writeFileSync(`uploads/invoice/${orderSlug}.pdf`, result.pdf, "base64");
+  // easyinvoice.download('myInvoice.pdf', result.pdf);
 
   return true;
 };

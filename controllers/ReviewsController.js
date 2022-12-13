@@ -92,7 +92,6 @@ exports.getAllProductReview = async (req, res, next) => {
 };
 
 // delete reviews
-
 exports.deleteReview = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
