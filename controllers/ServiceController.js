@@ -52,7 +52,7 @@ exports.updateServiceType = async (req, res, next) => {
       }
       await ServiceType.update(
         update,
-        { where: { id: categoryId }, transaction: t }
+        { where: { id: typeId }, transaction: t }
       );
       return res.status(200).send({
         success: true,

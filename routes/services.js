@@ -11,14 +11,14 @@ router
     .post(Auth, ServiceController.CreateServiceType);
 router
   .route("/service/type/update")
-  .patch(validate, Auth, ServiceController.updateServiceType);
+  .post(validate, Auth, ServiceController.updateServiceType);
 
 router
   .route("/service/type/get")
   .get(Auth, ServiceController.getServiceTypes);
   
 router
-  .route("/service/type/delete")
+  .route("/service/type/delete/:typeId")
   .delete(Auth, ServiceController.deleteCategory);
 
 module.exports = router;
