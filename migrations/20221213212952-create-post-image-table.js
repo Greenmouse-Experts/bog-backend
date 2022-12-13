@@ -1,24 +1,20 @@
 /* eslint-disable no-unused-vars */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const table = await queryInterface.createTable("blogs", {
+    const table = await queryInterface.createTable("blog_images", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
         unique: true,
         primaryKey: true
       },
-      categoryId: {
+      blogId: {
         allowNull: true,
         type: Sequelize.UUID
       },
-      title: {
+      image: {
         allowNull: true,
         type: Sequelize.STRING
-      },
-      status: {
-        type: Sequelize.ENUM("draft", "published", "review", "cancel"),
-        allowNull: true
       },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE },
@@ -28,6 +24,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("blogs");
+    return queryInterface.dropTable("blog_images");
   }
 };

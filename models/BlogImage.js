@@ -1,8 +1,9 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const Blog = require("./Blog");
 
-const Blog = sequelise.define(
-  "blogs",
+const BlogImage = sequelise.define(
+  "blog_images",
   {
     id: {
       type: Sequelize.UUID,
@@ -10,24 +11,21 @@ const Blog = sequelise.define(
       unique: true,
       primaryKey: true
     },
-    categoryId: {
+    blogId: {
       allowNull: true,
       type: Sequelize.UUID
     },
-    title: {
+    image: {
       allowNull: true,
       type: Sequelize.STRING
-    },
-    body: {
-      allowNull: true,
-      type: Sequelize.TEXT
-    },
-    status: {
-      type: Sequelize.ENUM("draft", "published", "review", "cancel"),
-      allowNull: true
     }
   },
   { paranoid: true }
 );
 
-module.exports = Blog;
+Blog.hasMany(BlogImage, {
+  foreignKey: "blogId",
+  as: "images"
+});
+
+module.exports = BlogImage;
