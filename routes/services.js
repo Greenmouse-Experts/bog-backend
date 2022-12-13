@@ -10,9 +10,11 @@ router
   .post(Auth, ServiceController.CreateServiceType);
 router
   .route("/service/type/update")
-  .post(validate, Auth, ServiceController.updateServiceType);
+  .patch(Auth, ServiceController.updateServiceType);
 
-router.route("/service/type/get").get(Auth, ServiceController.getServiceTypes);
+router.route("/service/type").get(ServiceController.getServiceTypes);
+
+router.route("/service/type/:typeId").get(ServiceController.findServiceType);
 
 router
   .route("/service/type/delete/:typeId")

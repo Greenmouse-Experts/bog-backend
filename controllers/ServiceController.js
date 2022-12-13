@@ -9,8 +9,7 @@ exports.CreateServiceType = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { title } = req.body;
-      const [type, created] = await ServiceType.findOrCreate({
-        where: { title },
+      const type = await ServiceType.create(req.body, {
         transaction: t
       });
       return res.status(200).send({
@@ -27,6 +26,20 @@ exports.CreateServiceType = async (req, res, next) => {
 exports.getServiceTypes = async (req, res, next) => {
   try {
     const types = await ServiceType.findAll();
+    return res.status(200).send({
+      success: true,
+      data: types
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.findServiceType = async (req, res, next) => {
+  try {
+    const types = await ServiceType.findOne({
+      where: { id: req.params.typeId }
+    });
     return res.status(200).send({
       success: true,
       data: types
