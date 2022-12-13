@@ -124,7 +124,7 @@ const ServiceTypeValidation = () => {
   return [
     check("title", "Title is required").notEmpty(),
     check("description", "No category selected").notEmpty(),
-    check("slug", "Status is required").notEmpty(),
+    check("slug", "Status is required").notEmpty()
   ];
 };
 
