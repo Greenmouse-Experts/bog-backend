@@ -21,7 +21,7 @@ const ServiceType = sequelise.define(
     slug: {
       allowNull: true,
       type: Sequelize.STRING
-    },
+    }
   },
   { paranoid: true }
 );

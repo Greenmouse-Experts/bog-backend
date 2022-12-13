@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
 const { Op } = require("sequelize");
-const sequelize = require("../config/database/connection")
+const sequelize = require("../config/database/connection");
 const ServiceType = require("../models/ServiceType");
 
 exports.CreateServiceType = async (req, res, next) => {
@@ -13,7 +13,6 @@ exports.CreateServiceType = async (req, res, next) => {
         where: { title },
         transaction: t
       });
-        console.log(type)
       return res.status(200).send({
         success: true,
         data: type
@@ -50,10 +49,10 @@ exports.updateServiceType = async (req, res, next) => {
           message: "Invalid category"
         });
       }
-      await ServiceType.update(
-        update,
-        { where: { id: typeId }, transaction: t }
-      );
+      await ServiceType.update(update, {
+        where: { id: typeId },
+        transaction: t
+      });
       return res.status(200).send({
         success: true,
         data: getTheType

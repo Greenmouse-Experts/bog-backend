@@ -110,15 +110,13 @@ const updateOrderRequestValidation = () => {
 };
 
 const BlogCategoryValidation = () => {
-  return [
-    check("name", "name of category is required").notEmpty()
-  ];
+  return [check("name", "name of category is required").notEmpty()];
 };
 const BlogValidation = () => {
   return [
     check("title", "Title is required").notEmpty(),
     check("categoryId", "No category selected").notEmpty(),
-    check("status", "Status is required").notEmpty(),
+    check("status", "Status is required").notEmpty()
   ];
 };
 
