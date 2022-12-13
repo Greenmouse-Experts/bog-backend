@@ -25,7 +25,7 @@ exports.registerUser = async (req, res, next) => {
       const { email, userType, name, captcha } = req.body;
       if (!req.body.platform && userType !== "admin") {
         const validateCaptcha = await UserService.validateCaptcha(captcha);
-        if (!validateCaptcha) {
+        if (validateCaptcha) {
           return res.status(400).send({
             success: false,
             message: "Please answer the captcha correctly",

@@ -89,7 +89,6 @@ exports.createInvoice = async (orderData, user) => {
       // "total": "Totaal" // Defaults to 'Total'
     }
   };
-  console.log(data);
   // Create your invoice! Easy!
   const result = await easyinvoice.createInvoice(data);
   // The response will contain a base64 encoded PDF file
