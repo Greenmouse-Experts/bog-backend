@@ -8,6 +8,7 @@ const BlogCategory = require("../models/BlogCategory");
 const BlogModel = require("../models/Blog");
 const cloudinary = require("../helpers/cloudinary");
 const BlogImage = require("../models/BlogImage");
+const PostCategory = require("../models/PostCategory");
 
 exports.createCategory = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -17,7 +18,6 @@ exports.createCategory = async (req, res, next) => {
         where: { name },
         transaction: t
       });
-      console.log(category);
       return res.status(200).send({
         success: true,
         data: category
@@ -99,6 +99,7 @@ exports.createBlog = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const data = req.body;
+      const { categoryIds } = req.body;
       const photos = [];
       for (let i = 0; i < req.files.length; i++) {
         const result = await cloudinary.uploader.upload(req.files[i].path);
@@ -120,6 +121,12 @@ exports.createBlog = async (req, res, next) => {
         ],
         transaction: t
       });
+
+      const category = categoryIds.map(cat => ({
+        blogId: blog.id,
+        categoryId: cat
+      }));
+      await PostCategory.bulkCreate(category, { transaction: t });
 
       return res.status(200).send({
         success: true,
@@ -144,10 +151,43 @@ exports.getMyBlogs = async (req, res, next) => {
 
     const blogs = await BlogModel.findAll({
       where,
+      order: [["createdAt", "DESC"]],
       include: [
         {
           model: BlogImage,
           as: "images"
+        },
+        {
+          model: BlogCategory,
+          as: "category"
+        }
+      ]
+    });
+    return res.status(200).send({
+      success: true,
+      data: blogs
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.findSingleBlog = async (req, res, next) => {
+  try {
+    const where = {
+      id: req.params.blogId
+    };
+
+    const blogs = await BlogModel.findOne({
+      where,
+      include: [
+        {
+          model: BlogImage,
+          as: "images"
+        },
+        {
+          model: BlogCategory,
+          as: "category"
         }
       ]
     });
@@ -166,10 +206,15 @@ exports.getCategoryBlogs = async (req, res, next) => {
     const where = { categoryId };
     const categories = await BlogModel.findAll({
       where,
+      order: [["createdAt", "DESC"]],
       include: [
         {
           model: BlogImage,
           as: "images"
+        },
+        {
+          model: BlogCategory,
+          as: "category"
         }
       ]
     });
@@ -185,7 +230,8 @@ exports.getCategoryBlogs = async (req, res, next) => {
 exports.updateBlog = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { blogId, ...otherInfo } = req.body;
+      const { blogId, categoryIds, ...otherInfo } = req.body;
+      console.log(req.body);
       const theBlog = await BlogModel.findOne({
         where: { id: blogId }
       });
@@ -220,9 +266,57 @@ exports.updateBlog = async (req, res, next) => {
         }
         await BlogImage.bulkCreate(photos, { transaction: t });
       }
+
+      if (categoryIds && categoryIds.length > 0) {
+        const categorys = await PostCategory.findAll({
+          where: { blogId },
+          attributes: ["id"]
+        });
+        if (categorys.length > 0) {
+          const Ids = categorys.map(img => img.id);
+          await PostCategory.destroy({ where: { id: Ids }, transaction: t });
+        }
+        const category = categoryIds.map(cat => ({
+          blogId,
+          categoryId: cat
+        }));
+        await PostCategory.bulkCreate(category, { transaction: t });
+      }
+
       return res.status(200).send({
         success: true,
         message: "Blog Updated"
+      });
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.publishBlog = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { blogId, ...otherInfo } = req.body;
+      const theBlog = await BlogModel.findOne({
+        where: { id: blogId }
+      });
+      if (!theBlog) {
+        return res.status(404).send({
+          success: false,
+          message: "Blog not found"
+        });
+      }
+
+      await BlogModel.update(otherInfo, {
+        where: { id: blogId },
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        message: "Blog Published"
       });
     } catch (error) {
       t.rollback();
