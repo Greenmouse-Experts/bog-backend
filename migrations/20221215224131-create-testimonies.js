@@ -20,6 +20,10 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: true
       },
+      image: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
       star: {
         type: Sequelize.INTEGER,
         allowNull: true

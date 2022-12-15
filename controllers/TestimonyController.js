@@ -8,8 +8,10 @@ const Testimony = require("../models/Testimonies");
 exports.CreateTestimony = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const data = { ...req.body, isHomepage: 0 };
-      const testimony = await Testimony.create(data, {
+      if (req.file) {
+        req.body.image = req.file.path;
+      }
+      const testimony = await Testimony.create(req.body, {
         transaction: t
       });
       return res.status(200).send({

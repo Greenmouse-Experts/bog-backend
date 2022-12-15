@@ -231,7 +231,6 @@ exports.updateBlog = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { blogId, categoryIds, ...otherInfo } = req.body;
-      console.log(req.body);
       const theBlog = await BlogModel.findOne({
         where: { id: blogId }
       });
@@ -288,7 +287,6 @@ exports.updateBlog = async (req, res, next) => {
         message: "Blog Updated"
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
       return next(error);
     }

@@ -2,6 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const Auth = require("../middleware/auth");
+const upload = require("../helpers/upload");
 const TestimonyController = require("../controllers/TestimonyController");
 
 const { validate, TestimonyValidation } = require("../helpers/validators");
@@ -20,6 +21,7 @@ router
     TestimonyValidation(),
     validate,
     Auth,
+    upload.single("image"),
     TestimonyController.CreateTestimony
   );
 

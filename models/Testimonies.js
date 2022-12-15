@@ -20,7 +20,12 @@ const Order = sequelise.define(
     },
     isHomepage: {
       type: Sequelize.BOOLEAN,
+      defaultValue: false,
       allowNull: true
+    },
+    image: {
+      allowNull: true,
+      type: Sequelize.STRING
     },
     star: {
       type: Sequelize.INTEGER,
