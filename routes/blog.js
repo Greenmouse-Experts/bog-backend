@@ -45,6 +45,6 @@ router.route("/blog/get-blogs").get(Auth, BlogController.getMyBlogs);
 
 router.route("/blog/delete/:blogId").delete(Auth, BlogController.deleteBlog);
 
-router.route("/blog/update").post(Auth, BlogController.updateBlog);
+router.route("/blog/update").post(validate, Auth, BlogController.updateBlog);
 
 module.exports = router;

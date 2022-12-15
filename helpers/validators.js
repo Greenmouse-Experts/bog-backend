@@ -109,6 +109,14 @@ const updateOrderRequestValidation = () => {
   ];
 };
 
+const TestimonyValidation = () => {
+  return [
+    check("name", "Name is required").notEmpty(),
+    check("message", "Message is required").notEmpty(),
+    check("star", "Rating is required").notEmpty()
+  ];
+};
+
 const BlogCategoryValidation = () => {
   return [check("name", "name of category is required").notEmpty()];
 };
@@ -165,6 +173,7 @@ module.exports = {
   updateOrderRequestValidation,
   BlogCategoryValidation,
   BlogValidation,
+  TestimonyValidation,
   ServiceTypeValidation,
   landSurveyRequestValidation,
   contractorRequestValidation
