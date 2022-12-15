@@ -99,17 +99,25 @@ exports.createBlog = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const data = req.body;
-      console.log(req.body);
       const { categoryIds } = req.body;
-      const photos = [];
+      let photos = [];
       if (req.files) {
-        for (let i = 0; i < req.files.length; i++) {
-          const result = await cloudinary.uploader.upload(req.files[i].path);
-          const docPath = result.secure_url;
-          photos.push({
-            image: docPath
-          });
-        }
+        // for (let i = 0; i < req.files.length; i++) {
+        //   const result = await cloudinary.uploader.upload(req.files[i].path);
+        //   const docPath = result.secure_url;
+        //   photos.push({
+        //     image: docPath
+        //   });
+        // }
+        photos = await Promise.all(
+          req.files.map(async file => {
+            const result = await cloudinary.uploader.upload(file.path);
+            const docPath = result.secure_url;
+            return {
+              image: docPath
+            };
+          })
+        );
       }
       if (photos.length > 0) {
         data.images = photos;
@@ -253,16 +261,26 @@ exports.updateBlog = async (req, res, next) => {
         where: { id: blogId },
         transaction: t
       });
-      const photos = [];
+      let photos = [];
       if (req.files) {
-        for (let i = 0; i < req.files.length; i++) {
-          const result = await cloudinary.uploader.upload(req.files[i].path);
-          const docPath = result.secure_url;
-          photos.push({
-            image: docPath,
-            blogId
-          });
-        }
+        // for (let i = 0; i < req.files.length; i++) {
+        //   const result = await cloudinary.uploader.upload(req.files[i].path);
+        //   const docPath = result.secure_url;
+        //   photos.push({
+        //     image: docPath,
+        //     blogId
+        //   });
+        // }
+        photos = await Promise.all(
+          req.files.map(async file => {
+            const result = await cloudinary.uploader.upload(file.path);
+            const docPath = result.secure_url;
+            return {
+              image: docPath,
+              blogId
+            };
+          })
+        );
       }
       if (photos.length > 0) {
         const images = await BlogImage.findAll({
