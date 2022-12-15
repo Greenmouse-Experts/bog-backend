@@ -114,6 +114,9 @@ exports.createBlog = async (req, res, next) => {
       if (photos.length > 0) {
         data.images = photos;
       }
+      if (!req.body.status) {
+        data.status = "draft";
+      }
 
       const blog = await BlogModel.create(data, {
         include: [
