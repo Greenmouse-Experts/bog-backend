@@ -102,12 +102,14 @@ exports.createBlog = async (req, res, next) => {
       console.log(req.body);
       const { categoryIds } = req.body;
       const photos = [];
-      for (let i = 0; i < req.files.length; i++) {
-        const result = await cloudinary.uploader.upload(req.files[i].path);
-        const docPath = result.secure_url;
-        photos.push({
-          image: docPath
-        });
+      if (req.files.length > 0) {
+        for (let i = 0; i < req.files.length; i++) {
+          const result = await cloudinary.uploader.upload(req.files[i].path);
+          const docPath = result.secure_url;
+          photos.push({
+            image: docPath
+          });
+        }
       }
       if (photos.length > 0) {
         data.images = photos;
@@ -249,13 +251,15 @@ exports.updateBlog = async (req, res, next) => {
         transaction: t
       });
       const photos = [];
-      for (let i = 0; i < req.files.length; i++) {
-        const result = await cloudinary.uploader.upload(req.files[i].path);
-        const docPath = result.secure_url;
-        photos.push({
-          image: docPath,
-          blogId
-        });
+      if (req.files.length > 0) {
+        for (let i = 0; i < req.files.length; i++) {
+          const result = await cloudinary.uploader.upload(req.files[i].path);
+          const docPath = result.secure_url;
+          photos.push({
+            image: docPath,
+            blogId
+          });
+        }
       }
       if (photos.length > 0) {
         const images = await BlogImage.findAll({
