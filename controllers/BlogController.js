@@ -143,6 +143,10 @@ exports.createBlog = async (req, res, next) => {
       await PostCategory.bulkCreate(category, { transaction: t });
       setTimeout(() => {
         console.log("delay for 5 seconds");
+        return res.status(200).send({
+          success: true,
+          data: blog
+        });
       }, 5000);
 
       return res.status(200).send({
@@ -315,6 +319,10 @@ exports.updateBlog = async (req, res, next) => {
 
       setTimeout(() => {
         console.log("delay for 5 seconds");
+        return res.status(200).send({
+          success: true,
+          message: "Blog Updated"
+        });
       }, 5000);
 
       return res.status(200).send({
