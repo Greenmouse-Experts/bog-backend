@@ -136,18 +136,13 @@ exports.createBlog = async (req, res, next) => {
         transaction: t
       });
 
-      const category = categoryIds.map(cat => ({
-        blogId: blog.id,
-        categoryId: cat
-      }));
-      await PostCategory.bulkCreate(category, { transaction: t });
-      setTimeout(() => {
-        console.log("delay for 5 seconds");
-        return res.status(200).send({
-          success: true,
-          data: blog
-        });
-      }, 5000);
+      if (categoryIds && categoryIds.length > 0) {
+        const category = categoryIds.map(cat => ({
+          blogId: blog.id,
+          categoryId: cat
+        }));
+        await PostCategory.bulkCreate(category, { transaction: t });
+      }
 
       return res.status(200).send({
         success: true,
@@ -226,8 +221,13 @@ exports.getCategoryBlogs = async (req, res, next) => {
   try {
     const { categoryId } = req.params;
     const where = { categoryId };
-    const categories = await BlogModel.findAll({
-      where,
+    const categories = await PostCategory.findAll({ where });
+    const Ids = categories.map(cat => cat.blogId);
+    const whereBlog = {
+      id: Ids
+    };
+    const blogs = await BlogModel.findAll({
+      whereBlog,
       order: [["createdAt", "DESC"]],
       include: [
         {
@@ -242,7 +242,7 @@ exports.getCategoryBlogs = async (req, res, next) => {
     });
     return res.status(200).send({
       success: true,
-      data: categories
+      data: blogs
     });
   } catch (error) {
     return next(error);
@@ -253,7 +253,6 @@ exports.updateBlog = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { blogId, categoryIds, ...otherInfo } = req.body;
-      console.log(req.body);
       const theBlog = await BlogModel.findOne({
         where: { id: blogId }
       });
@@ -316,14 +315,6 @@ exports.updateBlog = async (req, res, next) => {
         }));
         await PostCategory.bulkCreate(category, { transaction: t });
       }
-
-      setTimeout(() => {
-        console.log("delay for 5 seconds");
-        return res.status(200).send({
-          success: true,
-          message: "Blog Updated"
-        });
-      }, 5000);
 
       return res.status(200).send({
         success: true,
