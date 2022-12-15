@@ -99,6 +99,7 @@ exports.createBlog = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const data = req.body;
+      console.log(req.body);
       const { categoryIds } = req.body;
       const photos = [];
       for (let i = 0; i < req.files.length; i++) {
@@ -133,6 +134,7 @@ exports.createBlog = async (req, res, next) => {
         data: blog
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
