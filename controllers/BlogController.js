@@ -102,7 +102,7 @@ exports.createBlog = async (req, res, next) => {
       console.log(req.body);
       const { categoryIds } = req.body;
       const photos = [];
-      if (req.files.length > 0) {
+      if (req.files) {
         for (let i = 0; i < req.files.length; i++) {
           const result = await cloudinary.uploader.upload(req.files[i].path);
           const docPath = result.secure_url;
