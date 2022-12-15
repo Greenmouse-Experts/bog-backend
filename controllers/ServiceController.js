@@ -8,7 +8,6 @@ const ServiceType = require("../models/ServiceType");
 exports.CreateServiceType = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { title } = req.body;
       const type = await ServiceType.create(req.body, {
         transaction: t
       });

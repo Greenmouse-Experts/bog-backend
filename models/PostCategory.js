@@ -1,8 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
 
-const BlogCategory = sequelise.define(
-  "blog_categories",
+const PostCategory = sequelise.define(
+  "post_categories",
   {
     id: {
       type: Sequelize.UUID,
@@ -10,7 +10,11 @@ const BlogCategory = sequelise.define(
       unique: true,
       primaryKey: true
     },
-    name: {
+    blogId: {
+      allowNull: true,
+      type: Sequelize.UUID
+    },
+    categoryId: {
       allowNull: true,
       type: Sequelize.UUID
     }
@@ -18,4 +22,4 @@ const BlogCategory = sequelise.define(
   { paranoid: true }
 );
 
-module.exports = BlogCategory;
+module.exports = PostCategory;

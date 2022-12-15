@@ -124,7 +124,8 @@ const BlogValidation = () => {
   return [
     check("title", "Title is required").notEmpty(),
     check("categoryId", "No category selected").notEmpty(),
-    check("status", "Status is required").notEmpty()
+    check("status", "Status is required").notEmpty(),
+    check("body", "body is required").notEmpty()
   ];
 };
 

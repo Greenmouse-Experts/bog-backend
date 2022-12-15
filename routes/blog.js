@@ -4,11 +4,8 @@ const router = express.Router();
 const Auth = require("../middleware/auth");
 const BlogController = require("../controllers/BlogController");
 
-const {
-  validate,
-  BlogValidation,
-  BlogCategoryValidation
-} = require("../helpers/validators");
+const { validate, BlogCategoryValidation } = require("../helpers/validators");
+const upload = require("../helpers/upload");
 
 router
   .route("/blog/create-category")
@@ -39,12 +36,18 @@ router
 
 router
   .route("/blog/create-new")
-  .post(BlogValidation(), validate, Auth, BlogController.createBlog);
+  .post(upload.any(), Auth, BlogController.createBlog);
 
 router.route("/blog/get-blogs").get(Auth, BlogController.getMyBlogs);
 
+router.route("/blog/find/:blogId").get(BlogController.findSingleBlog);
+
 router.route("/blog/delete/:blogId").delete(Auth, BlogController.deleteBlog);
 
-router.route("/blog/update").post(validate, Auth, BlogController.updateBlog);
+router
+  .route("/blog/update")
+  .patch(Auth, upload.any(), BlogController.updateBlog);
+
+router.route("/blog/publish-post").patch(Auth, BlogController.publishBlog);
 
 module.exports = router;
