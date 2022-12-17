@@ -4,11 +4,7 @@ const router = express.Router();
 const Auth = require("../middleware/auth");
 const BlogController = require("../controllers/BlogController");
 
-const {
-  validate,
-  BlogValidation,
-  BlogCategoryValidation
-} = require("../helpers/validators");
+const { validate, BlogCategoryValidation } = require("../helpers/validators");
 const upload = require("../helpers/upload");
 
 router
@@ -26,7 +22,7 @@ router
 
 router
   .route("/blog/get-category-blogs/:categoryId")
-  .get(Auth, BlogController.getCategoryBlogs);
+  .get(validate, Auth, BlogController.getCategoryBlogs);
 
 router
   .route("/blog/delete-category")

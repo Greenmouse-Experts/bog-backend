@@ -109,6 +109,14 @@ const updateOrderRequestValidation = () => {
   ];
 };
 
+const TestimonyValidation = () => {
+  return [
+    check("name", "Name is required").notEmpty(),
+    check("message", "Message is required").notEmpty(),
+    check("star", "Rating is required").notEmpty()
+  ];
+};
+
 const BlogCategoryValidation = () => {
   return [check("name", "name of category is required").notEmpty()];
 };
@@ -118,6 +126,14 @@ const BlogValidation = () => {
     check("categoryId", "No category selected").notEmpty(),
     check("status", "Status is required").notEmpty(),
     check("body", "body is required").notEmpty()
+  ];
+};
+
+const ServiceTypeValidation = () => {
+  return [
+    check("title", "Title is required").notEmpty(),
+    check("description", "No category selected").notEmpty(),
+    check("slug", "Status is required").notEmpty()
   ];
 };
 
@@ -158,6 +174,8 @@ module.exports = {
   updateOrderRequestValidation,
   BlogCategoryValidation,
   BlogValidation,
+  TestimonyValidation,
+  ServiceTypeValidation,
   landSurveyRequestValidation,
   contractorRequestValidation
 };
