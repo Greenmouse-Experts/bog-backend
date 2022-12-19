@@ -12,6 +12,7 @@ const OrderItem = require("../models/OrderItem");
 const invoiceService = require("../service/invoiceService2");
 const { sendMail } = require("../service/attachmentEmailService");
 const helpers = require("../helpers/message");
+const helpTransaction = require("../helpers/transactions");
 const ContactDetails = require("../models/ContactDetails");
 
 exports.getMyOrders = async (req, res, next) => {
@@ -224,7 +225,7 @@ exports.createOrder = async (req, res, next) => {
         transaction: t
       });
 
-      console.log(orderData);
+      await helpTransaction.saveTxn(orderData, "Products");
       // if (await invoiceService.createInvoice(orderData, userId)) {
       const invoice = await invoiceService.createInvoice(orderData, user);
       if (invoice) {
