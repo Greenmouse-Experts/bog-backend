@@ -4,11 +4,7 @@ const router = express.Router();
 const Auth = require("../middleware/auth");
 const BlogController = require("../controllers/BlogController");
 
-const {
-  validate,
-  BlogValidation,
-  BlogCategoryValidation
-} = require("../helpers/validators");
+const { validate, BlogCategoryValidation } = require("../helpers/validators");
 const upload = require("../helpers/upload");
 
 router

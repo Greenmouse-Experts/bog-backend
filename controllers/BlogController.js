@@ -321,7 +321,6 @@ exports.updateBlog = async (req, res, next) => {
         message: "Blog Updated"
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
       return next(error);
     }

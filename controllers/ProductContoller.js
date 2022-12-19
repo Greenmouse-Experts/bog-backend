@@ -332,7 +332,6 @@ exports.updateProduct = async (req, res, next) => {
         data: result
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -464,7 +463,6 @@ exports.deleteOldProduct = async (req, res, next) => {
         data
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
       return next(error);
     }
