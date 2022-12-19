@@ -25,6 +25,19 @@ const registerValidation = () => {
   ];
 };
 
+const adminValidation = () => {
+  return [
+    check("name", "Name is required").notEmpty(),
+    check("email", "Please use a valid Email").isEmail(),
+    check("userType", "Enter The user type").notEmpty(),
+    check("level", "Enter The user type").isInt(),
+    check(
+      "password",
+      "Please enter a password with 5 or more characters"
+    ).isLength({ min: 5 })
+  ];
+};
+
 const loginValidation = () => {
   return [
     check("email", "Please use a valid Email").isEmail(),
@@ -159,5 +172,6 @@ module.exports = {
   BlogCategoryValidation,
   BlogValidation,
   landSurveyRequestValidation,
-  contractorRequestValidation
+  contractorRequestValidation,
+  adminValidation
 };

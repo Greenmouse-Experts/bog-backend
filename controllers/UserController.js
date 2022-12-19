@@ -142,6 +142,48 @@ exports.registerUser = async (req, res, next) => {
   });
 };
 
+exports.registerAdmin = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { email, userType, name } = req.body;
+
+      const isUserType = UserService.validateUserType(userType);
+      if (!isUserType) {
+        return res.status(400).send({
+          success: false,
+          message: "Invalid User Entity passed"
+        });
+      }
+      const user = await UserService.findUser({ email });
+      if (user) {
+        return res.status(400).send({
+          success: false,
+          message: "This Email is already in Use for this user entity"
+        });
+      }
+
+      const userData = {
+        name: req.body.name,
+        email: req.body.email,
+        password: bcrypt.hashSync(req.body.password, 10),
+        userType: req.body.userType,
+        level: req.body.level
+      };
+
+      const admin = await UserService.createNewUser(userData, t);
+
+      return res.status(201).send({
+        success: true,
+        message: "User Created Successfully",
+        admin
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
 exports.loginUser = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
@@ -758,6 +800,101 @@ exports.getAllUsers = async (req, res) => {
     return res.status(200).send({
       success: true,
       users
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error"
+    });
+  }
+};
+
+exports.getAllAdmin = async (req, res) => {
+  try {
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User Found"
+      });
+    }
+    if (user.level === 1) {
+      return res.status(401).send({
+        success: false,
+        message: "UnAuthorised access"
+      });
+    }
+    const where = {
+      userType: "admin"
+    };
+    const users = await User.findAll({ where, order: [["createdAt", "DESC"]] });
+
+    return res.status(200).send({
+      success: true,
+      users
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error"
+    });
+  }
+};
+
+exports.findAdmin = async (req, res) => {
+  try {
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User Found"
+      });
+    }
+    if (user.level === 1) {
+      return res.status(401).send({
+        success: false,
+        message: "UnAuthorised access"
+      });
+    }
+    const where = {
+      userType: "admin",
+      id: req.params.adminId
+    };
+    const admin = await User.findOne({ where });
+
+    return res.status(200).send({
+      success: true,
+      admin
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error"
+    });
+  }
+};
+
+exports.revokeAccess = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User Found"
+      });
+    }
+    if (user.level === 1) {
+      return res.status(401).send({
+        success: false,
+        message: "UnAuthorised access"
+      });
+    }
+    await User.destroy({ where: { id: userId } });
+
+    return res.status(200).send({
+      success: true,
+      message: "Admin Access revoked"
     });
   } catch (error) {
     return res.status(500).send({

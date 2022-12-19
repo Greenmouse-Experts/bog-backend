@@ -224,7 +224,6 @@ exports.createOrder = async (req, res, next) => {
         transaction: t
       });
 
-      console.log(orderData);
       // if (await invoiceService.createInvoice(orderData, userId)) {
       const invoice = await invoiceService.createInvoice(orderData, user);
       if (invoice) {
@@ -237,6 +236,8 @@ exports.createOrder = async (req, res, next) => {
         const message = helpers.invoiceMessage(user.name);
         sendMail(user.email, message, "BOG Invoice", files);
       }
+
+      // save the details of the transaction
       return res.status(200).send({
         success: true,
         message: "Order Request submitted",

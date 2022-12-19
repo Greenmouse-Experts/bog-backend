@@ -9,7 +9,8 @@ const {
   registerValidation,
   loginValidation,
   resetPasswordValidation,
-  changePasswordValidation
+  changePasswordValidation,
+  adminValidation
 } = require("../helpers/validators");
 
 // @route  api/signup
@@ -66,6 +67,16 @@ router
   .patch(Auth, upload.any(), UserController.updateUserProfile);
 
 router.route("/all/users").get(Auth, UserController.getAllUsers);
+
+router
+  .route("/admin/signup")
+  .post(adminValidation(), validate, UserController.registerAdmin);
+
+router.route("/all/admin").get(Auth, UserController.getAllAdmin);
+
+router.route("/admin/:adminId").get(Auth, UserController.findAdmin);
+
+router.route("/admin/revoke-access").post(Auth, UserController.revokeAccess);
 
 router.route("/users/get-user/:userId").get(UserController.findSingleUser);
 
