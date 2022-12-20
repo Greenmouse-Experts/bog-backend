@@ -8,7 +8,7 @@ const Category = require("../models/ProductCategory");
 const Product = require("../models/Product");
 const ProductImage = require("../models/ProductImage");
 const User = require("../models/User");
-const cloudinary = require("../helpers/cloudinary");
+// const cloudinary = require("../helpers/cloudinary");
 const Reviews = require("../models/Reviews");
 
 exports.getProducts = async (req, res, next) => {
@@ -224,13 +224,14 @@ exports.createProduct = async (req, res, next) => {
 
       const photos = [];
       for (let i = 0; i < req.files.length; i++) {
-        const result = await cloudinary.uploader.upload(req.files[i].path);
-        const docPath = result.secure_url;
+        // const result = await cloudinary.uploader.upload(req.files[i].path);
+        // const docPath = result.secure_url;
+        const url = `${process.env.APP_URL}/${req.files[i].path}`;
         photos.push({
           name: req.files[i].originalname,
           image: req.files[i].path,
           creatorId,
-          url: docPath
+          url
         });
       }
       if (photos.length > 0) {
@@ -278,14 +279,15 @@ exports.updateProduct = async (req, res, next) => {
       if (req.files.length > 0) {
         const photos = [];
         for (let i = 0; i < req.files.length; i++) {
-          const result = await cloudinary.uploader.upload(req.files[i].path);
-          const docPath = result.secure_url;
+          // const result = await cloudinary.uploader.upload(req.files[i].path);
+          // const docPath = result.secure_url;
+          const url = `${process.env.APP_URL}/${req.files[i].path}`;
           photos.push({
             name: req.files[i].originalname,
             image: req.files[i].path,
             creatorId,
             productId,
-            url: docPath
+            url
           });
         }
         const images = await ProductImage.findAll({

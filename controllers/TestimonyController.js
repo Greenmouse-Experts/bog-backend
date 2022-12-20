@@ -9,7 +9,8 @@ exports.CreateTestimony = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       if (req.file) {
-        req.body.image = req.file.path;
+        const url = `${process.env.APP_URL}/${req.file.path}`;
+        req.body.image = url;
       }
       const testimony = await Testimony.create(req.body, {
         transaction: t

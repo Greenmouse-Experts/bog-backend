@@ -6,7 +6,7 @@ const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
 const BlogCategory = require("../models/BlogCategory");
 const BlogModel = require("../models/Blog");
-const cloudinary = require("../helpers/cloudinary");
+// const cloudinary = require("../helpers/cloudinary");
 const BlogImage = require("../models/BlogImage");
 const PostCategory = require("../models/PostCategory");
 
@@ -111,10 +111,11 @@ exports.createBlog = async (req, res, next) => {
         // }
         photos = await Promise.all(
           req.files.map(async file => {
-            const result = await cloudinary.uploader.upload(file.path);
-            const docPath = result.secure_url;
+            // const result = await cloudinary.uploader.upload(file.path);
+            // const docPath = result.secure_url;
+            const url = `${process.env.APP_URL}/${file.path}`;
             return {
-              image: docPath
+              image: url
             };
           })
         );
@@ -279,10 +280,11 @@ exports.updateBlog = async (req, res, next) => {
         // }
         photos = await Promise.all(
           req.files.map(async file => {
-            const result = await cloudinary.uploader.upload(file.path);
-            const docPath = result.secure_url;
+            // const result = await cloudinary.uploader.upload(file.path);
+            // const docPath = result.secure_url;
+            const url = `${process.env.APP_URL}/${file.path}`;
             return {
-              image: docPath,
+              image: url,
               blogId
             };
           })

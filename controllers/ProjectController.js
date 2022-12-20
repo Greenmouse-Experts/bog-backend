@@ -286,16 +286,20 @@ exports.requestForContractor = async (req, res, next) => {
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
           if (req.files[i].fieldname === "surveyPlan") {
-            request.surveyPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.surveyPlan = url;
           }
           if (req.files[i].fieldname === "structuralPlan") {
-            request.structuralPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.structuralPlan = url;
           }
           if (req.files[i].fieldname === "architecturalPlan") {
-            request.architecturalPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.architecturalPlan = url;
           }
           if (req.files[i].fieldname === "mechanicalPlan") {
-            request.mechanicalPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.mechanicalPlan = url;
           }
         }
       }
@@ -353,16 +357,20 @@ exports.updateContractorRequest = async (req, res, next) => {
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
           if (req.files[i].fieldname === "surveyPlan") {
-            request.surveyPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.surveyPlan = url;
           }
           if (req.files[i].fieldname === "structuralPlan") {
-            request.structuralPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.structuralPlan = url;
           }
           if (req.files[i].fieldname === "architecturalPlan") {
-            request.architecturalPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.architecturalPlan = url;
           }
           if (req.files[i].fieldname === "mechanicalPlan") {
-            request.mechanicalPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.mechanicalPlan = url;
           }
         }
       }
@@ -412,19 +420,24 @@ exports.drawingProjectsRequest = async (req, res, next) => {
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
           if (req.files[i].fieldname === "surveyPlan") {
-            request.surveyPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.surveyPlan = url;
           }
           if (req.files[i].fieldname === "structuralPlan") {
-            request.structuralPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.structuralPlan = url;
           }
           if (req.files[i].fieldname === "architecturalPlan") {
-            request.architecturalPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.architecturalPlan = url;
           }
           if (req.files[i].fieldname === "mechanicalPlan") {
-            request.mechanicalPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.mechanicalPlan = url;
           }
           if (req.files[i].fieldname === "electricalPlan") {
-            request.electricalPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.electricalPlan = url;
           }
         }
       }
@@ -486,19 +499,24 @@ exports.updateDrawingRequest = async (req, res, next) => {
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
           if (req.files[i].fieldname === "surveyPlan") {
-            request.surveyPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.surveyPlan = url;
           }
           if (req.files[i].fieldname === "structuralPlan") {
-            request.structuralPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.structuralPlan = url;
           }
           if (req.files[i].fieldname === "architecturalPlan") {
-            request.architecturalPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.architecturalPlan = url;
           }
           if (req.files[i].fieldname === "mechanicalPlan") {
-            request.mechanicalPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.mechanicalPlan = url;
           }
           if (req.files[i].fieldname === "electricalPlan") {
-            request.electricalPlan = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            request.electricalPlan = url;
           }
         }
       }
@@ -538,8 +556,9 @@ exports.buildingApprovalProjectsRequest = async (req, res, next) => {
       };
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
+          const url = `${process.env.APP_URL}/${req.files[i].path}`;
           const name = req.files[i].fieldname;
-          request[name] = req.files[i].path;
+          request[name] = url;
         }
       }
 
@@ -595,8 +614,9 @@ exports.updateBuildingApprovalRequest = async (req, res, next) => {
 
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
+          const url = `${process.env.APP_URL}/${req.files[i].path}`;
           const name = req.files[i].fieldname;
-          request[name] = req.files[i].path;
+          request[name] = url;
         }
       }
 
@@ -631,8 +651,9 @@ exports.requestForGeoTechnicalInvestigation = async (req, res, next) => {
       request.projectId = project.id;
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
+          const url = `${process.env.APP_URL}/${req.files[i].path}`;
           const name = req.files[i].fieldname;
-          request[name] = req.files[i].path;
+          request[name] = url;
         }
       }
       const data = await GeoTechnical.create(request, {
@@ -671,8 +692,9 @@ exports.updateGeoTechnicalInvestigationRequest = async (req, res, next) => {
       }
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
+          const url = `${process.env.APP_URL}/${req.files[i].path}`;
           const name = req.files[i].fieldname;
-          request[name] = req.files[i].path;
+          request[name] = url;
         }
       }
 

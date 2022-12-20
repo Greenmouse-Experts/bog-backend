@@ -552,7 +552,8 @@ exports.updateUserAccount = async (req, res, next) => {
         });
       }
       if (req.file) {
-        data.photo = req.file.path;
+        const url = `${process.env.APP_URL}/${req.file.path}`;
+        data.photo = url;
       }
       data.id = userId;
       await UserService.updateUser(data, t);
@@ -588,10 +589,12 @@ exports.updateUserProfile = async (req, res, next) => {
         let professional;
         for (let i = 0; i < req.files.length; i++) {
           if (req.files[i].fieldname === "operation") {
-            operation = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            operation = url;
           }
           if (req.files[i].fieldname === "professional") {
-            professional = req.files[i].path;
+            const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            professional = url;
           }
         }
         const requestData = {
