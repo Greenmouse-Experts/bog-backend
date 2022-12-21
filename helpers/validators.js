@@ -124,9 +124,8 @@ const updateOrderRequestValidation = () => {
 
 const TestimonyValidation = () => {
   return [
-    check("name", "Name is required").notEmpty(),
     check("message", "Message is required").notEmpty(),
-    check("star", "Rating is required").notEmpty()
+    check("star", "Rating is required").isInt({ min: 0, max: 5 })
   ];
 };
 

@@ -1,7 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const User = require("./User");
 
-const Order = sequelise.define(
+const Testimony = sequelise.define(
   "testimonies",
   {
     id: {
@@ -9,6 +10,10 @@ const Order = sequelise.define(
       defaultValue: Sequelize.UUIDV4,
       unique: true,
       primaryKey: true
+    },
+    userId: {
+      type: Sequelize.UUID,
+      allowNull: true
     },
     name: {
       type: Sequelize.STRING,
@@ -35,4 +40,13 @@ const Order = sequelise.define(
   { paranoid: true }
 );
 
-module.exports = Order;
+User.hasMany(Testimony, {
+  foreignKey: "userId",
+  as: "review"
+});
+Testimony.belongsTo(User, {
+  foreignKey: "userId",
+  as: "user"
+});
+
+module.exports = Testimony;

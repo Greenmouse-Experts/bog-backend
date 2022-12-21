@@ -2,7 +2,6 @@ const express = require("express");
 
 const router = express.Router();
 const Auth = require("../middleware/auth");
-const upload = require("../helpers/upload");
 const TestimonyController = require("../controllers/TestimonyController");
 
 const { validate, TestimonyValidation } = require("../helpers/validators");
@@ -10,6 +9,14 @@ const { validate, TestimonyValidation } = require("../helpers/validators");
 router
   .route("/testimony/testimonies")
   .get(Auth, TestimonyController.getTestimonies);
+
+router
+  .route("/testimony/get-hompage-testimonies")
+  .get(TestimonyController.getHompageTestimonies);
+
+router
+  .route("/testimony/find-user-testimony")
+  .get(Auth, TestimonyController.getUserTestimony);
 
 router
   .route("/testimony/homepage/:testimonyId")
@@ -21,7 +28,6 @@ router
     TestimonyValidation(),
     validate,
     Auth,
-    upload.single("image"),
     TestimonyController.CreateTestimony
   );
 
