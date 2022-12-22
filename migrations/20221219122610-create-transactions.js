@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true
       },
       TransactionId: {
-        type: Sequelize.UUID,
+        type: Sequelize.STRING,
         allowNull: true
       },
       userId: {

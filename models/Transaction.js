@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const User = require("./User");
 
 const Transaction = sequelise.define(
   "transactions",
@@ -11,7 +12,7 @@ const Transaction = sequelise.define(
       primaryKey: true
     },
     TransactionId: {
-      type: Sequelize.UUID,
+      type: Sequelize.STRING,
       allowNull: true
     },
     userId: {
@@ -37,5 +38,15 @@ const Transaction = sequelise.define(
   },
   { paranoid: true }
 );
+
+User.hasMany(Transaction, {
+  foreignKey: "userId",
+  as: "transactions"
+});
+
+Transaction.belongsTo(User, {
+  foreignKey: "userId",
+  as: "user"
+});
 
 module.exports = Transaction;

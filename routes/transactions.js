@@ -4,12 +4,10 @@ const router = express.Router();
 const Auth = require("../middleware/auth");
 const Transaction = require("../helpers/transactions");
 
-const { validate } = require("../helpers/validators");
+router.route("/transactions").get(Auth, Transaction.getAllTxns);
 
-router
-  .route("/transaction/:userId")
-  .patch(validate, Auth, Transaction.getAllTxns);
+router.route("/transactions/user").get(Auth, Transaction.getAllUserTxns);
 
-router.route("/transaction").get(validate, Auth, Transaction.getOneTxns);
+router.route("/transaction/:txId").get(Auth, Transaction.getOneTxns);
 
 module.exports = router;
