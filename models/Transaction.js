@@ -19,6 +19,10 @@ const Transaction = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true
     },
+    amount: {
+      type: Sequelize.FLOAT,
+      allowNull: true
+    },
     status: {
       type: Sequelize.STRING,
       allowNull: true

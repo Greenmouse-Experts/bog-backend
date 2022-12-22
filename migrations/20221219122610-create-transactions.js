@@ -12,6 +12,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
+      amount: {
+        type: Sequelize.FLOAT,
+        allowNull: true
+      },
       userId: {
         type: Sequelize.STRING,
         allowNull: true

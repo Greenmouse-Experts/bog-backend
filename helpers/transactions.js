@@ -26,6 +26,7 @@ exports.saveTxn = async (data, type) => {
     data.TransactionId = data.orderSlug;
     const saveThis = {
       type,
+      amount: data.totalAmount,
       TransactionId: orderSlug,
       userId,
       description,

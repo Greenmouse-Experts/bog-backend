@@ -14,6 +14,7 @@ const { sendMail } = require("../service/attachmentEmailService");
 const helpers = require("../helpers/message");
 const helpTransaction = require("../helpers/transactions");
 const ContactDetails = require("../models/ContactDetails");
+const ProductReview = require("../models/Reviews");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -83,6 +84,10 @@ exports.getOrderDetails = async (req, res, next) => {
           model: User,
           as: "client",
           attributes: ["id", "fname", "lname", "email", "phone", "photo"]
+        },
+        {
+          model: ProductReview,
+          as: "review"
         }
       ]
     });
