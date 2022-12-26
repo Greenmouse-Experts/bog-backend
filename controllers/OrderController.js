@@ -236,7 +236,7 @@ exports.createOrder = async (req, res, next) => {
       if (invoice) {
         const files = [
           {
-            path: `uploads/invoice/${orderSlug}.pdf`,
+            path: `uploads/${orderSlug}.pdf`,
             filename: `${orderSlug}.pdf`
           }
         ];
