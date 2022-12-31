@@ -211,3 +211,20 @@ exports.validateCaptcha = async captcha => {
     return false;
   }
 };
+
+exports.getUserType = type => {
+  switch (type) {
+    case "admin":
+      return "Super Admin";
+    case "professional":
+      return "Service Partner";
+    case "vendor":
+      return "Product Partner";
+    case "private_client":
+      return "Private Client";
+    case "corporate_client":
+      return "Corporate Client";
+    default:
+      return "";
+  }
+};

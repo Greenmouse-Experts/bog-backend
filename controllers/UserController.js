@@ -131,7 +131,9 @@ exports.registerUser = async (req, res, next) => {
         await UserService.createProfile(data, t);
       }
 
-      const mesg = `A new user just signed up as ${userType}`;
+      const mesg = `A new user just signed up as ${UserService.getUserType(
+        userType
+      )}`;
       const userId = user.id;
       const notifyType = "admin";
       const { io } = req.app;
