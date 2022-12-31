@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-const User = require("../models/User");
 const Notification = require("../models/Notification");
 
 exports.getAllAdminNotifications = async (req, res, next) => {

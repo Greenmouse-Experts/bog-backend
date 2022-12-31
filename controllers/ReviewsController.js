@@ -5,7 +5,6 @@ const sequelize = require("../config/database/connection");
 const ProductReview = require("../models/Reviews");
 const ServiceReview = require("../models/ServiceReview");
 const Product = require("../models/Product");
-const PartnerModel = require("../models/ServicePartner");
 const User = require("../models/User");
 const Notification = require("../helpers/notification");
 const Order = require("../models/Order");

@@ -16,7 +16,6 @@ const ServicePartner = require("../models/ServicePartner");
 const ProductPartner = require("../models/ProductPartner");
 const PrivateClient = require("../models/PrivateClient");
 const CorporateClient = require("../models/CorporateClient");
-const BankDetail = require("../models/BankDetail");
 const User = require("../models/User");
 const Notification = require("../helpers/notification");
 
