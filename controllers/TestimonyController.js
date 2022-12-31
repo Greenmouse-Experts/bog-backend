@@ -131,6 +131,22 @@ exports.updateIsHomepage = async (req, res, next) => {
           transaction: t
         }
       );
+      if (getTestimony.isHomepage === false) {
+        // Notification
+        const { userId } = getTestimony;
+        const mesg = `Your testimonial has been published to home page`;
+        const notifyType = "user";
+        const { io } = req.app;
+        await Notification.createNotification({
+          type: notifyType,
+          message: mesg,
+          userId
+        });
+        io.emit(
+          "getNotifications",
+          await Notification.fetchUserNotificationApi({ userId })
+        );
+      }
       return res.status(200).send({
         success: true,
         data: getTestimony

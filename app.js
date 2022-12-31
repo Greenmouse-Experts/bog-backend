@@ -21,7 +21,6 @@ app.use(express.static(path.join(__dirname, "uploads")));
 // Static Files
 // dashboard
 app.use("/uploads", express.static(`${__dirname}/uploads`));
-app.use("/uploads/invoice", express.static(`${__dirname}/uploads/invoice`));
 
 app.use(morgan("combined"));
 
