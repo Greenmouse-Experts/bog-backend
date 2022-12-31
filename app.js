@@ -6,12 +6,13 @@ const app = express();
 const cors = require("cors");
 const morgan = require("morgan");
 const http = require("http");
-// const cron = require("node-cron");
+const { Server } = require("socket.io");
 const path = require("path");
 const bodyParser = require("body-parser");
 
 const server = http.createServer(app);
 require("./config/database/connection");
+const Notification = require("./helpers/notification");
 
 const Routes = require("./routes");
 // set up public folder
@@ -36,11 +37,34 @@ app.use(
   })
 );
 
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "PATCH", "DELETE"]
+  }
+});
+
+app.io = io;
+
 app.get("/", (req, res) => {
   res.send(`BOG APP ${new Date()}`);
 });
 
 app.use("/api", Routes);
+
+io.on("connection", async socket => {
+  // console.log(socket);
+  io.emit("getNotifications", await Notification.fetchAdminNotification());
+  io.emit(
+    "getUserNotifications",
+    await Notification.fetchUserNotificationApi(socket.handshake.query)
+  );
+  socket.on("notification_read", async data => {
+    console.log(data);
+    const { id } = data;
+    socket.emit("markAsRead", await Notification.updateNotification(id));
+  });
+});
 
 // Handles all errors
 app.use((err, req, res, next) => {

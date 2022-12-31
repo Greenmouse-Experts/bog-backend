@@ -10,6 +10,7 @@ const ProductImage = require("../models/ProductImage");
 const User = require("../models/User");
 // const cloudinary = require("../helpers/cloudinary");
 const Reviews = require("../models/Reviews");
+const Notification = require("../helpers/notification");
 
 exports.getProducts = async (req, res, next) => {
   try {
@@ -247,6 +248,15 @@ exports.createProduct = async (req, res, next) => {
           }
         ]
       });
+
+      const mesg = `A new Product was created`;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
 
       return res.status(200).send({
         success: true,
@@ -497,6 +507,17 @@ exports.addProductToShop = async (req, res, next) => {
         { where: { id: productId }, transaction: t }
       );
 
+      const mesg = `A product (${product.title}) has been sent for reviewed to be allowed in shop`;
+      const userId = product.creatorId;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg,
+        userId
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
+
       return res.status(200).send({
         success: true,
         message: "Product sent for review. Please wait for admin approval"
@@ -571,6 +592,19 @@ exports.approveProduct = async (req, res, next) => {
         data.showInShop = true;
       }
       await Product.update(data, { where: { id: productId }, transaction: t });
+      const mesg = `Your product ${product.title} has been reviewed and approved`;
+      const userId = product.creatorId;
+      const notifyType = "user";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg,
+        userId
+      });
+      io.emit(
+        "getNotifications",
+        await Notification.fetchUserNotificationApi({ userId })
+      );
 
       return res.status(200).send({
         success: true,

@@ -18,21 +18,22 @@ const PrivateClient = require("../models/PrivateClient");
 const CorporateClient = require("../models/CorporateClient");
 const BankDetail = require("../models/BankDetail");
 const User = require("../models/User");
+const Notification = require("../helpers/notification");
 
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { email, userType, name, captcha } = req.body;
-      if (!req.body.platform && userType !== "admin") {
-        const validateCaptcha = await UserService.validateCaptcha(captcha);
-        if (!validateCaptcha) {
-          return res.status(400).send({
-            success: false,
-            message: "Please answer the captcha correctly",
-            validateCaptcha
-          });
-        }
-      }
+      // if (!req.body.platform && userType !== "admin") {
+      //   const validateCaptcha = await UserService.validateCaptcha(captcha);
+      //   if (!validateCaptcha) {
+      //     return res.status(400).send({
+      //       success: false,
+      //       message: "Please answer the captcha correctly",
+      //       validateCaptcha
+      //     });
+      //   }
+      // }
 
       const isUserType = UserService.validateUserType(userType);
       if (!isUserType) {
@@ -130,6 +131,17 @@ exports.registerUser = async (req, res, next) => {
         };
         await UserService.createProfile(data, t);
       }
+
+      const mesg = "A new user was created";
+      const userId = user.id;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        userId,
+        type: notifyType,
+        message: mesg
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
 
       return res.status(201).send({
         success: true,
@@ -894,6 +906,16 @@ exports.revokeAccess = async (req, res) => {
       });
     }
     await User.destroy({ where: { id: userId } });
+
+    const mesg = `The Admin ${user.email} rights has been revoked by super admin`;
+    const notifyType = "admin";
+    const { io } = req.app;
+    await Notification.createNotification({
+      userId,
+      type: notifyType,
+      message: mesg
+    });
+    io.emit("getNotifications", await Notification.fetchAdminNotification());
 
     return res.status(200).send({
       success: true,

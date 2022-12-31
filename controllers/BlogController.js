@@ -9,6 +9,7 @@ const BlogModel = require("../models/Blog");
 // const cloudinary = require("../helpers/cloudinary");
 const BlogImage = require("../models/BlogImage");
 const PostCategory = require("../models/PostCategory");
+const Notification = require("../helpers/notification");
 
 exports.createCategory = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -145,12 +146,20 @@ exports.createBlog = async (req, res, next) => {
         await PostCategory.bulkCreate(category, { transaction: t });
       }
 
+      const mesg = "A new Blog post was created";
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
+
       return res.status(200).send({
         success: true,
         data: blog
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -347,6 +356,15 @@ exports.publishBlog = async (req, res, next) => {
         where: { id: blogId },
         transaction: t
       });
+
+      const mesg = `Blog Post with title: ${theBlog.title} has been published to home Page`;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
 
       return res.status(200).send({
         success: true,

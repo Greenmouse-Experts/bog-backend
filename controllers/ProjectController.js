@@ -13,6 +13,18 @@ const BuildingProject = require("../models/BuildingProject");
 const ContractorProject = require("../models/ContractorProject");
 const GeoTechnical = require("../models/GeoTechnical");
 const utility = require("../helpers/utility");
+const Notification = require("../helpers/notification");
+
+exports.notifyAdmin = async ({ userId, message, req }) => {
+  const notifyType = "admin";
+  const { io } = req.app;
+  await Notification.createNotification({
+    type: notifyType,
+    message,
+    userId
+  });
+  io.emit("getNotifications", await Notification.fetchAdminNotification());
+};
 
 // Projects
 exports.getProjectRequest = async (req, res, next) => {
@@ -198,6 +210,7 @@ exports.requestForLandSurvey = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const userId = req.user.id;
+      const user = await User.findByPk(userId, { attributes: ["name"] });
       const request = req.body;
       const projectData = {
         title: req.body.title,
@@ -210,6 +223,12 @@ exports.requestForLandSurvey = async (req, res, next) => {
       const data = await LandSurveyProject.create(request, {
         transaction: t
       });
+      const reqData = {
+        req,
+        userId,
+        message: `${user.name} has open a project request for Land survey`
+      };
+      await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
         data
@@ -307,6 +326,13 @@ exports.requestForContractor = async (req, res, next) => {
       const data = await ContractorProject.create(request, {
         transaction: t
       });
+      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const reqData = {
+        req,
+        userId,
+        message: `${user.name} has requested for a contractor service partner`
+      };
+      await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
         data
@@ -445,6 +471,13 @@ exports.drawingProjectsRequest = async (req, res, next) => {
       const data = await DrawingProject.create(request, {
         transaction: t
       });
+      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const reqData = {
+        req,
+        userId,
+        message: `${user.name} has open a request for a construction drawing project`
+      };
+      await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
         message: "Drawing Project created successfully",
@@ -565,6 +598,13 @@ exports.buildingApprovalProjectsRequest = async (req, res, next) => {
       const data = await BuildingProject.create(request, {
         transaction: t
       });
+      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const reqData = {
+        req,
+        userId,
+        message: `${user.name} has requested for a building approval project`
+      };
+      await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
         message: "Building Approval Project created successfully",
@@ -659,6 +699,13 @@ exports.requestForGeoTechnicalInvestigation = async (req, res, next) => {
       const data = await GeoTechnical.create(request, {
         transaction: t
       });
+      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const reqData = {
+        req,
+        userId,
+        message: `${user.name} has requested for a geotechnical investigator`
+      };
+      await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
         data

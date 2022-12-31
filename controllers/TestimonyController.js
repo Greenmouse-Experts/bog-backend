@@ -5,6 +5,7 @@ const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
 const Testimony = require("../models/Testimonies");
 const User = require("../models/User");
+const Notification = require("../helpers/notification");
 
 exports.CreateTestimony = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -22,6 +23,18 @@ exports.CreateTestimony = async (req, res, next) => {
       const testimony = await Testimony.create(data, {
         transaction: t
       });
+
+      // Notification
+      const mesg = `${user.name} gave a testimony`;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg,
+        userId
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
+
       return res.status(200).send({
         success: true,
         data: testimony

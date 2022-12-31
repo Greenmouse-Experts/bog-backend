@@ -15,6 +15,7 @@ const helpers = require("../helpers/message");
 const helpTransaction = require("../helpers/transactions");
 const ContactDetails = require("../models/ContactDetails");
 const ProductReview = require("../models/Reviews");
+const Notification = require("../helpers/notification");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -243,6 +244,15 @@ exports.createOrder = async (req, res, next) => {
         const message = helpers.invoiceMessage(user.name);
         sendMail(user.email, message, "BOG Invoice", files);
       }
+
+      const mesg = `A new order was made by ${user.name}`;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
 
       // save the details of the transaction
       return res.status(200).send({
