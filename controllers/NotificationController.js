@@ -35,3 +35,21 @@ exports.getAllAUserNotifications = async (req, res, next) => {
     return next(error);
   }
 };
+
+exports.markNotificationAsRead = async (req, res, next) => {
+  try {
+    const data = {
+      status: "read",
+      isRead: true
+    };
+    await Notification.update(data, {
+      where: { id: req.params.notificationId }
+    });
+    return res.status(200).send({
+      success: true,
+      message: "Notification mark as read"
+    });
+  } catch (error) {
+    return next(error);
+  }
+};

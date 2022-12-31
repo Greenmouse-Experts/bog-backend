@@ -1,8 +1,7 @@
-const Sequelize = require("sequelize");
+// const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
 
 // local imports
-const Users = require("../models/User");
 const Notification = require("../models/Notification");
 
 exports.createNotification = async ({ userId, type, message }) => {
@@ -28,7 +27,8 @@ exports.fetchUserNotification = async ({ userId }) => {
         type: "user",
         [Op.or]: [{ status: "pending" }, { status: "unread" }]
       },
-      order: [["createdAt", "DESC"]]
+      order: [["createdAt", "DESC"]],
+      limit: 5
     });
     return notifications;
   } catch (error) {
@@ -44,7 +44,8 @@ exports.fetchUserNotificationApi = async notifyParam => {
         type: "user",
         [Op.or]: [{ status: "pending" }, { status: "unread" }]
       },
-      order: [["createdAt", "DESC"]]
+      order: [["createdAt", "DESC"]],
+      limit: 5
     });
     return notifications;
   } catch (error) {
@@ -59,7 +60,8 @@ exports.fetchAdminNotification = async () => {
         type: "admin",
         [Op.or]: [{ status: "pending" }, { status: "unread" }]
       },
-      order: [["createdAt", "DESC"]]
+      order: [["createdAt", "DESC"]],
+      limit: 5
     });
     console.log(JSON.parse(JSON.stringify(notifications)));
     return JSON.parse(JSON.stringify(notifications));
