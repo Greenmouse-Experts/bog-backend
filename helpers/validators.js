@@ -208,5 +208,7 @@ module.exports = {
   ServiceTypeValidation,
   landSurveyRequestValidation,
   contractorRequestValidation,
-  adminValidation
+  adminValidation,
+  meetingValidation,
+  meetingStatusValidation
 };
