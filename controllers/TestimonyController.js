@@ -1,19 +1,39 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
-const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
 const Testimony = require("../models/Testimonies");
+const User = require("../models/User");
+const Notification = require("../helpers/notification");
 
 exports.CreateTestimony = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      if (req.file) {
-        req.body.image = req.file.path;
-      }
-      const testimony = await Testimony.create(req.body, {
+      const userId = req.user.id;
+      const user = await User.findByPk(userId, {
+        attributes: ["id", "name", "photo"]
+      });
+      const data = {
+        ...req.body,
+        name: user.name,
+        image: user.photo,
+        userId
+      };
+      const testimony = await Testimony.create(data, {
         transaction: t
       });
+
+      // Notification
+      const mesg = `${user.name} gave a testimony`;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg,
+        userId
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
+
       return res.status(200).send({
         success: true,
         data: testimony
@@ -27,7 +47,59 @@ exports.CreateTestimony = async (req, res, next) => {
 
 exports.getTestimonies = async (req, res, next) => {
   try {
-    const testimony = await Testimony.findAll();
+    const testimony = await Testimony.findAll({
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["id", "name", "photo", "userType"]
+        }
+      ]
+    });
+    return res.status(200).send({
+      success: true,
+      data: testimony
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getHompageTestimonies = async (req, res, next) => {
+  try {
+    const testimony = await Testimony.findAll({
+      where: { isHomePage: true },
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["id", "name", "photo", "userType"]
+        }
+      ]
+    });
+    return res.status(200).send({
+      success: true,
+      data: testimony
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getUserTestimony = async (req, res, next) => {
+  try {
+    const testimony = await Testimony.findOne({
+      where: { userId: req.user.id },
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["id", "name", "photo", "userType"]
+        }
+      ]
+    });
     return res.status(200).send({
       success: true,
       data: testimony
@@ -58,6 +130,22 @@ exports.updateIsHomepage = async (req, res, next) => {
           transaction: t
         }
       );
+      if (getTestimony.isHomepage === false) {
+        // Notification
+        const { userId } = getTestimony;
+        const mesg = `Your testimonial has been published to home page`;
+        const notifyType = "user";
+        const { io } = req.app;
+        await Notification.createNotification({
+          type: notifyType,
+          message: mesg,
+          userId
+        });
+        io.emit(
+          "getNotifications",
+          await Notification.fetchUserNotificationApi({ userId })
+        );
+      }
       return res.status(200).send({
         success: true,
         data: getTestimony

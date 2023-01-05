@@ -93,7 +93,7 @@ exports.createInvoice = async (orderData, user) => {
   const result = await easyinvoice.createInvoice(data);
   // The response will contain a base64 encoded PDF file
   // console.log('PDF base64 string: ', result.pdf);
-  fs.writeFileSync(`uploads/invoice/${orderSlug}.pdf`, result.pdf, "base64");
+  fs.writeFileSync(`uploads/${orderSlug}.pdf`, result.pdf, "base64");
   // easyinvoice.download('myInvoice.pdf', result.pdf);
 
   return true;

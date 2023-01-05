@@ -25,6 +25,19 @@ const registerValidation = () => {
   ];
 };
 
+const adminValidation = () => {
+  return [
+    check("name", "Name is required").notEmpty(),
+    check("email", "Please use a valid Email").isEmail(),
+    check("userType", "Enter The user type").notEmpty(),
+    check("level", "Enter The user type").isInt(),
+    check(
+      "password",
+      "Please enter a password with 5 or more characters"
+    ).isLength({ min: 5 })
+  ];
+};
+
 const loginValidation = () => {
   return [
     check("email", "Please use a valid Email").isEmail(),
@@ -129,9 +142,8 @@ const updateOrderRequestValidation = () => {
 
 const TestimonyValidation = () => {
   return [
-    check("name", "Name is required").notEmpty(),
     check("message", "Message is required").notEmpty(),
-    check("star", "Rating is required").notEmpty()
+    check("star", "Rating is required").isInt({ min: 0, max: 5 })
   ];
 };
 
@@ -196,6 +208,5 @@ module.exports = {
   ServiceTypeValidation,
   landSurveyRequestValidation,
   contractorRequestValidation,
-  meetingValidation,
-  meetingStatusValidation
+  adminValidation
 };

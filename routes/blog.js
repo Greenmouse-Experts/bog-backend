@@ -16,13 +16,11 @@ router
     BlogController.createCategory
   );
 
-router
-  .route("/blog/get-categories")
-  .get(Auth, BlogController.getBlogCategories);
+router.route("/blog/get-categories").get(BlogController.getBlogCategories);
 
 router
   .route("/blog/get-category-blogs/:categoryId")
-  .get(validate, Auth, BlogController.getCategoryBlogs);
+  .get(BlogController.getCategoryBlogs);
 
 router
   .route("/blog/delete-category")
@@ -38,7 +36,7 @@ router
   .route("/blog/create-new")
   .post(upload.any(), Auth, BlogController.createBlog);
 
-router.route("/blog/get-blogs").get(Auth, BlogController.getMyBlogs);
+router.route("/blog/get-blogs").get(BlogController.getMyBlogs);
 
 router.route("/blog/find/:blogId").get(BlogController.findSingleBlog);
 

@@ -5,6 +5,9 @@
 /* eslint-disable no-unused-vars */
 const Transaction = require("../models/Transaction");
 const sequelize = require("../config/database/connection");
+const User = require("../models/User");
+const Order = require("../models/Order");
+const OrderItem = require("../models/OrderItem");
 
 const generateDesc = order_items => {
   const data = order_items.map(
@@ -22,6 +25,7 @@ exports.saveTxn = async (data, type) => {
     data.TransactionId = data.orderSlug;
     const saveThis = {
       type,
+      amount: data.totalAmount,
       TransactionId: orderSlug,
       userId,
       description,
@@ -40,9 +44,32 @@ exports.saveTxn = async (data, type) => {
 
 exports.getAllTxns = async (req, res, next) => {
   try {
-    const where = { userId: req.params.userId };
     const Txns = await Transaction.findAll({
-      where
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["name", "photo", "email", "userType", "phone"]
+        }
+      ]
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: Txns
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getAllUserTxns = async (req, res, next) => {
+  try {
+    const where = { userId: req.user.id };
+    const Txns = await Transaction.findAll({
+      where,
+      order: [["createdAt", "DESC"]]
     });
 
     return res.status(200).send({
@@ -56,15 +83,60 @@ exports.getAllTxns = async (req, res, next) => {
 
 exports.getOneTxns = async (req, res, next) => {
   try {
-    const where = { id: req.query.txn };
-    const Txns = await Transaction.findOne({
-      where
+    const where = { id: req.params.txId };
+    const Txns = JSON.parse(
+      JSON.stringify(
+        await Transaction.findOne({
+          where
+        })
+      )
+    );
+    const { TransactionId, userId, type } = Txns;
+    const detail = await this.getTransactionDetail({
+      txId: TransactionId,
+      userId,
+      type
     });
     return res.status(200).send({
       success: true,
-      data: Txns
+      data: {
+        transaction: Txns,
+        detail
+      }
     });
   } catch (error) {
     return next(error);
+  }
+};
+
+exports.getTransactionDetail = async ({ type, userId, txId }) => {
+  try {
+    let detail;
+    if (type === "Products") {
+      const where = {
+        orderSlug: txId,
+        userId
+      };
+      detail = JSON.parse(
+        JSON.stringify(
+          await Order.findOne({
+            where,
+            include: [
+              {
+                model: OrderItem,
+                as: "order_items"
+              }
+            ]
+          })
+        )
+      );
+    }
+    if (type === "Service") {
+      // Todo: Service request
+      detail = null;
+    }
+    return detail;
+  } catch (error) {
+    return error;
   }
 };

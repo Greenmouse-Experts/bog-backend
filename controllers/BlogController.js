@@ -6,9 +6,10 @@ const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
 const BlogCategory = require("../models/BlogCategory");
 const BlogModel = require("../models/Blog");
-const cloudinary = require("../helpers/cloudinary");
+// const cloudinary = require("../helpers/cloudinary");
 const BlogImage = require("../models/BlogImage");
 const PostCategory = require("../models/PostCategory");
+const Notification = require("../helpers/notification");
 
 exports.createCategory = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -100,16 +101,31 @@ exports.createBlog = async (req, res, next) => {
     try {
       const data = req.body;
       const { categoryIds } = req.body;
-      const photos = [];
-      for (let i = 0; i < req.files.length; i++) {
-        const result = await cloudinary.uploader.upload(req.files[i].path);
-        const docPath = result.secure_url;
-        photos.push({
-          image: docPath
-        });
+      let photos = [];
+      if (req.files) {
+        // for (let i = 0; i < req.files.length; i++) {
+        //   const result = await cloudinary.uploader.upload(req.files[i].path);
+        //   const docPath = result.secure_url;
+        //   photos.push({
+        //     image: docPath
+        //   });
+        // }
+        photos = await Promise.all(
+          req.files.map(async file => {
+            // const result = await cloudinary.uploader.upload(file.path);
+            // const docPath = result.secure_url;
+            const url = `${process.env.APP_URL}/${file.path}`;
+            return {
+              image: url
+            };
+          })
+        );
       }
       if (photos.length > 0) {
         data.images = photos;
+      }
+      if (!req.body.status) {
+        data.status = "draft";
       }
 
       const blog = await BlogModel.create(data, {
@@ -122,11 +138,22 @@ exports.createBlog = async (req, res, next) => {
         transaction: t
       });
 
-      const category = categoryIds.map(cat => ({
-        blogId: blog.id,
-        categoryId: cat
-      }));
-      await PostCategory.bulkCreate(category, { transaction: t });
+      if (categoryIds && categoryIds.length > 0) {
+        const category = categoryIds.map(cat => ({
+          blogId: blog.id,
+          categoryId: cat
+        }));
+        await PostCategory.bulkCreate(category, { transaction: t });
+      }
+
+      const mesg = "A new Blog post was created";
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
 
       return res.status(200).send({
         success: true,
@@ -204,8 +231,13 @@ exports.getCategoryBlogs = async (req, res, next) => {
   try {
     const { categoryId } = req.params;
     const where = { categoryId };
-    const categories = await BlogModel.findAll({
-      where,
+    const categories = await PostCategory.findAll({ where });
+    const Ids = categories.map(cat => cat.blogId);
+    const whereBlog = {
+      id: Ids
+    };
+    const blogs = await BlogModel.findAll({
+      whereBlog,
       order: [["createdAt", "DESC"]],
       include: [
         {
@@ -220,7 +252,7 @@ exports.getCategoryBlogs = async (req, res, next) => {
     });
     return res.status(200).send({
       success: true,
-      data: categories
+      data: blogs
     });
   } catch (error) {
     return next(error);
@@ -245,14 +277,27 @@ exports.updateBlog = async (req, res, next) => {
         where: { id: blogId },
         transaction: t
       });
-      const photos = [];
-      for (let i = 0; i < req.files.length; i++) {
-        const result = await cloudinary.uploader.upload(req.files[i].path);
-        const docPath = result.secure_url;
-        photos.push({
-          image: docPath,
-          blogId
-        });
+      let photos = [];
+      if (req.files) {
+        // for (let i = 0; i < req.files.length; i++) {
+        //   const result = await cloudinary.uploader.upload(req.files[i].path);
+        //   const docPath = result.secure_url;
+        //   photos.push({
+        //     image: docPath,
+        //     blogId
+        //   });
+        // }
+        photos = await Promise.all(
+          req.files.map(async file => {
+            // const result = await cloudinary.uploader.upload(file.path);
+            // const docPath = result.secure_url;
+            const url = `${process.env.APP_URL}/${file.path}`;
+            return {
+              image: url,
+              blogId
+            };
+          })
+        );
       }
       if (photos.length > 0) {
         const images = await BlogImage.findAll({
@@ -311,6 +356,15 @@ exports.publishBlog = async (req, res, next) => {
         where: { id: blogId },
         transaction: t
       });
+
+      const mesg = `Blog Post with title: ${theBlog.title} has been published to home Page`;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
 
       return res.status(200).send({
         success: true,

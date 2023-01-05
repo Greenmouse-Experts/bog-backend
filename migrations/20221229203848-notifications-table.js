@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const table = await queryInterface.createTable("testimonies", {
+    const table = await queryInterface.createTable("notifications", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -12,25 +12,24 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: true
       },
-      name: {
-        type: Sequelize.STRING,
-        allowNull: true
+      type: {
+        allowNull: true,
+        type: Sequelize.ENUM("user", "admin")
       },
       message: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      isHomepage: {
-        type: Sequelize.BOOLEAN,
-        allowNull: true
-      },
-      image: {
         allowNull: true,
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
-      star: {
-        type: Sequelize.INTEGER,
-        allowNull: true
+      isRead: {
+        allowNull: true,
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      status: {
+        allowNull: true,
+        type: Sequelize.ENUM,
+        values: ["pending", "read", "unread"],
+        defaultValue: "pending"
       },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE },
@@ -40,6 +39,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("testimonies");
+    return queryInterface.dropTable("notifications");
   }
 };

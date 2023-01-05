@@ -14,6 +14,8 @@ const { sendMail } = require("../service/attachmentEmailService");
 const helpers = require("../helpers/message");
 const helpTransaction = require("../helpers/transactions");
 const ContactDetails = require("../models/ContactDetails");
+const ProductReview = require("../models/Reviews");
+const Notification = require("../helpers/notification");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -83,6 +85,10 @@ exports.getOrderDetails = async (req, res, next) => {
           model: User,
           as: "client",
           attributes: ["id", "fname", "lname", "email", "phone", "photo"]
+        },
+        {
+          model: ProductReview,
+          as: "review"
         }
       ]
     });
@@ -231,20 +237,30 @@ exports.createOrder = async (req, res, next) => {
       if (invoice) {
         const files = [
           {
-            path: `uploads/invoice/${orderSlug}.pdf`,
+            path: `uploads/${orderSlug}.pdf`,
             filename: `${orderSlug}.pdf`
           }
         ];
         const message = helpers.invoiceMessage(user.name);
         sendMail(user.email, message, "BOG Invoice", files);
       }
+
+      const mesg = `A new order was made by ${user.name}`;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
+
+      // save the details of the transaction
       return res.status(200).send({
         success: true,
         message: "Order Request submitted",
         order
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
       return next(error);
     }

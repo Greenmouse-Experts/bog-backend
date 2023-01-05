@@ -5,7 +5,9 @@ const sequelize = require("../config/database/connection");
 const ProductReview = require("../models/Reviews");
 const ServiceReview = require("../models/ServiceReview");
 const Product = require("../models/Product");
-const PartnerModel = require("../models/ServicePartner");
+const User = require("../models/User");
+const Notification = require("../helpers/notification");
+const Order = require("../models/Order");
 
 // create reviews
 exports.createReview = async (req, res, next) => {
@@ -17,6 +19,20 @@ exports.createReview = async (req, res, next) => {
       const myReview = await ProductReview.create(req.body, {
         transaction: t
       });
+
+      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const order = await Order.findByPk(req.body.productId, {
+        attributes: ["orderSlug"]
+      });
+      const mesg = `${user.name} gave a review on an order ${order.orderSlug}`;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg,
+        userId
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
 
       return res.status(200).send({
         success: true,

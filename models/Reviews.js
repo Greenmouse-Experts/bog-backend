@@ -1,7 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
-const Product = require("./Product");
-const Partner = require("./ServicePartner");
+const Order = require("./Order");
 
 const ProductReview = sequelise.define(
   "reviews",
@@ -32,9 +31,9 @@ const ProductReview = sequelise.define(
   { paranoid: true }
 );
 
-Product.hasMany(ProductReview, {
+Order.hasOne(ProductReview, {
   foreignKey: "productId",
-  as: "product_reviews",
+  as: "review",
   onDelete: "cascade",
   hooks: true
 });
