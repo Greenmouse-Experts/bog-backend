@@ -14,7 +14,6 @@ const generateDesc = order_items => {
     item => `${item.quantity} of ${item.product.name}`
   );
   const joined = data.join(" and ");
-  console.log(joined);
   return `Bought ${joined}`;
 };
 exports.saveTxn = async (data, type) => {

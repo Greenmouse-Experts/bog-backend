@@ -76,6 +76,24 @@ const bankValidation = () => {
   ];
 };
 
+const meetingValidation = () => {
+  return [
+    check("description", "Account not found").notEmpty(),
+    check("projectSlug", "Please Select a Project").notEmpty(),
+    check("date", "Please enter meeting date").notEmpty(),
+    check("time", "Please enter meeting time").notEmpty(),
+    check("description", "Please describe the meeting").notEmpty(),
+    check("requestEmail", "Unexpected error, try to login again").notEmpty()
+  ];
+};
+
+const meetingStatusValidation = () => {
+  return [
+    check("meetingId", "Account not found").notEmpty(),
+    check("status", "No action").notEmpty()
+  ];
+};
+
 const categoryValidation = () => {
   return [check("name", "Please Enter category name").notEmpty()];
 };
@@ -190,5 +208,7 @@ module.exports = {
   ServiceTypeValidation,
   landSurveyRequestValidation,
   contractorRequestValidation,
-  adminValidation
+  adminValidation,
+  meetingValidation,
+  meetingStatusValidation
 };
