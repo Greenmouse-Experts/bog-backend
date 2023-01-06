@@ -5,6 +5,7 @@ const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
 const helper = require("../helpers/utility");
 const MeetingModel = require("../models/Meeting");
+const ProjectModel = require("../models/Project");
 const MeetingInfoModel = require("../models/MeetingInfo");
 const { zoomGenerator } = require("../service/zoomService");
 
@@ -61,15 +62,22 @@ exports.meetingAction = async (req, res, next) => {
           message: "Invalid Meeting"
         });
       }
+      const project = await ProjectModel.findOne({
+        where: { projectSlug: myMeeting.projectSlug }
+      });
       let start_url = "-";
       if (status === "approved") {
-        const zoomInfo = await zoomGenerator(myMeeting.requestEmail);
+        const zoomInfo = await zoomGenerator(
+          process.env.ADMIN_EMAIL,
+          project.title
+        );
         if (!zoomInfo) {
           return res.status(501).send({
             success: false,
             data: "Unable to generate zoom link"
           });
         }
+        console.log(zoomInfo);
         const meetData = { ...zoomInfo, meetingId };
         await MeetingInfoModel.create(meetData, {
           transaction: t
@@ -90,6 +98,7 @@ exports.meetingAction = async (req, res, next) => {
         data: updated
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
