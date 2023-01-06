@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
-const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
 const helper = require("../helpers/utility");
 const MeetingModel = require("../models/Meeting");
