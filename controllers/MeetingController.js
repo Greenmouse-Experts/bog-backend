@@ -29,7 +29,6 @@ exports.myMeeting = async (req, res, next) => {
 exports.createMeeting = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      console.log(req.body);
       const meetingData = {
         ...req.body,
         meetingSlug: `MET-${helper.generateOrderId}`
@@ -65,7 +64,7 @@ exports.meetingAction = async (req, res, next) => {
       const project = await ProjectModel.findOne({
         where: { projectSlug: myMeeting.projectSlug }
       });
-      let start_url = "-";
+      let start_url = "";
       if (status === "approved") {
         const zoomInfo = await zoomGenerator(
           process.env.ADMIN_EMAIL,
@@ -77,16 +76,15 @@ exports.meetingAction = async (req, res, next) => {
             data: "Unable to generate zoom link"
           });
         }
-        console.log(zoomInfo);
         const meetData = { ...zoomInfo, meetingId };
         await MeetingInfoModel.create(meetData, {
           transaction: t
         });
         start_url = zoomInfo.start_url;
       }
-
+      const meetingStatus = start_url !== "" ? "placed" : "cancelled";
       const updated = await MeetingModel.update(
-        { approval_status: status, start_url, status: "placed" },
+        { approval_status: status, start_url, status: meetingStatus },
         {
           where: { id: meetingId },
           transaction: t
@@ -98,7 +96,6 @@ exports.meetingAction = async (req, res, next) => {
         data: updated
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
       return next(error);
     }
