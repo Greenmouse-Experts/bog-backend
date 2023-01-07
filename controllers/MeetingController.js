@@ -64,11 +64,9 @@ exports.meetingAction = async (req, res, next) => {
         where: { projectSlug: myMeeting.projectSlug }
       });
       let start_url = "";
+      const topic = project.title ? project.title : project.projectSlug;
       if (status === "approved") {
-        const zoomInfo = await zoomGenerator(
-          process.env.ADMIN_EMAIL,
-          project.title || project.projectSlug
-        );
+        const zoomInfo = await zoomGenerator(process.env.ADMIN_EMAIL, topic);
         if (!zoomInfo) {
           return res.status(501).send({
             success: false,
