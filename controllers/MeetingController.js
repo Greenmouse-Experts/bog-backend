@@ -67,7 +67,7 @@ exports.meetingAction = async (req, res, next) => {
       if (status === "approved") {
         const zoomInfo = await zoomGenerator(
           process.env.ADMIN_EMAIL,
-          project.title
+          project.title || project.projectSlug
         );
         if (!zoomInfo) {
           return res.status(501).send({
