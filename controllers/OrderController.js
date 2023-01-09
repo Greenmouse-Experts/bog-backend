@@ -148,7 +148,7 @@ exports.createOrder = async (req, res, next) => {
       const userId = req.user.id;
       const ownerId = req.user.id;
       const user = await User.findByPk(userId, {
-        attributes: ["email", "name"]
+        attributes: ["email", "name", "fname", "lname"]
       });
       const {
         shippingAddress,
@@ -245,7 +245,9 @@ exports.createOrder = async (req, res, next) => {
         sendMail(user.email, message, "BOG Invoice", files);
       }
 
-      const mesg = `A new order was made by ${user.name}`;
+      const mesg = `A new order was made by ${
+        user.name ? user.name : `${user.fname} ${user.lname}`
+      }`;
       const notifyType = "admin";
       const { io } = req.app;
       await Notification.createNotification({

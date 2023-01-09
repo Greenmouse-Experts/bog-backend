@@ -507,7 +507,7 @@ exports.addProductToShop = async (req, res, next) => {
         { where: { id: productId }, transaction: t }
       );
 
-      const mesg = `A product (${product.title}) has been sent for reviewed to be allowed in shop`;
+      const mesg = `A product (${product.name}) has been sent for reviewed to be allowed in shop`;
       const userId = product.creatorId;
       const notifyType = "admin";
       const { io } = req.app;

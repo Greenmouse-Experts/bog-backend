@@ -7,6 +7,8 @@ const MeetingModel = require("../models/Meeting");
 const ProjectModel = require("../models/Project");
 const MeetingInfoModel = require("../models/MeetingInfo");
 const { zoomGenerator } = require("../service/zoomService");
+const Notification = require("../helpers/notification");
+const User = require("../models/User");
 
 exports.myMeeting = async (req, res, next) => {
   try {
@@ -36,6 +38,20 @@ exports.createMeeting = async (req, res, next) => {
       const myMeetings = await MeetingModel.create(meetingData, {
         transaction: t
       });
+      const user = await User.findByPk(req.user.id, {
+        attributes: ["email", "name", "fname", "lname"]
+      });
+
+      const mesg = `${user.fname} ${user.lname} requested for a meeting on Project`;
+      const userId = req.user.id;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg,
+        userId
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
 
       return res.status(200).send({
         success: true,
@@ -64,7 +80,7 @@ exports.meetingAction = async (req, res, next) => {
         where: { projectSlug: myMeeting.projectSlug }
       });
       let start_url = "";
-      const topic = project.title ? project.title : project.projectSlug;
+      const topic = project.title ? project.title : myMeeting.projectSlug;
       if (status === "approved") {
         const zoomInfo = await zoomGenerator(process.env.ADMIN_EMAIL, topic);
         if (!zoomInfo) {
@@ -78,6 +94,20 @@ exports.meetingAction = async (req, res, next) => {
           transaction: t
         });
         start_url = zoomInfo.start_url;
+
+        const mesg = `Your meeting request has been approved`;
+        const { userId } = project;
+        const notifyType = "user";
+        const { io } = req.app;
+        await Notification.createNotification({
+          type: notifyType,
+          message: mesg,
+          userId
+        });
+        io.emit(
+          "getNotifications",
+          await Notification.fetchUserNotificationApi({ userId })
+        );
       }
       const meetingStatus = start_url !== "" ? "placed" : "cancelled";
       const updated = await MeetingModel.update(
