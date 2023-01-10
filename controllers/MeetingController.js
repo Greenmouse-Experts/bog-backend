@@ -22,7 +22,13 @@ exports.myMeeting = async (req, res, next) => {
 
     const meetings = await MeetingModel.findAll({
       where,
-      order: [["createdAt", "DESC"]]
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: MeetingInfoModel,
+          as: "meeting_info"
+        }
+      ]
     });
 
     return res.status(200).send({
@@ -145,7 +151,13 @@ exports.getAllMeeting = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const allMyMeeting = await MeetingModel.findAll({
-        order: [["createdAt", "DESC"]]
+        order: [["createdAt", "DESC"]],
+        include: [
+          {
+            model: MeetingInfoModel,
+            as: "meeting_info"
+          }
+        ]
       });
 
       return res.status(200).send({

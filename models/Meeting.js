@@ -68,14 +68,4 @@ const Meeting = sequelise.define(
   { paranoid: true }
 );
 
-// Meeting.hasMany(MeetingInfo, {
-//   foreignKey: "meetingId",
-//   as: "mymeeting"
-// });
-
-// MeetingInfo.belongsTo(Meeting, {
-//   foreignKey: "meetingId",
-//   as: "meetings"
-// });
-
 module.exports = Meeting;
