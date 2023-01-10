@@ -4,6 +4,10 @@ const User = require("../models/User");
 const Profile = require("../models/UserProfile");
 const BankDetail = require("../models/BankDetail");
 const Referral = require("../models/Referral");
+const ServicePartner = require("../models/ServicePartner");
+const ProductPartner = require("../models/ProductPartner");
+const PrivateClient = require("../models/PrivateClient");
+const CorporateClient = require("../models/CorporateClient");
 
 exports.findUser = async where => {
   const user = await User.findOne({ where });
@@ -227,4 +231,35 @@ exports.getUserType = type => {
     default:
       return "";
   }
+};
+
+exports.getUserTypeProfile = async (userType, userId) => {
+  const attributes = ["id", "userType"];
+  let profile;
+  if (userType === "professional") {
+    profile = JSON.parse(
+      JSON.stringify(
+        await ServicePartner.findOne({ where: { userId }, attributes })
+      )
+    );
+  } else if (userType === "vendor") {
+    profile = JSON.parse(
+      JSON.stringify(
+        await ProductPartner.findOne({ where: { userId }, attributes })
+      )
+    );
+  } else if (userType === "private_client") {
+    profile = JSON.parse(
+      JSON.stringify(
+        await PrivateClient.findOne({ where: { userId }, attributes })
+      )
+    );
+  } else if (userType === "corporate_client") {
+    profile = JSON.parse(
+      JSON.stringify(
+        await CorporateClient.findOne({ where: { userId }, attributes })
+      )
+    );
+  }
+  return profile;
 };

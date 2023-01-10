@@ -9,14 +9,21 @@ const MeetingInfoModel = require("../models/MeetingInfo");
 const { zoomGenerator } = require("../service/zoomService");
 const Notification = require("../helpers/notification");
 const User = require("../models/User");
+const { getUserTypeProfile } = require("../service/UserService");
 
 exports.myMeeting = async (req, res, next) => {
   try {
+    const userId = req.user.id;
+    const { userType } = req.query;
+    const profile = await getUserTypeProfile(userType, userId);
     const where = {
-      requestId: req.params.userId
+      userId: profile.id
     };
 
-    const meetings = await MeetingModel.findAll({ where });
+    const meetings = await MeetingModel.findAll({
+      where,
+      order: [["createdAt", "DESC"]]
+    });
 
     return res.status(200).send({
       success: true,
@@ -30,10 +37,16 @@ exports.myMeeting = async (req, res, next) => {
 exports.createMeeting = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
+      const { userType } = req.body;
+      const userId = req.user.id;
       const meetingData = {
         ...req.body,
-        meetingSlug: `MET-${helper.generateOrderId}`
+        meetingSlug: `MET-${Math.floor(190000000 + Math.random() * 990000000)}`
       };
+      if (userType !== "admin") {
+        const profile = await getUserTypeProfile(userType, userId);
+        meetingData.userId = profile.id;
+      }
 
       const myMeetings = await MeetingModel.create(meetingData, {
         transaction: t
@@ -43,7 +56,6 @@ exports.createMeeting = async (req, res, next) => {
       });
 
       const mesg = `${user.fname} ${user.lname} requested for a meeting on Project`;
-      const userId = req.user.id;
       const notifyType = "admin";
       const { io } = req.app;
       await Notification.createNotification({
@@ -132,7 +144,9 @@ exports.meetingAction = async (req, res, next) => {
 exports.getAllMeeting = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const allMyMeeting = await MeetingModel.findAll();
+      const allMyMeeting = await MeetingModel.findAll({
+        order: [["createdAt", "DESC"]]
+      });
 
       return res.status(200).send({
         success: true,

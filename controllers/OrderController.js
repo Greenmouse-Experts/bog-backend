@@ -158,7 +158,9 @@ exports.createOrder = async (req, res, next) => {
         discount,
         totalAmount
       } = req.body;
-      const orderSlug = `ORD-${utility.generateOrderId}`;
+      const orderSlug = `ORD-${Math.floor(
+        190000000 + Math.random() * 990000000
+      )}`;
       const orderData = {
         orderSlug,
         userId,
@@ -192,7 +194,9 @@ exports.createOrder = async (req, res, next) => {
             ]
           });
           const amount = product.quantity * Number(prodData.price);
-          const trackingId = `TRD-${utility.generateOrderId}`;
+          const trackingId = `TRD-${Math.floor(
+            190000000 + Math.random() * 990000000
+          )}`;
           return {
             status: "paid",
             trackingId,

@@ -121,7 +121,9 @@ exports.viewProjectRequest = async (req, res, next) => {
 
 exports.createProject = async (data, transaction) => {
   try {
-    const projectSlug = `PRJ-${utility.generateOrderId}`;
+    const projectSlug = `PRJ-${Math.floor(
+      190000000 + Math.random() * 990000000
+    )}`;
     data.projectSlug = projectSlug;
     const result = await Project.create(data, { transaction });
     return result;

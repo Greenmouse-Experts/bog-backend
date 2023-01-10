@@ -22,6 +22,10 @@ const Meeting = sequelise.define(
       type: Sequelize.UUID,
       allowNull: true
     },
+    userId: {
+      type: Sequelize.UUID,
+      allowNull: true
+    },
     description: {
       type: Sequelize.STRING,
       allowNull: true
