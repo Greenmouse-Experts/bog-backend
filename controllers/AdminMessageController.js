@@ -52,7 +52,7 @@ exports.viewAnnouncements = async (req, res, next) => {
 exports.deleteAnnouncement = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { id } = req.param;
+      const { id } = req.params;
       await AdminMessage.destroy({ where: { id }, transaction: t });
       return res.status(200).send({
         success: true,
