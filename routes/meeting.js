@@ -18,8 +18,6 @@ router
   .route("/meeting/action")
   .post(meetingStatusValidation(), Auth, MeetingController.meetingAction);
 
-// router.route("/meeting/create").post(Auth, ZoomService.CreatMeeting);
-
 router
   .route("/meeting/create")
   .post(meetingValidation(), validate, Auth, MeetingController.createMeeting);

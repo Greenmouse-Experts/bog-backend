@@ -43,11 +43,17 @@ exports.myMeeting = async (req, res, next) => {
 exports.createMeeting = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.body;
+      const { userType, projectSlug } = req.body;
       const userId = req.user.id;
+      const project = await ProjectModel.findOne({
+        where: { projectSlug }
+      });
+      const type = helper.projectSlug(project.projectTypes);
       const meetingData = {
         ...req.body,
-        meetingSlug: `MET-${Math.floor(190000000 + Math.random() * 990000000)}`
+        meetingSlug: `BOG/MET/${type}/${Math.floor(
+          190000000 + Math.random() * 990000000
+        )}`
       };
       if (userType !== "admin") {
         const profile = await getUserTypeProfile(userType, userId);

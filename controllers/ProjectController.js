@@ -5,7 +5,6 @@ require("dotenv").config();
 const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
 const User = require("../models/User");
-const cloudinary = require("../helpers/cloudinary");
 const Project = require("../models/Project");
 const LandSurveyProject = require("../models/LandSurveyProject");
 const DrawingProject = require("../models/DrawingProject");
@@ -121,7 +120,8 @@ exports.viewProjectRequest = async (req, res, next) => {
 
 exports.createProject = async (data, transaction) => {
   try {
-    const projectSlug = `PRJ-${Math.floor(
+    const type = utility.projectSlug(data.projectTypes);
+    const projectSlug = `BOG/PRJ/${type}/${Math.floor(
       190000000 + Math.random() * 990000000
     )}`;
     data.projectSlug = projectSlug;

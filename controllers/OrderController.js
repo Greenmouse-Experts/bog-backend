@@ -158,7 +158,7 @@ exports.createOrder = async (req, res, next) => {
         discount,
         totalAmount
       } = req.body;
-      const orderSlug = `ORD-${Math.floor(
+      const orderSlug = `BOG/ORD/${Math.floor(
         190000000 + Math.random() * 990000000
       )}`;
       const orderData = {
