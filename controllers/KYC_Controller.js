@@ -318,7 +318,7 @@ exports.updateKycWorkExperience = async (req, res, next) => {
 };
 
 // Kyc Documents controllers
-exports.createSupplyCategories = async (req, res, next) => {
+exports.createKycDocuments = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { userId, userType } = req.body;
