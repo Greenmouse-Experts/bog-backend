@@ -10,7 +10,9 @@ router
   .route("/announcements/all")
   .get(AdminMessageController.viewAnnouncements);
 
-router.route("/announcements").get(AdminMessageController.allAdminMessages);
+router
+  .route("/announcements")
+  .get(Auth, AdminMessageController.allAdminMessages);
 
 router
   .route("/announcements/delete-message/:id")
