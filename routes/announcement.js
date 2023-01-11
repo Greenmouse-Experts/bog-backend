@@ -13,7 +13,7 @@ router
 router.route("/announcements").get(AdminMessageController.allAdminMessages);
 
 router
-  .route("/announcements/delete-message")
+  .route("/announcements/delete-message/:id")
   .delete(Auth, AdminMessageController.deleteAnnouncement);
 
 router
