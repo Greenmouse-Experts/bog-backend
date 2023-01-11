@@ -9,12 +9,19 @@ const KycGeneralInfo = require("../models/KycGeneralInfo");
 const KycOrganisationInfo = require("../models/KycOrganisationInfo");
 const KycTaxPermits = require("../models/KycTaxPermits");
 const KycWorkExperience = require("../models/KycWorkExperience");
+const { getUserTypeProfile } = require("../service/UserService");
 
 // supply Categories controllers
 exports.createSupplyCategories = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const myCategories = await SupplyCategory.create(req.body, {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const myCategories = await SupplyCategory.create(data, {
         transaction: t
       });
 
@@ -31,7 +38,14 @@ exports.createSupplyCategories = async (req, res, next) => {
 exports.updateSupplyCategories = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const myCategories = await SupplyCategory.create(req.body, {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const myCategories = await SupplyCategory.update(data, {
+        where: { userId },
         transaction: t
       });
 
@@ -45,11 +59,20 @@ exports.updateSupplyCategories = async (req, res, next) => {
   });
 };
 
+//
+//
+//
 // Financial Data controllers
 exports.createKycFinancialData = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const myFinancial = await KycFinancialData.create(req.body, {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const myFinancial = await KycFinancialData.create(data, {
         transaction: t
       });
 
@@ -63,11 +86,44 @@ exports.createKycFinancialData = async (req, res, next) => {
   });
 };
 
+exports.updateKycFinancialData = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const myFinancial = await KycFinancialData.update(data, {
+        where: { userId },
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        data: myFinancial
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
+//
+//
+//
 // General Info controllers
 exports.createKycGeneralInfo = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const myInfo = await KycGeneralInfo.create(req.body, {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const myInfo = await KycGeneralInfo.create(data, {
         transaction: t
       });
 
@@ -81,11 +137,45 @@ exports.createKycGeneralInfo = async (req, res, next) => {
   });
 };
 
+exports.updateKycGeneralInfo = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const updatedInfo = await KycGeneralInfo.update(data, {
+        where: { userId },
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        data: updatedInfo
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
+//
+//
+//
+//
 // Organisation Info controllers
 exports.createKycOrganisationInfo = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const OrganisationInfo = await KycOrganisationInfo.create(req.body, {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const OrganisationInfo = await KycOrganisationInfo.create(data, {
         transaction: t
       });
 
@@ -99,11 +189,45 @@ exports.createKycOrganisationInfo = async (req, res, next) => {
   });
 };
 
+exports.updateKycOrganisationInfo = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const updatedInfo = await KycOrganisationInfo.update(data, {
+        where: { userId },
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        data: updatedInfo
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
+//
+//
+//
+//
 // Tax Permits controllers
 exports.createKycTaxPermits = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const taxPermits = await KycTaxPermits.create(req.body, {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const taxPermits = await KycTaxPermits.create(data, {
         transaction: t
       });
 
@@ -117,11 +241,45 @@ exports.createKycTaxPermits = async (req, res, next) => {
   });
 };
 
+exports.updateKycTaxPermits = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const updatedTaxPermits = await KycTaxPermits.update(data, {
+        where: { userId },
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        data: updatedTaxPermits
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
+//
+//
+//
+//
 // Work Experience controllers
 exports.createKycWorkExperience = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const experiences = await KycWorkExperience.create(req.body, {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const experiences = await KycWorkExperience.create(data, {
         transaction: t
       });
 
@@ -135,11 +293,41 @@ exports.createKycWorkExperience = async (req, res, next) => {
   });
 };
 
+exports.updateKycWorkExperience = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const updatedExperiences = await KycWorkExperience.update(data, {
+        where: { userId },
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        data: updatedExperiences
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
 // Kyc Documents controllers
 exports.createSupplyCategories = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const documents = await KycDocuments.create(req.body, {
+      const { userId, userType } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const documents = await KycDocuments.create(data, {
         transaction: t
       });
       return res.status(200).send({
