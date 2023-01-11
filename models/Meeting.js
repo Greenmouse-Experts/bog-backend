@@ -22,6 +22,10 @@ const Meeting = sequelise.define(
       type: Sequelize.UUID,
       allowNull: true
     },
+    userId: {
+      type: Sequelize.UUID,
+      allowNull: true
+    },
     description: {
       type: Sequelize.STRING,
       allowNull: true
@@ -63,15 +67,5 @@ const Meeting = sequelise.define(
   },
   { paranoid: true }
 );
-
-// Meeting.hasMany(MeetingInfo, {
-//   foreignKey: "meetingId",
-//   as: "mymeeting"
-// });
-
-// MeetingInfo.belongsTo(Meeting, {
-//   foreignKey: "meetingId",
-//   as: "meetings"
-// });
 
 module.exports = Meeting;

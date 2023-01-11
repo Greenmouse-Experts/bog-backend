@@ -12,9 +12,7 @@ const {
 
 router.route("/meeting/all").get(Auth, MeetingController.getAllMeeting);
 
-router
-  .route("/meeting/my-meeting/:userId")
-  .get(Auth, MeetingController.myMeeting);
+router.route("/meeting/my-meeting").get(Auth, MeetingController.myMeeting);
 
 router
   .route("/meeting/action")

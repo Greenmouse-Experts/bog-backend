@@ -148,7 +148,7 @@ exports.createOrder = async (req, res, next) => {
       const userId = req.user.id;
       const ownerId = req.user.id;
       const user = await User.findByPk(userId, {
-        attributes: ["email", "name"]
+        attributes: ["email", "name", "fname", "lname"]
       });
       const {
         shippingAddress,
@@ -158,7 +158,9 @@ exports.createOrder = async (req, res, next) => {
         discount,
         totalAmount
       } = req.body;
-      const orderSlug = `ORD-${utility.generateOrderId}`;
+      const orderSlug = `ORD-${Math.floor(
+        190000000 + Math.random() * 990000000
+      )}`;
       const orderData = {
         orderSlug,
         userId,
@@ -192,7 +194,9 @@ exports.createOrder = async (req, res, next) => {
             ]
           });
           const amount = product.quantity * Number(prodData.price);
-          const trackingId = `TRD-${utility.generateOrderId}`;
+          const trackingId = `TRD-${Math.floor(
+            190000000 + Math.random() * 990000000
+          )}`;
           return {
             status: "paid",
             trackingId,
@@ -245,7 +249,9 @@ exports.createOrder = async (req, res, next) => {
         sendMail(user.email, message, "BOG Invoice", files);
       }
 
-      const mesg = `A new order was made by ${user.name}`;
+      const mesg = `A new order was made by ${
+        user.name ? user.name : `${user.fname} ${user.lname}`
+      }`;
       const notifyType = "admin";
       const { io } = req.app;
       await Notification.createNotification({

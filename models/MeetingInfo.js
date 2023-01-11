@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const Meeting = require("./Meeting");
 
 const MeetingInfo = sequelise.define(
   "meetings_infos",
@@ -49,5 +50,15 @@ const MeetingInfo = sequelise.define(
   },
   { paranoid: true }
 );
+
+Meeting.hasOne(MeetingInfo, {
+  foreignKey: "meetingId",
+  as: "meeting_info"
+});
+
+MeetingInfo.belongsTo(Meeting, {
+  foreignKey: "meetingId",
+  as: "meeting"
+});
 
 module.exports = MeetingInfo;
