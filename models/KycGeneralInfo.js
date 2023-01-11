@@ -42,9 +42,7 @@ const KycGeneralInfo = sequelise.define(
     },
     operational_address: {
       allowNull: true,
-      type: Sequelize.ENUM,
-      values: ["pending", "approved", "cancelled", "completed"],
-      defaultValue: "pending"
+      type: Sequelize.STRING
     }
   },
   { paranoid: true }

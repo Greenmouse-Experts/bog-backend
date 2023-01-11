@@ -38,9 +38,7 @@ module.exports = {
       },
       operational_address: {
         allowNull: true,
-        type: Sequelize.ENUM,
-        values: ["pending", "approved", "cancelled", "completed"],
-        defaultValue: "pending"
+        type: Sequelize.STRING
       },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE },

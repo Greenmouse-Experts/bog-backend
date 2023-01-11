@@ -189,6 +189,10 @@ const contractorRequestValidation = () => {
   ];
 };
 
+const BasicKYCRequirements = () => {
+  return [check("userType", "Couldn't get profile type").notEmpty()];
+};
+
 module.exports = {
   validate,
   registerValidation,
@@ -210,5 +214,6 @@ module.exports = {
   contractorRequestValidation,
   adminValidation,
   meetingValidation,
-  meetingStatusValidation
+  meetingStatusValidation,
+  BasicKYCRequirements
 };
