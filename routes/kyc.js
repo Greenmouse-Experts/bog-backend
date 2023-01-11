@@ -4,6 +4,7 @@ const express = require("express");
 const router = express.Router();
 const Auth = require("../middleware/auth");
 const KYC_Controller = require("../controllers/KYC_Controller");
+const upload = require("../helpers/upload");
 
 const { validate, BasicKYCRequirements } = require("../helpers/validators");
 
@@ -24,7 +25,7 @@ router
     BasicKYCRequirements(),
     validate,
     Auth,
-    KYC_Controller.createSupplyCategories
+    KYC_Controller.createKycFinancialData
   );
 
 //
@@ -63,20 +64,15 @@ router
 router
   .route("/kyc-work-experience/create")
   .post(
-    BasicKYCRequirements(),
     validate,
     Auth,
+    upload.single("photo"),
     KYC_Controller.createKycWorkExperience
   );
 
 // kyc_documents
 router
   .route("/kyc-documents/create")
-  .post(
-    BasicKYCRequirements(),
-    validate,
-    Auth,
-    KYC_Controller.createKycDocuments
-  );
+  .post(validate, Auth, upload.any(), KYC_Controller.createKycDocuments);
 
 module.exports = router;

@@ -12,7 +12,6 @@ const KycWorkExperience = require("../models/KycWorkExperience");
 const { getUserTypeProfile } = require("../service/UserService");
 
 // supply Categories controllers
-
 exports.createSupplyCategories = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
@@ -64,22 +63,19 @@ exports.createKycFinancialData = async (req, res, next) => {
         ...req.body,
         userId: profile.id
       };
-      const getFinancial = await KycFinancialData.findOne({
+      let myFinancial = await KycFinancialData.findOne({
         where: { userId: profile.id }
       });
-      if (getFinancial) {
-        const updatedFiniacials = await KycFinancialData.update(req.body, {
+      if (myFinancial) {
+        await KycFinancialData.update(req.body, {
           where: { userId: profile.id },
           transaction: t
         });
-        return res.status(200).send({
-          success: true,
-          data: updatedFiniacials
+      } else {
+        myFinancial = await KycFinancialData.create(data, {
+          transaction: t
         });
       }
-      const myFinancial = await KycFinancialData.create(data, {
-        transaction: t
-      });
 
       return res.status(200).send({
         success: true,
@@ -224,23 +220,13 @@ exports.createKycWorkExperience = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
+      const url = `${process.env.APP_URL}/${req.file.path}`;
+
       const data = {
         ...req.body,
-        userId: profile.id
+        userId: profile.id,
+        fileUrl: url
       };
-      const getExperience = await KycWorkExperience.findOne({
-        where: { userId: profile.id }
-      });
-      if (getExperience) {
-        const updatedExperience = await KycWorkExperience.update(req.body, {
-          where: { userId: profile.id },
-          transaction: t
-        });
-        return res.status(200).send({
-          success: true,
-          data: updatedExperience
-        });
-      }
       const experiences = await KycWorkExperience.create(data, {
         transaction: t
       });
@@ -255,6 +241,54 @@ exports.createKycWorkExperience = async (req, res, next) => {
   });
 };
 
+exports.UpdateKycWorkExperience = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType } = req.body;
+      const userId = req.user.id;
+      const profile = await getUserTypeProfile(userType, userId);
+      const { jobId } = req.params;
+      const url = `${process.env.APP_URL}/${req.file.path}`;
+
+      const data = {
+        ...req.body,
+        userId: profile.id,
+        fileUrl: url
+      };
+      const updatedExperience = await KycWorkExperience.update(data, {
+        where: { id: jobId },
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        data: updatedExperience
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
+exports.deleteKycWorkExperience = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { jobId } = req.params;
+      await KycWorkExperience.destroy({
+        where: { id: jobId },
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        message: "Work deleted successfully"
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
 // Kyc Documents controllers
 exports.createKycDocuments = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -262,11 +296,14 @@ exports.createKycDocuments = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
-      const data = {
-        ...req.body,
+      const loadFiles = req.files.map((file, i) => ({
+        name: file.fieldname,
+        file: `${process.env.APP_URL}/${req.file.path}`,
+        userType,
         userId: profile.id
-      };
-      const documents = await KycDocuments.create(data, {
+      }));
+
+      const documents = await KycDocuments.bulkCreate(loadFiles, {
         transaction: t
       });
       return res.status(200).send({
