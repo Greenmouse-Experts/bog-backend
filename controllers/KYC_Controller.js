@@ -49,6 +49,26 @@ exports.createSupplyCategories = async (req, res, next) => {
   });
 };
 
+exports.ReadSupplyCategories = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType } = req.body;
+      const userId = req.user.id;
+      const profile = await getUserTypeProfile(userType, userId);
+      const result = await SupplyCategory.find({
+        where: { userId: profile.id }
+      });
+
+      return res.status(200).send({
+        success: false,
+        message: result
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
 //
 //
 //
@@ -86,6 +106,27 @@ exports.createKycFinancialData = async (req, res, next) => {
     }
   });
 };
+
+exports.ReadKycFinancialData = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType } = req.body;
+      const userId = req.user.id;
+      const profile = await getUserTypeProfile(userType, userId);
+      const result = await KycFinancialData.find({
+        where: { userId: profile.id }
+      });
+
+      return res.status(200).send({
+        success: false,
+        message: result
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
 //
 //
 //
@@ -125,6 +166,27 @@ exports.createKycGeneralInfo = async (req, res, next) => {
     }
   });
 };
+
+exports.ReadKycGeneralInfo = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType } = req.body;
+      const userId = req.user.id;
+      const profile = await getUserTypeProfile(userType, userId);
+      const result = await KycGeneralInfo.find({
+        where: { userId: profile.id }
+      });
+
+      return res.status(200).send({
+        success: false,
+        message: result
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
 //
 //
 //
@@ -167,6 +229,25 @@ exports.createKycOrganisationInfo = async (req, res, next) => {
   });
 };
 
+exports.ReadKycOrganisationInfo = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType } = req.body;
+      const userId = req.user.id;
+      const profile = await getUserTypeProfile(userType, userId);
+      const result = await KycOrganisationInfo.find({
+        where: { userId: profile.id }
+      });
+
+      return res.status(200).send({
+        success: false,
+        message: result
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
 //
 //
 //
@@ -209,6 +290,25 @@ exports.createKycTaxPermits = async (req, res, next) => {
   });
 };
 
+exports.ReadKycTaxPermits = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType } = req.body;
+      const userId = req.user.id;
+      const profile = await getUserTypeProfile(userType, userId);
+      const result = await KycTaxPermits.find({
+        where: { userId: profile.id }
+      });
+
+      return res.status(200).send({
+        success: false,
+        message: result
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
 //
 //
 //
@@ -240,7 +340,25 @@ exports.createKycWorkExperience = async (req, res, next) => {
     }
   });
 };
+exports.ReadKycWorkExperience = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType } = req.body;
+      const userId = req.user.id;
+      const profile = await getUserTypeProfile(userType, userId);
+      const result = await KycWorkExperience.find({
+        where: { userId: profile.id }
+      });
 
+      return res.status(200).send({
+        success: false,
+        message: result
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
 exports.UpdateKycWorkExperience = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
@@ -309,6 +427,26 @@ exports.createKycDocuments = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         data: documents
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
+exports.ReadKycDocuments = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType } = req.body;
+      const userId = req.user.id;
+      const profile = await getUserTypeProfile(userType, userId);
+      const result = await KycDocuments.find({
+        where: { userId: profile.id }
+      });
+
+      return res.status(200).send({
+        success: false,
+        message: result
       });
     } catch (error) {
       return next(error);

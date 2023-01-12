@@ -17,6 +17,14 @@ router
     KYC_Controller.createSupplyCategories
   );
 
+router
+  .route("/kyc-supply-category/fetch")
+  .post(
+    BasicKYCRequirements(),
+    validate,
+    Auth,
+    KYC_Controller.ReadSupplyCategories
+  );
 //
 // kyc-financial-data
 router
@@ -28,6 +36,14 @@ router
     KYC_Controller.createKycFinancialData
   );
 
+router
+  .route("/kyc-financial-data/fetch")
+  .post(
+    BasicKYCRequirements(),
+    validate,
+    Auth,
+    KYC_Controller.ReadKycFinancialData
+  );
 //
 // kyc_general_info
 router
@@ -37,6 +53,15 @@ router
     validate,
     Auth,
     KYC_Controller.createKycGeneralInfo
+  );
+
+router
+  .route("/kyc-general-info/fetch")
+  .post(
+    BasicKYCRequirements(),
+    validate,
+    Auth,
+    KYC_Controller.ReadKycGeneralInfo
   );
 
 //
@@ -50,6 +75,14 @@ router
     KYC_Controller.createKycOrganisationInfo
   );
 
+router
+  .route("/kyc-organisation-info/fetch")
+  .post(
+    BasicKYCRequirements(),
+    validate,
+    Auth,
+    KYC_Controller.ReadKycOrganisationInfo
+  );
 // kyc_tax_permits
 router
   .route("/kyc-tax-permits/create")
@@ -58,6 +91,15 @@ router
     validate,
     Auth,
     KYC_Controller.createKycTaxPermits
+  );
+
+router
+  .route("/kyc-tax-permits/fetch")
+  .post(
+    BasicKYCRequirements(),
+    validate,
+    Auth,
+    KYC_Controller.ReadKycTaxPermits
   );
 
 // kyc_work_experience
@@ -69,10 +111,26 @@ router
     upload.single("photo"),
     KYC_Controller.createKycWorkExperience
   );
-
+router
+  .route("/kyc-work-experience/fetch")
+  .post(
+    BasicKYCRequirements(),
+    validate,
+    Auth,
+    KYC_Controller.ReadKycWorkExperience
+  );
 // kyc_documents
 router
   .route("/kyc-documents/create")
   .post(validate, Auth, upload.any(), KYC_Controller.createKycDocuments);
+
+router
+  .route("/kyc-documents/fetch")
+  .post(
+    BasicKYCRequirements(),
+    validate,
+    Auth,
+    KYC_Controller.ReadKycDocuments
+  );
 
 module.exports = router;

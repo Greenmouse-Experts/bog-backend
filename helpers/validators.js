@@ -192,6 +192,12 @@ const contractorRequestValidation = () => {
 const BasicKYCRequirements = () => {
   return [check("userType", "Couldn't get profile type").notEmpty()];
 };
+const CalculatorCalculator = () => {
+  return [
+    check("name", "Please provide the rate name").notEmpty(),
+    check("rate", "Please provide the rate value").notEmpty()
+  ];
+};
 
 module.exports = {
   validate,
@@ -207,6 +213,7 @@ module.exports = {
   updateOrderValidation,
   updateOrderRequestValidation,
   BlogCategoryValidation,
+  CalculatorCalculator,
   BlogValidation,
   TestimonyValidation,
   ServiceTypeValidation,
