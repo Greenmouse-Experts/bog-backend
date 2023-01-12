@@ -20,6 +20,10 @@ router
 
 router
   .route("/announcements/new-announcement")
-  .post(upload.any(), Auth, AdminMessageController.postAnnouncement);
+  .post(
+    upload.single("supportingDocument"),
+    Auth,
+    AdminMessageController.postAnnouncement
+  );
 
 module.exports = router;

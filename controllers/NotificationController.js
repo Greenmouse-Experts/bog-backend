@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 const Notification = require("../models/Notification");
 const NotificationService = require("../helpers/notification");
+const sequelize = require("../config/database/connection");
 
 exports.getAllAdminNotifications = async (req, res, next) => {
   try {
@@ -75,4 +76,19 @@ exports.markNotificationAsRead = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
+};
+
+exports.deleteNotification = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { notificationId } = req.params;
+      await NotificationService.deleteNotifications(notificationId);
+      return res.status(200).send({
+        success: true,
+        message: "Notification deleted"
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
 };

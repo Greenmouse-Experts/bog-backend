@@ -11,8 +11,13 @@ router
 router
   .route("/notifications/user/:userId")
   .get(Auth, NotificationController.getAllAUserNotifications);
+
 router
   .route("/notifications/mark-read/:notificationId")
   .patch(NotificationController.markNotificationAsRead);
+
+router
+  .route("/notifications/delete/:notificationId")
+  .delete(NotificationController.deleteNotification);
 
 module.exports = router;
