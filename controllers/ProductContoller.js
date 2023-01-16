@@ -38,7 +38,7 @@ exports.getProducts = async (req, res, next) => {
         }
       ],
       order: [["createdAt", "DESC"]]
-    });
+    })
     return res.status(200).send({
       success: true,
       data: products
@@ -592,7 +592,7 @@ exports.approveProduct = async (req, res, next) => {
         data.showInShop = true;
       }
       await Product.update(data, { where: { id: productId }, transaction: t });
-      const mesg = `Your product ${product.title} has been reviewed and approved`;
+      const mesg = `Your product ${product.name} has been reviewed and approved`;
       const userId = product.creatorId;
       const notifyType = "user";
       const { io } = req.app;

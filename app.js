@@ -59,7 +59,6 @@ io.on("connection", async socket => {
     await Notification.fetchUserNotificationApi(socket.handshake.query)
   );
   socket.on("notification_read", async data => {
-    console.log(data);
     const { id } = data;
     socket.emit("markAsRead", await Notification.updateNotification(id));
   });
