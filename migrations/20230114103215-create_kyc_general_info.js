@@ -32,6 +32,10 @@ module.exports = {
         type: Sequelize.ENUM,
         values: ["Incorporation", "Registered Business Name"]
       },
+      registration_number: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
       business_address: {
         type: Sequelize.STRING,
         allowNull: true
