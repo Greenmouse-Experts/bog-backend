@@ -38,7 +38,7 @@ exports.createSupplyCategories = async (req, res, next) => {
       const myCategories = await SupplyCategory.create(data, {
         transaction: t
       });
-
+      myCategories.categories = myCategories.categories.split(",");
       return res.status(200).send({
         success: true,
         data: myCategories
@@ -55,13 +55,13 @@ exports.ReadSupplyCategories = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
-      const result = await SupplyCategory.find({
+      const result = await SupplyCategory.findOne({
         where: { userId: profile.id }
       });
-
+      result.categories = result.categories.split(",");
       return res.status(200).send({
         success: false,
-        message: result
+        data: result
       });
     } catch (error) {
       return next(error);
@@ -113,13 +113,13 @@ exports.ReadKycFinancialData = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
-      const result = await KycFinancialData.find({
+      const result = await KycFinancialData.findOne({
         where: { userId: profile.id }
       });
 
       return res.status(200).send({
         success: false,
-        message: result
+        data: result
       });
     } catch (error) {
       return next(error);
@@ -173,13 +173,13 @@ exports.ReadKycGeneralInfo = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
-      const result = await KycGeneralInfo.find({
+      const result = await KycGeneralInfo.findOne({
         where: { userId: profile.id }
       });
 
       return res.status(200).send({
         success: false,
-        message: result
+        data: result
       });
     } catch (error) {
       return next(error);
@@ -235,13 +235,13 @@ exports.ReadKycOrganisationInfo = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
-      const result = await KycOrganisationInfo.find({
+      const result = await KycOrganisationInfo.findOne({
         where: { userId: profile.id }
       });
 
       return res.status(200).send({
         success: false,
-        message: result
+        data: result
       });
     } catch (error) {
       return next(error);
@@ -296,13 +296,13 @@ exports.ReadKycTaxPermits = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
-      const result = await KycTaxPermits.find({
+      const result = await KycTaxPermits.findOne({
         where: { userId: profile.id }
       });
 
       return res.status(200).send({
         success: false,
-        message: result
+        data: result
       });
     } catch (error) {
       return next(error);
@@ -346,13 +346,13 @@ exports.ReadKycWorkExperience = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
-      const result = await KycWorkExperience.find({
+      const result = await KycWorkExperience.findAll({
         where: { userId: profile.id }
       });
 
       return res.status(200).send({
         success: false,
-        message: result
+        data: result
       });
     } catch (error) {
       return next(error);
@@ -391,15 +391,15 @@ exports.UpdateKycWorkExperience = async (req, res, next) => {
 exports.deleteKycWorkExperience = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { jobId } = req.params;
+      const { id } = req.params;
       await KycWorkExperience.destroy({
-        where: { id: jobId },
+        where: { id },
         transaction: t
       });
 
       return res.status(200).send({
         success: true,
-        message: "Work deleted successfully"
+        data: "Work deleted successfully"
       });
     } catch (error) {
       return next(error);
@@ -416,7 +416,7 @@ exports.createKycDocuments = async (req, res, next) => {
       const profile = await getUserTypeProfile(userType, userId);
       const loadFiles = req.files.map((file, i) => ({
         name: file.fieldname,
-        file: `${process.env.APP_URL}/${req.file.path}`,
+        file: `${process.env.APP_URL}/${file.path}`,
         userType,
         userId: profile.id
       }));
@@ -440,13 +440,30 @@ exports.ReadKycDocuments = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
-      const result = await KycDocuments.find({
+      const result = await KycDocuments.findAll({
         where: { userId: profile.id }
       });
 
       return res.status(200).send({
         success: false,
-        message: result
+        data: result
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+exports.deleteKycDocuments = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { id } = req.params;
+      await KycDocuments.destroy({
+        where: { id },
+        transaction: t
+      });
+      return res.status(200).send({
+        success: true,
+        data: "Document deleted successfully"
       });
     } catch (error) {
       return next(error);

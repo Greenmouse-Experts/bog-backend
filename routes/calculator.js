@@ -16,19 +16,14 @@ router
   );
 
 router
-  .route("/calculator-settings/update")
-  .post(
-    CalculatorCalculator(),
-    validate,
-    Auth,
-    CalculatorController.UpdateRate
-  );
+  .route("/calculator-settings/update/:id")
+  .post(validate, Auth, CalculatorController.UpdateRate);
 router
   .route("/calculator-settings/delete/:id")
-  .post(validate, CalculatorController.DeleteRate);
+  .patch(validate, CalculatorController.DeleteRate);
 
 router
   .route("/calculator-settings/all")
-  .post(validate, CalculatorController.ReadRate);
+  .get(validate, CalculatorController.ReadRate);
 
 module.exports = router;

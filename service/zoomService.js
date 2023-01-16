@@ -25,6 +25,5 @@ exports.zoomGenerator = async (email, title) => {
     }
   };
   const response = await axios.post(uri, body, config);
-  console.log(response);
   return response.data;
 };

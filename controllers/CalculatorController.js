@@ -34,7 +34,7 @@ exports.createRate = async (req, res, next) => {
 exports.ReadRate = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const getRates = await SmartCalculatorSetting.find();
+      const getRates = await SmartCalculatorSetting.findAll();
 
       return res.status(200).send({
         success: false,
@@ -86,14 +86,14 @@ exports.DeleteRate = async (req, res, next) => {
           message: "Already deleted"
         });
       }
-      const allSettings = await SmartCalculatorSetting.destroy({
+      await SmartCalculatorSetting.destroy({
         where: { id },
         transaction: t
       });
 
       return res.status(200).send({
         success: true,
-        data: allSettings
+        data: "Deleted successfully"
       });
     } catch (error) {
       return next(error);

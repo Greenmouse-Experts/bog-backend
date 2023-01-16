@@ -22,6 +22,10 @@ const KycSupplyCategory = sequelise.define(
     categories: {
       type: Sequelize.STRING,
       allowNull: true
+    },
+    others: {
+      type: Sequelize.STRING,
+      allowNull: true
     }
   },
   { paranoid: true }
