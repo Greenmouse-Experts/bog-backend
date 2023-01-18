@@ -1,8 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
 
-const KycTaxPermit = sequelise.define(
-  "kyc_tax_permits",
+const KycYearsExperience = sequelise.define(
+  "kyc_years_of_experiences",
   {
     id: {
       type: Sequelize.UUID,
@@ -19,15 +19,11 @@ const KycTaxPermit = sequelise.define(
       type: Sequelize.UUID,
       allowNull: true
     },
-    VAT: {
+    years_of_experience: {
       type: Sequelize.STRING,
       allowNull: true
     },
-    TIN: {
-      type: Sequelize.STRING,
-      allowNull: true
-    },
-    relevant_statutory: {
+    company_involvement: {
       type: Sequelize.STRING,
       allowNull: true
     }
@@ -35,4 +31,4 @@ const KycTaxPermit = sequelise.define(
   { paranoid: true }
 );
 
-module.exports = KycTaxPermit;
+module.exports = KycYearsExperience;

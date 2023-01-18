@@ -9,6 +9,7 @@ const KycGeneralInfo = require("../models/KycGeneralInfo");
 const KycOrganisationInfo = require("../models/KycOrganisationInfo");
 const KycTaxPermits = require("../models/KycTaxPermits");
 const KycWorkExperience = require("../models/KycWorkExperience");
+const KycYearsOfExperience = require("../models/KycYearsOfExperience");
 const { getUserTypeProfile } = require("../service/UserService");
 
 // supply Categories controllers
@@ -297,6 +298,70 @@ exports.ReadKycTaxPermits = async (req, res, next) => {
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycTaxPermits.findOne({
+        where: { userId: profile.id }
+      });
+
+      return res.status(200).send({
+        success: false,
+        data: result
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+//
+//
+//
+//
+//
+//
+//
+//
+exports.createKycYearsOfExperience = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType } = req.body;
+      const userId = req.user.id;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        ...req.body,
+        userId: profile.id
+      };
+      const getSavedData = await KycYearsOfExperience.findOne({
+        where: { userId: profile.id }
+      });
+      if (getSavedData) {
+        const updatedData = await KycYearsOfExperience.update(req.body, {
+          where: { userId: profile.id },
+          transaction: t
+        });
+        return res.status(200).send({
+          success: true,
+          data: updatedData
+        });
+      }
+      const newSaved = await KycYearsOfExperience.create(data, {
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        data: newSaved
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
+exports.ReadKycYearsExperience = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType } = req.body;
+      const userId = req.user.id;
+      const profile = await getUserTypeProfile(userType, userId);
+      const result = await KycYearsOfExperience.findOne({
         where: { userId: profile.id }
       });
 
