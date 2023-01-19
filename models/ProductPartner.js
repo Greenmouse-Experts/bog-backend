@@ -63,6 +63,11 @@ const ProductPartner = sequelise.define(
     professional_certificate: {
       type: Sequelize.STRING,
       allowNull: true
+    },
+    kycPoint: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      defaultValue: 0
     }
   },
   { paranoid: true }

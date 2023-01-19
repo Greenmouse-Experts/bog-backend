@@ -6,7 +6,11 @@ const Auth = require("../middleware/auth");
 const KYC_Controller = require("../controllers/KYC_Controller");
 const upload = require("../helpers/upload");
 
-const { validate, BasicKYCRequirements } = require("../helpers/validators");
+const {
+  validate,
+  BasicKYCRequirements,
+  KYCApprovalValidation
+} = require("../helpers/validators");
 
 const {
   createSupplyCategories,
@@ -24,7 +28,8 @@ const {
   deleteKycWorkExperience,
   createKycDocuments,
   ReadKycDocuments,
-  deleteKycDocuments
+  deleteKycDocuments,
+  approveKycVerification
 } = KYC_Controller;
 router
   .route("/kyc-supply-category/create")
@@ -93,5 +98,9 @@ router
 router
   .route("/kyc-documents/delete/:id")
   .delete(validate, Auth, deleteKycDocuments);
+
+router
+  .route("/kyc/admin-approval")
+  .post(KYCApprovalValidation(), validate, Auth, approveKycVerification);
 
 module.exports = router;

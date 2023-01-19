@@ -9,7 +9,10 @@ const KycGeneralInfo = require("../models/KycGeneralInfo");
 const KycOrganisationInfo = require("../models/KycOrganisationInfo");
 const KycTaxPermits = require("../models/KycTaxPermits");
 const KycWorkExperience = require("../models/KycWorkExperience");
-const { getUserTypeProfile } = require("../service/UserService");
+const {
+  getUserTypeProfile,
+  updateUserTypeProfile
+} = require("../service/UserService");
 
 // supply Categories controllers
 exports.createSupplyCategories = async (req, res, next) => {
@@ -69,9 +72,6 @@ exports.ReadSupplyCategories = async (req, res, next) => {
   });
 };
 
-//
-//
-//
 // Financial Data controllers
 exports.createKycFinancialData = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -127,9 +127,6 @@ exports.ReadKycFinancialData = async (req, res, next) => {
   });
 };
 
-//
-//
-//
 // General Info controllers
 exports.createKycGeneralInfo = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -186,10 +183,6 @@ exports.ReadKycGeneralInfo = async (req, res, next) => {
     }
   });
 };
-//
-//
-//
-//
 // Organisation Info controllers
 exports.createKycOrganisationInfo = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -247,10 +240,7 @@ exports.ReadKycOrganisationInfo = async (req, res, next) => {
     }
   });
 };
-//
-//
-//
-//
+
 // Tax Permits controllers
 exports.createKycTaxPermits = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -308,15 +298,7 @@ exports.ReadKycTaxPermits = async (req, res, next) => {
     }
   });
 };
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
 // Work Experience controllers
 exports.createKycWorkExperience = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -344,6 +326,7 @@ exports.createKycWorkExperience = async (req, res, next) => {
     }
   });
 };
+
 exports.ReadKycWorkExperience = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
@@ -363,6 +346,7 @@ exports.ReadKycWorkExperience = async (req, res, next) => {
     }
   });
 };
+
 exports.UpdateKycWorkExperience = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
@@ -457,6 +441,7 @@ exports.ReadKycDocuments = async (req, res, next) => {
     }
   });
 };
+
 exports.deleteKycDocuments = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
@@ -470,6 +455,35 @@ exports.deleteKycDocuments = async (req, res, next) => {
         data: "Document deleted successfully"
       });
     } catch (error) {
+      return next(error);
+    }
+  });
+};
+
+// Admin verifies user and give score based on kyc
+exports.approveKycVerification = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType, userId, verificationStatus, kycPoint } = req.body;
+      const profile = await getUserTypeProfile(userType, userId);
+      const data = {
+        isVerified: verificationStatus,
+        kycPoint: verificationStatus === true ? kycPoint : 0
+      };
+
+      await updateUserTypeProfile({
+        userType,
+        id: profile.id,
+        data,
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        message: "Profile updated successfully"
+      });
+    } catch (error) {
+      t.rollback();
       return next(error);
     }
   });
