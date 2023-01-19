@@ -24,9 +24,7 @@ const {
   deleteKycWorkExperience,
   createKycDocuments,
   ReadKycDocuments,
-  deleteKycDocuments,
-  createKycYearsOfExperience,
-  ReadKycYearsExperience
+  deleteKycDocuments
 } = KYC_Controller;
 router
   .route("/kyc-supply-category/create")
@@ -72,13 +70,6 @@ router
   .route("/kyc-tax-permits/fetch")
   .post(BasicKYCRequirements(), validate, Auth, ReadKycTaxPermits);
 
-// kyc_work_experience
-router
-  .route("/kyc-years-experience/create")
-  .post(BasicKYCRequirements(), validate, Auth, createKycYearsOfExperience);
-router
-  .route("/kyc-years-experience/fetch")
-  .post(BasicKYCRequirements(), validate, Auth, ReadKycYearsExperience);
 // kyc_work_experience
 
 router
