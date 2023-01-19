@@ -236,13 +236,13 @@ exports.getUserType = type => {
 exports.getUserTypeProfile = async (userType, userId) => {
   const attributes = ["id", "userType"];
   let profile;
-  if (userType === "professional") {
+  if (userType === "professional" || userType === "service_partner") {
     profile = JSON.parse(
       JSON.stringify(
         await ServicePartner.findOne({ where: { userId }, attributes })
       )
     );
-  } else if (userType === "vendor") {
+  } else if (userType === "vendor" || userType === "product_partner") {
     profile = JSON.parse(
       JSON.stringify(
         await ProductPartner.findOne({ where: { userId }, attributes })
@@ -262,4 +262,17 @@ exports.getUserTypeProfile = async (userType, userId) => {
     );
   }
   return profile;
+};
+
+exports.updateUserTypeProfile = async ({ userType, id, data, transaction }) => {
+  if (userType === "professional" || userType === "service_partner") {
+    await ServicePartner.update(data, { where: { id }, transaction });
+  } else if (userType === "vendor" || userType === "product_partner") {
+    await ProductPartner.update(data, { where: { id }, transaction });
+  } else if (userType === "private_client") {
+    await PrivateClient.update(data, { where: { id }, transaction });
+  } else if (userType === "corporate_client") {
+    await CorporateClient.update(data, { where: { id }, transaction });
+  }
+  return true;
 };
