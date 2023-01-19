@@ -313,6 +313,11 @@ exports.ReadKycTaxPermits = async (req, res, next) => {
 //
 //
 //
+//
+//
+//
+//
+//
 // Work Experience controllers
 exports.createKycWorkExperience = async (req, res, next) => {
   sequelize.transaction(async t => {

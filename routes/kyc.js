@@ -71,6 +71,7 @@ router
   .post(BasicKYCRequirements(), validate, Auth, ReadKycTaxPermits);
 
 // kyc_work_experience
+
 router
   .route("/kyc-work-experience/create")
   .post(validate, Auth, upload.single("document"), createKycWorkExperience);

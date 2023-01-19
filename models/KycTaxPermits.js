@@ -28,7 +28,7 @@ const KycTaxPermit = sequelise.define(
       allowNull: true
     },
     relevant_statutory: {
-      type: Sequelize.DATE,
+      type: Sequelize.STRING,
       allowNull: true
     }
   },
