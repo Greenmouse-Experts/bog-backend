@@ -20,7 +20,7 @@ router
   .post(validate, Auth, CalculatorController.UpdateRate);
 router
   .route("/calculator-settings/delete/:id")
-  .patch(validate, CalculatorController.DeleteRate);
+  .delete(validate, CalculatorController.DeleteRate);
 
 router
   .route("/calculator-settings/all")

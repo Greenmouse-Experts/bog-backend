@@ -36,8 +36,8 @@ router
   .post(BasicKYCRequirements(), validate, Auth, createSupplyCategories);
 
 router
-  .route("/kyc-supply-category/fetch")
-  .post(BasicKYCRequirements(), validate, Auth, ReadSupplyCategories);
+  .route("/kyc-supply-category/fetch/:userType")
+  .get(BasicKYCRequirements(), validate, Auth, ReadSupplyCategories);
 //
 // kyc-financial-data
 router
@@ -45,8 +45,8 @@ router
   .post(BasicKYCRequirements(), validate, Auth, createKycFinancialData);
 
 router
-  .route("/kyc-financial-data/fetch")
-  .post(BasicKYCRequirements(), validate, Auth, ReadKycFinancialData);
+  .route("/kyc-financial-data/fetch/:userType")
+  .get(BasicKYCRequirements(), validate, Auth, ReadKycFinancialData);
 //
 // kyc_general_info
 router
@@ -54,8 +54,8 @@ router
   .post(BasicKYCRequirements(), validate, Auth, createKycGeneralInfo);
 
 router
-  .route("/kyc-general-info/fetch")
-  .post(BasicKYCRequirements(), validate, Auth, ReadKycGeneralInfo);
+  .route("/kyc-general-info/fetch/:userType")
+  .get(BasicKYCRequirements(), validate, Auth, ReadKycGeneralInfo);
 
 //
 // kyc_organisation_info
@@ -64,16 +64,16 @@ router
   .post(BasicKYCRequirements(), validate, Auth, createKycOrganisationInfo);
 
 router
-  .route("/kyc-organisation-info/fetch")
-  .post(BasicKYCRequirements(), validate, Auth, ReadKycOrganisationInfo);
+  .route("/kyc-organisation-info/fetch/:userType")
+  .get(BasicKYCRequirements(), validate, Auth, ReadKycOrganisationInfo);
 // kyc_tax_permits
 router
   .route("/kyc-tax-permits/create")
   .post(BasicKYCRequirements(), validate, Auth, createKycTaxPermits);
 
 router
-  .route("/kyc-tax-permits/fetch")
-  .post(BasicKYCRequirements(), validate, Auth, ReadKycTaxPermits);
+  .route("/kyc-tax-permits/fetch/:userType")
+  .get(BasicKYCRequirements(), validate, Auth, ReadKycTaxPermits);
 
 // kyc_work_experience
 
@@ -81,8 +81,8 @@ router
   .route("/kyc-work-experience/create")
   .post(validate, Auth, upload.single("document"), createKycWorkExperience);
 router
-  .route("/kyc-work-experience/fetch")
-  .post(BasicKYCRequirements(), validate, Auth, ReadKycWorkExperience);
+  .route("/kyc-work-experience/fetch/:userType")
+  .get(BasicKYCRequirements(), validate, Auth, ReadKycWorkExperience);
 router
   .route("/kyc-work-experience/delete/:id")
   .delete(validate, Auth, deleteKycWorkExperience);
@@ -92,8 +92,8 @@ router
   .post(validate, Auth, upload.any(), createKycDocuments);
 
 router
-  .route("/kyc-documents/fetch")
-  .post(BasicKYCRequirements(), validate, Auth, ReadKycDocuments);
+  .route("/kyc-documents/fetch/:userType")
+  .get(BasicKYCRequirements(), validate, Auth, ReadKycDocuments);
 
 router
   .route("/kyc-documents/delete/:id")

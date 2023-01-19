@@ -55,7 +55,7 @@ exports.createSupplyCategories = async (req, res, next) => {
 exports.ReadSupplyCategories = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.body;
+      const { userType } = req.params;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await SupplyCategory.findOne({
@@ -63,7 +63,7 @@ exports.ReadSupplyCategories = async (req, res, next) => {
       });
       result.categories = result.categories.split(",");
       return res.status(200).send({
-        success: false,
+        success: true,
         data: result
       });
     } catch (error) {
@@ -110,7 +110,7 @@ exports.createKycFinancialData = async (req, res, next) => {
 exports.ReadKycFinancialData = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.body;
+      const { userType } = req.params;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycFinancialData.findOne({
@@ -118,7 +118,7 @@ exports.ReadKycFinancialData = async (req, res, next) => {
       });
 
       return res.status(200).send({
-        success: false,
+        success: true,
         data: result
       });
     } catch (error) {
@@ -167,7 +167,7 @@ exports.createKycGeneralInfo = async (req, res, next) => {
 exports.ReadKycGeneralInfo = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.body;
+      const { userType } = req.params;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycGeneralInfo.findOne({
@@ -175,7 +175,7 @@ exports.ReadKycGeneralInfo = async (req, res, next) => {
       });
 
       return res.status(200).send({
-        success: false,
+        success: true,
         data: result
       });
     } catch (error) {
@@ -183,7 +183,6 @@ exports.ReadKycGeneralInfo = async (req, res, next) => {
     }
   });
 };
-
 // Organisation Info controllers
 exports.createKycOrganisationInfo = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -225,7 +224,7 @@ exports.createKycOrganisationInfo = async (req, res, next) => {
 exports.ReadKycOrganisationInfo = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.body;
+      const { userType } = req.params;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycOrganisationInfo.findOne({
@@ -233,7 +232,7 @@ exports.ReadKycOrganisationInfo = async (req, res, next) => {
       });
 
       return res.status(200).send({
-        success: false,
+        success: true,
         data: result
       });
     } catch (error) {
@@ -283,7 +282,7 @@ exports.createKycTaxPermits = async (req, res, next) => {
 exports.ReadKycTaxPermits = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.body;
+      const { userType } = req.params;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycTaxPermits.findOne({
@@ -291,7 +290,7 @@ exports.ReadKycTaxPermits = async (req, res, next) => {
       });
 
       return res.status(200).send({
-        success: false,
+        success: true,
         data: result
       });
     } catch (error) {
@@ -331,7 +330,7 @@ exports.createKycWorkExperience = async (req, res, next) => {
 exports.ReadKycWorkExperience = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.body;
+      const { userType } = req.params;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycWorkExperience.findAll({
@@ -339,7 +338,7 @@ exports.ReadKycWorkExperience = async (req, res, next) => {
       });
 
       return res.status(200).send({
-        success: false,
+        success: true,
         data: result
       });
     } catch (error) {
@@ -426,7 +425,7 @@ exports.createKycDocuments = async (req, res, next) => {
 exports.ReadKycDocuments = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.body;
+      const { userType } = req.params;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycDocuments.findAll({
@@ -434,7 +433,7 @@ exports.ReadKycDocuments = async (req, res, next) => {
       });
 
       return res.status(200).send({
-        success: false,
+        success: true,
         data: result
       });
     } catch (error) {
