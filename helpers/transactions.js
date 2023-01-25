@@ -129,7 +129,7 @@ exports.getTransactionDetail = async ({ type, userId, txId }) => {
                   {
                     model: User,
                     as: "user",
-                    attributes: ["name", "email", "fname", "lname"]
+                    attributes: ["id", "name", "email", "fname", "lname"]
                   }
                 ]
               }
