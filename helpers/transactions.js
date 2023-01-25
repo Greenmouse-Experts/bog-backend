@@ -87,7 +87,13 @@ exports.getOneTxns = async (req, res, next) => {
     const Txns = JSON.parse(
       JSON.stringify(
         await Transaction.findOne({
-          where
+          where,
+          include: [
+            {
+              model: User,
+              as: "user"
+            }
+          ]
         })
       )
     );
