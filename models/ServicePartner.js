@@ -71,6 +71,10 @@ const ServicePartner = sequelise.define(
     tax_certificate: {
       type: Sequelize.STRING,
       allowNull: true
+    },
+    serviceTypeId: {
+      type: Sequelize.UUID,
+      allowNull: true
     }
   },
   { paranoid: true }

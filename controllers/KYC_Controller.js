@@ -13,6 +13,7 @@ const {
   getUserTypeProfile,
   updateUserTypeProfile
 } = require("../service/UserService");
+const Notification = require("../helpers/notification");
 
 // supply Categories controllers
 exports.createSupplyCategories = async (req, res, next) => {
@@ -55,7 +56,7 @@ exports.createSupplyCategories = async (req, res, next) => {
 exports.ReadSupplyCategories = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.params;
+      const { userType } = req.query;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await SupplyCategory.findOne({
@@ -110,7 +111,7 @@ exports.createKycFinancialData = async (req, res, next) => {
 exports.ReadKycFinancialData = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.params;
+      const { userType } = req.query;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycFinancialData.findOne({
@@ -167,7 +168,7 @@ exports.createKycGeneralInfo = async (req, res, next) => {
 exports.ReadKycGeneralInfo = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.params;
+      const { userType } = req.query;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycGeneralInfo.findOne({
@@ -224,7 +225,7 @@ exports.createKycOrganisationInfo = async (req, res, next) => {
 exports.ReadKycOrganisationInfo = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.params;
+      const { userType } = req.query;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycOrganisationInfo.findOne({
@@ -282,7 +283,7 @@ exports.createKycTaxPermits = async (req, res, next) => {
 exports.ReadKycTaxPermits = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.params;
+      const { userType } = req.query;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycTaxPermits.findOne({
@@ -330,7 +331,7 @@ exports.createKycWorkExperience = async (req, res, next) => {
 exports.ReadKycWorkExperience = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.params;
+      const { userType } = req.query;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycWorkExperience.findAll({
@@ -425,7 +426,7 @@ exports.createKycDocuments = async (req, res, next) => {
 exports.ReadKycDocuments = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { userType } = req.params;
+      const { userType } = req.query;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycDocuments.findAll({
@@ -477,6 +478,20 @@ exports.approveKycVerification = async (req, res, next) => {
         data,
         transaction: t
       });
+
+      const message =
+        "Your KYC was successful, your profile has been verified.";
+
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: "user",
+        message,
+        userId: profile.id
+      });
+      io.emit(
+        "getNotifications",
+        await Notification.fetchUserNotificationApi({ userId: profile.id })
+      );
 
       return res.status(200).send({
         success: true,

@@ -45,8 +45,36 @@ const Project = sequelise.define(
     status: {
       allowNull: true,
       type: Sequelize.ENUM,
-      values: ["pending", "approved", "ongoing", "cancelled", "completed"],
+      values: [
+        "pending",
+        "approved",
+        "ongoing",
+        "cancelled",
+        "completed",
+        "draft",
+        "closed"
+      ],
       defaultValue: "pending"
+    },
+    approvalStatus: {
+      allowNull: true,
+      type: Sequelize.ENUM,
+      values: ["pending", "approved", "disapproved", "in_review"],
+      defaultValue: "pending"
+    },
+    serviceProviderId: {
+      type: Sequelize.UUID,
+      allowNull: true
+    },
+    totalCost: {
+      type: Sequelize.FLOAT,
+      allowNull: true,
+      defaultValue: 0.0
+    },
+    estimatedCost: {
+      type: Sequelize.FLOAT,
+      allowNull: true,
+      defaultValue: 0.0
     }
   },
   { paranoid: true }

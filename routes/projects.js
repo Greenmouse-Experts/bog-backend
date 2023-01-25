@@ -84,4 +84,12 @@ router
     ProjectController.updateGeoTechnicalInvestigationRequest
   );
 
+router
+  .route("/projects/request-for-approval/:projectId")
+  .patch(Auth, ProjectController.requestProjectApproval);
+
+router
+  .route("/projects/approve-project/:projectId")
+  .patch(Auth, ProjectController.approveProjectRequest);
+
 module.exports = router;

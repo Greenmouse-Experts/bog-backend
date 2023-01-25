@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
 require("dotenv").config();
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 const sequelize = require("../config/database/connection");
 const User = require("../models/User");
 const Project = require("../models/Project");
@@ -13,6 +13,10 @@ const ContractorProject = require("../models/ContractorProject");
 const GeoTechnical = require("../models/GeoTechnical");
 const utility = require("../helpers/utility");
 const Notification = require("../helpers/notification");
+const userService = require("../service/UserService");
+const ServiceType = require("../models/ServiceType");
+const ServicePartner = require("../models/ServicePartner");
+const ServiceProvider = require("../models/ServiceProvider");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
@@ -29,7 +33,12 @@ exports.notifyAdmin = async ({ userId, message, req }) => {
 exports.getProjectRequest = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const where = { userId };
+
+    const profile = await userService.getUserTypeProfile(
+      req.query.userType,
+      userId
+    );
+    const where = { userId: profile.id };
     if (req.query.status) {
       where.status = req.query.status;
     }
@@ -213,10 +222,12 @@ exports.requestForLandSurvey = async (req, res, next) => {
     try {
       const userId = req.user.id;
       const user = await User.findByPk(userId, { attributes: ["name"] });
+      const { userType } = req.body;
       const request = req.body;
+      const profile = await userService.getUserTypeProfile(userType, userId);
       const projectData = {
         title: req.body.title,
-        userId,
+        userId: profile.id,
         projectTypes: "land_survey"
       };
       const project = await this.createProject(projectData, t);
@@ -288,11 +299,13 @@ exports.requestForContractor = async (req, res, next) => {
         projectLocation,
         clientName,
         projectType,
-        buildingType
+        buildingType,
+        userType
       } = req.body;
+      const profile = await userService.getUserTypeProfile(userType, userId);
       const projectData = {
         title,
-        userId,
+        userId: profile.id,
         projectTypes: "contractor"
       };
       const project = await this.createProject(projectData, t);
@@ -428,11 +441,13 @@ exports.drawingProjectsRequest = async (req, res, next) => {
         clientName,
         projectType,
         buildingType,
-        drawingType
+        drawingType,
+        userType
       } = req.body;
+      const profile = await userService.getUserTypeProfile(userType, userId);
       const projectData = {
         title,
-        userId,
+        userId: profile.id,
         projectTypes: "construction_drawing"
       };
       const project = await this.createProject(projectData, t);
@@ -575,10 +590,17 @@ exports.buildingApprovalProjectsRequest = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const userId = req.user.id;
-      const { title, projectLocation, clientName, purpose } = req.body;
+      const {
+        title,
+        projectLocation,
+        clientName,
+        purpose,
+        userType
+      } = req.body;
+      const profile = await userService.getUserTypeProfile(userType, userId);
       const projectData = {
         title,
-        userId,
+        userId: profile.id,
         projectTypes: "building_approval"
       };
       const project = await this.createProject(projectData, t);
@@ -683,9 +705,11 @@ exports.requestForGeoTechnicalInvestigation = async (req, res, next) => {
     try {
       const userId = req.user.id;
       const request = req.body;
+      const { userType, title } = req.body;
+      const profile = await userService.getUserTypeProfile(userType, userId);
       const projectData = {
-        title: req.body.title,
-        userId,
+        title,
+        userId: profile.id,
         projectTypes: "geotechnical_investigation"
       };
       const project = await this.createProject(projectData, t);
@@ -760,4 +784,154 @@ exports.updateGeoTechnicalInvestigationRequest = async (req, res, next) => {
       return next(error);
     }
   });
+};
+
+// Request for project approval
+exports.requestProjectApproval = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { projectId } = req.params;
+      const project = await Project.findOne({ where: { id: projectId } });
+      if (!project) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Project"
+        });
+      }
+      const requestData = {
+        approvalStatus: "in_review"
+      };
+      await Project.update(requestData, {
+        where: { id: projectId },
+        transaction: t
+      });
+      const userId = req.user.id;
+      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const reqData = {
+        req,
+        userId,
+        message: `${user.name} has requested to commence with ${project.projectSlug}`
+      };
+      await this.notifyAdmin(reqData);
+      return res.status(200).send({
+        success: true,
+        message: "Project sent for approval"
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+// Approve Project request
+exports.approveProjectRequest = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { projectId } = req.params;
+      const project = await Project.findOne({ where: { id: projectId } });
+      if (!project) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Project"
+        });
+      }
+      const requestData = {
+        approvalStatus: "approved",
+        status: "approved"
+      };
+      await Project.update(requestData, {
+        where: { id: projectId },
+        transaction: t
+      });
+
+      // await this.getQualifiedServiceProviders(project);
+      const { userId } = project;
+      const message = `Your project ${project.id} has been approved to commence. Please wait for further information regarding cost and estimations`;
+
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: "user",
+        message,
+        userId
+      });
+      io.emit(
+        "getNotifications",
+        await Notification.fetchUserNotificationApi({ userId })
+      );
+      return res.status(200).send({
+        success: true,
+        message: "Project approved for commencement"
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.getQualifiedServiceProviders = async (project, transaction) => {
+  try {
+    // check project type
+    const { projectTypes } = project;
+    // get service types for project types
+    const serviceTypes = await ServiceType.findOne({
+      where: { slug: projectTypes }
+    });
+    // query all service partners with service type id
+    const servicePartners = await ServicePartner.findAll({
+      where: { serviceTypeId: serviceTypes.id },
+      order: [[Sequelize.literal("RAND()")]]
+    });
+    // remove service partners with ongoing projects
+    const where = {
+      status: "ongoing",
+      approvalStatus: "approved",
+      serviceProviderId: {
+        [Op.ne]: null
+      }
+    };
+    const ongoingProjects = await Project.findAll({
+      where,
+      attributes: ["serviceProviderId"]
+    });
+    const partnersWithProjects = ongoingProjects.map(p => p.serviceProviderId);
+    const filteredServicePartners = servicePartners.filter(partner => {
+      if (!partnersWithProjects.includes(partner.id)) {
+        return partner;
+      }
+      return null;
+    });
+    const qualifiedPartners = filteredServicePartners.filter(
+      pat => pat !== null
+    );
+    // get 3 random service partner for the project
+    const providers = this.getRandom(qualifiedPartners, 3);
+    // add them as service providers
+    const providerData = providers.map(pr => ({
+      userId: pr.id,
+      status: "pending",
+      projectId: project.id
+    }));
+    await ServiceProvider.bulkCreate(providerData, { transaction });
+    // send notifications to them
+    return true;
+  } catch (error) {
+    transaction.rollback();
+    return error;
+  }
+};
+
+exports.getRandom = (arr, n) => {
+  const result = new Array(n);
+  let len = arr.length;
+  const taken = new Array(len);
+  if (n > len)
+    throw new RangeError("getRandom: more elements taken than available");
+  while (n--) {
+    const x = Math.floor(Math.random() * len);
+    result[n] = arr[x in taken ? taken[x] : x];
+    taken[x] = --len in taken ? taken[len] : len;
+  }
+  return result;
 };

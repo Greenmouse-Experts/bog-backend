@@ -124,7 +124,14 @@ exports.getTransactionDetail = async ({ type, userId, txId }) => {
             include: [
               {
                 model: OrderItem,
-                as: "order_items"
+                as: "order_items",
+                include: [
+                  {
+                    model: User,
+                    as: "user_orders",
+                    attributes: ["name", "email", "fname", "lname"]
+                  }
+                ]
               }
             ]
           })
