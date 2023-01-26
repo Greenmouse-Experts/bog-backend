@@ -29,7 +29,8 @@ const {
   createKycDocuments,
   ReadKycDocuments,
   deleteKycDocuments,
-  approveKycVerification
+  approveKycVerification,
+  getUserKycDetails
 } = KYC_Controller;
 
 router
@@ -92,5 +93,7 @@ router
 router
   .route("/kyc/admin-approval")
   .post(KYCApprovalValidation(), validate, Auth, approveKycVerification);
+
+router.route("/kyc/user-kyc/:userId").get(Auth, getUserKycDetails);
 
 module.exports = router;

@@ -503,3 +503,55 @@ exports.approveKycVerification = async (req, res, next) => {
     }
   });
 };
+
+exports.getUserKycDetails = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userType } = req.query;
+      const { userId } = req.params;
+      const profile = await getUserTypeProfile(userType, userId);
+      const result = await SupplyCategory.findOne({
+        where: { userId: profile.id }
+      });
+      const kycFinancialData = await KycFinancialData.findOne({
+        where: { userId: profile.id }
+      });
+
+      const kycGeneralInfo = await KycGeneralInfo.findOne({
+        where: { userId: profile.id }
+      });
+
+      const kycOrganisationInfo = await KycOrganisationInfo.findOne({
+        where: { userId: profile.id }
+      });
+
+      const kycTaxPermits = await KycTaxPermits.findOne({
+        where: { userId: profile.id }
+      });
+
+      const kycWorkExperience = await KycWorkExperience.findAll({
+        where: { userId: profile.id }
+      });
+
+      const kycDocuments = await KycDocuments.findAll({
+        where: { userId: profile.id }
+      });
+
+      const data = {
+        suppyCategory: result,
+        kycFinancialData,
+        kycGeneralInfo,
+        kycOrganisationInfo,
+        kycTaxPermits,
+        kycWorkExperience,
+        kycDocuments
+      };
+      return res.status(200).send({
+        success: true,
+        data
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};

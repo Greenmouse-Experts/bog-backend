@@ -17,13 +17,11 @@ router
 
 router
   .route("/calculator-settings/update/:id")
-  .post(validate, Auth, CalculatorController.UpdateRate);
+  .post(Auth, CalculatorController.UpdateRate);
 router
   .route("/calculator-settings/delete/:id")
-  .delete(validate, CalculatorController.DeleteRate);
+  .delete(CalculatorController.DeleteRate);
 
-router
-  .route("/calculator-settings/all")
-  .get(validate, CalculatorController.ReadRate);
+router.route("/calculator-settings/all").get(CalculatorController.ReadRate);
 
 module.exports = router;

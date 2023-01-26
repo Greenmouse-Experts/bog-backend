@@ -63,7 +63,6 @@ exports.fetchAdminNotification = async () => {
       order: [["createdAt", "DESC"]],
       limit: 5
     });
-    console.log(JSON.parse(JSON.stringify(notifications)));
     return JSON.parse(JSON.stringify(notifications));
   } catch (error) {
     return error;

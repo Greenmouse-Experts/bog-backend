@@ -25,4 +25,15 @@ router
   .route("/service/type/delete/:typeId")
   .delete(validate, Auth, ServiceController.deleteCategory);
 
+// BOG Services
+router.route("/services/create").post(Auth, ServiceController.createService);
+
+router
+  .route("/services/update/:id")
+  .patch(Auth, ServiceController.updateService);
+
+router.route("/services/delete/:id").delete(ServiceController.deleteServices);
+
+router.route("/services/all").get(ServiceController.getServices);
+
 module.exports = router;
