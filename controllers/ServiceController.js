@@ -150,9 +150,10 @@ exports.findSingleService = async (req, res, next) => {
 exports.updateService = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { typeId, name } = req.body;
+      const { name } = req.body;
+      const { id } = req.params;
       const getTheType = await Services.findOne({
-        where: { id: typeId }
+        where: { id }
       });
       if (!getTheType) {
         return res.status(404).send({
@@ -163,7 +164,7 @@ exports.updateService = async (req, res, next) => {
       await Services.update(
         { name },
         {
-          where: { id: typeId },
+          where: { id },
           transaction: t
         }
       );
