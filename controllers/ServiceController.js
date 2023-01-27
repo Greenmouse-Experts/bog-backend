@@ -181,9 +181,9 @@ exports.updateService = async (req, res, next) => {
 exports.deleteServices = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
-      const { typeId } = req.params;
+      const { id } = req.params;
       const getTheType = await Services.findOne({
-        where: { id: typeId }
+        where: { id }
       });
       if (!getTheType) {
         return res.status(404).send({
@@ -191,7 +191,7 @@ exports.deleteServices = async (req, res, next) => {
           message: "Invalid Services"
         });
       }
-      await Services.destroy({ where: { id: typeId }, transaction: t });
+      await Services.destroy({ where: { id }, transaction: t });
       return res.status(200).send({
         success: true,
         message: "Service deleted successfully"
