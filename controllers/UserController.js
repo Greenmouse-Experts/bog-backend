@@ -89,18 +89,12 @@ exports.registerUser = async (req, res, next) => {
             await UserService.createReferral(referenceData, t);
           }
         }
-        const isUser = await this.checkIfAccountExist(userType, user.id);
-        if (isUser) {
-          return res.status(400).send({
-            success: false,
-            message: "This Email is already in Use for this user entity"
-          });
-        }
         if (userType !== "admin" || userType !== "other") {
           const request = {
             userId: user.id,
             userType,
-            company_name: req.body.company_name
+            company_name: req.body.company_name,
+            serviceTypeId: req.body.serviceTypeId
           };
           const result = await this.addUserProfile(request, t);
         }
@@ -116,7 +110,8 @@ exports.registerUser = async (req, res, next) => {
           const request = {
             userId: user.id,
             userType,
-            company_name: req.body.company_name
+            company_name: req.body.company_name,
+            serviceTypeId: req.body.serviceTypeId
           };
           const result = await this.addUserProfile(request, t);
         }
@@ -201,7 +196,9 @@ exports.loginUser = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { email, password } = req.body;
-      const user = await UserService.findUser({ email });
+      const user = JSON.parse(
+        JSON.stringify(await UserService.findUser({ email }))
+      );
 
       if (!user) {
         return res.status(400).send({
@@ -237,43 +234,22 @@ exports.loginUser = async (req, res, next) => {
         expiresIn: 36000
       });
       let profile;
-      const data = JSON.parse(
-        JSON.stringify(await UserService.getUserDetails({ id: user.id }))
-      );
+      const data = {
+        ...user
+      };
+      const userId = user.id;
       if (req.body.userType && req.body.userType !== "") {
         const { userType } = req.body;
-        const userId = user.id;
-        const attributes = {
-          exclude: ["createdAt", "updatedAt", "deletedAt"]
-        };
-        if (userType === "professional") {
-          profile = JSON.parse(
-            JSON.stringify(
-              await ServicePartner.findOne({ where: { userId }, attributes })
-            )
-          );
-        } else if (userType === "vendor") {
-          profile = JSON.parse(
-            JSON.stringify(
-              await ProductPartner.findOne({ where: { userId }, attributes })
-            )
-          );
-        } else if (userType === "private_client") {
-          profile = JSON.parse(
-            JSON.stringify(
-              await PrivateClient.findOne({ where: { userId }, attributes })
-            )
-          );
-        } else if (userType === "corporate_client") {
-          profile = JSON.parse(
-            JSON.stringify(
-              await CorporateClient.findOne({ where: { userId }, attributes })
-            )
-          );
-        }
+        profile = await UserService.getUserTypeProfile(userType, userId);
         if (profile) {
           data.profile = profile;
           data.userType = userType;
+        }
+      } else {
+        profile = await UserService.getUserTypeProfile(user.userType, userId);
+        if (profile) {
+          data.profile = profile;
+          data.userType = user.userType;
         }
       }
 
@@ -465,7 +441,7 @@ exports.loginAdmin = async (req, res, next) => {
 exports.getLoggedInUser = async (req, res) => {
   try {
     const user = JSON.parse(
-      JSON.stringify(await UserService.getUserDetails({ id: req.user.id }))
+      JSON.stringify(await UserService.findUserById(req.user.id))
     );
     if (!user) {
       return res.status(404).send({
@@ -475,45 +451,28 @@ exports.getLoggedInUser = async (req, res) => {
       });
     }
     let profile;
-    if (req.query.userType) {
-      const { userType } = req.query;
-      const userId = req.user.id;
-      const attributes = {
-        exclude: ["createdAt", "updatedAt", "deletedAt"]
-      };
-      if (userType === "professional") {
-        profile = JSON.parse(
-          JSON.stringify(
-            await ServicePartner.findOne({ where: { userId }, attributes })
-          )
-        );
-      } else if (userType === "vendor") {
-        profile = JSON.parse(
-          JSON.stringify(
-            await ProductPartner.findOne({ where: { userId }, attributes })
-          )
-        );
-      } else if (userType === "private_client") {
-        profile = JSON.parse(
-          JSON.stringify(
-            await PrivateClient.findOne({ where: { userId }, attributes })
-          )
-        );
-      } else if (userType === "corporate_client") {
-        profile = JSON.parse(
-          JSON.stringify(
-            await CorporateClient.findOne({ where: { userId }, attributes })
-          )
-        );
-      }
+    const data = {
+      ...user
+    };
+    const userId = user.id;
+    if (req.body.userType && req.body.userType !== "") {
+      const { userType } = req.body;
+      profile = await UserService.getUserTypeProfile(userType, userId);
       if (profile) {
-        user.profile = profile;
-        user.userType = userType;
+        data.profile = profile;
+        data.userType = userType;
+      }
+    } else if (user.userType !== "admin") {
+      profile = await UserService.getUserTypeProfile(user.userType, userId);
+      if (profile) {
+        data.profile = profile;
+        data.userType = user.userType;
       }
     }
+
     return res.status(200).send({
       success: true,
-      user
+      user: data
     });
   } catch (error) {
     return res.status(500).send({
@@ -953,7 +912,7 @@ exports.findSingleUser = async (req, res) => {
 
 exports.addUserProfile = async (data, t) => {
   try {
-    const { userType, userId, company_name } = data;
+    const { userType, userId, company_name, serviceTypeId } = data;
     const where = {
       userId
     };
@@ -961,7 +920,8 @@ exports.addUserProfile = async (data, t) => {
       const request = {
         userId,
         company_name,
-        userType: "professional"
+        userType: "professional",
+        serviceTypeId
       };
       await ServicePartner.create(request, { transaction: t });
     } else if (userType === "vendor") {

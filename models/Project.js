@@ -44,16 +44,7 @@ const Project = sequelise.define(
     },
     status: {
       allowNull: true,
-      type: Sequelize.ENUM,
-      values: [
-        "pending",
-        "approved",
-        "ongoing",
-        "cancelled",
-        "completed",
-        "draft",
-        "closed"
-      ],
+      type: Sequelize.STRING,
       defaultValue: "pending"
     },
     approvalStatus: {
@@ -75,6 +66,14 @@ const Project = sequelise.define(
       type: Sequelize.FLOAT,
       allowNull: true,
       defaultValue: 0.0
+    },
+    duration: {
+      allowNull: true,
+      type: Sequelize.INTEGER
+    },
+    endDate: {
+      allowNull: true,
+      type: Sequelize.DATE
     }
   },
   { paranoid: true }

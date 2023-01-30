@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const Project = require("./Project");
 
 const ProjectBidding = sequelise.define(
   "project_biddings",
@@ -24,8 +25,9 @@ const ProjectBidding = sequelise.define(
       allowNull: true
     },
     status: {
-      type: Sequelize.ENUM,
-      values: ["pending", "accepted", "rejected"]
+      type: Sequelize.STRING,
+      defaultValue: "pending",
+      allowNull: true
     },
     deliveryTimeLine: {
       type: Sequelize.INTEGER,
@@ -42,5 +44,15 @@ const ProjectBidding = sequelise.define(
   },
   { paranoid: true }
 );
+
+Project.hasMany(ProjectBidding, {
+  foreignKey: "projectId",
+  as: "bids"
+});
+
+ProjectBidding.belongsTo(Project, {
+  foreignKey: "projectId",
+  as: "project"
+});
 
 module.exports = ProjectBidding;

@@ -234,7 +234,9 @@ exports.getUserType = type => {
 };
 
 exports.getUserTypeProfile = async (userType, userId) => {
-  const attributes = ["id", "userType"];
+  const attributes = {
+    exclude: ["createdAt", "updatedAt", "deletedAt"]
+  };
   let profile;
   if (userType === "professional" || userType === "service_partner") {
     profile = JSON.parse(
@@ -275,4 +277,37 @@ exports.updateUserTypeProfile = async ({ userType, id, data, transaction }) => {
     await CorporateClient.update(data, { where: { id }, transaction });
   }
   return true;
+};
+
+exports.getUserFromProfile = async (userType, id) => {
+  const attributes = {
+    exclude: ["createdAt", "updatedAt", "deletedAt"]
+  };
+  let profile;
+  if (userType === "professional" || userType === "service_partner") {
+    profile = JSON.parse(
+      JSON.stringify(
+        await ServicePartner.findOne({ where: { id }, attributes })
+      )
+    );
+  } else if (userType === "vendor" || userType === "product_partner") {
+    profile = JSON.parse(
+      JSON.stringify(
+        await ProductPartner.findOne({ where: { id }, attributes })
+      )
+    );
+  } else if (userType === "private_client") {
+    profile = JSON.parse(
+      JSON.stringify(await PrivateClient.findOne({ where: { id }, attributes }))
+    );
+  } else if (userType === "corporate_client") {
+    profile = JSON.parse(
+      JSON.stringify(
+        await CorporateClient.findOne({ where: { id }, attributes })
+      )
+    );
+  }
+  const user = JSON.parse(JSON.stringify(await User.findByPk(profile.userId)));
+  user.profile = profile;
+  return user;
 };

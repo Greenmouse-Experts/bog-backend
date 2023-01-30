@@ -163,7 +163,7 @@ const ServiceTypeValidation = () => {
   return [
     check("title", "Title is required").notEmpty(),
     check("description", "No category selected").notEmpty(),
-    check("slug", "Status is required").notEmpty()
+    check("serviceId", "Service Type is required").isUUID()
   ];
 };
 
@@ -211,6 +211,28 @@ const KYCApprovalValidation = () => {
   ];
 };
 
+const projectAssignmentRequestValidation = () => {
+  return [
+    check("userId", "userId is required").isUUID(),
+    check("projectId", "projectId is required").isUUID(),
+    check("duration", "duration is required").isNumeric(),
+    check("endDate", "endDate is required").isDate(),
+    check("totalCost", "totalCost is required").isNumeric(),
+    check("estimatedCost", "estimatedCost is required").isNumeric()
+  ];
+};
+
+const projectBidRequestValidation = () => {
+  return [
+    check("userId", "userId is required").isUUID(),
+    check("projectId", "projectId is required").isUUID(),
+    check("deliveryTimeLine", "deliveryTimeLine is required").isNumeric(),
+    check("areYouInterested", "areYouInterested is required").isBoolean(),
+    check("projectCost", "projectCost is required").isNumeric(),
+    check("reasonOfInterest", "reasonOfInterest is required").notEmpty()
+  ];
+};
+
 module.exports = {
   validate,
   registerValidation,
@@ -235,5 +257,7 @@ module.exports = {
   meetingValidation,
   meetingStatusValidation,
   BasicKYCRequirements,
-  KYCApprovalValidation
+  KYCApprovalValidation,
+  projectAssignmentRequestValidation,
+  projectBidRequestValidation
 };

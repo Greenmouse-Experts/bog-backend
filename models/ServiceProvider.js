@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const Project = require("./Project");
 
 const ServiceProvider = sequelise.define(
   "service_providers",
@@ -30,5 +31,15 @@ const ServiceProvider = sequelise.define(
   },
   { paranoid: true }
 );
+
+Project.hasMany(ServiceProvider, {
+  foreignKey: "projectId",
+  as: "providers"
+});
+
+ServiceProvider.belongsTo(Project, {
+  foreignKey: "projectId",
+  as: "project"
+});
 
 module.exports = ServiceProvider;

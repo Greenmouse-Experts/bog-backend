@@ -7,25 +7,29 @@ const Services = require("../models/Services");
 const ServiceType = require("../models/ServiceType");
 
 exports.CreateServiceType = async (req, res, next) => {
-  sequelize.transaction(async t => {
-    try {
-      const type = await ServiceType.create(req.body, {
-        transaction: t
-      });
-      return res.status(200).send({
-        success: true,
-        data: type
-      });
-    } catch (error) {
-      t.rollback();
-      return next(error);
-    }
-  });
+  try {
+    const type = await ServiceType.create(req.body);
+    const data = await this.getServiceProviderDetails(type.id);
+    return res.status(200).send({
+      success: true,
+      data
+    });
+  } catch (error) {
+    return next(error);
+  }
 };
 
 exports.getServiceTypes = async (req, res, next) => {
   try {
-    const types = await ServiceType.findAll();
+    const types = await ServiceType.findAll({
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: Services,
+          as: "service"
+        }
+      ]
+    });
     return res.status(200).send({
       success: true,
       data: types
@@ -35,11 +39,22 @@ exports.getServiceTypes = async (req, res, next) => {
   }
 };
 
+exports.getServiceProviderDetails = async id => {
+  const serviceProvider = await ServiceType.findOne({
+    where: { id },
+    include: [
+      {
+        model: Services,
+        as: "service"
+      }
+    ]
+  });
+  return serviceProvider;
+};
+
 exports.findServiceType = async (req, res, next) => {
   try {
-    const types = await ServiceType.findOne({
-      where: { id: req.params.typeId }
-    });
+    const types = await this.getServiceProviderDetails(req.params.typeId);
     return res.status(200).send({
       success: true,
       data: types

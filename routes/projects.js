@@ -6,7 +6,9 @@ const upload = require("../helpers/upload");
 
 const {
   validate,
-  landSurveyRequestValidation
+  landSurveyRequestValidation,
+  projectAssignmentRequestValidation,
+  projectBidRequestValidation
   //   contractorRequestValidation
 } = require("../helpers/validators");
 const ProjectController = require("../controllers/ProjectController");
@@ -15,6 +17,14 @@ const ProjectController = require("../controllers/ProjectController");
 router
   .route("/projects/my-request")
   .get(Auth, ProjectController.getProjectRequest);
+
+router
+  .route("/projects/dispatched-projects/:userId")
+  .get(Auth, ProjectController.getDispatchedProject);
+
+router
+  .route("/projects/assigned-projects/:userId")
+  .get(Auth, ProjectController.getAssignedProjects);
 
 router.route("/projects/all").get(Auth, ProjectController.getAllProjectRequest);
 
@@ -91,5 +101,33 @@ router
 router
   .route("/projects/approve-project/:projectId")
   .patch(Auth, ProjectController.approveProjectRequest);
+
+router
+  .route("/projects/dispatch-project/:projectId")
+  .patch(Auth, ProjectController.dispatchProject);
+
+router
+  .route("/projects/assign-project")
+  .post(
+    projectAssignmentRequestValidation(),
+    validate,
+    Auth,
+    ProjectController.assignProject
+  );
+
+router
+  .route("/projects/bid-project")
+  .post(
+    projectBidRequestValidation(),
+    validate,
+    Auth,
+    ProjectController.bidForProject
+  );
+
+router.route("/projects/bids/:projectId").get(ProjectController.getProjectBids);
+
+router
+  .route("/projects/individual-bid/:projectId/:userId")
+  .get(ProjectController.getIndividualProjectBid);
 
 module.exports = router;

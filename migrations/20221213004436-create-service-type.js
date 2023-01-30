@@ -10,6 +10,10 @@ module.exports = {
       },
       title: {
         allowNull: true,
+        type: Sequelize.STRING
+      },
+      serviceId: {
+        allowNull: true,
         type: Sequelize.UUID
       },
       description: {

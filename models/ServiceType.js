@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const Services = require("./Services");
 
 const ServiceType = sequelise.define(
   "service_types",
@@ -11,6 +12,10 @@ const ServiceType = sequelise.define(
       primaryKey: true
     },
     title: {
+      allowNull: true,
+      type: Sequelize.STRING
+    },
+    serviceId: {
       allowNull: true,
       type: Sequelize.UUID
     },
@@ -25,5 +30,15 @@ const ServiceType = sequelise.define(
   },
   { paranoid: true }
 );
+
+Services.hasMany(ServiceType, {
+  foreignKey: "serviceId",
+  as: "service_provider"
+});
+
+ServiceType.belongsTo(Services, {
+  foreignKey: "serviceId",
+  as: "service"
+});
 
 module.exports = ServiceType;

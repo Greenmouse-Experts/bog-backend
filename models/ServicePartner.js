@@ -75,6 +75,11 @@ const ServicePartner = sequelise.define(
     serviceTypeId: {
       type: Sequelize.UUID,
       allowNull: true
+    },
+    kycPoint: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      defaultValue: 0
     }
   },
   { paranoid: true }

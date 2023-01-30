@@ -17,6 +17,7 @@ const userService = require("../service/UserService");
 const ServiceType = require("../models/ServiceType");
 const ServicePartner = require("../models/ServicePartner");
 const ServiceProvider = require("../models/ServiceProvider");
+const ProjectBidding = require("../models/ProjectBidding");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
@@ -134,6 +135,7 @@ exports.createProject = async (data, transaction) => {
       190000000 + Math.random() * 990000000
     )}`;
     data.projectSlug = projectSlug;
+    data.status = "pending";
     const result = await Project.create(data, { transaction });
     return result;
   } catch (error) {
@@ -829,6 +831,7 @@ exports.approveProjectRequest = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { projectId } = req.params;
+      const { isApproved } = req.body;
       const project = await Project.findOne({ where: { id: projectId } });
       if (!project) {
         return res.status(404).send({
@@ -837,17 +840,19 @@ exports.approveProjectRequest = async (req, res, next) => {
         });
       }
       const requestData = {
-        approvalStatus: "approved",
-        status: "approved"
+        approvalStatus: isApproved ? "approved" : "disapproved",
+        status: isApproved ? "approved" : "closed"
       };
       await Project.update(requestData, {
         where: { id: projectId },
         transaction: t
       });
 
-      // await this.getQualifiedServiceProviders(project);
       const { userId } = project;
-      const message = `Your project ${project.id} has been approved to commence. Please wait for further information regarding cost and estimations`;
+      const message = `Your project ${project.id} has been ${
+        isApproved ? "approved" : "disapproved"
+      }  to commence. ${isApproved &&
+        "Please wait for further information regarding cost and estimations"}`;
 
       const { io } = req.app;
       await Notification.createNotification({
@@ -870,6 +875,42 @@ exports.approveProjectRequest = async (req, res, next) => {
   });
 };
 
+// Dispatch Project request
+exports.dispatchProject = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { projectId } = req.params;
+      const project = await Project.findByPk(projectId);
+      if (!project) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Project"
+        });
+      }
+      const serviceProviders = await this.getQualifiedServiceProviders(
+        project,
+        t
+      );
+
+      project.update({ status: "dispatched" }, { transaction: t });
+
+      await Promise.all(
+        serviceProviders.map(async service => {
+          await this.notifyServicePartner(req, serviceProviders.userId);
+        })
+      );
+
+      return res.status(200).send({
+        success: true,
+        message: "Project dispatched to service partner"
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
 exports.getQualifiedServiceProviders = async (project, transaction) => {
   try {
     // check project type
@@ -879,10 +920,14 @@ exports.getQualifiedServiceProviders = async (project, transaction) => {
       where: { slug: projectTypes }
     });
     // query all service partners with service type id
-    const servicePartners = await ServicePartner.findAll({
-      where: { serviceTypeId: serviceTypes.id },
-      order: [[Sequelize.literal("RAND()")]]
-    });
+    const servicePartners = JSON.parse(
+      JSON.stringify(
+        await ServicePartner.findAll({
+          where: { serviceTypeId: serviceTypes.id },
+          order: [[Sequelize.literal("RAND()")]]
+        })
+      )
+    );
     // remove service partners with ongoing projects
     const where = {
       status: "ongoing",
@@ -913,9 +958,11 @@ exports.getQualifiedServiceProviders = async (project, transaction) => {
       status: "pending",
       projectId: project.id
     }));
-    await ServiceProvider.bulkCreate(providerData, { transaction });
+    await ServiceProvider.bulkCreate(providerData, {
+      transaction
+    });
     // send notifications to them
-    return true;
+    return providerData;
   } catch (error) {
     transaction.rollback();
     return error;
@@ -934,4 +981,217 @@ exports.getRandom = (arr, n) => {
     taken[x] = --len in taken ? taken[len] : len;
   }
   return result;
+};
+
+exports.notifyServicePartner = async (req, userId) => {
+  const message = `Admin has sent a project, see if you are interested in taking it up`;
+
+  const { io } = req.app;
+  await Notification.createNotification({
+    type: "user",
+    message,
+    userId
+  });
+  io.emit(
+    "getNotifications",
+    await Notification.fetchUserNotificationApi({ userId })
+  );
+  return true;
+};
+
+exports.getDispatchedProject = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    const where = { userId };
+    const requests = JSON.parse(
+      JSON.stringify(
+        await ServiceProvider.findAll({
+          where,
+          order: [["createdAt", "DESC"]],
+          include: [
+            {
+              model: Project,
+              as: "project"
+            }
+          ]
+        })
+      )
+    );
+    const data = await Promise.all(
+      requests.map(async request => {
+        const projectDetails = JSON.parse(
+          JSON.stringify(
+            await this.getProjectTypeData(
+              request.project.id,
+              request.project.projectTypes
+            )
+          )
+        );
+        request.projectDetails = projectDetails;
+        return request;
+      })
+    );
+
+    return res.status(200).send({
+      success: true,
+      data
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getAssignedProjects = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    const where = { serviceProviderId: userId };
+    const projects = JSON.parse(
+      JSON.stringify(
+        await Project.findAll({
+          where,
+          order: [["createdAt", "DESC"]]
+        })
+      )
+    );
+    const data = await Promise.all(
+      projects.map(async project => {
+        const requestData = await this.getProjectTypeData(
+          project.id,
+          project.projectTypes
+        );
+        project.projectData = requestData;
+        return project;
+      })
+    );
+    return res.status(200).send({
+      success: true,
+      data
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// Assign Project to Service Partner
+exports.assignProject = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const {
+        projectId,
+        userId,
+        estimatedCost,
+        totalCost,
+        duration,
+        endDate
+      } = req.body;
+      const project = await Project.findByPk(projectId);
+      if (!project) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Project"
+        });
+      }
+      const request = {
+        serviceProviderId: userId,
+        status: "ongoing",
+        estimatedCost,
+        totalCost,
+        duration,
+        endDate
+      };
+      await Project.update(request, { transaction: t });
+
+      return res.status(200).send({
+        success: true,
+        message: "Project assigned to service partner"
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+// Assign Project to Service Partner
+exports.bidForProject = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const data = req.body;
+      const project = await Project.findByPk(data.projectId);
+      if (!project) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Project"
+        });
+      }
+
+      const bid = await ProjectBidding.create(data, { transaction: t });
+
+      return res.status(200).send({
+        success: true,
+        message: "Project Bade successfully",
+        data: bid
+      });
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.getProjectBids = async (req, res, next) => {
+  try {
+    const { projectId } = req.params;
+
+    const project = await Project.findByPk(projectId);
+    const bids = JSON.parse(
+      JSON.stringify(await ProjectBidding.findAll({ where: { projectId } }))
+    );
+    const data = await Promise.all(
+      bids.map(async bid => {
+        const user = await userService.getUserFromProfile(
+          "professional",
+          bid.userId
+        );
+        bid.userDetails = user;
+        return bid;
+      })
+    );
+    return res.status(200).send({
+      success: true,
+      data: {
+        project,
+        bids: data
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getIndividualProjectBid = async (req, res, next) => {
+  try {
+    const { projectId, userId } = req.params;
+
+    const project = await Project.findByPk(projectId);
+    const bid = JSON.parse(
+      JSON.stringify(
+        await ProjectBidding.findOne({ where: { projectId, userId } })
+      )
+    );
+    const user = await userService.getUserFromProfile("professional", userId);
+    bid.userDetails = user;
+    return res.status(200).send({
+      success: true,
+      data: {
+        project,
+        bid
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
 };

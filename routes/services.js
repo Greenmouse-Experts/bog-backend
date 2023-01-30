@@ -8,7 +8,7 @@ const { validate, ServiceTypeValidation } = require("../helpers/validators");
 router
   .route("/service/type/create")
   .post(
-    ServiceTypeValidation,
+    ServiceTypeValidation(),
     validate,
     Auth,
     ServiceController.CreateServiceType
