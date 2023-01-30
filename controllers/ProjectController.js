@@ -887,24 +887,31 @@ exports.dispatchProject = async (req, res, next) => {
           message: "Invalid Project"
         });
       }
-      const serviceProviders = await this.getQualifiedServiceProviders(
-        project,
-        t
-      );
-
-      project.update({ status: "dispatched" }, { transaction: t });
-
-      await Promise.all(
-        serviceProviders.map(async service => {
-          await this.notifyServicePartner(req, serviceProviders.userId);
-        })
-      );
-
+      const {
+        providerData: serviceProviders,
+        completed
+      } = await this.getQualifiedServiceProviders(project, t);
+      if (completed === true) {
+        project.update({ status: "dispatched" }, { transaction: t });
+        if (serviceProviders.length > 0) {
+          await Promise.all(
+            serviceProviders.map(async service => {
+              await this.notifyServicePartner(req, serviceProviders.userId);
+            })
+          );
+        }
+      } else {
+        return res.status(400).send({
+          success: false,
+          message: "Not enough service providers to dispatch job"
+        });
+      }
       return res.status(200).send({
         success: true,
         message: "Project dispatched to service partner"
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -928,6 +935,13 @@ exports.getQualifiedServiceProviders = async (project, transaction) => {
         })
       )
     );
+    if (servicePartners.length === 0) {
+      return {
+        completed: false,
+        message: "Not enough service providers",
+        providerData: []
+      };
+    }
     // remove service partners with ongoing projects
     const where = {
       status: "ongoing",
@@ -962,8 +976,12 @@ exports.getQualifiedServiceProviders = async (project, transaction) => {
       transaction
     });
     // send notifications to them
-    return providerData;
+    return {
+      completed: true,
+      providerData
+    };
   } catch (error) {
+    console.log(error);
     transaction.rollback();
     return error;
   }

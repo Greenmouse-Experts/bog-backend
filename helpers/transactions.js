@@ -36,6 +36,7 @@ exports.saveTxn = async (data, type) => {
       await Transaction.create(saveThis);
       return true;
     } catch (error) {
+      console.log(error);
       t.rollback();
       return false;
     }

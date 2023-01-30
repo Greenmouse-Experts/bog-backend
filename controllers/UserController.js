@@ -455,8 +455,8 @@ exports.getLoggedInUser = async (req, res) => {
       ...user
     };
     const userId = user.id;
-    if (req.body.userType && req.body.userType !== "") {
-      const { userType } = req.body;
+    if (req.query.userType && req.query.userType !== "") {
+      const { userType } = req.query;
       profile = await UserService.getUserTypeProfile(userType, userId);
       if (profile) {
         data.profile = profile;

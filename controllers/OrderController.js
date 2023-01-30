@@ -158,9 +158,8 @@ exports.createOrder = async (req, res, next) => {
         discount,
         totalAmount
       } = req.body;
-      const orderSlug = `BOG/ORD/${Math.floor(
-        190000000 + Math.random() * 990000000
-      )}`;
+      const slug = Math.floor(190000000 + Math.random() * 990000000);
+      const orderSlug = `BOG/ORD/${slug}`;
       const orderData = {
         orderSlug,
         userId,
@@ -236,13 +235,13 @@ exports.createOrder = async (req, res, next) => {
       });
 
       await helpTransaction.saveTxn(orderData, "Products");
-      // if (await invoiceService.createInvoice(orderData, userId)) {
+      orderData.orderSlug = slug;
       const invoice = await invoiceService.createInvoice(orderData, user);
       if (invoice) {
         const files = [
           {
-            path: `uploads/${orderSlug}.pdf`,
-            filename: `${orderSlug}.pdf`
+            path: `uploads/${slug}.pdf`,
+            filename: `${slug}.pdf`
           }
         ];
         const message = helpers.invoiceMessage(user.name);
@@ -267,6 +266,7 @@ exports.createOrder = async (req, res, next) => {
         order
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
