@@ -216,7 +216,6 @@ const projectAssignmentRequestValidation = () => {
     check("userId", "userId is required").isUUID(),
     check("projectId", "projectId is required").isUUID(),
     check("duration", "duration is required").isNumeric(),
-    check("endDate", "endDate is required").isDate(),
     check("totalCost", "totalCost is required").isNumeric(),
     check("estimatedCost", "estimatedCost is required").isNumeric()
   ];

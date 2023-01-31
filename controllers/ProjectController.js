@@ -3,6 +3,7 @@
 /* eslint-disable no-param-reassign */
 require("dotenv").config();
 const { Op, Sequelize } = require("sequelize");
+const moment = require("moment");
 const sequelize = require("../config/database/connection");
 const User = require("../models/User");
 const Project = require("../models/Project");
@@ -1046,6 +1047,19 @@ exports.getDispatchedProject = async (req, res, next) => {
             )
           )
         );
+        const bid = JSON.parse(
+          JSON.stringify(
+            await ProjectBidding.findOne({
+              where: { userId, projectId: request.project.id }
+            })
+          )
+        );
+        request.hasBid = false;
+        request.bid = null;
+        if (bid) {
+          request.hasBid = true;
+          request.bid = bid;
+        }
         request.projectDetails = projectDetails;
         return request;
       })
@@ -1101,8 +1115,7 @@ exports.assignProject = async (req, res, next) => {
         userId,
         estimatedCost,
         totalCost,
-        duration,
-        endDate
+        duration
       } = req.body;
       const project = await Project.findByPk(projectId);
       if (!project) {
@@ -1111,6 +1124,7 @@ exports.assignProject = async (req, res, next) => {
           message: "Invalid Project"
         });
       }
+      const endDate = moment().add(duration, "weeks");
       const request = {
         serviceProviderId: userId,
         status: "ongoing",
@@ -1119,13 +1133,14 @@ exports.assignProject = async (req, res, next) => {
         duration,
         endDate
       };
-      await Project.update(request, { transaction: t });
+      await project.update(request, { transaction: t });
 
       return res.status(200).send({
         success: true,
         message: "Project assigned to service partner"
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -1175,6 +1190,14 @@ exports.getProjectBids = async (req, res, next) => {
           bid.userId
         );
         bid.userDetails = user;
+        const completedProjects = await Project.count({
+          where: { serviceProviderId: bid.userId, status: "completed" }
+        });
+        const ongoingProjects = await Project.count({
+          where: { serviceProviderId: bid.userId, status: "ongoing" }
+        });
+        bid.completedProjects = completedProjects;
+        bid.ongoingProjects = ongoingProjects;
         return bid;
       })
     );

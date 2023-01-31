@@ -8,6 +8,7 @@ const ServicePartner = require("../models/ServicePartner");
 const ProductPartner = require("../models/ProductPartner");
 const PrivateClient = require("../models/PrivateClient");
 const CorporateClient = require("../models/CorporateClient");
+const ServiceType = require("../models/ServiceType");
 
 exports.findUser = async where => {
   const user = await User.findOne({ where });
@@ -287,7 +288,16 @@ exports.getUserFromProfile = async (userType, id) => {
   if (userType === "professional" || userType === "service_partner") {
     profile = JSON.parse(
       JSON.stringify(
-        await ServicePartner.findOne({ where: { id }, attributes })
+        await ServicePartner.findOne({
+          where: { id },
+          attributes,
+          include: [
+            {
+              model: ServiceType,
+              as: "service_category"
+            }
+          ]
+        })
       )
     );
   } else if (userType === "vendor" || userType === "product_partner") {
