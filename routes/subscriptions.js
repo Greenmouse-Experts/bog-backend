@@ -6,7 +6,8 @@ const SubscriptionController = require("../controllers/SubscriptionController");
 
 const {
   validate,
-  subscriptionRequestValidation
+  subscriptionRequestValidation,
+  subscribeRequestValidation
 } = require("../helpers/validators");
 
 router
@@ -32,5 +33,13 @@ router
 router
   .route("/subscription/delete/:planId")
   .delete(Auth, SubscriptionController.deleteSubscriptionPlan);
+
+router
+  .route("/subscription/subscribe")
+  .post(
+    subscribeRequestValidation(),
+    validate,
+    SubscriptionController.createSubscriptionPlan
+  );
 
 module.exports = router;

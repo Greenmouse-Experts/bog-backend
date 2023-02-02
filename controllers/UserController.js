@@ -60,7 +60,8 @@ exports.registerUser = async (req, res, next) => {
 
         user = await UserService.createNewUser(userData, t);
         let token = helpers.generateWebToken();
-        let message = helpers.verifyEmailMessage(name, email, token);
+        const encodeEmail = encodeURIComponent(email);
+        let message = helpers.verifyEmailMessage(name, encodeEmail, token);
         if (req.body.platform === "mobile") {
           token = helpers.generateMobileToken();
           message = helpers.mobileVerifyMessage(name, token);

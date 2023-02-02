@@ -240,6 +240,13 @@ const subscriptionRequestValidation = () => {
   ];
 };
 
+const subscribeRequestValidation = () => {
+  return [
+    check("userId", "userId is required").isUUID(),
+    check("planId", "planId is required").isUUID()
+  ];
+};
+
 module.exports = {
   validate,
   registerValidation,
@@ -267,5 +274,6 @@ module.exports = {
   KYCApprovalValidation,
   projectAssignmentRequestValidation,
   projectBidRequestValidation,
-  subscriptionRequestValidation
+  subscriptionRequestValidation,
+  subscribeRequestValidation
 };
