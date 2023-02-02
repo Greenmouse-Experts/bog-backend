@@ -232,6 +232,14 @@ const projectBidRequestValidation = () => {
   ];
 };
 
+const subscriptionRequestValidation = () => {
+  return [
+    check("duration", "duration is required").isNumeric(),
+    check("amount", "amount is required").isFloat(),
+    check("name", "name is required").notEmpty()
+  ];
+};
+
 module.exports = {
   validate,
   registerValidation,
@@ -258,5 +266,6 @@ module.exports = {
   BasicKYCRequirements,
   KYCApprovalValidation,
   projectAssignmentRequestValidation,
-  projectBidRequestValidation
+  projectBidRequestValidation,
+  subscriptionRequestValidation
 };
