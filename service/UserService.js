@@ -47,23 +47,7 @@ exports.getAllUsers = async where => {
     attributes: {
       exclude: ["password", "deletedAt"]
     },
-    order: [["createdAt", "DESC"]],
-    include: [
-      {
-        model: Profile,
-        as: "profile",
-        attributes: {
-          exclude: ["createdAt", "updatedAt", "deletedAt"]
-        }
-      },
-      {
-        model: BankDetail,
-        as: "bank_detail",
-        attributes: {
-          exclude: ["createdAt", "updatedAt", "deletedAt"]
-        }
-      }
-    ]
+    order: [["createdAt", "DESC"]]
   });
   return user;
 };
@@ -73,24 +57,7 @@ exports.findUserDetail = async where => {
     where,
     attributes: {
       exclude: ["password", "deletedAt"]
-    },
-    order: [["createdAt", "DESC"]],
-    include: [
-      {
-        model: Profile,
-        as: "profile",
-        attributes: {
-          exclude: ["createdAt", "updatedAt", "deletedAt"]
-        }
-      },
-      {
-        model: BankDetail,
-        as: "bank_detail",
-        attributes: {
-          exclude: ["createdAt", "updatedAt", "deletedAt"]
-        }
-      }
-    ]
+    }
   });
   return user;
 };
@@ -222,8 +189,10 @@ exports.getUserType = type => {
     case "admin":
       return "Super Admin";
     case "professional":
+    case "service_partner":
       return "Service Partner";
     case "vendor":
+    case "product_partner":
       return "Product Partner";
     case "private_client":
       return "Private Client";

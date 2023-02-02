@@ -1,12 +1,17 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
+const moment = require("moment");
 const sequelize = require("../config/database/connection");
 const Testimony = require("../models/Testimonies");
 const User = require("../models/User");
 const Notification = require("../helpers/notification");
 const SubscriptionPlan = require("../models/SubscriptionPlan");
 const SubscriptionPlanPackage = require("../models/SubscriptionPlanPackage");
+const Subscription = require("../models/Subscription");
+const Payment = require("../models/Payment");
+const Transaction = require("../models/Transaction");
+const UserService = require("../service/UserService");
 
 exports.createSubscriptionPlan = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -129,4 +134,103 @@ exports.getSingleSubscriptionPlan = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
+};
+
+exports.subscribeToPlan = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { userId, reference, planId, userType } = req.body;
+      const plan = await SubscriptionPlan.findOne({ where: { id: planId } });
+      const { duration, amount, name } = plan;
+      const profile = await UserService.getUserTypeProfile(userType, userId);
+      const { id } = profile;
+      // safe payment made for reference
+      const paymentData = {
+        userId: id,
+        payment_reference: reference,
+        amount,
+        payment_category: "Subscription"
+      };
+
+      await Payment.create(paymentData, { transaction: t });
+      // get user has active sub
+      const sub = await Subscription.findOne({
+        where: { userId: id, status: 1 }
+      });
+      const now = moment();
+      let remainingDays = 0;
+      if (sub) {
+        // get expiration Date
+        const { expiredAt } = sub;
+        const then = moment(expiredAt);
+        remainingDays = then.diff(now, "days");
+        // console.log(expiredAt, remainingDays);
+        await sub.update({ status: 0 }, { transaction: t });
+      }
+      const days = Number(duration) * 7 + remainingDays;
+
+      // create subscription
+      const newDate = moment(now, "DD-MM-YYYY").add(days, "days");
+      const request = {
+        userId: id,
+        planId,
+        status: 1,
+        expiredAt: newDate,
+        amount
+      };
+      await Subscription.create(request, { transaction: t });
+      // update user profile
+      const userData = {
+        planId,
+        hasActiveSubscription: true,
+        expiredAt: newDate
+      };
+      await UserService.updateUserTypeProfile({
+        id,
+        userType,
+        data: userData,
+        transaction: t
+      });
+
+      // save transaction
+      const description = `Made Payment for ${plan.name}`;
+      const slug = Math.floor(190000000 + Math.random() * 990000000);
+      const txSlug = `BOG/TXN/${slug}`;
+      const transaction = {
+        TransactionId: txSlug,
+        userId: id,
+        type: "Subscription",
+        amount,
+        description,
+        paymentReference: reference,
+        status: "PAID"
+      };
+      await Transaction.create(transaction, { transaction: t });
+      const user = await User.findByPk(userId);
+
+      // Notify admin
+      const mesg = `${
+        user.name ? user.name : `${user.fname} ${user.lname}`
+      } Just subscribe to ${name} with their ${UserService.getUserType(
+        userType
+      )} account`;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg,
+        userId: id
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
+
+      return res.send({
+        success: true,
+        message: "Subscription Made Sucessfully"
+      });
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
 };

@@ -68,6 +68,18 @@ const ProductPartner = sequelise.define(
       type: Sequelize.INTEGER,
       allowNull: true,
       defaultValue: 0
+    },
+    planId: {
+      type: Sequelize.UUID,
+      allowNull: true
+    },
+    expiredAt: {
+      type: Sequelize.DATE,
+      allowNull: true
+    },
+    hasActiveSubscription: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
     }
   },
   { paranoid: true }

@@ -71,6 +71,18 @@ const CorporateClient = sequelise.define(
     tax_certificate: {
       type: Sequelize.STRING,
       allowNull: true
+    },
+    planId: {
+      type: Sequelize.UUID,
+      allowNull: true
+    },
+    expiredAt: {
+      type: Sequelize.DATE,
+      allowNull: true
+    },
+    hasActiveSubscription: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
     }
   },
   { paranoid: true }

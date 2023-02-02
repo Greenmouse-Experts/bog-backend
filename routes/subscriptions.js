@@ -39,7 +39,8 @@ router
   .post(
     subscribeRequestValidation(),
     validate,
-    SubscriptionController.createSubscriptionPlan
+    Auth,
+    SubscriptionController.subscribeToPlan
   );
 
 module.exports = router;

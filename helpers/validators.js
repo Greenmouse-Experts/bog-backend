@@ -243,7 +243,9 @@ const subscriptionRequestValidation = () => {
 const subscribeRequestValidation = () => {
   return [
     check("userId", "userId is required").isUUID(),
-    check("planId", "planId is required").isUUID()
+    check("planId", "planId is required").isUUID(),
+    check("reference", "reference is required").notEmpty(),
+    check("userType", "userType is required").notEmpty()
   ];
 };
 
