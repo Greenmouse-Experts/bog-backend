@@ -2,6 +2,8 @@ const express = require("express");
 
 const router = express.Router();
 const Auth = require("../middleware/auth");
+const Access = require("../middleware/access");
+
 const ServiceController = require("../controllers/ServiceController");
 const { validate, ServiceTypeValidation } = require("../helpers/validators");
 
@@ -10,12 +12,12 @@ router
   .post(
     ServiceTypeValidation(),
     validate,
-    Auth,
+    [Auth, Access.verifyAccess],
     ServiceController.CreateServiceType
   );
 router
   .route("/service/type/update")
-  .patch(validate, Auth, ServiceController.updateServiceType);
+  .patch(validate, [Auth, Access.verifyAccess], ServiceController.updateServiceType);
 
 router.route("/service/type").get(ServiceController.getServiceTypes);
 
@@ -23,14 +25,14 @@ router.route("/service/type/:typeId").get(ServiceController.findServiceType);
 
 router
   .route("/service/type/delete/:typeId")
-  .delete(validate, Auth, ServiceController.deleteCategory);
+  .delete(validate, [Auth, Access.verifyAccess], ServiceController.deleteCategory);
 
 // BOG Services
-router.route("/services/create").post(Auth, ServiceController.createService);
+router.route("/services/create").post([Auth, Access.verifyAccess], ServiceController.createService);
 
 router
   .route("/services/update/:id")
-  .patch(Auth, ServiceController.updateService);
+  .patch([Auth, Access.verifyAccess], ServiceController.updateService);
 
 router.route("/services/delete/:id").delete(ServiceController.deleteServices);
 

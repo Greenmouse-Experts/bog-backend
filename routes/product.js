@@ -3,6 +3,8 @@ const express = require("express");
 
 const router = express.Router();
 const Auth = require("../middleware/auth");
+const Access = require("../middleware/access");
+
 const upload = require("../helpers/upload");
 const ProductController = require("../controllers/ProductContoller");
 
@@ -37,33 +39,33 @@ router
   .post(
     // productValidation(),
     // validate,
-    Auth,
+    [Auth, Access.verifyAccess],
     upload.any(),
     ProductController.createProduct
   )
-  .get(Auth, ProductController.getAllProducts);
+  .get([Auth, Access.verifyAccess], ProductController.getAllProducts);
 
 router
   .route("/product/:productId")
-  .patch(Auth, upload.any(), ProductController.updateProduct)
-  .delete(Auth, ProductController.deleteProduct)
+  .patch([Auth, Access.verifyAccess], upload.any(), ProductController.updateProduct)
+  .delete([Auth, Access.verifyAccess], ProductController.deleteProduct)
   .get(ProductController.getSingleProducts);
 
 router
   .route("/product/add-to-shop/:productId")
-  .patch(Auth, ProductController.addProductToShop);
+  .patch([Auth, Access.verifyAccess], ProductController.addProductToShop);
 
 // Admin routes
 router
   .route("/product/admin/get-products")
-  .get(Auth, ProductController.getProductsForAdmin);
+  .get([Auth, Access.verifyAccess], ProductController.getProductsForAdmin);
 
 router
   .route("/product/admin/approve-product")
   .post(
     productApprovalValidation(),
     validate,
-    Auth,
+    [Auth, Access.verifyAccess],
     ProductController.approveProduct
   );
 

@@ -3,14 +3,31 @@ const Notification = require("../models/Notification");
 const NotificationService = require("../helpers/notification");
 const sequelize = require("../config/database/connection");
 
+const { Op } = require("sequelize");
+
 exports.getAllAdminNotifications = async (req, res, next) => {
   try {
-    const notifications = await Notification.findAll({
+    const {level, role} = req._credentials;
+
+    let notifications = await Notification.findAll({
       where: {
         type: "admin"
       },
       order: [["createdAt", "DESC"]]
     });
+    
+    if (level !== 1) {
+      // Get privileged Notifications
+      notifications = notifications.filter(_notification => {
+        // Check if the sub admin is permitted to view this message
+        const _privilegedMsg = role.privileges.filter(_priv => _notification.message.toLowerCase().includes(_priv.toLowerCase()))
+        if (_privilegedMsg.length > 0) {
+          return _notification;
+        }
+      })
+      
+    }
+
     return res.status(200).send({
       success: true,
       data: notifications

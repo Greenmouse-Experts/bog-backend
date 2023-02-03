@@ -4,6 +4,8 @@ const router = express.Router();
 const UserController = require("../controllers/UserController");
 const upload = require("../helpers/upload");
 const Auth = require("../middleware/auth");
+const Access = require("../middleware/access");
+
 const {
   validate,
   registerValidation,
@@ -72,11 +74,11 @@ router
   .route("/admin/signup")
   .post(adminValidation(), validate, UserController.registerAdmin);
 
-router.route("/all/admin").get(Auth, UserController.getAllAdmin);
+router.route("/all/admin").get([Auth, Access.verifyAccess], UserController.getAllAdmin);
 
-router.route("/admin/:adminId").get(Auth, UserController.findAdmin);
+router.route("/admin/:adminId").get([Auth, Access.verifyAccess], UserController.findAdmin);
 
-router.route("/admin/revoke-access").post(Auth, UserController.revokeAccess);
+router.route("/admin/revoke-access").post([Auth, Access.verifyAccess], UserController.revokeAccess);
 
 router.route("/users/get-user/:userId").get(UserController.findSingleUser);
 

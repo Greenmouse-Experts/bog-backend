@@ -2,6 +2,8 @@ const express = require("express");
 
 const router = express.Router();
 const Auth = require("../middleware/auth");
+const Access = require("../middleware/access");
+
 const OrderController = require("../controllers/OrderController");
 
 const {
@@ -11,38 +13,38 @@ const {
   updateOrderRequestValidation
 } = require("../helpers/validators");
 
-router.route("/orders/my-orders").get(Auth, OrderController.getMyOrders);
+router.route("/orders/my-orders").get([Auth, Access.verifyAccess], OrderController.getMyOrders);
 
 router
   .route("/orders/order-detail/:orderId")
-  .get(Auth, OrderController.getOrderDetails);
+  .get([Auth, Access.verifyAccess], OrderController.getOrderDetails);
 
 router
   .route("/orders/submit-order")
-  .post(orderValidation(), validate, Auth, OrderController.createOrder);
+  .post(orderValidation(), validate, [Auth, Access.verifyAccess], OrderController.createOrder);
 
 router
   .route("/orders/update-order")
-  .patch(updateOrderValidation(), validate, Auth, OrderController.updateOrder);
+  .patch(updateOrderValidation(), validate, [Auth, Access.verifyAccess], OrderController.updateOrder);
 
 router
   .route("/orders/request/update-order")
   .patch(
     updateOrderRequestValidation(),
     validate,
-    Auth,
+    [Auth, Access.verifyAccess],
     OrderController.updateOrderRequest
   );
 
 router
   .route("/orders/order-request")
-  .get(Auth, OrderController.getOrderRequest);
+  .get([Auth, Access.verifyAccess], OrderController.getOrderRequest);
 
-router.route("/orders/all").get(Auth, OrderController.getAllOrders);
+router.route("/orders/all").get([Auth, Access.verifyAccess], OrderController.getAllOrders);
 
 // Router
 router
   .route("/orders/generateInvoice")
-  .get(Auth, OrderController.generateOrderInvoice);
+  .get([Auth, Access.verifyAccess], OrderController.generateOrderInvoice);
 
 module.exports = router;
