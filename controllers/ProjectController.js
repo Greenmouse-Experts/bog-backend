@@ -488,6 +488,8 @@ exports.drawingProjectsRequest = async (req, res, next) => {
         }
       }
 
+      console.log(request);
+
       const data = await DrawingProject.create(request, {
         transaction: t
       });
@@ -504,6 +506,7 @@ exports.drawingProjectsRequest = async (req, res, next) => {
         data
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -722,7 +725,7 @@ exports.requestForGeoTechnicalInvestigation = async (req, res, next) => {
         for (let i = 0; i < req.files.length; i++) {
           const url = `${process.env.APP_URL}/${req.files[i].path}`;
           const name = req.files[i].fieldname;
-          request[name] = url;
+          request.propertyPicture = url;
         }
       }
       const data = await GeoTechnical.create(request, {
@@ -770,7 +773,7 @@ exports.updateGeoTechnicalInvestigationRequest = async (req, res, next) => {
         for (let i = 0; i < req.files.length; i++) {
           const url = `${process.env.APP_URL}/${req.files[i].path}`;
           const name = req.files[i].fieldname;
-          request[name] = url;
+          request.propertyPicture = url;
         }
       }
 
