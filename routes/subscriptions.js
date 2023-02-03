@@ -2,6 +2,8 @@ const express = require("express");
 
 const router = express.Router();
 const Auth = require("../middleware/auth");
+const Access = require("../middleware/access");
+
 const SubscriptionController = require("../controllers/SubscriptionController");
 
 const {
@@ -32,14 +34,14 @@ router
 
 router
   .route("/subscription/delete/:planId")
-  .delete(Auth, SubscriptionController.deleteSubscriptionPlan);
+  .delete([Auth, Access.verifyAccess], SubscriptionController.deleteSubscriptionPlan);
 
 router
   .route("/subscription/subscribe")
   .post(
     subscribeRequestValidation(),
     validate,
-    Auth,
+    [Auth, Access.verifyAccess],
     SubscriptionController.subscribeToPlan
   );
 

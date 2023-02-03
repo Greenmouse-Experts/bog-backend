@@ -20,6 +20,8 @@ const CorporateClient = require("../models/CorporateClient");
 const User = require("../models/User");
 const Notification = require("../helpers/notification");
 
+const {adminLevels, adminPrivileges} = require("../helpers/utility")
+
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
@@ -427,11 +429,15 @@ exports.loginAdmin = async (req, res, next) => {
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: 3600
       });
+
+      const _adminLevel = adminLevels.find(_level => _level.level === user.level && _level.type.includes(user.userType));
+      const _adminPrivilege = adminPrivileges.find(_privilege => _privilege.type === _adminLevel.type);
+      
       return res.status(201).send({
         success: true,
         message: "Admin Logged In Sucessfully",
         token,
-        user
+        user: {...user.toJSON(), role: _adminPrivilege}        
       });
     } catch (error) {
       t.rollback();
