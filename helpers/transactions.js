@@ -18,15 +18,16 @@ const generateDesc = order_items => {
 };
 exports.saveTxn = async (data, type) => {
   sequelize.transaction(async t => {
-    const { orderSlug, userId, order_items } = data;
+    const { slug, userId, order_items } = data;
     let description;
     type === "Products" && (description = generateDesc(order_items));
-    type === "Service" && (description = `Payment for {service} request`);
-    data.TransactionId = data.orderSlug;
+    type === "Service" && (description = `Payment for service`);
+    type === "Subscription" && (description = `Payment for Subscription`);
+    data.TransactionId = data.slug;
     const saveThis = {
       type,
       amount: data.totalAmount,
-      TransactionId: orderSlug,
+      TransactionId: slug,
       userId,
       description,
       paymentReference: order_items[0].paymentInfo.reference,

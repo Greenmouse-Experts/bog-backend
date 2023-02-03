@@ -23,6 +23,18 @@ const PrivateClient = sequelise.define(
       type: Sequelize.BOOLEAN,
       allowNull: true,
       defaultValue: false
+    },
+    planId: {
+      type: Sequelize.UUID,
+      allowNull: true
+    },
+    expiredAt: {
+      type: Sequelize.DATE,
+      allowNull: true
+    },
+    hasActiveSubscription: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
     }
   },
   { paranoid: true }

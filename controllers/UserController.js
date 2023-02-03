@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable camelcase */
@@ -60,7 +61,8 @@ exports.registerUser = async (req, res, next) => {
 
         user = await UserService.createNewUser(userData, t);
         let token = helpers.generateWebToken();
-        let message = helpers.verifyEmailMessage(name, email, token);
+        const encodeEmail = encodeURIComponent(email);
+        let message = helpers.verifyEmailMessage(name, encodeEmail, token);
         if (req.body.platform === "mobile") {
           token = helpers.generateMobileToken();
           message = helpers.mobileVerifyMessage(name, token);
@@ -762,10 +764,17 @@ exports.getAllUsers = async (req, res) => {
     const where = {
       level: 1
     };
-    const userData = await UserService.getAllUsers(where);
+    const userData = JSON.parse(
+      JSON.stringify(await UserService.getAllUsers(where))
+    );
     const users = await Promise.all(
       userData.map(async customer => {
         const accounts = await this.getAccountsData(customer.id);
+        const profile = await UserService.getUserTypeProfile(
+          customer.userType,
+          customer.id
+        );
+        customer.profile = profile;
         return {
           user: customer,
           accounts: JSON.parse(JSON.stringify(accounts))
@@ -892,7 +901,15 @@ exports.revokeAccess = async (req, res) => {
 exports.findSingleUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const userData = await UserService.findUserDetail({ id: userId });
+    const userData = JSON.parse(
+      JSON.stringify(await UserService.findUserDetail({ id: userId }))
+    );
+    const profile = await UserService.getUserTypeProfile(
+      userData.userType,
+      userData.id
+    );
+    userData.profile = profile;
+
     const accounts = await this.getAccountsData(userId);
 
     return res.status(200).send({
