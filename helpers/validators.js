@@ -167,6 +167,15 @@ const ServiceTypeValidation = () => {
   ];
 };
 
+const ServiceFormBuilderValidation = () => {
+  return [
+    check("serviceName", "Service Name is required").notEmpty(),
+    check("label", "Label is required").notEmpty(),
+    check("inputType", "Input Type is required").notEmpty(),
+    check("name", "Name is required").notEmpty()
+  ];
+};
+
 const landSurveyRequestValidation = () => {
   return [
     check("title", "Project title is required").notEmpty(),
@@ -277,5 +286,6 @@ module.exports = {
   projectAssignmentRequestValidation,
   projectBidRequestValidation,
   subscriptionRequestValidation,
-  subscribeRequestValidation
+  subscribeRequestValidation,
+  ServiceFormBuilderValidation
 };

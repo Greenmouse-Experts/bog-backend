@@ -431,6 +431,7 @@ exports.loginAdmin = async (req, res, next) => {
       });
 
       const _adminLevel = adminLevels.find(_level => _level.level === user.level && _level.type.includes(user.userType));
+  
       const _adminPrivilege = adminPrivileges.find(_privilege => _privilege.type === _adminLevel.type);
       
       return res.status(201).send({
