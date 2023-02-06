@@ -19,7 +19,7 @@ exports.verifyAccess = async (req, res, next) => {
     else{
 
         // Level number 1 is for super admin role
-        if (userDetails.level === 1 && userDetails.userType !== 'admin') {
+        if (userDetails.level === 1 || userDetails.userType !== 'admin') {
             next();
         }
         else{

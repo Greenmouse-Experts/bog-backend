@@ -22,7 +22,7 @@ module.exports = {
 
         return Promise.all(levelColumn);
       } catch (error) {
-        return t.rollback();
+        // return t.rollback();
       }
     });
   },
