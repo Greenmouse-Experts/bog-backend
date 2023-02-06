@@ -74,11 +74,19 @@ router
   .route("/admin/signup")
   .post(adminValidation(), validate, UserController.registerAdmin);
 
-router.route("/all/admin").get([Auth, Access.verifyAccess], UserController.getAllAdmin);
+router
+  .route("/all/admin")
+  .get([Auth, Access.verifyAccess], UserController.getAllAdmin);
 
-router.route("/admin/:adminId").get([Auth, Access.verifyAccess], UserController.findAdmin);
+router
+  .route("/admin/:adminId")
+  .get([Auth, Access.verifyAccess], UserController.findAdmin);
 
-router.route("/admin/revoke-access").post([Auth, Access.verifyAccess], UserController.revokeAccess);
+router
+  .route("/admin/revoke-access")
+  .post([Auth, Access.verifyAccess], UserController.revokeAccess);
+
+router.route("/admin/suspend-user").post([Auth], UserController.suspendUser);
 
 router.route("/users/get-user/:userId").get(UserController.findSingleUser);
 

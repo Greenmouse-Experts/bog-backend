@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
@@ -12,6 +13,8 @@ const Subscription = require("../models/Subscription");
 const Payment = require("../models/Payment");
 const Transaction = require("../models/Transaction");
 const UserService = require("../service/UserService");
+const ServicePartner = require("../models/ServicePartner");
+const ProductPartner = require("../models/ProductPartner");
 
 exports.createSubscriptionPlan = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -233,4 +236,48 @@ exports.subscribeToPlan = async (req, res, next) => {
       return next(error);
     }
   });
+};
+
+exports.getSubscriptionHistory = async (req, res, next) => {
+  try {
+    const plans = await Subscription.findAll({
+      order: [["createdAt", "DESC"]]
+    });
+    const subscriptions = await Promise.all(
+      plans.map(async plan => {
+        let user = await ServicePartner.findOne({
+          where: { id: plan.userId }
+        });
+        if (!user) {
+          user = await ProductPartner.findOne({
+            where: { id: plan.userId }
+          });
+        }
+        plan.user = user;
+        return plan;
+      })
+    );
+    return res.status(200).send({
+      success: true,
+      data: subscriptions
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getUserSubscriptionHistory = async (req, res, next) => {
+  try {
+    const subscriptions = await Subscription.findAll({
+      where: { userId: req.params.userId },
+      order: [["createdAt", "DESC"]]
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: subscriptions
+    });
+  } catch (error) {
+    return next(error);
+  }
 };
