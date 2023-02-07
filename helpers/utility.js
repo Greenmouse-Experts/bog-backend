@@ -16,22 +16,26 @@ exports.projectSlug = type => {
   return slug;
 };
 
-
-
 /**
  * List of the levels of administrators
  */
 exports.adminLevels = [
-  {level: 1, type: 'super admin'},
-  {level: 2, type: 'article admin'},
-  {level: 3, type: 'finance admin'},
-  {level: 4, type: 'product admin'},
-  {level: 5, type: 'project admin'},
+  { level: 1, type: "super admin" },
+  { level: 2, type: "article admin" },
+  { level: 3, type: "finance admin" },
+  { level: 4, type: "product admin" },
+  { level: 5, type: "project admin" }
 ];
 
 exports.adminPrivileges = [
-  {type: 'article admin', privileges: ['BLOG', 'PROFILE']},
-  {type: 'finance admin', privileges: ['TRANSACTION', 'PROFILE']},
-  {type: 'product admin', privileges: ['PRODUCT', 'ORDER', 'NOTIFICATION', 'PROFILE']},
-  {type: 'project admin', privileges: ['PROJECT', 'MEETING', 'NOTIFICATION', 'PROFILE']},
-]
+  { type: "article admin", privileges: ["BLOG", "PROFILE"] },
+  { type: "finance admin", privileges: ["TRANSACTION", "PROFILE"] },
+  {
+    type: "product admin",
+    privileges: ["PRODUCT", "ORDER", "NOTIFICATION", "PROFILE"]
+  },
+  {
+    type: "project admin",
+    privileges: ["PROJECT", "MEETING", "NOTIFICATION", "PROFILE"]
+  }
+];

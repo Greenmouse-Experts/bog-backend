@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-param-reassign */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
@@ -20,7 +21,7 @@ const CorporateClient = require("../models/CorporateClient");
 const User = require("../models/User");
 const Notification = require("../helpers/notification");
 
-const {adminLevels, adminPrivileges} = require("../helpers/utility")
+const { adminLevels, adminPrivileges } = require("../helpers/utility");
 
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -430,15 +431,20 @@ exports.loginAdmin = async (req, res, next) => {
         expiresIn: 3600
       });
 
-      const _adminLevel = adminLevels.find(_level => _level.level === user.level && _level.type.includes(user.userType));
-  
-      const _adminPrivilege = adminPrivileges.find(_privilege => _privilege.type === _adminLevel.type);
-      
+      const _adminLevel = adminLevels.find(
+        _level =>
+          _level.level === user.level && _level.type.includes(user.userType)
+      );
+
+      const _adminPrivilege = adminPrivileges.find(
+        _privilege => _privilege.type === _adminLevel.type
+      );
+
       return res.status(201).send({
         success: true,
         message: "Admin Logged In Sucessfully",
         token,
-        user: {...user.toJSON(), role: _adminPrivilege}        
+        user: { ...user.toJSON(), role: _adminPrivilege }
       });
     } catch (error) {
       t.rollback();
@@ -976,4 +982,34 @@ exports.checkIfAccountExist = async (userType, userId) => {
     user = await CorporateClient.findOne({ where });
   }
   return user;
+};
+
+exports.suspendUser = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User Found"
+      });
+    }
+    if (user.level === 1) {
+      return res.status(401).send({
+        success: false,
+        message: "UnAuthorised access"
+      });
+    }
+    await User.destroy({ where: { id: userId } });
+
+    return res.status(200).send({
+      success: true,
+      message: "User suspended"
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error"
+    });
+  }
 };
