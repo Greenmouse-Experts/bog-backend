@@ -9,12 +9,17 @@ const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
 const bodyParser = require("body-parser");
+const cron = require("node-cron");
 
 const server = http.createServer(app);
 require("./config/database/connection");
+const moment = require("moment");
 const Notification = require("./helpers/notification");
 
 const Routes = require("./routes");
+const Subscription = require("./models/Subscription");
+const ServicePartner = require("./models/ServicePartner");
+const ProductPartner = require("./models/ProductPartner");
 // set up public folder
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "uploads")));
@@ -62,6 +67,47 @@ io.on("connection", async socket => {
     const { id } = data;
     socket.emit("markAsRead", await Notification.updateNotification(id));
   });
+});
+
+// scheduler for subscription
+cron.schedule("* 6 * * *", () => {
+  Subscription.findAll({
+    where: { status: 1 }
+  })
+    .then(async activeSubscriptions => {
+      // console.log(activeSubscriptions);
+      await Promise.all(
+        activeSubscriptions.map(async sub => {
+          if (sub.expiredAt < moment()) {
+            await Subscription.update({ status: 0 }, { where: { id: sub.id } });
+            let user = await ServicePartner.findOne({
+              where: { id: sub.userId }
+            });
+            const updateData = {
+              hasActiveSubscription: false,
+              planId: null
+            };
+            if (user) {
+              await ServicePartner.update(updateData, {
+                where: { id: user.id }
+              });
+            } else {
+              user = await ProductPartner.findOne({
+                where: { id: sub.userId }
+              });
+              await ProductPartner.update(updateData, {
+                where: { id: user.id }
+              });
+            }
+          }
+        })
+      );
+      console.log(`No Subscription updated`);
+    })
+    .catch(error => {
+      return null;
+    });
+  // }
 });
 
 // Handles all errors
