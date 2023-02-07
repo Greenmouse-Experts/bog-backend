@@ -68,7 +68,7 @@ router
   .route("/user/update-profile")
   .patch(Auth, upload.any(), UserController.updateUserProfile);
 
-router.route("/all/users").get(Auth, UserController.getAllUsers);
+router.route("/all/users").get([Auth, Access.verifyAccess], UserController.getAllUsers);
 
 router
   .route("/admin/signup")
