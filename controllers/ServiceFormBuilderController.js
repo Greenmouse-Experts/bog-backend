@@ -12,11 +12,11 @@ const formatServiceForm = _serviceForms => {
     if (__serviceForms.length === 0) {
       __serviceForms.push({
         formTitle: _s.serviceName,
-        required: _s.required,
         fields: [
           {
             label: _s.label,
             inputType: _s.inputType,
+            required: _s.required,
             formSubs: [
               {
                 id: _s.id,
@@ -35,18 +35,17 @@ const formatServiceForm = _serviceForms => {
     ) {
       __serviceForms.push({
         formTitle: _s.serviceName,
-        required: _s.required,
         fields: [
           {
             label: _s.label,
             inputType: _s.inputType,
+            required: _s.required,
             formSubs: [
               {
                 id: _s.id,
                 placeholder: _s.placeholder,
                 name: _s.name,
                 value: _s.value,
-                required: _s.required,
                 isActive: _s.isActive
               }
             ]
