@@ -28,7 +28,9 @@ router
   .route("/projects/assigned-projects/:userId")
   .get([Auth, Access.verifyAccess], ProjectController.getAssignedProjects);
 
-router.route("/projects/all").get([Auth, Access.verifyAccess], ProjectController.getAllProjectRequest);
+router
+  .route("/projects/all")
+  .get([Auth, Access.verifyAccess], ProjectController.getAllProjectRequest);
 
 router
   .route("/projects/view-project/:projectId")
@@ -50,34 +52,61 @@ router
 
 router
   .route("/projects/land-survey/update-request")
-  .patch([Auth, Access.verifyAccess], ProjectController.updateLandSurveyRequest);
+  .patch(
+    [Auth, Access.verifyAccess],
+    ProjectController.updateLandSurveyRequest
+  );
 
 // Contractor Project
 router
   .route("/projects/contractor/request")
-  .post([Auth, Access.verifyAccess], upload.any(), ProjectController.requestForContractor);
+  .post(
+    [Auth, Access.verifyAccess],
+    upload.any(),
+    ProjectController.requestForContractor
+  );
 
 router
   .route("/projects/contractor/update-request")
-  .patch([Auth, Access.verifyAccess], upload.any(), ProjectController.updateContractorRequest);
+  .patch(
+    [Auth, Access.verifyAccess],
+    upload.any(),
+    ProjectController.updateContractorRequest
+  );
 
 // Drawing Project
 router
   .route("/projects/drawing/request")
-  .post([Auth, Access.verifyAccess], upload.any(), ProjectController.drawingProjectsRequest);
+  .post(
+    [Auth, Access.verifyAccess],
+    upload.any(),
+    ProjectController.drawingProjectsRequest
+  );
 
 router
   .route("/projects/drawing/update-request")
-  .patch([Auth, Access.verifyAccess], upload.any(), ProjectController.updateDrawingRequest);
+  .patch(
+    [Auth, Access.verifyAccess],
+    upload.any(),
+    ProjectController.updateDrawingRequest
+  );
 
 // Building Approval Project
 router
   .route("/projects/building-approval/request")
-  .post([Auth, Access.verifyAccess], upload.any(), ProjectController.buildingApprovalProjectsRequest);
+  .post(
+    [Auth, Access.verifyAccess],
+    upload.any(),
+    ProjectController.buildingApprovalProjectsRequest
+  );
 
 router
   .route("/projects/building-approval/update-request")
-  .patch([Auth, Access.verifyAccess], upload.any(), ProjectController.updateBuildingApprovalRequest);
+  .patch(
+    [Auth, Access.verifyAccess],
+    upload.any(),
+    ProjectController.updateBuildingApprovalRequest
+  );
 
 // Geotechnical Project
 router

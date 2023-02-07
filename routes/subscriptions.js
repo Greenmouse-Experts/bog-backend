@@ -29,12 +29,23 @@ router
   .get(SubscriptionController.getSingleSubscriptionPlan);
 
 router
+  .route("/subscription/history")
+  .get(SubscriptionController.getSubscriptionHistory);
+
+router
+  .route("/subscription/user-history/:userId")
+  .get(Auth, SubscriptionController.getUserSubscriptionHistory);
+
+router
   .route("/subscription/update")
   .patch(SubscriptionController.updateSubscriptionPlan);
 
 router
   .route("/subscription/delete/:planId")
-  .delete([Auth, Access.verifyAccess], SubscriptionController.deleteSubscriptionPlan);
+  .delete(
+    [Auth, Access.verifyAccess],
+    SubscriptionController.deleteSubscriptionPlan
+  );
 
 router
   .route("/subscription/subscribe")
