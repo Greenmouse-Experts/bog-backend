@@ -815,12 +815,7 @@ exports.getAllAdmin = async (req, res) => {
         message: "No User Found"
       });
     }
-    if (user.level === 1) {
-      return res.status(401).send({
-        success: false,
-        message: "UnAuthorised access"
-      });
-    }
+    
     const where = {
       userType: "admin"
     };
