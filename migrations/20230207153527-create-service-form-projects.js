@@ -2,36 +2,27 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('ServicesFormBuilders', {
+    await queryInterface.createTable('ServiceFormProjects', {
       id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true
       },
-      serviceTypeID: {
+      userID: {
         type: Sequelize.STRING
       },
-      serviceName: {
+      projectID: {
         type: Sequelize.STRING
       },
-      label: {
-        type: Sequelize.STRING
-      },
-      inputType: {
-        type: Sequelize.STRING
-      },
-      placeholder: {
-        type: Sequelize.STRING
-      },
-      name: {
+      serviceFormID: {
         type: Sequelize.STRING
       },
       value: {
         type: Sequelize.STRING
       },
-      required: {
-        type: Sequelize.BOOLEAN
+      status: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -44,6 +35,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ServicesFormBuilders');
+    await queryInterface.dropTable('ServiceFormProjects');
   }
 };

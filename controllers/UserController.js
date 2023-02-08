@@ -868,7 +868,7 @@ exports.revokeAccess = async (req, res) => {
         message: "No User Found"
       });
     }
-    if (user.level !== 1) {
+    if (user.level === 1) {
       return res.status(401).send({
         success: false,
         message: "UnAuthorised access"

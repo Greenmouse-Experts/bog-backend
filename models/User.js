@@ -9,6 +9,7 @@ const CorporateClient = require("./CorporateClient");
 const ServicePartner = require("./ServicePartner");
 const ProductPartner = require("./ProductPartner");
 
+
 const User = sequelise.define(
   "users",
   {

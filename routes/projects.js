@@ -32,13 +32,30 @@ router
   .route("/projects/all")
   .get([Auth, Access.verifyAccess], ProjectController.getAllProjectRequest);
 
+  // View all project v2
+router
+  .route("/projects/v2/all")
+  .get([Auth, Access.verifyAccess], ProjectController.getAllProjectRequestV2);
+
+
 router
   .route("/projects/view-project/:projectId")
   .get([Auth, Access.verifyAccess], ProjectController.viewProjectRequest);
 
+// Project request view v2
+router
+  .route("/projects/v2/view-project/:projectId")
+  .get([Auth, Access.verifyAccess], ProjectController.viewProjectRequestV2);
+
 router
   .route("/projects/delete/:requestId")
   .delete([Auth, Access.verifyAccess], ProjectController.deleteProjectRequest);
+
+
+// Request service type
+router
+  .route("/projects/request")
+  .post([Auth, Access.verifyAccess], ProjectController.requestForService)
 
 // Land Survey
 router

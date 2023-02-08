@@ -188,36 +188,42 @@ exports.getUserType = type => {
 };
 
 exports.getUserTypeProfile = async (userType, userId) => {
-  const attributes = {
-    exclude: ["createdAt", "updatedAt", "deletedAt"]
-  };
-  let profile;
-  if (userType === "professional" || userType === "service_partner") {
-    profile = JSON.parse(
-      JSON.stringify(
-        await ServicePartner.findOne({ where: { userId }, attributes })
-      )
-    );
-  } else if (userType === "vendor" || userType === "product_partner") {
-    profile = JSON.parse(
-      JSON.stringify(
-        await ProductPartner.findOne({ where: { userId }, attributes })
-      )
-    );
-  } else if (userType === "private_client") {
-    profile = JSON.parse(
-      JSON.stringify(
-        await PrivateClient.findOne({ where: { userId }, attributes })
-      )
-    );
-  } else if (userType === "corporate_client") {
-    profile = JSON.parse(
-      JSON.stringify(
-        await CorporateClient.findOne({ where: { userId }, attributes })
-      )
-    );
+  try {
+    const attributes = {
+      exclude: ["createdAt", "updatedAt", "deletedAt"]
+    };
+    let profile = null;
+    if (userType === "professional" || userType === "service_partner") {
+      profile = JSON.parse(
+        JSON.stringify(
+          await ServicePartner.findOne({ where: { userId }, attributes })
+        )
+      );
+    } else if (userType === "vendor" || userType === "product_partner") {
+    
+      profile = JSON.parse(
+        JSON.stringify(
+          await ProductPartner.findOne({ where: { userId }, attributes })
+        )
+      );
+    } else if (userType === "private_client") {
+      profile = JSON.parse(
+        JSON.stringify(
+          await PrivateClient.findOne({ where: { userId }, attributes })
+        )
+      );
+    } else if (userType === "corporate_client") {
+      profile = JSON.parse(
+        JSON.stringify(
+          await CorporateClient.findOne({ where: { userId }, attributes })
+        )
+      );
+    }
+    return profile;
+  } catch (error) {
+    console.log(error)
   }
-  return profile;
+  
 };
 
 exports.updateUserTypeProfile = async ({ userType, id, data, transaction }) => {

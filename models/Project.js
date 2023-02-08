@@ -79,12 +79,12 @@ const Project = sequelise.define(
   { paranoid: true }
 );
 
-User.hasMany(Project, {
-  foreignKey: "userId",
-  as: "projects",
-  onDelete: "cascade",
-  hooks: true
-});
+// User.hasOne(Project, {
+//   foreignKey: "userId",
+//   as: "projects",
+//   onDelete: "cascade",
+//   hooks: true
+// });
 
 Project.hasMany(LandSurveyProject, {
   foreignKey: "projectId",
@@ -113,5 +113,6 @@ Project.hasMany(BuildingProject, {
   onDelete: "cascade",
   hooks: true
 });
+
 
 module.exports = Project;
