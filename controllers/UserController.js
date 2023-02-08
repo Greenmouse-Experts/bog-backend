@@ -996,13 +996,53 @@ exports.suspendUser = async (req, res) => {
         message: "No User Found"
       });
     }
-    if (user.level !== 1) {
+    if (user.userType !== "admin") {
       return res.status(401).send({
         success: false,
         message: "UnAuthorised access"
       });
     }
-    await User.destroy({ where: { id: userId } });
+    const update = {
+      isSuspended: true,
+      isActive: false
+    };
+
+    await User.update(update, { where: { id: userId } });
+
+    return res.status(200).send({
+      success: true,
+      message: "User suspended"
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error"
+    });
+  }
+};
+
+exports.unsuspendUser = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User Found"
+      });
+    }
+    if (user.userType !== "admin") {
+      return res.status(401).send({
+        success: false,
+        message: "UnAuthorised access"
+      });
+    }
+    const update = {
+      isSuspended: false,
+      isActive: true
+    };
+
+    await User.update(update, { where: { id: userId } });
 
     return res.status(200).send({
       success: true,

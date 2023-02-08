@@ -90,6 +90,8 @@ router
 
 router.route("/admin/suspend-user").post(Auth, UserController.suspendUser);
 
+router.route("/admin/unsuspend-user").post(Auth, UserController.unsuspendUser);
+
 router.route("/users/get-user/:userId").get(UserController.findSingleUser);
 
 module.exports = router;
