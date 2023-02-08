@@ -12,6 +12,8 @@ exports.projectSlug = type => {
     slug = "GTI";
   } else if (type === "contractor") {
     slug = "CNT";
+  }else{
+    slug = type.toUpperCase().slice(0, 3)
   }
   return slug;
 };

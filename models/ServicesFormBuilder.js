@@ -1,35 +1,8 @@
-// 'use strict';
-// const {
-//   Model
-// } = require('sequelize');
-// module.exports = (sequelize, DataTypes) => {
-//   class ServicesFormBuilder extends Model {
-//     /**
-//      * Helper method for defining associations.
-//      * This method is not a part of Sequelize lifecycle.
-//      * The `models/index` file will call this method automatically.
-//      */
-//     static associate(models) {
-//       // define association here
-//     }
-//   }
-//   ServicesFormBuilder.init({
-//     serviceName: DataTypes.STRING,
-//     label: DataTypes.STRING,
-//     inputType: DataTypes.STRING,
-//     placeholder: DataTypes.STRING,
-//     name: DataTypes.STRING,
-//     value: DataTypes.STRING,
-//     required: DataTypes.BOOLEAN
-//   }, {
-//     sequelize,
-//     modelName: 'ServicesFormBuilder',
-//   });
-//   return ServicesFormBuilder;
-// };
+
 
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const ServiceType = require('./ServiceType');
 
 const ServicesFormBuilders = sequelise.define(
   "ServicesFormBuilders",
@@ -39,6 +12,10 @@ const ServicesFormBuilders = sequelise.define(
       autoIncrement: true,
       primaryKey: true,
       type: Sequelize.INTEGER
+    },
+    serviceTypeID: {
+      allowNull: true,
+      type: Sequelize.STRING
     },
     serviceName: {
       allowNull: true,
@@ -75,5 +52,20 @@ const ServicesFormBuilders = sequelise.define(
   }
   // { paranoid: true }
 );
+
+ServiceType.hasMany(ServicesFormBuilders, {
+  foreignKey: "serviceTypeID",
+  as: "serviceType",
+  onDelete: "cascade",
+  hooks: true
+})
+
+
+ServicesFormBuilders.belongsTo(ServiceType, {
+  foreignKey: "serviceTypeID",
+  as: "serviceType",
+  onDelete: "cascade",
+  hooks: true
+})
 
 module.exports = ServicesFormBuilders;

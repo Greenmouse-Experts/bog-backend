@@ -7,6 +7,8 @@ const moment = require("moment");
 const sequelize = require("../config/database/connection");
 const User = require("../models/User");
 const Project = require("../models/Project");
+const ServiceFormProjects = require("../models/ServiceFormProjects")
+
 const LandSurveyProject = require("../models/LandSurveyProject");
 const DrawingProject = require("../models/DrawingProject");
 const BuildingProject = require("../models/BuildingProject");
@@ -19,6 +21,7 @@ const ServiceType = require("../models/ServiceType");
 const ServicePartner = require("../models/ServicePartner");
 const ServiceProvider = require("../models/ServiceProvider");
 const ProjectBidding = require("../models/ProjectBidding");
+const ServicesFormBuilders = require("../models/ServicesFormBuilder");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
@@ -104,6 +107,45 @@ exports.getAllProjectRequest = async (req, res, next) => {
   }
 };
 
+/**
+ * View all project requests v2
+ */
+exports.getAllProjectRequestV2 = async (req, res, next) => {
+  try {
+    const where = null;
+    if (req.query.status) {
+      where.status = req.query.status;
+    }
+    const projects = 
+        await Project.findAll({
+          where,
+          order: [["createdAt", "DESC"]]
+        });
+
+    // const data = await Promise.all(
+    //   projects.map(async project => {
+    //     const requestData = await ServiceFormProjects.findAll({
+    //       include: [{model: ServicesFormBuilders, as: 'serviceForm'}],
+    //       where: {projectID: project.id}
+    //     });
+        
+    //     const proj = {
+    //       ...project.toJSON(),
+    //       projectData: requestData
+    //     }
+    //     // project.toJSON().projectData = requestData;
+    //     return proj;
+    //   })
+    // );
+    return res.status(200).send({
+      success: true,
+      data: projects
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 exports.viewProjectRequest = async (req, res, next) => {
   try {
     const where = { id: req.params.projectId };
@@ -129,6 +171,47 @@ exports.viewProjectRequest = async (req, res, next) => {
   }
 };
 
+/**
+ * v2 view project request
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
+exports.viewProjectRequestV2 = async (req, res, next) => {
+  try {
+    const where = { id: req.params.projectId };
+    const project = await Project.findOne({
+      where
+    });
+
+    if(project === null){
+      return res.status(404).send({
+        status: false,
+        message: "Project not found!"
+      });
+    }
+
+    const requestData = await ServiceFormProjects.findAll({
+      include: [{model: ServicesFormBuilders, as: 'serviceForm'}],
+      where: {projectID: project.id}
+    });
+
+  
+    // project.toJSON().projectData = requestData;
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        ...project.toJSON(),
+        projectData: requestData
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 exports.createProject = async (data, transaction) => {
   try {
     const type = utility.projectSlug(data.projectTypes);
@@ -137,7 +220,8 @@ exports.createProject = async (data, transaction) => {
     )}`;
     data.projectSlug = projectSlug;
     data.status = "pending";
-    const result = await Project.create(data, { transaction });
+    const result = await Project.create(data);
+
     return result;
   } catch (error) {
     transaction.rollback();
@@ -217,6 +301,81 @@ exports.deleteProjectTypeData = async (projectId, type, t) => {
     default:
       return true;
   }
+};
+
+/**
+ * Request for a type of service
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.requestForService = async (req, res, next) => {
+ 
+  sequelize.transaction(async t => {
+    try {
+      const userId = req.user.id;
+      const user = await User.findOne({where: {id: userId}});
+
+      const { form } = req.body;
+      
+      let _project = null;
+      for (let index = 0; index < form.length; index++) {
+        const f = form[index];
+     
+        // Get Service form
+        const serviceForm = await ServicesFormBuilders.findOne({
+          include: [{model: ServiceType, as: 'serviceType'}], 
+          where: {id: f._id}
+        });
+        
+        if(serviceForm === null){
+          return res.status(400).send({
+            status: false,
+            msg: "This service form input does not exist!"
+          });
+        }
+
+        const profile = await userService.getUserTypeProfile(user.userType, userId);
+      
+        const projectData = {
+          title: serviceForm.serviceName,
+          userId: profile.id,
+          projectTypes: serviceForm.serviceType.slug
+        };
+
+
+        if(_project === null){
+          _project = await this.createProject(projectData, t);
+          const reqData = {
+            req,
+            userId,
+            message: `${user.name} has opened a project request for ${serviceForm.serviceType.title}`
+          };
+          await this.notifyAdmin(reqData);
+        }
+
+        const request = {
+          serviceFormID: serviceForm.id,
+          value: f.value,
+          userID: userId,
+          projectID: _project.id,
+          status: 'pending'
+        };
+
+        const data = await ServiceFormProjects.create(request);
+
+      }
+
+      return res.status(200).send({
+        success: true,
+        message: "Project requested"
+      });
+      
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
 };
 
 // Land Survey Request

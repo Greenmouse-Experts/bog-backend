@@ -866,12 +866,7 @@ exports.revokeAccess = async (req, res) => {
         message: "No User Found"
       });
     }
-    if (user.level === 1) {
-      return res.status(401).send({
-        success: false,
-        message: "UnAuthorised access"
-      });
-    }
+    
     await User.destroy({ where: { id: userId } });
 
     const mesg = `The Admin ${user.email} rights has been revoked by super admin`;
@@ -994,12 +989,7 @@ exports.suspendUser = async (req, res) => {
         message: "No User Found"
       });
     }
-    if (user.level === 1) {
-      return res.status(401).send({
-        success: false,
-        message: "UnAuthorised access"
-      });
-    }
+   
     await User.destroy({ where: { id: userId } });
 
     return res.status(200).send({
