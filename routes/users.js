@@ -68,7 +68,9 @@ router
   .route("/user/update-profile")
   .patch(Auth, upload.any(), UserController.updateUserProfile);
 
-router.route("/all/users").get([Auth, Access.verifyAccess], UserController.getAllUsers);
+router
+  .route("/all/users")
+  .get([Auth, Access.verifyAccess], UserController.getAllUsers);
 
 router
   .route("/admin/signup")
@@ -86,7 +88,7 @@ router
   .route("/admin/revoke-access")
   .post([Auth, Access.verifyAccess], UserController.revokeAccess);
 
-router.route("/admin/suspend-user").post([Auth], UserController.suspendUser);
+router.route("/admin/suspend-user").post(Auth, UserController.suspendUser);
 
 router.route("/users/get-user/:userId").get(UserController.findSingleUser);
 
