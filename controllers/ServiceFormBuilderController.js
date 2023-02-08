@@ -4,6 +4,7 @@ require("dotenv").config();
 const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
 const ServicesFormBuilder = require("../models/ServicesFormBuilder");
+const ServiceType = require("../models/ServiceType");
 
 const formatServiceForm = _serviceForms => {
   const __serviceForms = [];
@@ -12,6 +13,7 @@ const formatServiceForm = _serviceForms => {
     if (__serviceForms.length === 0) {
       __serviceForms.push({
         formTitle: _s.serviceName,
+        serviceType: _s.serviceType,
         fields: [
           {
             label: _s.label,
@@ -30,11 +32,12 @@ const formatServiceForm = _serviceForms => {
         ]
       });
     } else if (
-      __serviceForms.filter(_sform => _sform.formTitle === _s.serviceName)
+      __serviceForms.filter(_sform => _sform.formTitle === _s.serviceName && _sform.serviceType.id === _s.serviceTypeID)
         .length === 0
     ) {
       __serviceForms.push({
         formTitle: _s.serviceName,
+        serviceType: _s.serviceType,
         fields: [
           {
             label: _s.label,
@@ -56,7 +59,7 @@ const formatServiceForm = _serviceForms => {
       for (let index = 0; index < __serviceForms.length; index++) {
         const element = __serviceForms[index];
 
-        if (element.formTitle === _s.serviceName) {
+        if (element.formTitle === _s.serviceName && element.serviceType.id === _s.serviceTypeID) {
           if (
             element.fields.filter(_field => _field.label === _s.label)
               .length === 0
@@ -121,10 +124,19 @@ const formatServiceForm = _serviceForms => {
  * @returns
  */
 exports.createServiceForm = async (req, res, next) => {
-  const { serviceName, label, inputType, name, value } = req.body;
+  const { serviceName, serviceTypeID, label, inputType, name, value } = req.body;
   try {
+    // Check service type
+    const serviceType = await ServiceType.findOne({id: serviceTypeID});
+    if (serviceType === null) {
+      return res.status(400).send({
+        success: false,
+        msg: "Service Type does not exist!"
+      })
+    }
+
     const ServiceDetail = await ServicesFormBuilder.findOne({
-      where: { serviceName, label, inputType, name, value }
+      where: { serviceTypeID, serviceName, label, inputType, name, value }
     });
     if (ServiceDetail !== null) {
       return res.status(400).send({
@@ -156,7 +168,9 @@ exports.createServiceForm = async (req, res, next) => {
  */
 exports.getServiceForms = async (req, res, next) => {
   try {
-    const serviceForms = await ServicesFormBuilder.findAll();
+    const serviceForms = await ServicesFormBuilder.findAll({include: [{
+      model: ServiceType, as: "serviceType"
+    }]});
 
     return res.status(200).send({
       success: true,
@@ -179,6 +193,9 @@ exports.getServiceFormDetails = async (req, res, next) => {
   try {
     const serviceForm = await ServicesFormBuilder.findOne({
       where: { id },
+      include: [{
+        model: ServiceType, as: "serviceType"
+      }],
       order: [["createdAt", "DESC"]]
     });
     return res.status(200).send({
