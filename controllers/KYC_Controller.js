@@ -509,8 +509,14 @@ exports.getUserKycDetails = async (req, res, next) => {
     try {
       const { userType } = req.query;
       const { userId } = req.params;
+      if (!userType) {
+        return res.status(400).send({
+          success: false,
+          message: "userType is required"
+        });
+      }
       const profile = await getUserTypeProfile(userType, userId);
-      const result = await SupplyCategory.findOne({
+      const suppyCategory = await SupplyCategory.findOne({
         where: { userId: profile.id }
       });
       const kycFinancialData = await KycFinancialData.findOne({
@@ -536,9 +542,33 @@ exports.getUserKycDetails = async (req, res, next) => {
       const kycDocuments = await KycDocuments.findAll({
         where: { userId: profile.id }
       });
+      let isKycCompleted = true;
+      if (userType === "vendor") {
+        if (
+          !kycFinancialData &&
+          kycDocuments.length === 0 &&
+          kycWorkExperience.length === 0 &&
+          !kycGeneralInfo &&
+          !kycTaxPermits &&
+          !kycOrganisationInfo &&
+          !suppyCategory
+        ) {
+          isKycCompleted = false;
+        }
+      } else if (
+        !kycFinancialData &&
+        kycDocuments.length === 0 &&
+        kycWorkExperience.length === 0 &&
+        !kycGeneralInfo &&
+        !kycTaxPermits &&
+        !kycOrganisationInfo
+      ) {
+        isKycCompleted = false;
+      }
 
       const data = {
-        suppyCategory: result,
+        isKycCompleted,
+        suppyCategory,
         kycFinancialData,
         kycGeneralInfo,
         kycOrganisationInfo,
