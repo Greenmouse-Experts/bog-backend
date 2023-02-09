@@ -10,7 +10,7 @@ const { validate, ServiceFormBuilderValidation } = require("../helpers/validator
 router
   .route("/service/form-builder/create")
   .post(
-    ServiceFormBuilderValidation(), validate,
+    // ServiceFormBuilderValidation(), validate,
     [Auth, Access.verifyAccess],
     ServiceFormBuilderController.createServiceForm
   );
