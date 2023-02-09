@@ -93,6 +93,10 @@ const User = sequelise.define(
     aboutUs: {
       type: Sequelize.STRING,
       allowNull: true
+    },
+    isSuspended: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
     }
   },
   { paranoid: true }
