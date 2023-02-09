@@ -219,10 +219,7 @@ exports.createServiceForm = async (req, res, next) => {
 
   const { serviceName, serviceType, formData } = req.body;
   try {
-
-    if () {
-      
-    }
+    
 
     // Check service type
     let form = JSON.parse(formData);

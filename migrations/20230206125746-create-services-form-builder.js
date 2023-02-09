@@ -80,6 +80,10 @@ module.exports = {
       subtype: {
         allowNull: true,
         type: Sequelize.STRING
+      },
+      isActive: {
+        allowNull: true,
+        type: Sequelize.BOOLEAN
       }
     });
   },
