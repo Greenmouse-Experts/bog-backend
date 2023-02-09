@@ -124,31 +124,38 @@ const formatServiceForm = _serviceForms => {
  * @returns
  */
 exports.createServiceForm = async (req, res, next) => {
+  const form = req.body;
   const { serviceName, serviceTypeID, label, inputType, name, value } = req.body;
   try {
     // Check service type
-    const serviceType = await ServiceType.findOne({id: serviceTypeID});
-    if (serviceType === null) {
-      return res.status(400).send({
-        success: false,
-        msg: "Service Type does not exist!"
-      })
-    }
+    for (let index = 0; index < form.length; index++) {
+      const { serviceName, serviceTypeID, label, inputType, name, value } = form[index];
+      
+      const serviceType = await ServiceType.findOne({id: serviceTypeID});
+      if (serviceType === null) {
+        return res.status(400).send({
+          success: false,
+          msg: "Service Type does not exist!"
+        })
+      }
 
-    const ServiceDetail = await ServicesFormBuilder.findOne({
-      where: { serviceTypeID, serviceName, label, inputType, name, value }
-    });
-    if (ServiceDetail !== null) {
-      return res.status(400).send({
-        success: false,
-        message: "Form exists!"
+      const ServiceDetail = await ServicesFormBuilder.findOne({
+        where: { serviceTypeID, serviceName, label, inputType, name, value }
       });
-    }
+      if (ServiceDetail !== null) {
+        return res.status(400).send({
+          success: false,
+          message: "Form exists!"
+        });
+      }
 
-    const response = await ServicesFormBuilder.create({
-      ...req.body,
-      isActive: true
-    });
+      const response = await ServicesFormBuilder.create({
+        ...req.body,
+        isActive: true
+      });
+
+    }
+    
     return res.status(201).send({
       success: true,
       message: "Form created!",
