@@ -16,6 +16,8 @@ require("./config/database/connection");
 const moment = require("moment");
 const Notification = require("./helpers/notification");
 
+const cloudinary = require('./helpers/cloudinaryMediaProvider');
+
 const Routes = require("./routes");
 const Subscription = require("./models/Subscription");
 const ServicePartner = require("./models/ServicePartner");
@@ -55,6 +57,21 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", Routes);
+app.post('/upload', async (req, res, next) => {
+
+  try {
+    const response = await cloudinary.upload(req);
+    return res.status(200).json(response);
+  } catch (error) {
+    console.log(error)
+    return res.status(400).json({
+      status: false,
+      message: "Problem occured!",
+      error
+    })
+  }
+
+});
 
 io.on("connection", async socket => {
   // console.log(socket);
