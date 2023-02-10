@@ -88,9 +88,12 @@ router
   .route("/admin/revoke-access")
   .post([Auth, Access.verifyAccess], UserController.revokeAccess);
 
-router.route("/admin/suspend-user").post(Auth, UserController.suspendUser);
+router.route("/admin/suspend-user").post([Auth, Access.verifyAccess, Access.verifyAdmin], UserController.suspendUser);
 
-router.route("/admin/unsuspend-user").post(Auth, UserController.unsuspendUser);
+router.route("/admin/unsuspend-user").post([Auth, Access.verifyAccess, Access.verifyAdmin], UserController.unsuspendUser);
+
+router.route("/admin/delete-user/:id").delete([Auth, Access.verifyAccess, Access.verifyAdmin], UserController.deleteUser);
+
 
 router.route("/users/get-user/:userId").get(UserController.findSingleUser);
 
