@@ -12,7 +12,8 @@ const {
   loginValidation,
   resetPasswordValidation,
   changePasswordValidation,
-  adminValidation
+  adminValidation,
+  resetAdminPasswordValidation
 } = require("../helpers/validators");
 
 // @route  api/signup
@@ -59,6 +60,12 @@ router
 router
   .route("/user/reset-password")
   .post(resetPasswordValidation(), validate, UserController.resetPassword);
+  
+  
+router
+  .route("/admin/reset-password/:id")
+  .put(resetAdminPasswordValidation(), validate, [Auth, Access.verifyAccess, Access.verifyAdmin], UserController.resetUserPassword);
+
 
 router
   .route("/user/update-account")
