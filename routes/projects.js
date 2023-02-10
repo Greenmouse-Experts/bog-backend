@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const Auth = require("../middleware/auth");
-const Access = require("../middleware/access");
+// const Access = require("../middleware/access");
 
 const upload = require("../helpers/upload");
 
@@ -18,44 +18,44 @@ const ProjectController = require("../controllers/ProjectController");
 // Projects
 router
   .route("/projects/my-request")
-  .get([Auth, Access.verifyAccess], ProjectController.getProjectRequest);
+  .get(Auth, ProjectController.getProjectRequest);
+
+router
+  .route("/projects/service-request")
+  .get(Auth, ProjectController.getServicePartnerProjectRequest);
 
 router
   .route("/projects/dispatched-projects/:userId")
-  .get([Auth, Access.verifyAccess], ProjectController.getDispatchedProject);
+  .get(Auth, ProjectController.getDispatchedProject);
 
 router
   .route("/projects/assigned-projects/:userId")
-  .get([Auth, Access.verifyAccess], ProjectController.getAssignedProjects);
+  .get(Auth, ProjectController.getAssignedProjects);
 
-router
-  .route("/projects/all")
-  .get([Auth, Access.verifyAccess], ProjectController.getAllProjectRequest);
+router.route("/projects/all").get(Auth, ProjectController.getAllProjectRequest);
 
-  // View all project v2
+// View all project v2
 router
   .route("/projects/v2/all")
-  .get([Auth, Access.verifyAccess], ProjectController.getAllProjectRequestV2);
-
+  .get(Auth, ProjectController.getAllProjectRequestV2);
 
 router
   .route("/projects/view-project/:projectId")
-  .get([Auth, Access.verifyAccess], ProjectController.viewProjectRequest);
+  .get(Auth, ProjectController.viewProjectRequest);
 
 // Project request view v2
 router
   .route("/projects/v2/view-project/:projectId")
-  .get([Auth, Access.verifyAccess], ProjectController.viewProjectRequestV2);
+  .get(Auth, ProjectController.viewProjectRequestV2);
 
 router
   .route("/projects/delete/:requestId")
-  .delete([Auth, Access.verifyAccess], ProjectController.deleteProjectRequest);
-
+  .delete(Auth, ProjectController.deleteProjectRequest);
 
 // Request service type
 router
   .route("/projects/request")
-  .post([Auth, Access.verifyAccess], ProjectController.requestForService)
+  .post(Auth, ProjectController.requestForService);
 
 // Land Survey
 router
@@ -63,73 +63,46 @@ router
   .post(
     landSurveyRequestValidation(),
     validate,
-    [Auth, Access.verifyAccess],
+    Auth,
     ProjectController.requestForLandSurvey
   );
 
 router
   .route("/projects/land-survey/update-request")
-  .patch(
-    [Auth, Access.verifyAccess],
-    ProjectController.updateLandSurveyRequest
-  );
+  .patch(Auth, ProjectController.updateLandSurveyRequest);
 
 // Contractor Project
 router
   .route("/projects/contractor/request")
-  .post(
-    [Auth, Access.verifyAccess],
-    upload.any(),
-    ProjectController.requestForContractor
-  );
+  .post(Auth, upload.any(), ProjectController.requestForContractor);
 
 router
   .route("/projects/contractor/update-request")
-  .patch(
-    [Auth, Access.verifyAccess],
-    upload.any(),
-    ProjectController.updateContractorRequest
-  );
+  .patch(Auth, upload.any(), ProjectController.updateContractorRequest);
 
 // Drawing Project
 router
   .route("/projects/drawing/request")
-  .post(
-    [Auth, Access.verifyAccess],
-    upload.any(),
-    ProjectController.drawingProjectsRequest
-  );
+  .post(Auth, upload.any(), ProjectController.drawingProjectsRequest);
 
 router
   .route("/projects/drawing/update-request")
-  .patch(
-    [Auth, Access.verifyAccess],
-    upload.any(),
-    ProjectController.updateDrawingRequest
-  );
+  .patch(Auth, upload.any(), ProjectController.updateDrawingRequest);
 
 // Building Approval Project
 router
   .route("/projects/building-approval/request")
-  .post(
-    [Auth, Access.verifyAccess],
-    upload.any(),
-    ProjectController.buildingApprovalProjectsRequest
-  );
+  .post(Auth, upload.any(), ProjectController.buildingApprovalProjectsRequest);
 
 router
   .route("/projects/building-approval/update-request")
-  .patch(
-    [Auth, Access.verifyAccess],
-    upload.any(),
-    ProjectController.updateBuildingApprovalRequest
-  );
+  .patch(Auth, upload.any(), ProjectController.updateBuildingApprovalRequest);
 
 // Geotechnical Project
 router
   .route("/projects/geotechnical/request")
   .post(
-    [Auth, Access.verifyAccess],
+    Auth,
     upload.any(),
     ProjectController.requestForGeoTechnicalInvestigation
   );
@@ -137,29 +110,29 @@ router
 router
   .route("/projects/geotechnical/update-request")
   .patch(
-    [Auth, Access.verifyAccess],
+    Auth,
     upload.any(),
     ProjectController.updateGeoTechnicalInvestigationRequest
   );
 
 router
   .route("/projects/request-for-approval/:projectId")
-  .patch([Auth, Access.verifyAccess], ProjectController.requestProjectApproval);
+  .patch(Auth, ProjectController.requestProjectApproval);
 
 router
   .route("/projects/approve-project/:projectId")
-  .patch([Auth, Access.verifyAccess], ProjectController.approveProjectRequest);
+  .patch(Auth, ProjectController.approveProjectRequest);
 
 router
   .route("/projects/dispatch-project/:projectId")
-  .patch([Auth, Access.verifyAccess], ProjectController.dispatchProject);
+  .patch(Auth, ProjectController.dispatchProject);
 
 router
   .route("/projects/assign-project")
   .post(
     projectAssignmentRequestValidation(),
     validate,
-    [Auth, Access.verifyAccess],
+    Auth,
     ProjectController.assignProject
   );
 
@@ -168,7 +141,7 @@ router
   .post(
     projectBidRequestValidation(),
     validate,
-    [Auth, Access.verifyAccess],
+    Auth,
     ProjectController.bidForProject
   );
 

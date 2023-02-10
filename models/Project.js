@@ -4,7 +4,7 @@ const BuildingProject = require("./BuildingProject");
 const ContractorProject = require("./ContractorProject");
 const DrawingProject = require("./DrawingProject");
 const LandSurveyProject = require("./LandSurveyProject");
-const User = require("./User");
+// const User = require("./User");
 
 const Project = sequelise.define(
   "projects",
@@ -113,6 +113,5 @@ Project.hasMany(BuildingProject, {
   onDelete: "cascade",
   hooks: true
 });
-
 
 module.exports = Project;

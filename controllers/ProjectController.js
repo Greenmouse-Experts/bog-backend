@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
@@ -7,7 +9,7 @@ const moment = require("moment");
 const sequelize = require("../config/database/connection");
 const User = require("../models/User");
 const Project = require("../models/Project");
-const ServiceFormProjects = require("../models/ServiceFormProjects")
+const ServiceFormProjects = require("../models/ServiceFormProjects");
 
 const LandSurveyProject = require("../models/LandSurveyProject");
 const DrawingProject = require("../models/DrawingProject");
@@ -22,6 +24,8 @@ const ServicePartner = require("../models/ServicePartner");
 const ServiceProvider = require("../models/ServiceProvider");
 const ProjectBidding = require("../models/ProjectBidding");
 const ServicesFormBuilders = require("../models/ServicesFormBuilder");
+const PrivateClient = require("../models/PrivateClient");
+const CorporateClient = require("../models/CorporateClient");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
@@ -74,9 +78,16 @@ exports.getProjectRequest = async (req, res, next) => {
   }
 };
 
-exports.getAllProjectRequest = async (req, res, next) => {
+// Projects Service Partner
+exports.getServicePartnerProjectRequest = async (req, res, next) => {
   try {
-    const where = null;
+    const userId = req.user.id;
+
+    const profile = await userService.getUserTypeProfile(
+      req.query.userType,
+      userId
+    );
+    const where = { serviceProviderId: profile.id };
     if (req.query.status) {
       where.status = req.query.status;
     }
@@ -107,6 +118,55 @@ exports.getAllProjectRequest = async (req, res, next) => {
   }
 };
 
+exports.getAllProjectRequest = async (req, res, next) => {
+  try {
+    const where = {};
+    if (req.query.status) {
+      where.status = req.query.status;
+    }
+    const projects = JSON.parse(
+      JSON.stringify(
+        await Project.findAll({
+          where,
+          order: [["createdAt", "DESC"]]
+        })
+      )
+    );
+    const data = await Promise.all(
+      projects.map(async project => {
+        const requestData = await this.getProjectTypeData(
+          project.id,
+          project.projectTypes
+        );
+        let projectOwner = await PrivateClient.findByPk(project.userId, {
+          include: ["private_user"]
+        });
+        if (!projectOwner) {
+          projectOwner = await CorporateClient.findByPk(project.userId, {
+            include: ["corporate_user"]
+          });
+        }
+        project.projectOwner = projectOwner;
+        if (project.status === "ongoing") {
+          const serviceProvider = await ServicePartner.findByPk(
+            project.serviceProviderId,
+            { include: ["service_user"] }
+          );
+          project.serviceProvider = serviceProvider;
+        }
+        project.projectData = requestData;
+        return project;
+      })
+    );
+    return res.status(200).send({
+      success: true,
+      data
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 /**
  * View all project requests v2
  */
@@ -116,11 +176,10 @@ exports.getAllProjectRequestV2 = async (req, res, next) => {
     if (req.query.status) {
       where.status = req.query.status;
     }
-    const projects = 
-        await Project.findAll({
-          where,
-          order: [["createdAt", "DESC"]]
-        });
+    const projects = await Project.findAll({
+      where,
+      order: [["createdAt", "DESC"]]
+    });
 
     // const data = await Promise.all(
     //   projects.map(async project => {
@@ -128,7 +187,7 @@ exports.getAllProjectRequestV2 = async (req, res, next) => {
     //       include: [{model: ServicesFormBuilders, as: 'serviceForm'}],
     //       where: {projectID: project.id}
     //     });
-        
+
     //     const proj = {
     //       ...project.toJSON(),
     //       projectData: requestData
@@ -173,10 +232,10 @@ exports.viewProjectRequest = async (req, res, next) => {
 
 /**
  * v2 view project request
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- * @returns 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
  */
 exports.viewProjectRequestV2 = async (req, res, next) => {
   try {
@@ -185,7 +244,7 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
       where
     });
 
-    if(project === null){
+    if (project === null) {
       return res.status(404).send({
         status: false,
         message: "Project not found!"
@@ -193,11 +252,10 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
     }
 
     const requestData = await ServiceFormProjects.findAll({
-      include: [{model: ServicesFormBuilders, as: 'serviceForm'}],
-      where: {projectID: project.id}
+      include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+      where: { projectID: project.id }
     });
 
-  
     // project.toJSON().projectData = requestData;
 
     return res.status(200).send({
@@ -305,46 +363,47 @@ exports.deleteProjectTypeData = async (projectId, type, t) => {
 
 /**
  * Request for a type of service
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
  */
 exports.requestForService = async (req, res, next) => {
- 
   sequelize.transaction(async t => {
     try {
       const userId = req.user.id;
-      const user = await User.findOne({where: {id: userId}});
+      const user = await User.findOne({ where: { id: userId } });
 
       const { form } = req.body;
-      
+
       let _project = null;
       for (let index = 0; index < form.length; index++) {
         const f = form[index];
-     
+
         // Get Service form
         const serviceForm = await ServicesFormBuilders.findOne({
-          include: [{model: ServiceType, as: 'serviceType'}], 
-          where: {id: f._id}
+          include: [{ model: ServiceType, as: "serviceType" }],
+          where: { id: f._id }
         });
-        
-        if(serviceForm === null){
+
+        if (serviceForm === null) {
           return res.status(400).send({
             status: false,
             msg: "This service form input does not exist!"
           });
         }
 
-        const profile = await userService.getUserTypeProfile(user.userType, userId);
-      
+        const profile = await userService.getUserTypeProfile(
+          user.userType,
+          userId
+        );
+
         const projectData = {
           title: serviceForm.serviceName,
           userId: profile.id,
           projectTypes: serviceForm.serviceType.slug
         };
 
-
-        if(_project === null){
+        if (_project === null) {
           _project = await this.createProject(projectData, t);
           const reqData = {
             req,
@@ -359,18 +418,16 @@ exports.requestForService = async (req, res, next) => {
           value: f.value,
           userID: userId,
           projectID: _project.id,
-          status: 'pending'
+          status: "pending"
         };
 
         const data = await ServiceFormProjects.create(request);
-
       }
 
       return res.status(200).send({
         success: true,
         message: "Project requested"
       });
-      
     } catch (error) {
       t.rollback();
       return next(error);
@@ -1310,6 +1367,7 @@ exports.assignProject = async (req, res, next) => {
 exports.bidForProject = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
+      const { userId, projectId } = req.body;
       const data = req.body;
       const project = await Project.findByPk(data.projectId);
       if (!project) {
@@ -1318,6 +1376,14 @@ exports.bidForProject = async (req, res, next) => {
           message: "Invalid Project"
         });
       }
+      const where = {
+        userId,
+        projectId
+      };
+      await ServiceProvider.update(
+        { status: "accepted" },
+        { where, transaction: t }
+      );
 
       const bid = await ProjectBidding.create(data, { transaction: t });
 

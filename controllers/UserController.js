@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-param-reassign */
 /* eslint-disable guard-for-in */
@@ -777,9 +778,24 @@ exports.getAllUsers = async (req, res) => {
     const userData = JSON.parse(
       JSON.stringify(await UserService.getAllUsers(where))
     );
+    const usersAccounts = [];
     const users = await Promise.all(
       userData.map(async customer => {
         const accounts = await this.getAccountsData(customer.id);
+        if (accounts.length > 1) {
+          for (const account of accounts) {
+            if (account.userType !== customer.userType) {
+              const userEntity = await UserService.getUserTypeProfile(
+                account.userType,
+                customer.id
+              );
+              const customerData = { ...customer };
+              customerData.userType = account.userType;
+              customerData.profile = userEntity;
+              usersAccounts.push({ user: customerData, accounts });
+            }
+          }
+        }
         const profile = await UserService.getUserTypeProfile(
           customer.userType,
           customer.id
@@ -791,9 +807,10 @@ exports.getAllUsers = async (req, res) => {
         };
       })
     );
+    const data = [...users, ...usersAccounts];
     return res.status(200).send({
       success: true,
-      users
+      users: data
     });
   } catch (error) {
     return res.status(500).send({
