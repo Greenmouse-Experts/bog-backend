@@ -10,6 +10,7 @@ const formatServiceForm = _serviceForms => {
   const __serviceForms = [];
 
   _serviceForms.forEach(_s => {
+    console.log(_s);
     if (__serviceForms.length === 0) {
 
       let __form = {};
@@ -48,6 +49,7 @@ const formatServiceForm = _serviceForms => {
           serviceType: _s.serviceType,
           formData: [
             {
+              id: _s.id,
               label: _s.label,
               name: _s.name,
               inputType: _s.inputType,
@@ -93,6 +95,7 @@ const formatServiceForm = _serviceForms => {
         }
       } else {
         __form = {
+          id: _s.id,
           label: _s.label,
           name: _s.name,
           inputType: _s.inputType,
@@ -148,6 +151,7 @@ const formatServiceForm = _serviceForms => {
               }
             } else {
               __form = {
+                id: _s.id,
                 label: _s.label,
                 name: _s.name,
                 inputType: _s.inputType,
@@ -220,7 +224,6 @@ exports.createServiceForm = async (req, res, next) => {
   const { serviceName, serviceType, formData } = req.body;
   try {
     
-
     // Check service type
     let form = JSON.parse(formData);
     if (typeof form === 'string') {
@@ -229,11 +232,11 @@ exports.createServiceForm = async (req, res, next) => {
     for (let index = 0; index < form.length; index++) {
       const element = form[index];
       
-      const _serviceType = await ServiceType.findOne({id: serviceType});
+      const _serviceType = await ServiceType.findOne({where: {id: serviceType}});
       if (_serviceType === null) {
         return res.status(400).send({
           success: false,
-          msg: "Service Type does not exist!"
+          message: "Service Type does not exist!"
         })
       }
 
