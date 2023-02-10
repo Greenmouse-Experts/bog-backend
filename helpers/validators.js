@@ -48,6 +48,15 @@ const loginValidation = () => {
   ];
 };
 
+const resetAdminPasswordValidation = () => {
+  return [
+    check(
+      "password",
+      "Please enter a password with 5 or more characters"
+    ).isLength({ min: 5 })
+  ]
+}
+
 const resetPasswordValidation = () => {
   return [
     check("email", "Please use a valid Email").isEmail(),
@@ -263,6 +272,7 @@ module.exports = {
   registerValidation,
   loginValidation,
   resetPasswordValidation,
+  resetAdminPasswordValidation,
   changePasswordValidation,
   bankValidation,
   categoryValidation,

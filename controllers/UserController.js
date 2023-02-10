@@ -1019,12 +1019,7 @@ exports.suspendUser = async (req, res) => {
         message: "No User Found"
       });
     }
-    if (user.userType !== "admin") {
-      return res.status(401).send({
-        success: false,
-        message: "UnAuthorised access"
-      });
-    }
+
     const update = {
       isSuspended: true,
       isActive: false
@@ -1035,6 +1030,67 @@ exports.suspendUser = async (req, res) => {
     return res.status(200).send({
       success: true,
       message: "User suspended"
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error"
+    });
+  }
+};
+
+exports.resetUserPassword = async (req, res) => {
+  try {
+    const {id} = req.params;
+    const { password } = req.body;
+    const user = await UserService.getUserDetails({ id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User Found"
+      });
+    }
+ 
+    const update = {
+      password: bcrypt.hashSync(password, 10),
+    };
+
+    await User.update(update, { where: { id } });
+
+    return res.status(200).send({
+      success: true,
+      message: "Password changed!"
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error"
+    });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    
+    const { id } = req.params;
+    const user = await UserService.getUserDetails({ id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User Found"
+      });
+    }
+    
+    const update = {
+      isSuspended: true,
+      isActive: false
+    };
+
+    await User.destroy({ where: { id } });
+
+    return res.status(200).send({
+      success: true,
+      message: "User deleted!"
     });
   } catch (error) {
     return res.status(500).send({

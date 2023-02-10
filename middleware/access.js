@@ -24,6 +24,9 @@ exports.verifyAccess = async (req, res, next) => {
     } else {
       // Level number 1 is for super admin role
       if (userDetails.level === 1 || userDetails.userType !== "admin") {
+        req._credentials = {
+          ...userDetails.toJSON()
+        };
         next();
       } else {
         // Get the level of the admin
@@ -76,6 +79,20 @@ exports.verifyAccess = async (req, res, next) => {
   }
 
 };
+
+exports.verifyAdmin = (req, res, next) => {
+  const {_credentials} = req;
+
+  if (_credentials.userType !== 'admin') {
+    return res.status(403).send({
+      status: false,
+      message: "Unauthorized Access!"
+    })
+  }
+  else{
+    next()
+  }
+}
 
 // module.exports = function(req, res, next) {
 //   const token = req.header("authorization");
