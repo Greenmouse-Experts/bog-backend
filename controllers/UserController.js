@@ -922,7 +922,7 @@ exports.findSingleUser = async (req, res) => {
       JSON.stringify(await UserService.findUserDetail({ id: userId }))
     );
     const profile = await UserService.getUserTypeProfile(
-      userData.userType,
+      req.query.userType,
       userData.id
     );
     userData.profile = profile;
