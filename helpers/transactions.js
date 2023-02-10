@@ -8,6 +8,9 @@ const sequelize = require("../config/database/connection");
 const User = require("../models/User");
 const Order = require("../models/Order");
 const OrderItem = require("../models/OrderItem");
+const Subscription = require("../models/Subscription");
+const ServicePartner = require("../models/ServicePartner");
+const ProductPartner = require("../models/ProductPartner");
 
 const generateDesc = order_items => {
   const data = order_items.map(
@@ -99,11 +102,12 @@ exports.getOneTxns = async (req, res, next) => {
         })
       )
     );
-    const { TransactionId, userId, type } = Txns;
+    const { TransactionId, userId, type, amount } = Txns;
     const detail = await this.getTransactionDetail({
       txId: TransactionId,
       userId,
-      type
+      type,
+      amount
     });
     return res.status(200).send({
       success: true,
@@ -117,7 +121,7 @@ exports.getOneTxns = async (req, res, next) => {
   }
 };
 
-exports.getTransactionDetail = async ({ type, userId, txId }) => {
+exports.getTransactionDetail = async ({ type, userId, txId, amount = 0 }) => {
   try {
     let detail;
     if (type === "Products") {
@@ -146,9 +150,34 @@ exports.getTransactionDetail = async ({ type, userId, txId }) => {
         )
       );
     }
-    if (type === "Service") {
+    if (type === "Subscription") {
       // Todo: Service request
-      detail = null;
+      detail = JSON.parse(
+        JSON.stringify(
+          await Subscription.findOne({
+            where: { userId, amount }
+          })
+        )
+      );
+      let user = JSON.parse(
+        JSON.stringify(
+          await ServicePartner.findOne({
+            where: { id: userId },
+            include: ["service_user"]
+          })
+        )
+      );
+      if (!user) {
+        user = JSON.parse(
+          JSON.stringify(
+            await ProductPartner.findOne({
+              where: { id: userId },
+              include: ["product_user"]
+            })
+          )
+        );
+      }
+      detail.user = user;
     }
     return detail;
   } catch (error) {
