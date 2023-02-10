@@ -37,8 +37,8 @@ exports.ReadRate = async (req, res, next) => {
       const getRates = await SmartCalculatorSetting.findAll();
 
       return res.status(200).send({
-        success: false,
-        message: getRates
+        success: true,
+        data: getRates
       });
     } catch (error) {
       return next(error);
@@ -93,7 +93,7 @@ exports.DeleteRate = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        data: "Deleted successfully"
+        message: "Deleted successfully"
       });
     } catch (error) {
       return next(error);

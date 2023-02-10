@@ -122,9 +122,23 @@ User.hasOne(PrivateClient, {
   hooks: true
 });
 
+PrivateClient.belongsTo(User, {
+  foreignKey: "userId",
+  as: "private_user",
+  onDelete: "cascade",
+  hooks: true
+});
+
 User.hasOne(CorporateClient, {
   foreignKey: "userId",
   as: "corporate_client",
+  onDelete: "cascade",
+  hooks: true
+});
+
+CorporateClient.belongsTo(User, {
+  foreignKey: "userId",
+  as: "corporate_user",
   onDelete: "cascade",
   hooks: true
 });
@@ -136,9 +150,23 @@ User.hasOne(ServicePartner, {
   hooks: true
 });
 
+ServicePartner.belongsTo(User, {
+  foreignKey: "userId",
+  as: "service_user",
+  onDelete: "cascade",
+  hooks: true
+});
+
 User.hasOne(ProductPartner, {
   foreignKey: "userId",
   as: "product_partner",
+  onDelete: "cascade",
+  hooks: true
+});
+
+ProductPartner.belongsTo(User, {
+  foreignKey: "userId",
+  as: "product_user",
   onDelete: "cascade",
   hooks: true
 });

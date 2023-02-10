@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
+const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
 const helper = require("../helpers/utility");
 const MeetingModel = require("../models/Meeting");
@@ -10,6 +11,7 @@ const { zoomGenerator } = require("../service/zoomService");
 const Notification = require("../helpers/notification");
 const User = require("../models/User");
 const { getUserTypeProfile } = require("../service/UserService");
+const Project = require("../models/Project");
 
 exports.myMeeting = async (req, res, next) => {
   try {
@@ -18,6 +20,44 @@ exports.myMeeting = async (req, res, next) => {
     const profile = await getUserTypeProfile(userType, userId);
     const where = {
       userId: profile.id
+    };
+
+    const meetings = await MeetingModel.findAll({
+      where,
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: MeetingInfoModel,
+          as: "meeting_info"
+        }
+      ]
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: meetings
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.servicePartnerMeetings = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { userType } = req.query;
+    const profile = await getUserTypeProfile(userType, userId);
+
+    const whereProject = { serviceProviderId: profile.id };
+    const projects = await Project.findAll({
+      where: whereProject,
+      order: [["createdAt", "DESC"]]
+    });
+
+    const projectSlugs = projects.map(proj => proj.projectSlug);
+
+    const where = {
+      [Op.or]: [{ userId: profile.id }, { projectSlug: projectSlugs }]
     };
 
     const meetings = await MeetingModel.findAll({
