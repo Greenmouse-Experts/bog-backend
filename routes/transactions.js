@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const Auth = require("../middleware/auth");
-const Access = require("../middleware/access");
+// const Access = require("../middleware/access");
 
 const Transaction = require("../helpers/transactions");
 
