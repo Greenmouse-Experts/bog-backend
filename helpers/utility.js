@@ -26,10 +26,14 @@ exports.adminLevels = [
   { level: 2, type: "article admin" },
   { level: 3, type: "finance admin" },
   { level: 4, type: "product admin" },
-  { level: 5, type: "project admin" }
+  { level: 5, type: "project admin" },
+  { level: 6, type: "general admin" }
 ];
 
 exports.adminPrivileges = [
+  {type: "general admin", privileges: [
+    "BLOG", "PROFILE", "TRANSACTION", "PRODUCT", "ORDER", "NOTIFICATION", "PROJECT", "MEETING",
+  ]},
   { type: "article admin", privileges: ["BLOG", "PROFILE"] },
   { type: "finance admin", privileges: ["TRANSACTION", "PROFILE"] },
   {

@@ -48,7 +48,47 @@ const ServicesFormBuilders = sequelise.define(
     isActive: {
       allowNull: true,
       type: Sequelize.BOOLEAN
-    }
+    },
+    access: {
+      allowNull: true,
+      type: Sequelize.BOOLEAN
+    },
+    inline: {
+      allowNull: true,
+      type: Sequelize.BOOLEAN
+    },
+    toggle: {
+      allowNull: true,
+      type: Sequelize.BOOLEAN
+    },
+    other: {
+      allowNull: true,
+      type: Sequelize.BOOLEAN
+    },
+    subLabel: {
+      allowNull: true,
+      type: Sequelize.STRING
+    },
+    selected: {
+      allowNull: true,
+      type: Sequelize.BOOLEAN
+    },
+    className: {
+      allowNull: true,
+      type: Sequelize.STRING
+    },
+    requireValidOption: {
+      allowNull: true,
+      type: Sequelize.BOOLEAN
+    },
+    multiple: {
+      allowNull: true,
+      type: Sequelize.BOOLEAN
+    },
+    subtype: {
+      allowNull: true,
+      type: Sequelize.STRING
+    },
   }
   // { paranoid: true }
 );

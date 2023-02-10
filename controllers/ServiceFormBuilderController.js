@@ -11,82 +11,171 @@ const formatServiceForm = _serviceForms => {
 
   _serviceForms.forEach(_s => {
     if (__serviceForms.length === 0) {
-      __serviceForms.push({
-        formTitle: _s.serviceName,
-        serviceType: _s.serviceType,
-        fields: [
-          {
-            label: _s.label,
-            inputType: _s.inputType,
-            required: _s.required,
-            formSubs: [
-              {
+
+      let __form = {};
+      if(_s.subtype === null){
+        __form = {
+          formTitle: _s.serviceName,
+          serviceType: _s.serviceType,
+          formData: [
+            {
+              label: _s.label,
+              name: _s.name,
+              inputType: _s.inputType,
+              required: _s.required,
+              placeholder: _s.placeholder,
+              multiple: _s.multiple,
+              requireValidOption: _s.requireValidOption,
+              className: _s.className,
+              placeholder: _s.placeholder,
+              toggle: _s.toggle,
+              subtype: _s.subtype,
+              _values: [{
                 id: _s.id,
-                placeholder: _s.placeholder,
-                name: _s.name,
+                label: _s.subLabel,
+                selected: _s.selected,
                 value: _s.value,
                 isActive: _s.isActive
-              }
-            ]
-          }
-        ]
-      });
+              }]
+            }
+          ]
+        }
+      
+      }
+      else{
+        __form = {
+          formTitle: _s.serviceName,
+          serviceType: _s.serviceType,
+          formData: [
+            {
+              label: _s.label,
+              name: _s.name,
+              inputType: _s.inputType,
+              required: _s.required,
+              placeholder: _s.placeholder,
+              multiple: _s.multiple,
+              requireValidOption: _s.requireValidOption,
+              className: _s.className,
+              placeholder: _s.placeholder,
+              toggle: _s.toggle,
+              subtype: _s.subtype,
+              _values: []
+            }
+          ]
+        }
+      }
+      __serviceForms.push(__form);
+
     } else if (
       __serviceForms.filter(_sform => _sform.formTitle === _s.serviceName && _sform.serviceType.id === _s.serviceTypeID)
         .length === 0
     ) {
+      let __form = {};
+      if (_s.subtype === null) {
+        __form = {
+          label: _s.label,
+          name: _s.name,
+          inputType: _s.inputType,
+          required: _s.required,
+          placeholder: _s.placeholder,
+          multiple: _s.multiple,
+          requireValidOption: _s.requireValidOption,
+          className: _s.className,
+          placeholder: _s.placeholder,
+          toggle: _s.toggle,
+          _values: [{
+            id: _s.id,
+            label: _s.subLabel,
+            selected: _s.selected,
+            value: _s.value,
+            isActive: _s.isActive
+          }]
+        }
+      } else {
+        __form = {
+          label: _s.label,
+          name: _s.name,
+          inputType: _s.inputType,
+          required: _s.required,
+          placeholder: _s.placeholder,
+          multiple: _s.multiple,
+          requireValidOption: _s.requireValidOption,
+          className: _s.className,
+          placeholder: _s.placeholder,
+          toggle: _s.toggle,
+          subtype: _s.subtype,
+          _values: []
+        }
+      }
+
       __serviceForms.push({
         formTitle: _s.serviceName,
         serviceType: _s.serviceType,
-        fields: [
-          {
-            label: _s.label,
-            inputType: _s.inputType,
-            required: _s.required,
-            formSubs: [
-              {
-                id: _s.id,
-                placeholder: _s.placeholder,
-                name: _s.name,
-                value: _s.value,
-                isActive: _s.isActive
-              }
-            ]
-          }
+        formData: [
+          ...__form
         ]
       });
+
     } else {
       for (let index = 0; index < __serviceForms.length; index++) {
         const element = __serviceForms[index];
 
         if (element.formTitle === _s.serviceName && element.serviceType.id === _s.serviceTypeID) {
           if (
-            element.fields.filter(_field => _field.label === _s.label)
+            element.formData.filter(_field => _field.name === _s.name)
               .length === 0
           ) {
-            __serviceForms[index].fields.push({
-              label: _s.label,
-              inputType: _s.inputType,
-              required: _s.required,
-              formSubs: [
-                {
+            let __form = {};
+            if (_s.subtype === null) {
+              __form = {
+                label: _s.label,
+                name: _s.name,
+                inputType: _s.inputType,
+                required: _s.required,
+                placeholder: _s.placeholder,
+                multiple: _s.multiple,
+                requireValidOption: _s.requireValidOption,
+                className: _s.className,
+                placeholder: _s.placeholder,
+                toggle: _s.toggle,
+                _values: [{
                   id: _s.id,
-                  placeholder: _s.placeholder,
-                  name: _s.name,
+                  label: _s.subLabel,
+                  selected: _s.selected,
                   value: _s.value,
                   isActive: _s.isActive
-                }
-              ]
-            });
+                }]
+              }
+            } else {
+              __form = {
+                label: _s.label,
+                name: _s.name,
+                inputType: _s.inputType,
+                required: _s.required,
+                placeholder: _s.placeholder,
+                multiple: _s.multiple,
+                requireValidOption: _s.requireValidOption,
+                className: _s.className,
+                placeholder: _s.placeholder,
+                toggle: _s.toggle,
+                subtype: _s.subtype,
+                _values: []
+              }
+            }
+
+            __serviceForms[index].formData.push(__form);
+
           } else {
-            const retrivedLabelFormSubs = element.fields.filter(
+            let __form = {};
+
+            const retrivedLabelFormSubs = element.formData.filter(
               _field => _field.label === _s.label
             );
             let labelIndex = 0;
 
             // Get index of the label
-            for (let index2 = 0; index2 < element.fields.length; index2++) {
-              const element2 = element.fields[index2];
+            for (let index2 = 0; index2 < element.formData.length; index2++) {
+              const element2 = element.formData[index2];
               if(element2.label === _s.label){
                 break;
               }
@@ -94,17 +183,20 @@ const formatServiceForm = _serviceForms => {
             }
 
             if (retrivedLabelFormSubs.length > 0) {
-              const _valueFormSubs = retrivedLabelFormSubs[0].formSubs.filter(_retrieved => _retrieved.value === _s.value);
-             
+              const _valueFormSubs = retrivedLabelFormSubs[0]._values.filter(_retrieved => _retrieved.value === _s.value);
+              
               if(_valueFormSubs.length === 0){
-                __serviceForms[index].fields[labelIndex].formSubs.push({
-                  id: _s.id,
-                  placeholder: _s.placeholder,
-                  name: _s.name,
-                  value: _s.value,
-                  isActive: _s.isActive
-                })
+                if (_s.subtype === null) {
+                  __serviceForms[index].formData[labelIndex]._values.push({
+                    id: _s.id,
+                    label: _s.subLabel,
+                    selected: _s.selected,
+                    value: _s.value,
+                    isActive: _s.isActive
+                  })
+                }
               }
+              
             }
 
           }
@@ -124,36 +216,61 @@ const formatServiceForm = _serviceForms => {
  * @returns
  */
 exports.createServiceForm = async (req, res, next) => {
-  const { serviceName, serviceTypeID, label, inputType, name, value } = req.body;
+
+  const { serviceName, serviceType, formData } = req.body;
   try {
+    
+
     // Check service type
-    const serviceType = await ServiceType.findOne({id: serviceTypeID});
-    if (serviceType === null) {
-      return res.status(400).send({
-        success: false,
-        msg: "Service Type does not exist!"
-      })
-    }
+    let form = JSON.parse(formData);
+    for (let index = 0; index < form.length; index++) {
+      const element = form[index];
+      
+      const _serviceType = await ServiceType.findOne({id: serviceType});
+      if (_serviceType === null) {
+        return res.status(400).send({
+          success: false,
+          msg: "Service Type does not exist!"
+        })
+      }
 
-    const ServiceDetail = await ServicesFormBuilder.findOne({
-      where: { serviceTypeID, serviceName, label, inputType, name, value }
-    });
-    if (ServiceDetail !== null) {
-      return res.status(400).send({
-        success: false,
-        message: "Form exists!"
+      const ServiceDetail = await ServicesFormBuilder.findOne({
+        where: { serviceTypeID: serviceType, serviceName, name: element.name }
       });
-    }
+      if (ServiceDetail !== null) {
+        return res.status(400).send({
+          success: false,
+          message: "Form exists!"
+        });
+      }
+      
+      let formParams = {
+        ...element,
+        serviceName, serviceTypeID: serviceType,
+        inputType: element.type
+      };
 
-    const response = await ServicesFormBuilder.create({
-      ...req.body,
-      isActive: true
-    });
+      for (let index2 = 0; index2 < element.values.length; index2++) {
+        const element2 = element.values[index2];
+        
+        formParams.subLabel = element2.label;
+        formParams.value = element2.value;
+        formParams.selected = element2.selected;
+
+        const response = await ServicesFormBuilder.create({
+          ...formParams,
+          isActive: true
+        });
+
+      }
+
+    }
+    
     return res.status(201).send({
       success: true,
       message: "Form created!",
-      data: response
     });
+    
   } catch (error) {
     return next(error);
   }
