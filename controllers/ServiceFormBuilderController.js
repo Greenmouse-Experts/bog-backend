@@ -223,6 +223,9 @@ exports.createServiceForm = async (req, res, next) => {
 
     // Check service type
     let form = JSON.parse(formData);
+    if (typeof form === 'string') {
+      form = JSON.parse(formData)
+    }
     for (let index = 0; index < form.length; index++) {
       const element = form[index];
       
@@ -250,18 +253,26 @@ exports.createServiceForm = async (req, res, next) => {
         inputType: element.type
       };
 
-      for (let index2 = 0; index2 < element.values.length; index2++) {
-        const element2 = element.values[index2];
-        
-        formParams.subLabel = element2.label;
-        formParams.value = element2.value;
-        formParams.selected = element2.selected;
-
+      if (element.values !== undefined) {
+        for (let index2 = 0; index2 < element.values.length; index2++) {
+          const element2 = element.values[index2];
+          
+          formParams.subLabel = element2.label;
+          formParams.value = element2.value;
+          formParams.selected = element2.selected;
+  
+          const response = await ServicesFormBuilder.create({
+            ...formParams,
+            isActive: true
+          });
+  
+        }
+      }
+      else{
         const response = await ServicesFormBuilder.create({
           ...formParams,
           isActive: true
         });
-
       }
 
     }
