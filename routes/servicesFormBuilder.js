@@ -24,7 +24,7 @@ router
 
 
 router
-  .route("/service/form-builder/:id")
+  .route("/service/form-builder/:typeID")
   .get(
     [Auth, Access.verifyAccess],
     ServiceFormBuilderController.getServiceFormDetails

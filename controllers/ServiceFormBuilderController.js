@@ -10,7 +10,7 @@ const formatServiceForm = _serviceForms => {
   const __serviceForms = [];
 
   _serviceForms.forEach(_s => {
-    console.log(_s);
+
     if (__serviceForms.length === 0) {
 
       let __form = {};
@@ -115,7 +115,7 @@ const formatServiceForm = _serviceForms => {
         formTitle: _s.serviceName,
         serviceType: _s.serviceType,
         formData: [
-          ...__form
+          __form
         ]
       });
 
@@ -320,10 +320,10 @@ exports.getServiceForms = async (req, res, next) => {
  * @returns
  */
 exports.getServiceFormDetails = async (req, res, next) => {
-  const { id } = req.params;
+  const { typeID } = req.params;
   try {
-    const serviceForm = await ServicesFormBuilder.findOne({
-      where: { id },
+    const serviceForm = await ServicesFormBuilder.findAll({
+      where: { serviceTypeID: typeID },
       include: [{
         model: ServiceType, as: "serviceType"
       }],
@@ -331,7 +331,7 @@ exports.getServiceFormDetails = async (req, res, next) => {
     });
     return res.status(200).send({
       success: true,
-      data: serviceForm === null ? {} : serviceForm
+      data: serviceForm.length === 0 ? {} : formatServiceForm(serviceForm)[0]
     });
   } catch (error) {
     return next(error);
