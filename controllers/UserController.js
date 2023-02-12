@@ -224,6 +224,12 @@ exports.loginUser = async (req, res, next) => {
           message: "Please Verify account"
         });
       }
+      if (user.isSuspended) {
+        return res.status(400).send({
+          success: false,
+          message: "We couldn't find an account with this email"
+        });
+      }
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(404).send({
