@@ -231,6 +231,10 @@ exports.createServiceForm = async (req, res, next) => {
     }
     for (let index = 0; index < form.length; index++) {
       const element = form[index];
+
+      if (element.name === undefined) {
+        element.name = `form-${String(Math.random()).split('.')[1]}`;
+      }
       
       const _serviceType = await ServiceType.findOne({where: {id: serviceType}});
       if (_serviceType === null) {

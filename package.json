@@ -30,6 +30,7 @@
     "body-parser": "^1.20.1",
     "cloudinary": "^1.32.0",
     "cors": "^2.8.5",
+    "csv-parse": "^5.3.5",
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
     "easyinvoice": "^2.3.3",
@@ -47,7 +48,8 @@
     "sequelize": "^6.25.0",
     "sequelize-cli": "^6.5.1",
     "socket.io": "^4.5.4",
-    "supervisor": "^0.12.0"
+    "supervisor": "^0.12.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "eslint": "^6.1.0",
