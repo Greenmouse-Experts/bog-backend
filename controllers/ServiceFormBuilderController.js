@@ -245,7 +245,7 @@ exports.createServiceForm = async (req, res, next) => {
       }
 
       const ServiceDetail = await ServicesFormBuilder.findOne({
-        where: { serviceTypeID: serviceType, serviceName }
+        where: { serviceTypeID: serviceType, serviceName, name: element.name }
       });
       if (ServiceDetail !== null) {
         return res.status(400).send({

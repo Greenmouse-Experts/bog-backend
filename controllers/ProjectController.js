@@ -282,6 +282,7 @@ exports.createProject = async (data, transaction) => {
 
     return result;
   } catch (error) {
+    console.log(error);
     transaction.rollback();
     return error;
   }
@@ -376,15 +377,17 @@ exports.requestForService = async (req, res, next) => {
       const { form } = req.body;
 
       let _project = null;
+      const serviceRequestForm = []
+      let serviceNameRes = '';
       for (let index = 0; index < form.length; index++) {
         const f = form[index];
-
+        
         // Get Service form
         const serviceForm = await ServicesFormBuilders.findOne({
           include: [{ model: ServiceType, as: "serviceType" }],
           where: { id: f._id }
         });
-
+        
         if (serviceForm === null) {
           return res.status(400).send({
             status: false,
@@ -392,11 +395,30 @@ exports.requestForService = async (req, res, next) => {
           });
         }
 
+        const request = {
+          serviceFormID: serviceForm.id,
+          value: f.value,
+          userID: userId,
+          status: "pending"
+        };
+
+        serviceRequestForm.push(request);
+      }
+
+      for (let index = 0; index < serviceRequestForm.length; index++) {
+        const s = serviceRequestForm[index];
+
+        // Get Service form
+        const serviceForm = await ServicesFormBuilders.findOne({
+          include: [{ model: ServiceType, as: "serviceType" }],
+          where: { id: s.serviceFormID }
+        });
+
         const profile = await userService.getUserTypeProfile(
           user.userType,
           userId
         );
-
+       
         const projectData = {
           title: serviceForm.serviceName,
           userId: profile.id,
@@ -405,6 +427,8 @@ exports.requestForService = async (req, res, next) => {
 
         if (_project === null) {
           _project = await this.createProject(projectData, t);
+          // console.log(_project)
+          serviceNameRes = `${user.name} has opened a project request for ${serviceForm.serviceType.title}`
           const reqData = {
             req,
             userId,
@@ -415,8 +439,8 @@ exports.requestForService = async (req, res, next) => {
 
         const request = {
           serviceFormID: serviceForm.id,
-          value: f.value,
-          userID: userId,
+          value: s.value,
+          userID: s.userID,
           projectID: _project.id,
           status: "pending"
         };

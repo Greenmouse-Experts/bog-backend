@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const Auth = require("../middleware/auth");
-// const Access = require("../middleware/access");
+const Access = require("../middleware/access");
 
 const upload = require("../helpers/upload");
 
@@ -55,7 +55,7 @@ router
 // Request service type
 router
   .route("/projects/request")
-  .post(Auth, ProjectController.requestForService);
+  .post([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.requestForService);
 
 // Land Survey
 router

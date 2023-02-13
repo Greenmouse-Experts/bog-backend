@@ -61,7 +61,7 @@ const importDeptInputs = (req, res) => {
         
         var sheet_name_list = workbook.SheetNames;
     
-        const rates = {rates: []};
+        let rates = {rates: []}
         for (let index = 0; index < sheet_name_list.length; index++) {
           const sheet = sheet_name_list[index];
           var xlData = reader.utils.sheet_to_json(workbook.Sheets[sheet]);
@@ -71,7 +71,7 @@ const importDeptInputs = (req, res) => {
 
           console.log(__xlData);
           let _index = 0;
-          rates = __xlData.map(_xdata => {
+          rates.rates = __xlData.map(_xdata => {
         
             const formula = _xdata[`ALWAYS ROUND UP ALL RESULTS FORWARD TO THE NEXT WHOLE NUMBER`]
             _index+=1;
