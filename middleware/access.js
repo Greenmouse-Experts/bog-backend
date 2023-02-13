@@ -94,6 +94,20 @@ exports.verifyAdmin = (req, res, next) => {
   }
 }
 
+exports.verifyUser = (req, res, next) => {
+  const {_credentials} = req;
+
+  if (_credentials.userType === 'admin') {
+    return res.status(403).send({
+      status: false,
+      message: "Unauthorized Access!"
+    })
+  }
+  else{
+    next()
+  }
+}
+
 // module.exports = function(req, res, next) {
 //   const token = req.header("authorization");
 //   if (!token) {
