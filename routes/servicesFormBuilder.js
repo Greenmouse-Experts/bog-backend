@@ -46,10 +46,6 @@ router
 
 // router.route("/service/type/:typeId").get(ServiceController.findServiceType);
 
-// router
-//   .route("/service/type/delete/:typeId")
-//   .delete(validate, [Auth, Access.verifyAccess], ServiceController.deleteCategory);
-
 // // BOG Services
 // router.route("/services/create").post([Auth, Access.verifyAccess], ServiceController.createService);
 

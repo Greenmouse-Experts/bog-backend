@@ -245,13 +245,14 @@ exports.createServiceForm = async (req, res, next) => {
       }
 
       const ServiceDetail = await ServicesFormBuilder.findOne({
-        where: { serviceTypeID: serviceType, serviceName, name: element.name }
+        where: { serviceTypeID: serviceType, serviceName }
       });
       if (ServiceDetail !== null) {
         return res.status(400).send({
           success: false,
           message: "Form exists!"
         });
+
       }
       
       let formParams = {
@@ -384,19 +385,19 @@ exports.updateServiceForm = async (req, res, next) => {
  * @returns
  */
 exports.deleteServiceForm = async (req, res, next) => {
-  const { id } = req.params;
+  const { typeID } = req.params;
   try {
-    const serviceForm = await ServicesFormBuilder.findOne({
-      where: { id }
+    const serviceForm = await ServicesFormBuilder.findAll({
+      where: { serviceTypeID: typeID }
     });
-    if (serviceForm === null) {
+    if (serviceForm.length === 0) {
       return res.status(400).send({
         status: false,
         message: "Service form not found"
       });
     }
 
-    const response = await ServicesFormBuilder.destroy({ where: { id } });
+    const response = await ServicesFormBuilder.destroy({ where: { serviceTypeID: typeID } });
     return res.send({
       success: true,
       message: "Service form deleted!"
