@@ -227,7 +227,8 @@ exports.loginUser = async (req, res, next) => {
       if (user.isSuspended) {
         return res.status(400).send({
           success: false,
-          message: "We couldn't find an account with this email"
+          message:
+            "Your account has been suspended. Reach out to the admin for further information"
         });
       }
       const isMatch = await bcrypt.compare(password, user.password);
@@ -420,6 +421,12 @@ exports.loginAdmin = async (req, res, next) => {
         return res.status(400).send({
           success: false,
           message: "This Admin is not known"
+        });
+      }
+      if (user.isSuspended) {
+        return res.status(400).send({
+          success: false,
+          message: "Your access has been revoked by the superadmin"
         });
       }
       const isMatch = await bcrypt.compare(password, user.password);
@@ -1021,8 +1028,7 @@ exports.suspendUser = async (req, res) => {
     }
 
     const update = {
-      isSuspended: true,
-      isActive: false
+      isSuspended: true
     };
 
     await User.update(update, { where: { id: userId } });
@@ -1041,7 +1047,7 @@ exports.suspendUser = async (req, res) => {
 
 exports.resetUserPassword = async (req, res) => {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     const { password } = req.body;
     const user = await UserService.getUserDetails({ id });
     if (!user) {
@@ -1050,9 +1056,9 @@ exports.resetUserPassword = async (req, res) => {
         message: "No User Found"
       });
     }
- 
+
     const update = {
-      password: bcrypt.hashSync(password, 10),
+      password: bcrypt.hashSync(password, 10)
     };
 
     await User.update(update, { where: { id } });
@@ -1071,7 +1077,6 @@ exports.resetUserPassword = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    
     const { id } = req.params;
     const user = await UserService.getUserDetails({ id });
     if (!user) {
@@ -1080,11 +1085,6 @@ exports.deleteUser = async (req, res) => {
         message: "No User Found"
       });
     }
-    
-    const update = {
-      isSuspended: true,
-      isActive: false
-    };
 
     await User.destroy({ where: { id } });
 

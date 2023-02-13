@@ -377,17 +377,17 @@ exports.requestForService = async (req, res, next) => {
       const { form } = req.body;
 
       let _project = null;
-      const serviceRequestForm = []
-      let serviceNameRes = '';
+      const serviceRequestForm = [];
+      let serviceNameRes = "";
       for (let index = 0; index < form.length; index++) {
         const f = form[index];
-        
+
         // Get Service form
         const serviceForm = await ServicesFormBuilders.findOne({
           include: [{ model: ServiceType, as: "serviceType" }],
           where: { id: f._id }
         });
-        
+
         if (serviceForm === null) {
           return res.status(400).send({
             status: false,
@@ -418,7 +418,7 @@ exports.requestForService = async (req, res, next) => {
           user.userType,
           userId
         );
-       
+
         const projectData = {
           title: serviceForm.serviceName,
           userId: profile.id,
@@ -428,7 +428,7 @@ exports.requestForService = async (req, res, next) => {
         if (_project === null) {
           _project = await this.createProject(projectData, t);
           // console.log(_project)
-          serviceNameRes = `${user.name} has opened a project request for ${serviceForm.serviceType.title}`
+          serviceNameRes = `${user.name} has opened a project request for ${serviceForm.serviceType.title}`;
           const reqData = {
             req,
             userId,
@@ -1090,7 +1090,7 @@ exports.approveProjectRequest = async (req, res, next) => {
       });
 
       const { userId } = project;
-      const message = `Your project ${project.id} has been ${
+      const message = `Your project ${project.projectSlug} has been ${
         isApproved ? "approved" : "disapproved"
       }  to commence. ${isApproved &&
         "Please wait for further information regarding cost and estimations"}`;
@@ -1121,6 +1121,7 @@ exports.dispatchProject = async (req, res, next) => {
   sequelize.transaction(async t => {
     try {
       const { projectId } = req.params;
+      const { score } = req.body;
       const project = await Project.findByPk(projectId);
       if (!project) {
         return res.status(404).send({
@@ -1131,7 +1132,7 @@ exports.dispatchProject = async (req, res, next) => {
       const {
         providerData: serviceProviders,
         completed
-      } = await this.getQualifiedServiceProviders(project, t);
+      } = await this.getQualifiedServiceProviders(project, score, t);
       if (completed === true) {
         project.update({ status: "dispatched" }, { transaction: t });
         if (serviceProviders.length > 0) {
@@ -1159,7 +1160,7 @@ exports.dispatchProject = async (req, res, next) => {
   });
 };
 
-exports.getQualifiedServiceProviders = async (project, transaction) => {
+exports.getQualifiedServiceProviders = async (project, score, transaction) => {
   try {
     // check project type
     const { projectTypes } = project;
@@ -1168,14 +1169,26 @@ exports.getQualifiedServiceProviders = async (project, transaction) => {
       where: { slug: projectTypes }
     });
     // query all service partners with service type id
+    // kyc point greater than the passed score
+    // user is verified
+    // user has active subscription
+    const wherePartner = {
+      serviceTypeId: serviceTypes.id,
+      kycPoint: {
+        [Op.gte]: score
+      },
+      hasActiveSubscription: true,
+      isVerified: true
+    };
     const servicePartners = JSON.parse(
       JSON.stringify(
         await ServicePartner.findAll({
-          where: { serviceTypeId: serviceTypes.id },
+          where: wherePartner,
           order: [[Sequelize.literal("RAND()")]]
         })
       )
     );
+    console.log({ servicePartners });
     if (servicePartners.length === 0) {
       return {
         completed: false,
@@ -1205,8 +1218,11 @@ exports.getQualifiedServiceProviders = async (project, transaction) => {
     const qualifiedPartners = filteredServicePartners.filter(
       pat => pat !== null
     );
-    // get 3 random service partner for the project
-    const providers = this.getRandom(qualifiedPartners, 3);
+    let providers = [...qualifiedPartners];
+    if (qualifiedPartners.length > 3) {
+      // get 3 random service partner for the project
+      providers = this.getRandom(qualifiedPartners, 3);
+    }
     // add them as service providers
     const providerData = providers.map(pr => ({
       userId: pr.id,
@@ -1222,7 +1238,7 @@ exports.getQualifiedServiceProviders = async (project, transaction) => {
       providerData
     };
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     transaction.rollback();
     return error;
   }

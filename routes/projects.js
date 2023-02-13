@@ -55,7 +55,10 @@ router
 // Request service type
 router
   .route("/projects/request")
-  .post([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.requestForService);
+  .post(
+    [Auth, Access.verifyAccess, Access.verifyUser],
+    ProjectController.requestForService
+  );
 
 // Land Survey
 router
