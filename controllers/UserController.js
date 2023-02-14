@@ -938,6 +938,7 @@ exports.findSingleUser = async (req, res) => {
       req.query.userType,
       userData.id
     );
+    userData.userType = req.query.userType;
     userData.profile = profile;
 
     const accounts = await this.getAccountsData(userId);
