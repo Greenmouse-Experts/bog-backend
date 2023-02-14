@@ -60,12 +60,15 @@ router
 router
   .route("/user/reset-password")
   .post(resetPasswordValidation(), validate, UserController.resetPassword);
-  
-  
+
 router
   .route("/admin/reset-password/:id")
-  .put(resetAdminPasswordValidation(), validate, [Auth, Access.verifyAccess, Access.verifyAdmin], UserController.resetUserPassword);
-
+  .put(
+    resetAdminPasswordValidation(),
+    validate,
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    UserController.resetUserPassword
+  );
 
 router
   .route("/user/update-account")
@@ -95,12 +98,26 @@ router
   .route("/admin/revoke-access")
   .post([Auth, Access.verifyAccess], UserController.revokeAccess);
 
-router.route("/admin/suspend-user").post([Auth, Access.verifyAccess, Access.verifyAdmin], UserController.suspendUser);
+router
+  .route("/admin/suspend-user")
+  .post(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    UserController.suspendUser
+  );
 
-router.route("/admin/unsuspend-user").post([Auth, Access.verifyAccess, Access.verifyAdmin], UserController.unsuspendUser);
+router
+  .route("/admin/unsuspend-user")
+  .post(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    UserController.unsuspendUser
+  );
 
-router.route("/admin/delete-user/:id").delete([Auth, Access.verifyAccess, Access.verifyAdmin], UserController.deleteUser);
-
+router
+  .route("/admin/delete-user/:id")
+  .delete(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    UserController.deleteUser
+  );
 
 router.route("/users/get-user/:userId").get(UserController.findSingleUser);
 
