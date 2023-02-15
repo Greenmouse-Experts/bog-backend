@@ -134,28 +134,8 @@ exports.getAllProjectRequest = async (req, res, next) => {
     );
     const data = await Promise.all(
       projects.map(async project => {
-        const requestData = await this.getProjectTypeData(
-          project.id,
-          project.projectTypes
-        );
-        let projectOwner = await PrivateClient.findByPk(project.userId, {
-          include: ["private_user"]
-        });
-        if (!projectOwner) {
-          projectOwner = await CorporateClient.findByPk(project.userId, {
-            include: ["corporate_user"]
-          });
-        }
-        project.projectOwner = projectOwner;
-        if (project.status === "ongoing") {
-          const serviceProvider = await ServicePartner.findByPk(
-            project.serviceProviderId,
-            { include: ["service_user"] }
-          );
-          project.serviceProvider = serviceProvider;
-        }
-        project.projectData = requestData;
-        return project;
+        const result = await this.getFullProjectRequest(project);
+        return result;
       })
     );
     return res.status(200).send({
@@ -165,6 +145,31 @@ exports.getAllProjectRequest = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
+};
+
+exports.getFullProjectRequest = async project => {
+  const requestData = await this.getProjectTypeData(
+    project.id,
+    project.projectTypes
+  );
+  let projectOwner = await PrivateClient.findByPk(project.userId, {
+    include: ["private_user"]
+  });
+  if (!projectOwner) {
+    projectOwner = await CorporateClient.findByPk(project.userId, {
+      include: ["corporate_user"]
+    });
+  }
+  project.projectOwner = projectOwner;
+  if (project.status === "ongoing") {
+    const serviceProvider = await ServicePartner.findByPk(
+      project.serviceProviderId,
+      { include: ["service_user"] }
+    );
+    project.serviceProvider = serviceProvider;
+  }
+  project.projectData = requestData;
+  return project;
 };
 
 /**
@@ -215,15 +220,11 @@ exports.viewProjectRequest = async (req, res, next) => {
         })
       )
     );
-    const requestData = await this.getProjectTypeData(
-      project.id,
-      project.projectTypes
-    );
-    project.projectData = requestData;
+    const result = await this.getFullProjectRequest(project);
 
     return res.status(200).send({
       success: true,
-      data: project
+      data: result
     });
   } catch (error) {
     return next(error);
