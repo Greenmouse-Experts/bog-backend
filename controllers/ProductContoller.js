@@ -16,7 +16,7 @@ exports.getProducts = async (req, res, next) => {
   try {
     const where = {
       status: "approved",
-      showInShop: true
+      showInShop: true,
     };
     const products = await Product.findAll({
       where,
@@ -24,24 +24,24 @@ exports.getProducts = async (req, res, next) => {
         {
           model: User,
           as: "creator",
-          attributes: ["id", "name", "email", "phone", "photo"]
+          attributes: ["id", "name", "email", "phone", "photo"],
         },
         {
           model: Category,
           as: "category",
-          attributes: ["id", "name", "description"]
+          attributes: ["id", "name", "description"],
         },
         {
           model: ProductImage,
           as: "product_image",
-          attributes: ["id", "name", "image", "url"]
-        }
+          attributes: ["id", "name", "image", "url"],
+        },
       ],
-      order: [["createdAt", "DESC"]]
-    })
+      order: [["createdAt", "DESC"]],
+    });
     return res.status(200).send({
       success: true,
-      data: products
+      data: products,
     });
   } catch (error) {
     return next(error);
@@ -53,7 +53,7 @@ exports.getSimilarProducts = async (req, res, next) => {
     const where = {
       status: "approved",
       showInShop: true,
-      categoryId: req.query.category
+      categoryId: req.query.category,
     };
     const products = await Product.findAll({
       where,
@@ -61,29 +61,29 @@ exports.getSimilarProducts = async (req, res, next) => {
         {
           model: User,
           as: "creator",
-          attributes: ["id", "name", "email", "phone", "photo"]
+          attributes: ["id", "name", "email", "phone", "photo"],
         },
         {
           model: Category,
           as: "category",
-          attributes: ["id", "name", "description"]
+          attributes: ["id", "name", "description"],
         },
         {
           model: ProductImage,
           as: "product_image",
-          attributes: ["id", "name", "image", "url"]
+          attributes: ["id", "name", "image", "url"],
         },
         {
           model: Reviews,
           as: "product_reviews",
-          attributes: ["id", "star", "reviews", "userId"]
-        }
+          attributes: ["id", "star", "reviews", "userId"],
+        },
       ],
-      order: [["createdAt", "DESC"]]
+      order: [["createdAt", "DESC"]],
     });
     return res.status(200).send({
       success: true,
-      data: products
+      data: products,
     });
   } catch (error) {
     return next(error);
@@ -94,23 +94,23 @@ exports.getAllCategories = async (req, res, next) => {
   try {
     const categories = await Category.findAll();
     const data = await Promise.all(
-      categories.map(async category => {
+      categories.map(async (category) => {
         const where = {
           categoryId: category.id,
-          status: "approved"
+          status: "approved",
         };
         const count = await Product.count({ where });
         return {
           id: category.id,
           name: category.name,
           description: category.description,
-          totalProducts: count
+          totalProducts: count,
         };
       })
     );
     return res.status(200).send({
       success: true,
-      data
+      data,
     });
   } catch (error) {
     return next(error);
@@ -120,11 +120,11 @@ exports.getAllCategories = async (req, res, next) => {
 exports.getCategory = async (req, res, next) => {
   try {
     const category = await Category.findOne({
-      where: { id: req.params.categoryId }
+      where: { id: req.params.categoryId },
     });
     return res.status(200).send({
       success: true,
-      data: category
+      data: category,
     });
   } catch (error) {
     return next(error);
@@ -132,16 +132,16 @@ exports.getCategory = async (req, res, next) => {
 };
 
 exports.createCategory = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { name, description } = req.body;
       const [category, created] = await Category.findOrCreate({
         where: { name, description },
-        transaction: t
+        transaction: t,
       });
       return res.status(200).send({
         success: true,
-        data: category
+        data: category,
       });
     } catch (error) {
       t.rollback();
@@ -151,29 +151,29 @@ exports.createCategory = async (req, res, next) => {
 };
 
 exports.updateCategory = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { name, description } = req.body;
       const { categoryId } = req.params;
       const category = await Category.findOne({
-        where: { id: categoryId }
+        where: { id: categoryId },
       });
       if (!category) {
         return res.status(404).send({
           success: false,
-          message: "Invalid category"
+          message: "Invalid category",
         });
       }
       await Category.update(
         {
           name,
-          description
+          description,
         },
         { where: { id: categoryId }, transaction: t }
       );
       return res.status(200).send({
         success: true,
-        data: category
+        data: category,
       });
     } catch (error) {
       t.rollback();
@@ -183,22 +183,22 @@ exports.updateCategory = async (req, res, next) => {
 };
 
 exports.deleteCategory = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { categoryId } = req.params;
       const category = await Category.findOne({
-        where: { id: categoryId }
+        where: { id: categoryId },
       });
       if (!category) {
         return res.status(404).send({
           success: false,
-          message: "Invalid category"
+          message: "Invalid category",
         });
       }
       await Category.destroy({ where: { id: categoryId }, transaction: t });
       return res.status(200).send({
         success: true,
-        message: "Category deleted successfully"
+        message: "Category deleted successfully",
       });
     } catch (error) {
       t.rollback();
@@ -208,7 +208,7 @@ exports.deleteCategory = async (req, res, next) => {
 };
 
 exports.createProduct = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { categoryId, name, price, quantity, unit, description } = req.body;
       const creatorId = req.user.id;
@@ -220,7 +220,7 @@ exports.createProduct = async (req, res, next) => {
         unit,
         description,
         creatorId,
-        status: req.body.status
+        status: req.body.status,
       };
 
       const photos = [];
@@ -232,7 +232,7 @@ exports.createProduct = async (req, res, next) => {
           name: req.files[i].originalname,
           image: req.files[i].path,
           creatorId,
-          url
+          url,
         });
       }
       if (photos.length > 0) {
@@ -244,9 +244,9 @@ exports.createProduct = async (req, res, next) => {
         include: [
           {
             model: ProductImage,
-            as: "product_image"
-          }
-        ]
+            as: "product_image",
+          },
+        ],
       });
 
       const mesg = `A new Product was created`;
@@ -254,14 +254,14 @@ exports.createProduct = async (req, res, next) => {
       const { io } = req.app;
       await Notification.createNotification({
         type: notifyType,
-        message: mesg
+        message: mesg,
       });
       io.emit("getNotifications", await Notification.fetchAdminNotification());
 
       return res.status(200).send({
         success: true,
         message: "Product created successfully",
-        data: product
+        data: product,
       });
     } catch (error) {
       t.rollback();
@@ -271,18 +271,18 @@ exports.createProduct = async (req, res, next) => {
 };
 
 exports.updateProduct = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { productId } = req.params;
       const request = req.body;
       const creatorId = req.user.id;
       const product = await Product.findByPk(productId, {
-        attributes: ["id"]
+        attributes: ["id"],
       });
       if (!product) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Product"
+          message: "Invalid Product",
         });
       }
 
@@ -297,15 +297,15 @@ exports.updateProduct = async (req, res, next) => {
             image: req.files[i].path,
             creatorId,
             productId,
-            url
+            url,
           });
         }
         const images = await ProductImage.findAll({
           where: { productId },
-          attributes: ["id"]
+          attributes: ["id"],
         });
         if (images.length > 0) {
-          const Ids = images.map(img => img.id);
+          const Ids = images.map((img) => img.id);
           await ProductImage.destroy({ where: { id: Ids }, transaction: t });
         }
         await ProductImage.bulkCreate(photos, { transaction: t });
@@ -313,7 +313,7 @@ exports.updateProduct = async (req, res, next) => {
       }
 
       await Product.update(request, {
-        where: { id: productId }
+        where: { id: productId },
         // transaction: t
       });
 
@@ -323,25 +323,25 @@ exports.updateProduct = async (req, res, next) => {
           {
             model: User,
             as: "creator",
-            attributes: ["id", "name", "email", "phone", "photo"]
+            attributes: ["id", "name", "email", "phone", "photo"],
           },
           {
             model: Category,
             as: "category",
-            attributes: ["id", "name", "description"]
+            attributes: ["id", "name", "description"],
           },
           {
             model: ProductImage,
             as: "product_image",
-            attributes: ["id", "name", "image", "url"]
-          }
-        ]
+            attributes: ["id", "name", "image", "url"],
+          },
+        ],
       });
 
       return res.status(200).send({
         success: true,
         message: "Product updated successfully",
-        data: result
+        data: result,
       });
     } catch (error) {
       t.rollback();
@@ -354,7 +354,7 @@ exports.getAllProducts = async (req, res, next) => {
   try {
     const creatorId = req.user.id;
     const where = {
-      creatorId
+      creatorId,
     };
     if (req.query.status) {
       where.status = req.query.status;
@@ -365,19 +365,19 @@ exports.getAllProducts = async (req, res, next) => {
         {
           model: Category,
           as: "category",
-          attributes: ["id", "name", "description"]
+          attributes: ["id", "name", "description"],
         },
         {
           model: ProductImage,
           as: "product_image",
-          attributes: ["id", "name", "image", "url"]
-        }
+          attributes: ["id", "name", "image", "url"],
+        },
       ],
-      order: [["createdAt", "DESC"]]
+      order: [["createdAt", "DESC"]],
     });
     return res.status(200).send({
       success: true,
-      data: products
+      data: products,
     });
   } catch (error) {
     return next(error);
@@ -392,23 +392,23 @@ exports.getSingleProducts = async (req, res, next) => {
         {
           model: User,
           as: "creator",
-          attributes: ["id", "name", "email", "phone", "photo"]
+          attributes: ["id", "name", "email", "phone", "photo"],
         },
         {
           model: Category,
           as: "category",
-          attributes: ["id", "name", "description"]
+          attributes: ["id", "name", "description"],
         },
         {
           model: ProductImage,
           as: "product_image",
-          attributes: ["id", "name", "image", "url"]
-        }
-      ]
+          attributes: ["id", "name", "image", "url"],
+        },
+      ],
     });
     return res.status(200).send({
       success: true,
-      data: product
+      data: product,
     });
   } catch (error) {
     return next(error);
@@ -416,18 +416,18 @@ exports.getSingleProducts = async (req, res, next) => {
 };
 
 exports.deleteProduct = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { productId } = req.params;
       const creatorId = req.user.id;
 
       const product = await Product.findOne({
-        where: { id: productId }
+        where: { id: productId },
       });
       if (!product) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Product"
+          message: "Invalid Product",
         });
       }
       // if (creatorId !== product.creatorId) {
@@ -445,7 +445,7 @@ exports.deleteProduct = async (req, res, next) => {
       await Product.destroy({ where: { id: productId }, transaction: t });
       return res.status(200).send({
         success: true,
-        message: "Product deleted successfully"
+        message: "Product deleted successfully",
       });
     } catch (error) {
       t.rollback();
@@ -455,24 +455,24 @@ exports.deleteProduct = async (req, res, next) => {
 };
 
 exports.deleteOldProduct = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const products = await Product.findAll({ order: [["createdAt", "ASC"]] });
       const data = products
-        .map(product => {
+        .map((product) => {
           if (product.image.startsWith("upload")) {
             return product;
           }
           return null;
         })
-        .filter(prod => prod != null);
-      const Ids = data.map(product => product.id);
+        .filter((prod) => prod != null);
+      const Ids = data.map((product) => product.id);
 
       await Product.destroy({ where: { id: Ids }, transaction: t });
       return res.status(200).send({
         success: true,
         message: "Product deleted successfully",
-        data
+        data,
       });
     } catch (error) {
       t.rollback();
@@ -482,24 +482,24 @@ exports.deleteOldProduct = async (req, res, next) => {
 };
 
 exports.addProductToShop = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { productId } = req.params;
 
       const product = await Product.findOne({
-        where: { id: productId }
+        where: { id: productId },
       });
       if (!product) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Product"
+          message: "Invalid Product",
         });
       }
       if (product.status === "disapproved") {
         return res.status(400).send({
           success: false,
           message:
-            "This Product has been disapproved by admin. Please update or create a new one"
+            "This Product has been disapproved by admin. Please update or create a new one",
         });
       }
       await Product.update(
@@ -514,13 +514,13 @@ exports.addProductToShop = async (req, res, next) => {
       await Notification.createNotification({
         type: notifyType,
         message: mesg,
-        userId
+        userId,
       });
       io.emit("getNotifications", await Notification.fetchAdminNotification());
 
       return res.status(200).send({
         success: true,
-        message: "Product sent for review. Please wait for admin approval"
+        message: "Product sent for review. Please wait for admin approval",
       });
     } catch (error) {
       t.rollback();
@@ -535,8 +535,8 @@ exports.getProductsForAdmin = async (req, res, next) => {
       [Op.or]: [
         { status: "in_review" },
         { status: "approved" },
-        { status: "disapproved" }
-      ]
+        { status: "disapproved" },
+      ],
     };
     if (req.query.status) {
       where.status = req.query.status;
@@ -547,24 +547,24 @@ exports.getProductsForAdmin = async (req, res, next) => {
         {
           model: User,
           as: "creator",
-          attributes: ["id", "name", "email", "phone", "photo"]
+          attributes: ["id", "name", "email", "phone", "photo"],
         },
         {
           model: Category,
           as: "category",
-          attributes: ["id", "name", "description"]
+          attributes: ["id", "name", "description"],
         },
         {
           model: ProductImage,
           as: "product_image",
-          attributes: ["id", "name", "image", "url"]
-        }
+          attributes: ["id", "name", "image", "url"],
+        },
       ],
-      order: [["updatedAt", "DESC"]]
+      order: [["updatedAt", "DESC"]],
     });
     return res.status(200).send({
       success: true,
-      data: products
+      data: products,
     });
   } catch (error) {
     return next(error);
@@ -572,21 +572,21 @@ exports.getProductsForAdmin = async (req, res, next) => {
 };
 
 exports.approveProduct = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { productId, status } = req.body;
 
       const product = await Product.findOne({
-        where: { id: productId }
+        where: { id: productId },
       });
       if (!product) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Product"
+          message: "Invalid Product",
         });
       }
       const data = {
-        status
+        status,
       };
       if (status === "approved") {
         data.showInShop = true;
@@ -599,7 +599,7 @@ exports.approveProduct = async (req, res, next) => {
       await Notification.createNotification({
         type: notifyType,
         message: mesg,
-        userId
+        userId,
       });
       io.emit(
         "getNotifications",
@@ -608,7 +608,7 @@ exports.approveProduct = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: `Product ${status} successfully `
+        message: `Product ${status} successfully `,
       });
     } catch (error) {
       t.rollback();

@@ -33,7 +33,7 @@ exports.notifyAdmin = async ({ userId, message, req }) => {
   await Notification.createNotification({
     type: notifyType,
     message,
-    userId
+    userId,
   });
   io.emit("getNotifications", await Notification.fetchAdminNotification());
 };
@@ -55,12 +55,12 @@ exports.getProjectRequest = async (req, res, next) => {
       JSON.stringify(
         await Project.findAll({
           where,
-          order: [["createdAt", "DESC"]]
+          order: [["createdAt", "DESC"]],
         })
       )
     );
     const data = await Promise.all(
-      projects.map(async project => {
+      projects.map(async (project) => {
         const requestData = await this.getProjectTypeData(
           project.id,
           project.projectTypes
@@ -71,7 +71,7 @@ exports.getProjectRequest = async (req, res, next) => {
     );
     return res.status(200).send({
       success: true,
-      data
+      data,
     });
   } catch (error) {
     return next(error);
@@ -95,12 +95,12 @@ exports.getServicePartnerProjectRequest = async (req, res, next) => {
       JSON.stringify(
         await Project.findAll({
           where,
-          order: [["createdAt", "DESC"]]
+          order: [["createdAt", "DESC"]],
         })
       )
     );
     const data = await Promise.all(
-      projects.map(async project => {
+      projects.map(async (project) => {
         const requestData = await this.getProjectTypeData(
           project.id,
           project.projectTypes
@@ -111,7 +111,7 @@ exports.getServicePartnerProjectRequest = async (req, res, next) => {
     );
     return res.status(200).send({
       success: true,
-      data
+      data,
     });
   } catch (error) {
     return next(error);
@@ -128,22 +128,22 @@ exports.getAllProjectRequest = async (req, res, next) => {
       JSON.stringify(
         await Project.findAll({
           where,
-          order: [["createdAt", "DESC"]]
+          order: [["createdAt", "DESC"]],
         })
       )
     );
     const data = await Promise.all(
-      projects.map(async project => {
+      projects.map(async (project) => {
         const requestData = await this.getProjectTypeData(
           project.id,
           project.projectTypes
         );
         let projectOwner = await PrivateClient.findByPk(project.userId, {
-          include: ["private_user"]
+          include: ["private_user"],
         });
         if (!projectOwner) {
           projectOwner = await CorporateClient.findByPk(project.userId, {
-            include: ["corporate_user"]
+            include: ["corporate_user"],
           });
         }
         project.projectOwner = projectOwner;
@@ -160,7 +160,7 @@ exports.getAllProjectRequest = async (req, res, next) => {
     );
     return res.status(200).send({
       success: true,
-      data
+      data,
     });
   } catch (error) {
     return next(error);
@@ -178,7 +178,7 @@ exports.getAllProjectRequestV2 = async (req, res, next) => {
     }
     const projects = await Project.findAll({
       where,
-      order: [["createdAt", "DESC"]]
+      order: [["createdAt", "DESC"]],
     });
 
     // const data = await Promise.all(
@@ -198,7 +198,7 @@ exports.getAllProjectRequestV2 = async (req, res, next) => {
     // );
     return res.status(200).send({
       success: true,
-      data: projects
+      data: projects,
     });
   } catch (error) {
     return next(error);
@@ -211,7 +211,7 @@ exports.viewProjectRequest = async (req, res, next) => {
     const project = JSON.parse(
       JSON.stringify(
         await Project.findOne({
-          where
+          where,
         })
       )
     );
@@ -223,7 +223,7 @@ exports.viewProjectRequest = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: project
+      data: project,
     });
   } catch (error) {
     return next(error);
@@ -241,19 +241,19 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
   try {
     const where = { id: req.params.projectId };
     const project = await Project.findOne({
-      where
+      where,
     });
 
     if (project === null) {
       return res.status(404).send({
         status: false,
-        message: "Project not found!"
+        message: "Project not found!",
       });
     }
 
     const requestData = await ServiceFormProjects.findAll({
       include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
-      where: { projectID: project.id }
+      where: { projectID: project.id },
     });
 
     // project.toJSON().projectData = requestData;
@@ -262,8 +262,8 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
       success: true,
       data: {
         ...project.toJSON(),
-        projectData: requestData
-      }
+        projectData: requestData,
+      },
     });
   } catch (error) {
     return next(error);
@@ -289,26 +289,26 @@ exports.createProject = async (data, transaction) => {
 };
 
 exports.deleteProjectRequest = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { requestId } = req.params;
       const project = await Project.findOne({
-        where: { id: requestId }
+        where: { id: requestId },
       });
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project Request"
+          message: "Invalid Project Request",
         });
       }
       await Project.destroy({
         where: { id: requestId },
-        transaction: t
+        transaction: t,
       });
       await this.deleteProjectTypeData(requestId, project.projectTypes, t);
       return res.status(200).send({
         success: true,
-        message: "Project deleted successfully"
+        message: "Project deleted successfully",
       });
     } catch (error) {
       t.rollback();
@@ -369,7 +369,7 @@ exports.deleteProjectTypeData = async (projectId, type, t) => {
  * @param {*} next
  */
 exports.requestForService = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
       const user = await User.findOne({ where: { id: userId } });
@@ -385,13 +385,13 @@ exports.requestForService = async (req, res, next) => {
         // Get Service form
         const serviceForm = await ServicesFormBuilders.findOne({
           include: [{ model: ServiceType, as: "serviceType" }],
-          where: { id: f._id }
+          where: { id: f._id },
         });
 
         if (serviceForm === null) {
           return res.status(400).send({
             status: false,
-            msg: "This service form input does not exist!"
+            msg: "This service form input does not exist!",
           });
         }
 
@@ -399,7 +399,7 @@ exports.requestForService = async (req, res, next) => {
           serviceFormID: serviceForm.id,
           value: f.value,
           userID: userId,
-          status: "pending"
+          status: "pending",
         };
 
         serviceRequestForm.push(request);
@@ -411,7 +411,7 @@ exports.requestForService = async (req, res, next) => {
         // Get Service form
         const serviceForm = await ServicesFormBuilders.findOne({
           include: [{ model: ServiceType, as: "serviceType" }],
-          where: { id: s.serviceFormID }
+          where: { id: s.serviceFormID },
         });
 
         const profile = await userService.getUserTypeProfile(
@@ -422,7 +422,7 @@ exports.requestForService = async (req, res, next) => {
         const projectData = {
           title: serviceForm.serviceName,
           userId: profile.id,
-          projectTypes: serviceForm.serviceType.slug
+          projectTypes: serviceForm.serviceType.slug,
         };
 
         if (_project === null) {
@@ -432,7 +432,7 @@ exports.requestForService = async (req, res, next) => {
           const reqData = {
             req,
             userId,
-            message: `${user.name} has opened a project request for ${serviceForm.serviceType.title}`
+            message: `${user.name} has opened a project request for ${serviceForm.serviceType.title}`,
           };
           await this.notifyAdmin(reqData);
         }
@@ -442,7 +442,7 @@ exports.requestForService = async (req, res, next) => {
           value: s.value,
           userID: s.userID,
           projectID: _project.id,
-          status: "pending"
+          status: "pending",
         };
 
         const data = await ServiceFormProjects.create(request);
@@ -450,7 +450,7 @@ exports.requestForService = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: "Project requested"
+        message: "Project requested",
       });
     } catch (error) {
       t.rollback();
@@ -461,7 +461,7 @@ exports.requestForService = async (req, res, next) => {
 
 // Land Survey Request
 exports.requestForLandSurvey = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
       const user = await User.findByPk(userId, { attributes: ["name"] });
@@ -471,23 +471,23 @@ exports.requestForLandSurvey = async (req, res, next) => {
       const projectData = {
         title: req.body.title,
         userId: profile.id,
-        projectTypes: "land_survey"
+        projectTypes: "land_survey",
       };
       const project = await this.createProject(projectData, t);
       request.userId = userId;
       request.projectId = project.id;
       const data = await LandSurveyProject.create(request, {
-        transaction: t
+        transaction: t,
       });
       const reqData = {
         req,
         userId,
-        message: `${user.name} has open a project request for Land survey`
+        message: `${user.name} has open a project request for Land survey`,
       };
       await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
-        data
+        data,
       });
     } catch (error) {
       t.rollback();
@@ -497,17 +497,17 @@ exports.requestForLandSurvey = async (req, res, next) => {
 };
 
 exports.updateLandSurveyRequest = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const request = req.body;
       const { requestId, title } = req.body;
       const survey = await LandSurveyProject.findOne({
-        where: { id: requestId }
+        where: { id: requestId },
       });
       if (!survey) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Land Survey"
+          message: "Invalid Land Survey",
         });
       }
       if (title && title !== "") {
@@ -519,11 +519,11 @@ exports.updateLandSurveyRequest = async (req, res, next) => {
 
       await LandSurveyProject.update(request, {
         where: { id: requestId },
-        transaction: t
+        transaction: t,
       });
       return res.status(200).send({
         success: true,
-        message: "Land Survey request updated successfully"
+        message: "Land Survey request updated successfully",
       });
     } catch (error) {
       t.rollback();
@@ -534,7 +534,7 @@ exports.updateLandSurveyRequest = async (req, res, next) => {
 
 // Contractor Projects
 exports.requestForContractor = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
       const {
@@ -543,13 +543,13 @@ exports.requestForContractor = async (req, res, next) => {
         clientName,
         projectType,
         buildingType,
-        userType
+        userType,
       } = req.body;
       const profile = await userService.getUserTypeProfile(userType, userId);
       const projectData = {
         title,
         userId: profile.id,
-        projectTypes: "contractor"
+        projectTypes: "contractor",
       };
       const project = await this.createProject(projectData, t);
       const request = {
@@ -558,7 +558,7 @@ exports.requestForContractor = async (req, res, next) => {
         projectLocation,
         clientName,
         projectType,
-        buildingType
+        buildingType,
       };
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
@@ -582,18 +582,18 @@ exports.requestForContractor = async (req, res, next) => {
       }
 
       const data = await ContractorProject.create(request, {
-        transaction: t
+        transaction: t,
       });
       const user = await User.findByPk(userId, { attributes: ["name"] });
       const reqData = {
         req,
         userId,
-        message: `${user.name} has requested for a contractor service partner`
+        message: `${user.name} has requested for a contractor service partner`,
       };
       await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
-        data
+        data,
       });
     } catch (error) {
       t.rollback();
@@ -603,7 +603,7 @@ exports.requestForContractor = async (req, res, next) => {
 };
 
 exports.updateContractorRequest = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const {
         projectLocation,
@@ -611,17 +611,17 @@ exports.updateContractorRequest = async (req, res, next) => {
         projectType,
         buildingType,
         requestId,
-        title
+        title,
       } = req.body;
 
       const project = await ContractorProject.findOne({
-        where: { id: requestId }
+        where: { id: requestId },
       });
 
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Contractor Project"
+          message: "Invalid Contractor Project",
         });
       }
 
@@ -636,7 +636,7 @@ exports.updateContractorRequest = async (req, res, next) => {
         projectLocation,
         clientName,
         projectType,
-        buildingType
+        buildingType,
       };
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
@@ -660,11 +660,11 @@ exports.updateContractorRequest = async (req, res, next) => {
       }
       await ContractorProject.update(request, {
         where: { id: requestId },
-        transaction: t
+        transaction: t,
       });
       return res.status(200).send({
         success: true,
-        message: "Contractor request updated successfully"
+        message: "Contractor request updated successfully",
       });
     } catch (error) {
       t.rollback();
@@ -675,7 +675,7 @@ exports.updateContractorRequest = async (req, res, next) => {
 
 // Drawing Projects
 exports.drawingProjectsRequest = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
       const {
@@ -685,13 +685,13 @@ exports.drawingProjectsRequest = async (req, res, next) => {
         projectType,
         buildingType,
         drawingType,
-        userType
+        userType,
       } = req.body;
       const profile = await userService.getUserTypeProfile(userType, userId);
       const projectData = {
         title,
         userId: profile.id,
-        projectTypes: "construction_drawing"
+        projectTypes: "construction_drawing",
       };
       const project = await this.createProject(projectData, t);
       const request = {
@@ -701,7 +701,7 @@ exports.drawingProjectsRequest = async (req, res, next) => {
         clientName,
         projectType,
         buildingType,
-        drawingType
+        drawingType,
       };
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
@@ -729,19 +729,19 @@ exports.drawingProjectsRequest = async (req, res, next) => {
       }
 
       const data = await DrawingProject.create(request, {
-        transaction: t
+        transaction: t,
       });
       const user = await User.findByPk(userId, { attributes: ["name"] });
       const reqData = {
         req,
         userId,
-        message: `${user.name} has open a request for a construction drawing project`
+        message: `${user.name} has open a request for a construction drawing project`,
       };
       await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
         message: "Drawing Project created successfully",
-        data
+        data,
       });
     } catch (error) {
       t.rollback();
@@ -751,7 +751,7 @@ exports.drawingProjectsRequest = async (req, res, next) => {
 };
 
 exports.updateDrawingRequest = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const {
         projectLocation,
@@ -760,17 +760,17 @@ exports.updateDrawingRequest = async (req, res, next) => {
         buildingType,
         requestId,
         title,
-        drawingType
+        drawingType,
       } = req.body;
 
       const project = await DrawingProject.findOne({
-        where: { id: requestId }
+        where: { id: requestId },
       });
 
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Contractor Project"
+          message: "Invalid Contractor Project",
         });
       }
 
@@ -786,7 +786,7 @@ exports.updateDrawingRequest = async (req, res, next) => {
         clientName,
         projectType,
         buildingType,
-        drawingType
+        drawingType,
       };
 
       if (req.files.length > 0) {
@@ -815,11 +815,11 @@ exports.updateDrawingRequest = async (req, res, next) => {
       }
       await DrawingProject.update(request, {
         where: { id: requestId },
-        transaction: t
+        transaction: t,
       });
       return res.status(200).send({
         success: true,
-        message: "Drawing request updated successfully"
+        message: "Drawing request updated successfully",
       });
     } catch (error) {
       t.rollback();
@@ -830,7 +830,7 @@ exports.updateDrawingRequest = async (req, res, next) => {
 
 // Building Approval Projects
 exports.buildingApprovalProjectsRequest = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
       const {
@@ -838,13 +838,13 @@ exports.buildingApprovalProjectsRequest = async (req, res, next) => {
         projectLocation,
         clientName,
         purpose,
-        userType
+        userType,
       } = req.body;
       const profile = await userService.getUserTypeProfile(userType, userId);
       const projectData = {
         title,
         userId: profile.id,
-        projectTypes: "building_approval"
+        projectTypes: "building_approval",
       };
       const project = await this.createProject(projectData, t);
       const request = {
@@ -852,7 +852,7 @@ exports.buildingApprovalProjectsRequest = async (req, res, next) => {
         projectId: project.id,
         projectLocation,
         clientName,
-        purpose
+        purpose,
       };
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
@@ -863,19 +863,19 @@ exports.buildingApprovalProjectsRequest = async (req, res, next) => {
       }
 
       const data = await BuildingProject.create(request, {
-        transaction: t
+        transaction: t,
       });
       const user = await User.findByPk(userId, { attributes: ["name"] });
       const reqData = {
         req,
         userId,
-        message: `${user.name} has requested for a building approval project`
+        message: `${user.name} has requested for a building approval project`,
       };
       await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
         message: "Building Approval Project created successfully",
-        data
+        data,
       });
     } catch (error) {
       t.rollback();
@@ -885,24 +885,24 @@ exports.buildingApprovalProjectsRequest = async (req, res, next) => {
 };
 
 exports.updateBuildingApprovalRequest = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const {
         projectLocation,
         clientName,
         purpose,
         requestId,
-        title
+        title,
       } = req.body;
 
       const project = await BuildingProject.findOne({
-        where: { id: requestId }
+        where: { id: requestId },
       });
 
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Contractor Project"
+          message: "Invalid Contractor Project",
         });
       }
 
@@ -916,7 +916,7 @@ exports.updateBuildingApprovalRequest = async (req, res, next) => {
       const request = {
         projectLocation,
         clientName,
-        purpose
+        purpose,
       };
 
       if (req.files.length > 0) {
@@ -929,11 +929,11 @@ exports.updateBuildingApprovalRequest = async (req, res, next) => {
 
       await BuildingProject.update(request, {
         where: { id: requestId },
-        transaction: t
+        transaction: t,
       });
       return res.status(200).send({
         success: true,
-        message: "Building request updated successfully"
+        message: "Building request updated successfully",
       });
     } catch (error) {
       t.rollback();
@@ -944,7 +944,7 @@ exports.updateBuildingApprovalRequest = async (req, res, next) => {
 
 // Geotechnical Request
 exports.requestForGeoTechnicalInvestigation = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
       const request = req.body;
@@ -953,7 +953,7 @@ exports.requestForGeoTechnicalInvestigation = async (req, res, next) => {
       const projectData = {
         title,
         userId: profile.id,
-        projectTypes: "geotechnical_investigation"
+        projectTypes: "geotechnical_investigation",
       };
       const project = await this.createProject(projectData, t);
       request.userId = userId;
@@ -966,18 +966,18 @@ exports.requestForGeoTechnicalInvestigation = async (req, res, next) => {
         }
       }
       const data = await GeoTechnical.create(request, {
-        transaction: t
+        transaction: t,
       });
       const user = await User.findByPk(userId, { attributes: ["name"] });
       const reqData = {
         req,
         userId,
-        message: `${user.name} has requested for a geotechnical investigator`
+        message: `${user.name} has requested for a geotechnical investigator`,
       };
       await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
-        data
+        data,
       });
     } catch (error) {
       t.rollback();
@@ -987,17 +987,17 @@ exports.requestForGeoTechnicalInvestigation = async (req, res, next) => {
 };
 
 exports.updateGeoTechnicalInvestigationRequest = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const request = req.body;
       const { requestId, title } = req.body;
       const survey = await GeoTechnical.findOne({
-        where: { id: requestId }
+        where: { id: requestId },
       });
       if (!survey) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Investigation"
+          message: "Invalid Investigation",
         });
       }
       if (title && title !== "") {
@@ -1016,11 +1016,11 @@ exports.updateGeoTechnicalInvestigationRequest = async (req, res, next) => {
 
       await GeoTechnical.update(request, {
         where: { id: requestId },
-        transaction: t
+        transaction: t,
       });
       return res.status(200).send({
         success: true,
-        message: "Geotechnical Investigation updated successfully"
+        message: "Geotechnical Investigation updated successfully",
       });
     } catch (error) {
       t.rollback();
@@ -1031,34 +1031,34 @@ exports.updateGeoTechnicalInvestigationRequest = async (req, res, next) => {
 
 // Request for project approval
 exports.requestProjectApproval = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { projectId } = req.params;
       const project = await Project.findOne({ where: { id: projectId } });
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project"
+          message: "Invalid Project",
         });
       }
       const requestData = {
-        approvalStatus: "in_review"
+        approvalStatus: "in_review",
       };
       await Project.update(requestData, {
         where: { id: projectId },
-        transaction: t
+        transaction: t,
       });
       const userId = req.user.id;
       const user = await User.findByPk(userId, { attributes: ["name"] });
       const reqData = {
         req,
         userId,
-        message: `${user.name} has requested to commence with ${project.projectSlug}`
+        message: `${user.name} has requested to commence with ${project.projectSlug}`,
       };
       await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
-        message: "Project sent for approval"
+        message: "Project sent for approval",
       });
     } catch (error) {
       t.rollback();
@@ -1069,7 +1069,7 @@ exports.requestProjectApproval = async (req, res, next) => {
 
 // Approve Project request
 exports.approveProjectRequest = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { projectId } = req.params;
       const { isApproved } = req.body;
@@ -1077,16 +1077,16 @@ exports.approveProjectRequest = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project"
+          message: "Invalid Project",
         });
       }
       const requestData = {
         approvalStatus: isApproved ? "approved" : "disapproved",
-        status: isApproved ? "approved" : "closed"
+        status: isApproved ? "approved" : "closed",
       };
       await Project.update(requestData, {
         where: { id: projectId },
-        transaction: t
+        transaction: t,
       });
 
       const { userId } = project;
@@ -1099,7 +1099,7 @@ exports.approveProjectRequest = async (req, res, next) => {
       await Notification.createNotification({
         type: "user",
         message,
-        userId
+        userId,
       });
       io.emit(
         "getNotifications",
@@ -1107,7 +1107,7 @@ exports.approveProjectRequest = async (req, res, next) => {
       );
       return res.status(200).send({
         success: true,
-        message: "Project approved for commencement"
+        message: "Project approved for commencement",
       });
     } catch (error) {
       t.rollback();
@@ -1118,26 +1118,27 @@ exports.approveProjectRequest = async (req, res, next) => {
 
 // Dispatch Project request
 exports.dispatchProject = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { projectId } = req.params;
       const { score } = req.body;
+
       const project = await Project.findByPk(projectId);
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project"
-        });
+          message: "Invalid Project",
+        });             
       }
-      const {
+      const {           
         providerData: serviceProviders,
-        completed
+        completed,
       } = await this.getQualifiedServiceProviders(project, score, t);
       if (completed === true) {
         project.update({ status: "dispatched" }, { transaction: t });
         if (serviceProviders.length > 0) {
           await Promise.all(
-            serviceProviders.map(async service => {
+            serviceProviders.map(async (service) => {
               await this.notifyServicePartner(req, serviceProviders.userId);
             })
           );
@@ -1145,12 +1146,12 @@ exports.dispatchProject = async (req, res, next) => {
       } else {
         return res.status(400).send({
           success: false,
-          message: "Not enough service providers to dispatch job"
+          message: "Not enough service providers to dispatch job",
         });
       }
       return res.status(200).send({
         success: true,
-        message: "Project dispatched to service partner"
+        message: "Project dispatched to service partner",
       });
     } catch (error) {
       console.log(error);
@@ -1166,8 +1167,9 @@ exports.getQualifiedServiceProviders = async (project, score, transaction) => {
     const { projectTypes } = project;
     // get service types for project types
     const serviceTypes = await ServiceType.findOne({
-      where: { slug: projectTypes }
+      where: { slug: projectTypes },
     });
+    console.log(serviceTypes)
     // query all service partners with service type id
     // kyc point greater than the passed score
     // user is verified
@@ -1175,16 +1177,16 @@ exports.getQualifiedServiceProviders = async (project, score, transaction) => {
     const wherePartner = {
       serviceTypeId: serviceTypes.id,
       kycPoint: {
-        [Op.gte]: score
+        [Op.gte]: score,
       },
       hasActiveSubscription: true,
-      isVerified: true
+      isVerified: true,
     };
     const servicePartners = JSON.parse(
       JSON.stringify(
         await ServicePartner.findAll({
           where: wherePartner,
-          order: [[Sequelize.literal("RAND()")]]
+          order: [[Sequelize.literal("RAND()")]],
         })
       )
     );
@@ -1193,7 +1195,7 @@ exports.getQualifiedServiceProviders = async (project, score, transaction) => {
       return {
         completed: false,
         message: "Not enough service providers",
-        providerData: []
+        providerData: [],
       };
     }
     // remove service partners with ongoing projects
@@ -1201,22 +1203,24 @@ exports.getQualifiedServiceProviders = async (project, score, transaction) => {
       status: "ongoing",
       approvalStatus: "approved",
       serviceProviderId: {
-        [Op.ne]: null
-      }
+        [Op.ne]: null,
+      },
     };
     const ongoingProjects = await Project.findAll({
       where,
-      attributes: ["serviceProviderId"]
+      attributes: ["serviceProviderId"],
     });
-    const partnersWithProjects = ongoingProjects.map(p => p.serviceProviderId);
-    const filteredServicePartners = servicePartners.filter(partner => {
+    const partnersWithProjects = ongoingProjects.map(
+      (p) => p.serviceProviderId
+    );
+    const filteredServicePartners = servicePartners.filter((partner) => {
       if (!partnersWithProjects.includes(partner.id)) {
         return partner;
       }
       return null;
     });
     const qualifiedPartners = filteredServicePartners.filter(
-      pat => pat !== null
+      (pat) => pat !== null
     );
     let providers = [...qualifiedPartners];
     if (qualifiedPartners.length > 3) {
@@ -1224,18 +1228,18 @@ exports.getQualifiedServiceProviders = async (project, score, transaction) => {
       providers = this.getRandom(qualifiedPartners, 3);
     }
     // add them as service providers
-    const providerData = providers.map(pr => ({
+    const providerData = providers.map((pr) => ({
       userId: pr.id,
       status: "pending",
-      projectId: project.id
+      projectId: project.id,
     }));
     await ServiceProvider.bulkCreate(providerData, {
-      transaction
+      transaction,
     });
     // send notifications to them
     return {
       completed: true,
-      providerData
+      providerData,
     };
   } catch (error) {
     // console.log(error);
@@ -1265,7 +1269,7 @@ exports.notifyServicePartner = async (req, userId) => {
   await Notification.createNotification({
     type: "user",
     message,
-    userId
+    userId,
   });
   io.emit(
     "getNotifications",
@@ -1287,14 +1291,14 @@ exports.getDispatchedProject = async (req, res, next) => {
           include: [
             {
               model: Project,
-              as: "project"
-            }
-          ]
+              as: "project",
+            },
+          ],
         })
       )
     );
     const data = await Promise.all(
-      requests.map(async request => {
+      requests.map(async (request) => {
         const projectDetails = JSON.parse(
           JSON.stringify(
             await this.getProjectTypeData(
@@ -1306,7 +1310,7 @@ exports.getDispatchedProject = async (req, res, next) => {
         const bid = JSON.parse(
           JSON.stringify(
             await ProjectBidding.findOne({
-              where: { userId, projectId: request.project.id }
+              where: { userId, projectId: request.project.id },
             })
           )
         );
@@ -1323,7 +1327,7 @@ exports.getDispatchedProject = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data
+      data,
     });
   } catch (error) {
     return next(error);
@@ -1339,12 +1343,12 @@ exports.getAssignedProjects = async (req, res, next) => {
       JSON.stringify(
         await Project.findAll({
           where,
-          order: [["createdAt", "DESC"]]
+          order: [["createdAt", "DESC"]],
         })
       )
     );
     const data = await Promise.all(
-      projects.map(async project => {
+      projects.map(async (project) => {
         const requestData = await this.getProjectTypeData(
           project.id,
           project.projectTypes
@@ -1355,7 +1359,7 @@ exports.getAssignedProjects = async (req, res, next) => {
     );
     return res.status(200).send({
       success: true,
-      data
+      data,
     });
   } catch (error) {
     return next(error);
@@ -1364,20 +1368,20 @@ exports.getAssignedProjects = async (req, res, next) => {
 
 // Assign Project to Service Partner
 exports.assignProject = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const {
         projectId,
         userId,
         estimatedCost,
         totalCost,
-        duration
+        duration,
       } = req.body;
       const project = await Project.findByPk(projectId);
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project"
+          message: "Invalid Project",
         });
       }
       const endDate = moment().add(duration, "weeks");
@@ -1387,13 +1391,13 @@ exports.assignProject = async (req, res, next) => {
         estimatedCost,
         totalCost,
         duration,
-        endDate
+        endDate,
       };
       await project.update(request, { transaction: t });
 
       return res.status(200).send({
         success: true,
-        message: "Project assigned to service partner"
+        message: "Project assigned to service partner",
       });
     } catch (error) {
       console.log(error);
@@ -1405,7 +1409,7 @@ exports.assignProject = async (req, res, next) => {
 
 // Assign Project to Service Partner
 exports.bidForProject = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { userId, projectId } = req.body;
       const data = req.body;
@@ -1413,12 +1417,12 @@ exports.bidForProject = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project"
+          message: "Invalid Project",
         });
       }
       const where = {
         userId,
-        projectId
+        projectId,
       };
       await ServiceProvider.update(
         { status: "accepted" },
@@ -1430,7 +1434,7 @@ exports.bidForProject = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         message: "Project Bade successfully",
-        data: bid
+        data: bid,
       });
     } catch (error) {
       console.log(error);
@@ -1449,17 +1453,17 @@ exports.getProjectBids = async (req, res, next) => {
       JSON.stringify(await ProjectBidding.findAll({ where: { projectId } }))
     );
     const data = await Promise.all(
-      bids.map(async bid => {
+      bids.map(async (bid) => {
         const user = await userService.getUserFromProfile(
           "professional",
           bid.userId
         );
         bid.userDetails = user;
         const completedProjects = await Project.count({
-          where: { serviceProviderId: bid.userId, status: "completed" }
+          where: { serviceProviderId: bid.userId, status: "completed" },
         });
         const ongoingProjects = await Project.count({
-          where: { serviceProviderId: bid.userId, status: "ongoing" }
+          where: { serviceProviderId: bid.userId, status: "ongoing" },
         });
         bid.completedProjects = completedProjects;
         bid.ongoingProjects = ongoingProjects;
@@ -1470,8 +1474,8 @@ exports.getProjectBids = async (req, res, next) => {
       success: true,
       data: {
         project,
-        bids: data
-      }
+        bids: data,
+      },
     });
   } catch (error) {
     return next(error);
@@ -1494,8 +1498,8 @@ exports.getIndividualProjectBid = async (req, res, next) => {
       success: true,
       data: {
         project,
-        bid
-      }
+        bid,
+      },
     });
   } catch (error) {
     return next(error);
