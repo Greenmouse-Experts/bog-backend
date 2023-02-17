@@ -133,17 +133,17 @@ exports.getAllProjectRequest = async (req, res, next) => {
       )
     );
     const data = await Promise.all(
-      projects.map(async (project) => {
+      projects.map(async project => {
         const requestData = await this.getProjectTypeData(
           project.id,
           project.projectTypes
         );
         let projectOwner = await PrivateClient.findByPk(project.userId, {
-          include: ["private_user"],
+          include: ["private_user"]
         });
         if (!projectOwner) {
           projectOwner = await CorporateClient.findByPk(project.userId, {
-            include: ["corporate_user"],
+            include: ["corporate_user"]
           });
         }
         project.projectOwner = projectOwner;
@@ -160,7 +160,7 @@ exports.getAllProjectRequest = async (req, res, next) => {
     );
     return res.status(200).send({
       success: true,
-      data,
+      data
     });
   } catch (error) {
     return next(error);
@@ -215,15 +215,11 @@ exports.viewProjectRequest = async (req, res, next) => {
         })
       )
     );
-    const requestData = await this.getProjectTypeData(
-      project.id,
-      project.projectTypes
-    );
-    project.projectData = requestData;
+    const result = await this.getFullProjectRequest(project);
 
     return res.status(200).send({
       success: true,
-      data: project,
+      data: project
     });
   } catch (error) {
     return next(error);
