@@ -5,25 +5,25 @@ const sequelize = require("../config/database/connection");
 const SmartCalculatorSetting = require("../models/SmartCalculatorSetting");
 
 exports.createRate = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { name } = req.body;
       const getRate = await SmartCalculatorSetting.findOne({
-        where: { name }
+        where: { name },
       });
       if (getRate) {
         return res.status(200).send({
           success: false,
-          message: "Name already existed"
+          message: "Name already existed",
         });
       }
       const allSettings = await SmartCalculatorSetting.create(req.body, {
-        transaction: t
+        transaction: t,
       });
 
       return res.status(200).send({
         success: true,
-        data: allSettings
+        data: allSettings,
       });
     } catch (error) {
       return next(error);
@@ -32,13 +32,13 @@ exports.createRate = async (req, res, next) => {
 };
 
 exports.ReadRate = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const getRates = await SmartCalculatorSetting.findAll();
 
       return res.status(200).send({
         success: true,
-        data: getRates
+        data: getRates,
       });
     } catch (error) {
       return next(error);
@@ -47,25 +47,25 @@ exports.ReadRate = async (req, res, next) => {
 };
 
 exports.UpdateRate = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { id } = req.params;
       const getRate = await SmartCalculatorSetting.findOne({
-        where: { id }
+        where: { id },
       });
       if (!getRate) {
         return res.status(501).send({
           success: false,
-          message: "Already deleted"
+          message: "Already deleted",
         });
       }
       const updatedSetting = await SmartCalculatorSetting.update(req.body, {
         where: { id },
-        transaction: t
+        transaction: t,
       });
       return res.status(200).send({
         success: true,
-        data: updatedSetting
+        data: updatedSetting,
       });
     } catch (error) {
       return next(error);
@@ -74,29 +74,40 @@ exports.UpdateRate = async (req, res, next) => {
 };
 
 exports.DeleteRate = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { id } = req.params;
       const getRate = await SmartCalculatorSetting.findOne({
-        where: { id }
+        where: { id },
       });
       if (!getRate) {
         return res.status(501).send({
           success: false,
-          message: "Already deleted"
+          message: "Already deleted",
         });
       }
       await SmartCalculatorSetting.destroy({
         where: { id },
-        transaction: t
+        transaction: t,
       });
 
       return res.status(200).send({
         success: true,
-        message: "Deleted successfully"
+        message: "Deleted successfully",
       });
     } catch (error) {
       return next(error);
     }
   });
+};
+
+/**
+ * Extract parameters from uploaded file
+ */
+exports.extractAndStoreParams = (req, res, next) => {
+  try {
+    
+  } catch (error) {
+    
+  }
 };

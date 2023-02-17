@@ -1,6 +1,6 @@
 exports.generateOrderId = Math.floor(190000000 + Math.random() * 990000000);
 
-exports.projectSlug = type => {
+exports.projectSlug = (type) => {
   let slug;
   if (type === "land_survey") {
     slug = "LNS";
@@ -12,8 +12,8 @@ exports.projectSlug = type => {
     slug = "GTI";
   } else if (type === "contractor") {
     slug = "CNT";
-  }else{
-    slug = type.toUpperCase().slice(0, 3)
+  } else {
+    slug = type.toUpperCase().slice(0, 3);
   }
   return slug;
 };
@@ -27,23 +27,49 @@ exports.adminLevels = [
   { level: 3, type: "finance admin" },
   { level: 4, type: "product admin" },
   { level: 5, type: "project admin" },
-  { level: 6, type: "general admin" }
+  { level: 6, type: "general admin" },
 ];
 
 exports.adminPrivileges = [
-  {type: "general admin", privileges: [
-    "BLOG", "PROFILE", "TRANSACTION", "PRODUCT", "ORDER", "NOTIFICATION", "PROJECT", "MEETING",
-  ]},
+  {
+    type: "general admin",
+    privileges: [
+      "BLOG",
+      "PROFILE",
+      "TRANSACTION",
+      "PRODUCT",
+      "ORDER",
+      "NOTIFICATION",
+      "PROJECT",
+      "MEETING",
+    ],
+  },
   { type: "article admin", privileges: ["BLOG", "PROFILE"] },
   { type: "finance admin", privileges: ["TRANSACTION", "PROFILE"] },
   {
     type: "product admin",
-    privileges: ["PRODUCT", "ORDER", "NOTIFICATION", "PROFILE"]
+    privileges: ["PRODUCT", "ORDER", "NOTIFICATION", "PROFILE"],
   },
   {
     type: "project admin",
-    privileges: ["PROJECT", "MEETING", "NOTIFICATION", "PROFILE"]
-  }
+    privileges: ["PROJECT", "MEETING", "NOTIFICATION", "PROFILE"],
+  },
 ];
 
-// exports.
+exports.generalInformation = {
+  foundationDesign: [{type: "strip", formula: ''}, "pad", "raft", "pile"],
+  frameStructureDesign: ["concrete columns", "beams", "slab"],
+  blockWork: [
+    "225mm thick sandcrete block",
+    "150mm thick sandcrete block",
+    "100mm thick sandcrete block",
+    "clay bricks",
+  ],
+  roofDesign: [
+    "concrete roof slab & beam",
+    "stonecoated roofing",
+    "aluminium roofing",
+  ],
+};
+
+exports.formula = {};

@@ -58,15 +58,17 @@ router
 // Admin routes
 router
   .route("/product/admin/get-products")
-  .get([Auth, Access.verifyAccess], ProductController.getProductsForAdmin);
+  .get([Auth, Access.verifyAccess, Access.verifyAdmin], ProductController.getProductsForAdmin);
 
 router
   .route("/product/admin/approve-product")
   .post(
     productApprovalValidation(),
     validate,
-    [Auth, Access.verifyAccess],
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
     ProductController.approveProduct
   );
+
+
 
 module.exports = router;

@@ -96,6 +96,16 @@ const meetingValidation = () => {
   ];
 };
 
+const addressValidation = () => {
+  return [
+    check("title", "Title is required").notEmpty(),
+    check("address", "Address is required").notEmpty(),
+    check("state", "State is required").notEmpty(),
+    check("country", "Country is required").notEmpty(),
+    check("charge", "Charge is required").notEmpty(),
+  ];
+};
+
 const meetingStatusValidation = () => {
   return [
     check("meetingId", "Account not found").notEmpty(),
@@ -290,6 +300,7 @@ module.exports = {
   contractorRequestValidation,
   adminValidation,
   meetingValidation,
+  addressValidation,
   meetingStatusValidation,
   BasicKYCRequirements,
   KYCApprovalValidation,
