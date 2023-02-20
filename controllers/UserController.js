@@ -199,7 +199,7 @@ exports.registerAdmin = async (req, res, next) => {
 };
 
 exports.loginUser = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  // sequelize.transaction(async t => {
     try {
       const { email, password } = req.body;
       const user = JSON.parse(
@@ -273,10 +273,11 @@ exports.loginUser = async (req, res, next) => {
         user: data
       });
     } catch (error) {
-      t.rollback();
+      console.log(error)
+      // t.rollback();
       return next(error);
     }
-  });
+  // });
 };
 
 exports.switchAccount = async (req, res, next) => {
