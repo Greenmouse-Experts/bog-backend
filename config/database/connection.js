@@ -8,6 +8,7 @@ const sequelize = new Sequelize(
   config.password,
   {
     host: config.host,
+    port: config.port,
     dialect: "mysql",
     raw: true,
     pool: {

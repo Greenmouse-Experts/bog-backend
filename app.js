@@ -72,7 +72,7 @@ app.post("/upload", async (req, res, next) => {
 });
 
 io.on("connection", async socket => {
-  // console.log(socket);
+  console.log(socket);
   io.emit("getNotifications", await Notification.fetchAdminNotification());
   io.emit(
     "getUserNotifications",
@@ -152,7 +152,7 @@ app.use((err, req, res, next) => {
 app.use((req, res) => {
   return res.status(404).send({ success: false, message: "Route not found" });
 });
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`server started on port ${PORT}`);
 });

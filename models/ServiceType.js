@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const ServicePartner = require("./ServicePartner");
 const Services = require("./Services");
 
 const ServiceType = sequelise.define(
@@ -40,5 +41,6 @@ ServiceType.belongsTo(Services, {
   foreignKey: "serviceId",
   as: "service"
 });
+
 
 module.exports = ServiceType;
