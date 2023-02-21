@@ -18,7 +18,7 @@ router
   );
 
 router
-  .route("/address/view/all")
+  .route("/address/view/all") //?q={state}
   .get([Auth, Access.verifyAccess], DeliveryAddressController.viewAddresses);
 
 router

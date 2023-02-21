@@ -38,7 +38,9 @@ exports.createAddress = async (req, res, next) => {
 
 exports.viewAddresses = async (req, res, next) => {
   try {
-    const addresses = await Addresses.findAll();
+    const {q} = req.query;
+    let params = typeof q !== 'undefined' ? {where: {state: q}} : {}
+    const addresses = await Addresses.findAll(params);
     return res.status(200).send({
       success: true,
       data: addresses,
