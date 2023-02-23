@@ -37,6 +37,10 @@ const Product = sequelise.define(
       allowNull: true,
       type: Sequelize.DECIMAL
     },
+    weight: {
+      allowNull: true,
+      type: Sequelize.DOUBLE
+    },
     unit: {
       allowNull: true,
       type: Sequelize.STRING

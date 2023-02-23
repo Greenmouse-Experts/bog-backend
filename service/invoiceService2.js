@@ -60,7 +60,7 @@ exports.createInvoice = async (orderData, user) => {
     // Total values are being calculated automatically
     products: myProduct,
     // The message you would like to display on the bottom of your invoice
-    "bottom-notice": "Kindly pay your invoice within 15 days.",
+    // "bottom-notice": "Kindly pay your invoice within 15 days.",
     // Settings to customize your invoice
     settings: {
       currency: "NGN" // See documentation 'Locales and Currency' for more info. Leave empty for no currency.
