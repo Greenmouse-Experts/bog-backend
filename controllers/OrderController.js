@@ -170,9 +170,11 @@ exports.createOrder = async (req, res, next) => {
       const paymentData = {
         userId,
         payment_reference: paymentInfo.reference,
-        amount: paymentInfo.amount,
+        amount: totalAmount,
         payment_category: "Order"
       };
+
+      console.log(req.body)
 
       await Payment.create(paymentData, { transaction: t });
       const contact = {

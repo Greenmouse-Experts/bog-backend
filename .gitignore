@@ -4,3 +4,5 @@ uploads
 migrations_copy
 _copy
 test.js
+get-pip.py
+index.py
