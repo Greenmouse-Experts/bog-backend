@@ -100,16 +100,18 @@ exports.verifyAccount = async (req, res, next) => {
       const userId = req.user.id;
       const {account_number, bank_code} = req.body;
 
+      console.log(req.body)
       const headers = {
         Authorization: `Bearer ${process.env.PAYSTACK_SECRET}`
       }
       const response = await axios.get(`${process.env.PAYSTACK_BASEURL}/bank/resolve?account_number=${account_number}&bank_code=${bank_code}`, {headers});
 
-      return res.send(response);
+      // console.log(response)
+      return res.json(response.data);
 
     } catch (error) {
       // t.rollback(next);
-      console.log(error.response.data)
+      console.log(error)
       return next(error.response.data);
     }
   // });
