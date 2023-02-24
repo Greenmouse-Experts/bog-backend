@@ -1130,6 +1130,7 @@ exports.dispatchProject = async (req, res, next) => {
         providerData: serviceProviders,
         completed,
       } = await this.getQualifiedServiceProviders(project, score, t);
+      console.log(completed)
       if (completed === true) {
         project.update({ status: "dispatched" }, { transaction: t });
         if (serviceProviders.length > 0) {
