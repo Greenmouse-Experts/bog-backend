@@ -1161,12 +1161,12 @@ exports.dispatchProject = async (req, res, next) => {
 exports.getQualifiedServiceProviders = async (project, score, transaction) => {
   try {
     // check project type
-    const { projectTypes } = project;
+    const { projectTypes, title } = project;
+    // console.log(project)
     // get service types for project types
     const serviceTypes = await ServiceType.findOne({
-      where: { slug: projectTypes },
+      where: { slug: projectTypes, title },
     });
-    console.log(serviceTypes)
     // query all service partners with service type id
     // kyc point greater than the passed score
     // user is verified
