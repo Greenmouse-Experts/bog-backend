@@ -93,3 +93,24 @@ exports.getBankDetail = async (req, res, next) => {
     }
   });
 };
+
+exports.verifyAccount = async (req, res, next) => {
+  // sequelize.transaction(async t => {
+    try {
+      const userId = req.user.id;
+      const {account_number, bank_code} = req.body;
+
+      const headers = {
+        Authorization: `Bearer ${process.env.PAYSTACK_SECRET}`
+      }
+      const response = await axios.get(`${process.env.PAYSTACK_BASEURL}/bank/resolve?account_number=${account_number}&bank_code=${bank_code}`, {headers});
+
+      return res.send(response);
+
+    } catch (error) {
+      // t.rollback(next);
+      console.log(error)
+      return next(error);
+    }
+  // });
+};
