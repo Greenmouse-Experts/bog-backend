@@ -111,7 +111,7 @@ exports.verifyAccount = async (req, res, next) => {
 
     } catch (error) {
       // t.rollback(next);
-      console.log(error)
+      // console.log(error)
       return next(error.response.data);
     }
   // });
