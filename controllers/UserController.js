@@ -209,7 +209,7 @@ exports.loginUser = async (req, res, next) => {
       if (!user) {
         return res.status(400).send({
           success: false,
-          message: "Invalid User"
+          message: "Invalid Credentials!"
         });
       }
       if (user.userType === "admin") {
@@ -415,7 +415,7 @@ exports.loginAdmin = async (req, res, next) => {
       if (!user) {
         return res.status(400).send({
           success: false,
-          message: "Invalid User"
+          message: "Invalid Credentials!"
         });
       }
       if (user.userType !== "admin") {
