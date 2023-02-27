@@ -28,9 +28,18 @@ router
   .route("/projects/dispatched-projects/:userId")
   .get(Auth, ProjectController.getDispatchedProject);
 
+// Get dispatched projects v2
+router.route('/projects/v2/dispatched-projects/:userId')
+  .get([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.getV2DispatchedProject)
+
 router
   .route("/projects/assigned-projects/:userId")
   .get(Auth, ProjectController.getAssignedProjects);
+
+// Get assigned projects v2
+router
+  .route("/projects/v2/assigned-projects/:userId")
+  .get(Auth, ProjectController.getV2AssignedProjects);
 
 router.route("/projects/all").get(Auth, ProjectController.getAllProjectRequest);
 

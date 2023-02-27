@@ -17,12 +17,14 @@ const helpers = require("../helpers/message");
 const EmailService = require("../service/emailService");
 const ServicePartner = require("../models/ServicePartner");
 const ProductPartner = require("../models/ProductPartner");
+const Projects = require("../models/Project");
 const PrivateClient = require("../models/PrivateClient");
 const CorporateClient = require("../models/CorporateClient");
 const User = require("../models/User");
 const Notification = require("../helpers/notification");
 
 const { adminLevels, adminPrivileges } = require("../helpers/utility");
+const ServiceProvider = require("../models/ServiceProvider");
 
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async t => {
@@ -944,11 +946,22 @@ exports.findSingleUser = async (req, res) => {
 
     const accounts = await this.getAccountsData(userId);
 
+    const servicePartner = await ServicePartner.findOne({where: {userId}})
+    let ongoingProjects = [];
+    let completedProjects = [];
+    if (servicePartner !== null) {
+      const projectDetails = await Projects.findAll({where: {serviceProviderId: servicePartner.id}});
+      ongoingProjects = projectDetails.filter(_detail => _detail.status === 'ongoing');
+      completedProjects = projectDetails.filter(_detail => _detail.status === 'completed');
+    }
+
     return res.status(200).send({
       success: true,
       data: {
         user: userData,
-        accounts
+        accounts,
+        ongoingProjects,
+        completedProjects
       }
     });
   } catch (error) {
