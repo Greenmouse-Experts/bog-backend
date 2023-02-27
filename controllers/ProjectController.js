@@ -266,6 +266,52 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
   }
 };
 
+/**
+ * Get user's project based on the specified status in req.query.status
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.userProjects = async (req, res, next) => {
+  try {
+    const {status} = req.query;
+    const {id} = req.params;
+    const where = {};
+    if (status === undefined) {
+      where = {id}
+    } else {
+      where = {id, status}
+    }
+    const project = await Project.findOne({
+      where
+    });
+
+    if (project === null) {
+      return res.status(404).send({
+        status: false,
+        message: "Project not found!",
+      });
+    }
+
+    const requestData = await ServiceFormProjects.findAll({
+      include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+      where: { projectID: project.id },
+    });
+
+    // project.toJSON().projectData = requestData;
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        ...project.toJSON(),
+        projectData: requestData,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 exports.createProject = async (data, transaction) => {
   try {
     const type = utility.projectSlug(data.projectTypes);
@@ -1294,6 +1340,84 @@ exports.getDispatchedProject = async (req, res, next) => {
         })
       )
     );
+    console.log(requests);
+
+    const data = await Promise.all(
+      requests.map(async (request) => {
+        const projectDetails = JSON.parse(
+          JSON.stringify(
+            await this.getProjectTypeData(
+              request.project.id,
+              request.project.projectTypes
+            )
+          )
+        );
+        const bid = JSON.parse(
+          JSON.stringify(
+            await ProjectBidding.findOne({
+              where: { userId, projectId: request.project.id },
+            })
+          )
+        );
+        request.hasBid = false;
+        request.bid = null;
+        if (bid) {
+          request.hasBid = true;
+          request.bid = bid;
+        }
+        request.projectDetails = projectDetails;
+        return request;
+      })
+    );
+
+    return res.status(200).send({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * Get dispatched projects (v2)
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
+exports.getV2DispatchedProject = async (req, res, next) => {
+  try {
+    let { userId } = req.params;
+
+    // console.log(userId)
+    const response = await ServicePartner.findOne({where: {userId}});
+
+    if (response === null) {
+      return res.status(400).send({
+        status: false,
+        message: "Partner not found!"
+      })
+    }
+    userId = response.id
+    // const where = { userId };
+
+    const requests = JSON.parse(
+      JSON.stringify(
+        await ServiceProvider.findAll({
+          where: { userId },
+          order: [["createdAt", "DESC"]],
+          include: [
+            {
+              model: Project,
+              as: "project",
+            },
+          ],
+        })
+      )
+    );
+    console.log(requests);
+    
     const data = await Promise.all(
       requests.map(async (request) => {
         const projectDetails = JSON.parse(
@@ -1346,6 +1470,57 @@ exports.getAssignedProjects = async (req, res, next) => {
     );
     const data = await Promise.all(
       projects.map(async (project) => {
+        const requestData = await this.getProjectTypeData(
+          project.id,
+          project.projectTypes
+        );
+        project.projectData = requestData;
+        return project;
+      })
+    );
+    return res.status(200).send({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * v2 Get assigned projects
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
+exports.getV2AssignedProjects = async (req, res, next) => {
+  try {
+    let { userId } = req.params;
+
+    // console.log(userId)
+    const response = await ServicePartner.findOne({where: {userId}});
+
+    if (response === null) {
+      return res.status(400).send({
+        status: false,
+        message: "Partner not found!"
+      })
+    }
+    userId = response.id
+
+    const where = { serviceProviderId: userId };
+    const projects = JSON.parse(
+      JSON.stringify(
+        await Project.findAll({
+          where,
+          order: [["createdAt", "DESC"]],
+        })
+      )
+    );
+    const data = await Promise.all(
+      projects.map(async (project) => {
+
         const requestData = await this.getProjectTypeData(
           project.id,
           project.projectTypes
