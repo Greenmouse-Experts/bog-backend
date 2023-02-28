@@ -27,7 +27,7 @@ const { adminLevels, adminPrivileges } = require("../helpers/utility");
 const ServiceProvider = require("../models/ServiceProvider");
 
 exports.registerUser = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { email, userType, name, captcha } = req.body;
       if (!req.body.platform && userType !== "admin") {
@@ -36,7 +36,7 @@ exports.registerUser = async (req, res, next) => {
           return res.status(400).send({
             success: false,
             message: "Please answer the captcha correctly",
-            validateCaptcha
+            validateCaptcha,
           });
         }
       }
@@ -45,7 +45,7 @@ exports.registerUser = async (req, res, next) => {
       if (!isUserType) {
         return res.status(400).send({
           success: false,
-          message: "Invalid User Entity passed"
+          message: "Invalid User Entity passed",
         });
       }
       let user = await UserService.findUser({ email });
@@ -62,7 +62,7 @@ exports.registerUser = async (req, res, next) => {
           address: req.body.address,
           level: req.body.level,
           referralId: randomstring.generate(12),
-          aboutUs: req.body.aboutUs
+          aboutUs: req.body.aboutUs,
         };
 
         user = await UserService.createNewUser(userData, t);
@@ -78,21 +78,21 @@ exports.registerUser = async (req, res, next) => {
         }
         const data = {
           token,
-          id: user.id
+          id: user.id,
         };
         await UserService.updateUser(data, t);
         // check if refferalId was passed
         if (req.body.reference && req.body.reference !== "") {
           const where = {
             referralId: {
-              [Op.eq]: req.body.reference
-            }
+              [Op.eq]: req.body.reference,
+            },
           };
           const reference = await UserService.findUser(where);
           if (reference) {
             const referenceData = {
               userId: reference.id,
-              referredId: user.id
+              referredId: user.id,
             };
             await UserService.createReferral(referenceData, t);
           }
@@ -102,7 +102,7 @@ exports.registerUser = async (req, res, next) => {
             userId: user.id,
             userType,
             company_name: req.body.company_name,
-            serviceTypeId: req.body.serviceTypeId
+            serviceTypeId: req.body.serviceTypeId,
           };
           const result = await this.addUserProfile(request, t);
         }
@@ -111,7 +111,7 @@ exports.registerUser = async (req, res, next) => {
         if (isUser) {
           return res.status(400).send({
             success: false,
-            message: "This Email is already in Use for this user entity"
+            message: "This Email is already in Use for this user entity",
           });
         }
         if (userType !== "admin" || userType !== "other") {
@@ -119,7 +119,7 @@ exports.registerUser = async (req, res, next) => {
             userId: user.id,
             userType,
             company_name: req.body.company_name,
-            serviceTypeId: req.body.serviceTypeId
+            serviceTypeId: req.body.serviceTypeId,
           };
           const result = await this.addUserProfile(request, t);
         }
@@ -129,7 +129,7 @@ exports.registerUser = async (req, res, next) => {
       if (type.includes(userType)) {
         const data = {
           userId: user.id,
-          company_name: req.body.company_name
+          company_name: req.body.company_name,
         };
         await UserService.createProfile(data, t);
       }
@@ -143,13 +143,13 @@ exports.registerUser = async (req, res, next) => {
       await Notification.createNotification({
         userId,
         type: notifyType,
-        message: mesg
+        message: mesg,
       });
       io.emit("getNotifications", await Notification.fetchAdminNotification());
 
       return res.status(201).send({
         success: true,
-        message: "User Created Successfully"
+        message: "User Created Successfully",
       });
     } catch (error) {
       t.rollback();
@@ -159,7 +159,7 @@ exports.registerUser = async (req, res, next) => {
 };
 
 exports.registerAdmin = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { email, userType, name } = req.body;
 
@@ -167,14 +167,14 @@ exports.registerAdmin = async (req, res, next) => {
       if (!isUserType) {
         return res.status(400).send({
           success: false,
-          message: "Invalid User Entity passed"
+          message: "Invalid User Entity passed",
         });
       }
       const user = await UserService.findUser({ email });
       if (user) {
         return res.status(400).send({
           success: false,
-          message: "This Email is already in Use for this user entity"
+          message: "This Email is already in Use for this user entity",
         });
       }
 
@@ -183,7 +183,7 @@ exports.registerAdmin = async (req, res, next) => {
         email: req.body.email,
         password: bcrypt.hashSync(req.body.password, 10),
         userType: req.body.userType,
-        level: req.body.level
+        level: req.body.level,
       };
 
       const admin = await UserService.createNewUser(userData, t);
@@ -191,7 +191,7 @@ exports.registerAdmin = async (req, res, next) => {
       return res.status(201).send({
         success: true,
         message: "User Created Successfully",
-        admin
+        admin,
       });
     } catch (error) {
       t.rollback();
@@ -202,88 +202,88 @@ exports.registerAdmin = async (req, res, next) => {
 
 exports.loginUser = async (req, res, next) => {
   // sequelize.transaction(async t => {
-    try {
-      const { email, password } = req.body;
-      const user = JSON.parse(
-        JSON.stringify(await UserService.findUser({ email }))
-      );
+  try {
+    const { email, password } = req.body;
+    const user = JSON.parse(
+      JSON.stringify(await UserService.findUser({ email }))
+    );
 
-      if (!user) {
-        return res.status(400).send({
-          success: false,
-          message: "Invalid Credentials!"
-        });
-      }
-      if (user.userType === "admin") {
-        return res.status(400).send({
-          success: false,
-          message: "This user is not available"
-        });
-      }
-      if (!user.isActive) {
-        return res.status(400).send({
-          success: false,
-          message: "Please Verify account"
-        });
-      }
-      if (user.isSuspended) {
-        return res.status(400).send({
-          success: false,
-          message:
-            "Your account has been suspended. Reach out to the admin for further information"
-        });
-      }
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(404).send({
-          success: false,
-          message: "Invalid User Details"
-        });
-      }
-      const payload = {
-        user: {
-          id: user.id
-        }
-      };
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: 36000
+    if (!user) {
+      return res.status(400).send({
+        success: false,
+        message: "Invalid Credentials!",
       });
-      let profile;
-      const data = {
-        ...user
-      };
-      const userId = user.id;
-      if (req.body.userType && req.body.userType !== "") {
-        const { userType } = req.body;
-        profile = await UserService.getUserTypeProfile(userType, userId);
-        if (profile) {
-          data.profile = profile;
-          data.userType = userType;
-        }
-      } else {
-        profile = await UserService.getUserTypeProfile(user.userType, userId);
-        if (profile) {
-          data.profile = profile;
-          data.userType = user.userType;
-        }
-      }
-
-      return res.status(201).send({
-        success: true,
-        message: "User Logged In Sucessfully",
-        token,
-        user: data
-      });
-    } catch (error) {
-      console.log(error)
-      // t.rollback();
-      return next(error);
     }
+    if (user.userType === "admin") {
+      return res.status(400).send({
+        success: false,
+        message: "This user is not available",
+      });
+    }
+    if (!user.isActive) {
+      return res.status(400).send({
+        success: false,
+        message: "Please Verify account",
+      });
+    }
+    if (user.isSuspended) {
+      return res.status(400).send({
+        success: false,
+        message:
+          "Your account has been suspended. Reach out to the admin for further information",
+      });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(404).send({
+        success: false,
+        message: "Invalid User Details",
+      });
+    }
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: 36000,
+    });
+    let profile;
+    const data = {
+      ...user,
+    };
+    const userId = user.id;
+    if (req.body.userType && req.body.userType !== "") {
+      const { userType } = req.body;
+      profile = await UserService.getUserTypeProfile(userType, userId);
+      if (profile) {
+        data.profile = profile;
+        data.userType = userType;
+      }
+    } else {
+      profile = await UserService.getUserTypeProfile(user.userType, userId);
+      if (profile) {
+        data.profile = profile;
+        data.userType = user.userType;
+      }
+    }
+
+    return res.status(201).send({
+      success: true,
+      message: "User Logged In Sucessfully",
+      token,
+      user: data,
+    });
+  } catch (error) {
+    console.log(error);
+    // t.rollback();
+    return next(error);
+  }
   // });
 };
 
 exports.switchAccount = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { userType } = req.body;
       const userId = req.user.id;
@@ -294,18 +294,18 @@ exports.switchAccount = async (req, res, next) => {
       if (!user) {
         return res.status(400).send({
           success: false,
-          message: "Invalid User"
+          message: "Invalid User",
         });
       }
       if (user.userType === "admin") {
         return res.status(400).send({
           success: false,
-          message: "This user is not available"
+          message: "This user is not available",
         });
       }
       let profile;
       const attributes = {
-        exclude: ["createdAt", "updatedAt", "deletedAt"]
+        exclude: ["createdAt", "updatedAt", "deletedAt"],
       };
       if (userType === "professional") {
         profile = JSON.parse(
@@ -336,17 +336,17 @@ exports.switchAccount = async (req, res, next) => {
 
       const payload = {
         user: {
-          id: user.id
-        }
+          id: user.id,
+        },
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: 36000
+        expiresIn: 36000,
       });
       return res.status(201).send({
         success: true,
         message: "User Logged In Sucessfully",
         token,
-        user
+        user,
       });
     } catch (error) {
       t.rollback();
@@ -356,14 +356,14 @@ exports.switchAccount = async (req, res, next) => {
 };
 
 exports.getAccounts = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
       const accounts = await this.getAccountsData(userId);
 
       return res.status(201).send({
         success: true,
-        accounts
+        accounts,
       });
     } catch (error) {
       t.rollback();
@@ -372,26 +372,26 @@ exports.getAccounts = async (req, res, next) => {
   });
 };
 
-exports.getAccountsData = async userId => {
+exports.getAccountsData = async (userId) => {
   try {
     const attributes = ["id", "userId", "userType"];
     const accounts = {
       service_partner: await ServicePartner.findOne({
         where: { userId },
-        attributes
+        attributes,
       }),
       product_partner: await ProductPartner.findOne({
         where: { userId },
-        attributes
+        attributes,
       }),
       private_client: await PrivateClient.findOne({
         where: { userId },
-        attributes
+        attributes,
       }),
       corporate_client: await CorporateClient.findOne({
         where: { userId },
-        attributes
-      })
+        attributes,
+      }),
     };
     const data = [];
     for (const key in accounts) {
@@ -400,7 +400,7 @@ exports.getAccountsData = async userId => {
       }
       data.push(accounts[key]);
     }
-    const filtered = data.filter(where => where != null);
+    const filtered = data.filter((where) => where != null);
 
     return filtered;
   } catch (error) {
@@ -408,8 +408,46 @@ exports.getAccountsData = async userId => {
   }
 };
 
+/**
+ * verification before login
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+exports.verifyLogin = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { email, password } = req.body;
+      if (typeof email !== "undefined") {
+        const user = await UserService.findUser({ email });
+
+        if (!user) {
+          return res.status(400).send({
+            success: false,
+            message: "Invalid Email Address!",
+          });
+        }
+
+        if (typeof password !== "undefined") {
+          const isMatch = await bcrypt.compare(password, user.password);
+          if (!isMatch) {
+            return res.status(404).send({
+              success: false,
+              message: "Incorrect Password!",
+            });
+          }
+        }
+      }
+
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
 exports.loginAdmin = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { email, password } = req.body;
       const user = await UserService.findUser({ email });
@@ -417,51 +455,51 @@ exports.loginAdmin = async (req, res, next) => {
       if (!user) {
         return res.status(400).send({
           success: false,
-          message: "Invalid Credentials!"
+          message: "Invalid Credentials!",
         });
       }
       if (user.userType !== "admin") {
         return res.status(400).send({
           success: false,
-          message: "This Admin is not known"
+          message: "This Admin is not known",
         });
       }
       if (user.isSuspended) {
         return res.status(400).send({
           success: false,
-          message: "Your access has been revoked by the superadmin"
+          message: "Your access has been revoked by the superadmin",
         });
       }
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(404).send({
           success: false,
-          message: "Invalid User Details"
+          message: "Invalid User Details",
         });
       }
       const payload = {
         user: {
-          id: user.id
-        }
+          id: user.id,
+        },
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: 3600
+        expiresIn: 3600,
       });
 
       const _adminLevel = adminLevels.find(
-        _level =>
+        (_level) =>
           _level.level === user.level && _level.type.includes(user.userType)
       );
 
       const _adminPrivilege = adminPrivileges.find(
-        _privilege => _privilege.type === _adminLevel.type
+        (_privilege) => _privilege.type === _adminLevel.type
       );
 
       return res.status(201).send({
         success: true,
         message: "Admin Logged In Sucessfully",
         token,
-        user: { ...user.toJSON(), role: _adminPrivilege }
+        user: { ...user.toJSON(), role: _adminPrivilege },
       });
     } catch (error) {
       t.rollback();
@@ -479,12 +517,12 @@ exports.getLoggedInUser = async (req, res) => {
       return res.status(404).send({
         success: false,
         message: "No User Found",
-        user: null
+        user: null,
       });
     }
     let profile;
     const data = {
-      ...user
+      ...user,
     };
     const userId = user.id;
     if (req.query.userType && req.query.userType !== "") {
@@ -504,37 +542,37 @@ exports.getLoggedInUser = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      user: data
+      user: data,
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error"
+      message: "Server Error",
     });
   }
 };
 
 exports.verifyUser = async (req, res, next) => {
-  sequelize.transaction(async transaction => {
+  sequelize.transaction(async (transaction) => {
     try {
       const { email, token } = req.query;
       const user = await UserService.findUser({ email, token });
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: "No User found with this email"
+          message: "No User found with this email",
         });
       }
 
       const data = {
         id: user.id,
         isActive: true,
-        token: null
+        token: null,
       };
       await UserService.updateUser(data, transaction);
       return res.status(200).send({
         success: true,
-        message: "Account Activated Successfully"
+        message: "Account Activated Successfully",
       });
     } catch (error) {
       transaction.rollback();
@@ -544,7 +582,7 @@ exports.verifyUser = async (req, res, next) => {
 };
 
 exports.updateUserAccount = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const data = req.body;
       const userId = req.user.id;
@@ -552,7 +590,7 @@ exports.updateUserAccount = async (req, res, next) => {
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: "Invalid user"
+          message: "Invalid user",
         });
       }
       if (req.file) {
@@ -563,7 +601,7 @@ exports.updateUserAccount = async (req, res, next) => {
       await UserService.updateUser(data, t);
       return res.status(201).send({
         success: true,
-        message: "Profile Updated Successfully"
+        message: "Profile Updated Successfully",
       });
     } catch (error) {
       t.rollback();
@@ -573,7 +611,7 @@ exports.updateUserAccount = async (req, res, next) => {
 };
 
 exports.updateUserProfile = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const data = req.body;
       const userId = req.user.id;
@@ -581,12 +619,12 @@ exports.updateUserProfile = async (req, res, next) => {
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: "Invalid user"
+          message: "Invalid user",
         });
       }
 
       const where = {
-        userId
+        userId,
       };
       if (user.userType === "professional") {
         let operation;
@@ -607,7 +645,7 @@ exports.updateUserProfile = async (req, res, next) => {
           company_address: data.company_address,
           certificate_of_operation: operation,
           professional_certificate: professional,
-          years_of_experience: data.years
+          years_of_experience: data.years,
         };
         await UserService.updateUserProfile(requestData, where, t);
       } else if (
@@ -620,14 +658,14 @@ exports.updateUserProfile = async (req, res, next) => {
           company_address: data.company_address,
           tin: data.tin,
           cac_number: data.cac_number,
-          years_of_experience: data.years
+          years_of_experience: data.years,
         };
         await UserService.updateUserProfile(requestData, where, t);
       }
 
       return res.status(201).send({
         success: true,
-        message: "Profile Updated Successfully"
+        message: "Profile Updated Successfully",
       });
     } catch (error) {
       t.rollback();
@@ -637,14 +675,14 @@ exports.updateUserProfile = async (req, res, next) => {
 };
 
 exports.changePassword = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { id } = req.user;
       const { oldPassword, newPassword, confirmPassword } = req.body;
       if (newPassword !== confirmPassword) {
         return res.status(400).send({
           success: false,
-          message: "Passwords do not match"
+          message: "Passwords do not match",
         });
       }
 
@@ -653,18 +691,18 @@ exports.changePassword = async (req, res, next) => {
       if (!bcrypt.compareSync(oldPassword, user.password)) {
         return res.status(400).send({
           success: false,
-          message: "Incorrect Old Password"
+          message: "Incorrect Old Password",
         });
       }
       const currentPassword = bcrypt.hashSync(newPassword, 10);
       const data = {
         password: currentPassword,
-        id
+        id,
       };
       await UserService.updateUser(data, t);
       return res.status(200).send({
         success: true,
-        message: "Password Changed Successfully"
+        message: "Password Changed Successfully",
       });
     } catch (error) {
       t.rollback();
@@ -674,7 +712,7 @@ exports.changePassword = async (req, res, next) => {
 };
 
 exports.forgotPassword = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { email } = req.query;
 
@@ -682,7 +720,7 @@ exports.forgotPassword = async (req, res, next) => {
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: "Invalid user"
+          message: "Invalid user",
         });
       }
 
@@ -695,12 +733,12 @@ exports.forgotPassword = async (req, res, next) => {
       await EmailService.sendMail(email, message, "Reset Password");
       const data = {
         token,
-        id: user.id
+        id: user.id,
       };
       await UserService.updateUser(data, t);
       return res.status(200).send({
         success: true,
-        message: "Password Reset Email Sent Successfully"
+        message: "Password Reset Email Sent Successfully",
       });
     } catch (error) {
       t.rollback();
@@ -710,7 +748,7 @@ exports.forgotPassword = async (req, res, next) => {
 };
 
 exports.resetPassword = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { email, token, password } = req.body;
 
@@ -718,19 +756,19 @@ exports.resetPassword = async (req, res, next) => {
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: "Invalid user"
+          message: "Invalid user",
         });
       }
 
       const currentPassword = bcrypt.hashSync(password, 10);
       const data = {
         password: currentPassword,
-        id: user.id
+        id: user.id,
       };
       await UserService.updateUser(data, t);
       return res.status(200).send({
         status: true,
-        message: "Password Changed Successfully"
+        message: "Password Changed Successfully",
       });
     } catch (error) {
       t.rollback();
@@ -746,7 +784,7 @@ exports.resendCode = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User found with this email"
+        message: "No User found with this email",
       });
     }
 
@@ -760,18 +798,18 @@ exports.resendCode = async (req, res) => {
     await EmailService.sendMail(email, message, "Verify Email");
     const data = {
       token,
-      id: user.id
+      id: user.id,
     };
     await UserService.updateUser(data);
 
     return res.status(200).send({
       success: true,
-      message: "Token Sent check email or mobile number"
+      message: "Token Sent check email or mobile number",
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error"
+      message: "Server Error",
     });
   }
 };
@@ -782,21 +820,21 @@ exports.getAllUsers = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found"
+        message: "No User Found",
       });
     }
 
     const where = {
       userType: {
-        [Op.ne]: "admin"
-      }
+        [Op.ne]: "admin",
+      },
     };
     const userData = JSON.parse(
       JSON.stringify(await UserService.getAllUsers(where))
     );
     const usersAccounts = [];
     const users = await Promise.all(
-      userData.map(async customer => {
+      userData.map(async (customer) => {
         const accounts = await this.getAccountsData(customer.id);
         if (accounts.length > 1) {
           for (const account of accounts) {
@@ -819,19 +857,19 @@ exports.getAllUsers = async (req, res) => {
         customer.profile = profile;
         return {
           user: customer,
-          accounts: JSON.parse(JSON.stringify(accounts))
+          accounts: JSON.parse(JSON.stringify(accounts)),
         };
       })
     );
     const data = [...users, ...usersAccounts];
     return res.status(200).send({
       success: true,
-      users: data
+      users: data,
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error"
+      message: "Server Error",
     });
   }
 };
@@ -842,23 +880,23 @@ exports.getAllAdmin = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found"
+        message: "No User Found",
       });
     }
 
     const where = {
-      userType: "admin"
+      userType: "admin",
     };
     const users = await User.findAll({ where, order: [["createdAt", "DESC"]] });
 
     return res.status(200).send({
       success: true,
-      users
+      users,
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error"
+      message: "Server Error",
     });
   }
 };
@@ -869,24 +907,24 @@ exports.findAdmin = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found"
+        message: "No User Found",
       });
     }
 
     const where = {
       userType: "admin",
-      id: req.params.adminId
+      id: req.params.adminId,
     };
     const admin = await User.findOne({ where });
 
     return res.status(200).send({
       success: true,
-      admin
+      admin,
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error"
+      message: "Server Error",
     });
   }
 };
@@ -898,13 +936,13 @@ exports.revokeAccess = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found"
+        message: "No User Found",
       });
     }
     if (user.level === 1) {
       return res.status(401).send({
         success: false,
-        message: "UnAuthorised access"
+        message: "UnAuthorised access",
       });
     }
     await User.destroy({ where: { id: userId } });
@@ -915,18 +953,18 @@ exports.revokeAccess = async (req, res) => {
     await Notification.createNotification({
       userId,
       type: notifyType,
-      message: mesg
+      message: mesg,
     });
     io.emit("getNotifications", await Notification.fetchAdminNotification());
 
     return res.status(200).send({
       success: true,
-      message: "Admin Access revoked"
+      message: "Admin Access revoked",
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error"
+      message: "Server Error",
     });
   }
 };
@@ -946,13 +984,19 @@ exports.findSingleUser = async (req, res) => {
 
     const accounts = await this.getAccountsData(userId);
 
-    const servicePartner = await ServicePartner.findOne({where: {userId}})
+    const servicePartner = await ServicePartner.findOne({ where: { userId } });
     let ongoingProjects = [];
     let completedProjects = [];
     if (servicePartner !== null) {
-      const projectDetails = await Projects.findAll({where: {serviceProviderId: servicePartner.id}});
-      ongoingProjects = projectDetails.filter(_detail => _detail.status === 'ongoing');
-      completedProjects = projectDetails.filter(_detail => _detail.status === 'completed');
+      const projectDetails = await Projects.findAll({
+        where: { serviceProviderId: servicePartner.id },
+      });
+      ongoingProjects = projectDetails.filter(
+        (_detail) => _detail.status === "ongoing"
+      );
+      completedProjects = projectDetails.filter(
+        (_detail) => _detail.status === "completed"
+      );
     }
 
     return res.status(200).send({
@@ -961,13 +1005,13 @@ exports.findSingleUser = async (req, res) => {
         user: userData,
         accounts,
         ongoingProjects,
-        completedProjects
-      }
+        completedProjects,
+      },
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error"
+      message: "Server Error",
     });
   }
 };
@@ -976,34 +1020,34 @@ exports.addUserProfile = async (data, t) => {
   try {
     const { userType, userId, company_name, serviceTypeId } = data;
     const where = {
-      userId
+      userId,
     };
     if (userType === "professional") {
       const request = {
         userId,
         company_name,
         userType: "professional",
-        serviceTypeId
+        serviceTypeId,
       };
       await ServicePartner.create(request, { transaction: t });
     } else if (userType === "vendor") {
       const request = {
         userId,
         company_name,
-        userType: "vendor"
+        userType: "vendor",
       };
       await ProductPartner.create(request, { transaction: t });
     } else if (userType === "private_client") {
       const request = {
         userId,
-        userType: "private_client"
+        userType: "private_client",
       };
       await PrivateClient.create(request, { transaction: t });
     } else if (userType === "corporate_client") {
       const request = {
         userId,
         company_name,
-        userType: "corporate_client"
+        userType: "corporate_client",
       };
       await CorporateClient.create(request, { transaction: t });
     }
@@ -1016,7 +1060,7 @@ exports.addUserProfile = async (data, t) => {
 
 exports.checkIfAccountExist = async (userType, userId) => {
   const where = {
-    userId
+    userId,
   };
   let user;
   if (userType === "professional") {
@@ -1038,24 +1082,24 @@ exports.suspendUser = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found"
+        message: "No User Found",
       });
     }
 
     const update = {
-      isSuspended: true
+      isSuspended: true,
     };
 
     await User.update(update, { where: { id: userId } });
 
     return res.status(200).send({
       success: true,
-      message: "User suspended"
+      message: "User suspended",
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error"
+      message: "Server Error",
     });
   }
 };
@@ -1068,24 +1112,24 @@ exports.resetUserPassword = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found"
+        message: "No User Found",
       });
     }
 
     const update = {
-      password: bcrypt.hashSync(password, 10)
+      password: bcrypt.hashSync(password, 10),
     };
 
     await User.update(update, { where: { id } });
 
     return res.status(200).send({
       success: true,
-      message: "Password changed!"
+      message: "Password changed!",
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error"
+      message: "Server Error",
     });
   }
 };
@@ -1097,7 +1141,7 @@ exports.deleteUser = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found"
+        message: "No User Found",
       });
     }
 
@@ -1105,12 +1149,12 @@ exports.deleteUser = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: "User deleted!"
+      message: "User deleted!",
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error"
+      message: "Server Error",
     });
   }
 };
@@ -1122,30 +1166,30 @@ exports.unsuspendUser = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found"
+        message: "No User Found",
       });
     }
     if (user.userType !== "admin") {
       return res.status(401).send({
         success: false,
-        message: "UnAuthorised access"
+        message: "UnAuthorised access",
       });
     }
     const update = {
       isSuspended: false,
-      isActive: true
+      isActive: true,
     };
 
     await User.update(update, { where: { id: userId } });
 
     return res.status(200).send({
       success: true,
-      message: "User suspended"
+      message: "User suspended",
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error"
+      message: "Server Error",
     });
   }
 };
