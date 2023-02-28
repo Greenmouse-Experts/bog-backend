@@ -76,6 +76,7 @@ const changePasswordValidation = () => {
   ];
 };
 
+
 const bankValidation = () => {
   return [
     check("bank_code", "Please Select a bank").notEmpty(),
