@@ -3,91 +3,112 @@
 /* eslint-disable camelcase */
 const easyinvoice = require("easyinvoice");
 const fs = require("fs");
+const btoa = require("btoa");
+const moment = require("moment");
+
+const { invoice } = require("../helpers/invoice");
+const Product = require("../models/Product");
 
 exports.createInvoice = async (orderData, user) => {
   const { order_items, orderSlug, contact } = orderData;
   if (!order_items && order_items.length < 1) {
     return false;
   }
-  const myProduct = order_items.map(items => ({
-    description: items.product.name.substring(0, 27),
-    quantity: items.quantity,
-    price: parseInt(items.product.price),
-    "tax-rate": items.taxrate || 0
-  }));
+  console.log(orderData);
+
+  const myProduct = order_items.map((items) => {
+    console.log(items.product);
+    return {
+      description: items.product.name.substring(0, 27),
+      quantity: items.quantity,
+      price: parseInt(items.product.price),
+      "tax-rate": items.taxrate || 0,
+    };
+  });
+
+  let _subtotal = 0;
+  const _products = orderData.order_items.map((orderItem) => {
+    // const productDetails = await Product.findOne({where: {id: }})
+    _subtotal += orderItem.amount * orderItem.quantity;
+    return {
+      description: orderItem.product.name,
+      quantity: orderItem.quantity,
+      price: orderItem.amount.toLocaleString(),
+      row_total: (orderItem.amount * orderItem.quantity).toLocaleString(),
+    };
+  });
+
+  console.log(_products)
+
+  const invoiceData = {
+    logo:
+      "https://res.cloudinary.com/yhomi1996/image/upload/v1665783638/bog_moijdl.png",
+    document_title: "INVOICE",
+    company_from: "Sample Street 123",
+    zip_from: "1234 AB",
+    city_from: "Lagos",
+    country_from: "Nigeria",
+    sender_custom_1: "",
+    sender_custom_2: "",
+    sender_custom_3: "",
+    client: {
+      address_to: orderData.contact.home_address,
+      city_to: "",
+      country_to: orderData.contact.country,
+      client_custom_1: "",
+      client_custom_2: "",
+      client_custom_3: "",
+    },
+    ref: orderSlug,
+    date_ordered: moment(new Date()).format("MMMM Do YYYY, h:mm:ss a"),
+    delivery_address: orderData.contact.address,
+    delivery_time: orderData.contact.delivery_time,
+    products: _products,
+    subtotal: _subtotal.toLocaleString(),
+    delivery_fee: orderData.deliveryFee.toLocaleString(),
+    total: (_subtotal + orderData.deliveryFee).toLocaleString(),
+  };
+  const preparedInvoiceTemplate = invoice(invoiceData);
   const data = {
     customize: {
-      // "template": fs.readFileSync('template.html', 'base64')
+      template: btoa(preparedInvoiceTemplate),
+      // template: fs.readFileSync("./index.html", "base64"),
     },
-    images: {
-      // The logo on top of your invoice
-      // logo: "../uploads/bog_moijdl.png"
-      logo:
-        "https://res.cloudinary.com/yhomi1996/image/upload/v1665783638/bog_moijdl.png"
-      // The invoice background
-      // https://public.easyinvoice.cloud/img/watermark-draft.jpg
-      // background: ""
-    },
-    // Your own data
-    sender: {
-      company: "BOG LTD",
-      address: "Sample Street 123",
-      zip: "1234 AB",
-      city: "Lagos",
-      country: "Nigeria"
-      // "custom1": "custom value 1",
-      // "custom2": "custom value 2",
-      // "custom3": "custom value 3"
-    },
-    // Your recipient
-    client: {
-      company: user.name,
-      zip: contact.postal_code,
-      state: contact.state,
-      city: contact.city,
-      country: contact.country
-      // "custom1": "custom value 1",
-      // "custom2": "custom value 2",
-      // "custom3": "custom value 3"
-    },
-    information: {
-      // Invoice number
-      number: orderSlug,
-      // Invoice data
-      date: new Date().getDate()
-    },
-    // The products you would like to see on your invoice
-    // Total values are being calculated automatically
-    products: myProduct,
-    // The message you would like to display on the bottom of your invoice
-    // "bottom-notice": "Kindly pay your invoice within 15 days.",
-    // Settings to customize your invoice
-    settings: {
-      currency: "NGN" // See documentation 'Locales and Currency' for more info. Leave empty for no currency.
-      // "locale": "nl-NL", // Defaults to en-US, used for number formatting (See documentation 'Locales and Currency')
-      // "tax-notation": "gst", // Defaults to 'vat'
-      // "margin-top": 25, // Defaults to '25'
-      // "margin-right": 25, // Defaults to '25'
-      // "margin-left": 25, // Defaults to '25'
-      // "margin-bottom": 25, // Defaults to '25'
-      // "format": "A4", // Defaults to A4, options: A3, A4, A5, Legal, Letter, Tabloid
-      // "height": "1000px", // allowed units: mm, cm, in, px
-      // "width": "500px", // allowed units: mm, cm, in, px
-      // "orientation": "landscape", // portrait or landscape, defaults to portrait
-    },
-    // Translate your invoice to your preferred language
-    translate: {
-      // "invoice": "FACTUUR",  // Default to 'INVOICE'
-      // "number": "Nummer", // Defaults to 'Number'
-      // "date": "Datum", // Default to 'Date'
-      // "due-date": "Verloopdatum", // Defaults to 'Due Date'
-      // "subtotal": "Subtotaal", // Defaults to 'Subtotal'
-      // "products": "Producten", // Defaults to 'Products'
-      // "quantity": "Aantal", // Default to 'Quantity'
-      // "price": "Prijs", // Defaults to 'Price'
-      // "product-total": "Totaal", // Defaults to 'Total'
-      // "total": "Totaal" // Defaults to 'Total'
-    }
+    // information: {
+    //   logo:
+    //     "https://res.cloudinary.com/yhomi1996/image/upload/v1665783638/bog_moijdl.png",
+    //   "document-title": "BOG LTD",
+    //   "company-from": "Sample Street 123",
+    //   "zip-from": "1234 AB",
+    //   "city-from": "Lagos",
+    //   "country-from": "Nigeria",
+    //   "sender-custom-1": "",
+    //   "sender-custom-2": "",
+    //   "sender-custom-3": "",
+    //   client: {
+    //     address_to: "Sample Home Address",
+    //     city_to: "Lagos",
+    //     country_to: "Nigeria",
+    //     client_custom_1: "",
+    //     client_custom_2: "",
+    //     client_custom_3: "",
+    //   },
+    //   ref: orderSlug,
+    //   date_ordered: "",
+    //   delivery_address: "",
+    //   delivery_date: "",
+    //   products: [
+    //     {
+    //       description: "10 trips of sand",
+    //       quantity: 2,
+    //       price: 4000,
+    //       row_total: 4000 * 2,
+    //     },
+    //   ],
+    //   subtotal: 8000,
+    //   delivery_fee: 500,
+    //   total: 8500,
+    // },
   };
   // Create your invoice! Easy!
   const result = await easyinvoice.createInvoice(data);

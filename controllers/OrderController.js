@@ -175,6 +175,7 @@ exports.createOrder = async (req, res, next) => {
       };
 
       console.log(req.body)
+      
 
       await Payment.create(paymentData, { transaction: t });
       const contact = {
