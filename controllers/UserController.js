@@ -211,13 +211,13 @@ exports.loginUser = async (req, res, next) => {
     if (!user) {
       return res.status(400).send({
         success: false,
-        message: "Invalid Credentials!",
+        message: "Invalid Email Address!",
       });
     }
     if (user.userType === "admin") {
       return res.status(400).send({
         success: false,
-        message: "This user is not available",
+        message: "This account is not available",
       });
     }
     if (!user.isActive) {
@@ -237,7 +237,7 @@ exports.loginUser = async (req, res, next) => {
     if (!isMatch) {
       return res.status(404).send({
         success: false,
-        message: "Invalid User Details",
+        message: "Incorrect Password!",
       });
     }
     const payload = {
