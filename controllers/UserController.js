@@ -455,13 +455,13 @@ exports.loginAdmin = async (req, res, next) => {
       if (!user) {
         return res.status(400).send({
           success: false,
-          message: "Invalid Credentials!",
+          message: "Invalid Email Address!",
         });
       }
       if (user.userType !== "admin") {
         return res.status(400).send({
           success: false,
-          message: "This Admin is not known",
+          message: "This Account is not known",
         });
       }
       if (user.isSuspended) {
@@ -474,7 +474,7 @@ exports.loginAdmin = async (req, res, next) => {
       if (!isMatch) {
         return res.status(404).send({
           success: false,
-          message: "Invalid User Details",
+          message: "Invalid Password!",
         });
       }
       const payload = {
