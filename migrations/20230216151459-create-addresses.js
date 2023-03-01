@@ -36,6 +36,9 @@ module.exports = {
       delivery_type: {
         type: Sequelize.STRING
       },
+      delivery_time: {
+        type: Sequelize.STRING
+      },
       status: {
         type: Sequelize.BOOLEAN
       },

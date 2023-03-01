@@ -49,6 +49,10 @@ const Addresses = sequelise.define(
       allowNull: true,
       type: Sequelize.STRING
     },
+    delivery_time: {
+      allowNull: true,
+      type: Sequelize.STRING
+    },
     status: {
       allowNull: true,
       type: Sequelize.BOOLEAN
