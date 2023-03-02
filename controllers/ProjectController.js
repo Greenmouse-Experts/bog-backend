@@ -10,6 +10,7 @@ const sequelize = require("../config/database/connection");
 const User = require("../models/User");
 const Project = require("../models/Project");
 const ServiceFormProjects = require("../models/ServiceFormProjects");
+const ProjectReviews = require("../models/ProjectReviews");
 
 const LandSurveyProject = require("../models/LandSurveyProject");
 const DrawingProject = require("../models/DrawingProject");
@@ -237,6 +238,7 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
   try {
     const where = { id: req.params.projectId };
     const project = await Project.findOne({
+      include: [{ model: ServicePartner, as: "serviceProvider" }],
       where,
     });
 
@@ -247,18 +249,35 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
       });
     }
 
+    const project_reviews = await ProjectReviews.findAll({
+      include: [{model: User, as: "client"}],
+      where: {projectId: req.params.projectId}
+    });
+
     const requestData = await ServiceFormProjects.findAll({
-      include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+      include: [
+        { model: ServicesFormBuilders, as: "serviceForm" },
+      ],
       where: { projectID: project.id },
     });
 
-    // project.toJSON().projectData = requestData;
+    let client = {}
+    if (requestData.length > 0) {
+      const userId = requestData[0].userID;
+      const user = await User.findOne({
+        where: {id: userId},
+        attributes: {exclude: ['password']}
+      });
+      client = user === null ? {} : user
+    }
 
     return res.status(200).send({
       success: true,
       data: {
         ...project.toJSON(),
         projectData: requestData,
+        reviews: project_reviews,
+        client
       },
     });
   } catch (error) {
