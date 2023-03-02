@@ -10,7 +10,8 @@ const {
   validate,
   landSurveyRequestValidation,
   projectAssignmentRequestValidation,
-  projectBidRequestValidation
+  projectBidRequestValidation,
+  projectProgressValidation
   //   contractorRequestValidation
 } = require("../helpers/validators");
 const ProjectController = require("../controllers/ProjectController");
@@ -35,6 +36,15 @@ router
 router
   .route("/projects/assigned-projects/:userId")
   .get(Auth, ProjectController.getAssignedProjects);
+
+router
+  .route("/projects/progress/:providerId/:projectId")
+  .put(
+    projectProgressValidation(),
+    validate,
+    Auth,
+    ProjectController.updateProjectProgress
+  );
 
 // Get assigned projects v2
 // router
