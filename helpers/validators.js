@@ -261,6 +261,12 @@ const projectBidRequestValidation = () => {
   ];
 };
 
+const projectProgressValidation = () => {
+  return [
+    check("percent", "percent is required").notEmpty()
+  ];
+};
+
 const subscriptionRequestValidation = () => {
   return [
     check("duration", "duration is required").isNumeric(),
@@ -307,6 +313,7 @@ module.exports = {
   KYCApprovalValidation,
   projectAssignmentRequestValidation,
   projectBidRequestValidation,
+  projectProgressValidation,
   subscriptionRequestValidation,
   subscribeRequestValidation,
   ServiceFormBuilderValidation

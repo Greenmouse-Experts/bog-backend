@@ -72,6 +72,10 @@ const Project = sequelise.define(
       allowNull: true,
       type: Sequelize.INTEGER
     },
+    progress: {
+      allowNull: true,
+      type: Sequelize.INTEGER
+    },
     endDate: {
       allowNull: true,
       type: Sequelize.DATE

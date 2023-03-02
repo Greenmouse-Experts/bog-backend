@@ -286,6 +286,55 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
 };
 
 /**
+ * update project's progress - service partner
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.updateProjectProgress = async (req, res, next) => {
+  try {
+    const {providerId, projectId} = req.params;
+    const {percent} = req.body;
+
+    const project = await Project.findOne({
+      where: {id: projectId},
+    });
+
+    if (project === null) {
+      return res.status(404).send({
+        status: false,
+        message: "Project not found!",
+      });
+    }
+
+    if(project.serviceProviderId !== providerId){
+      return res.status(401).send({
+        status: false,
+        message: "You are not assigned to this project!",
+      });
+    }
+
+    console.log(project.progress)
+    // Forbid a service partner from reducing the project percentage
+    if(project.progress > percent){
+      return res.status(403).send({
+        status: false,
+        message: "You're not allowed to reduce the percentage of the project!"
+      })
+    }
+
+    await Project.update({progress: percent}, {where: {id: projectId}});
+    
+    return res.status(200).send({
+      success: true,
+      message: `Project has been updated to ${percent}%`
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
  * Get user's project based on the specified status in req.query.status
  * @param {*} req 
  * @param {*} res 
