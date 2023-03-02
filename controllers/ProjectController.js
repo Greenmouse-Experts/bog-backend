@@ -1432,6 +1432,7 @@ exports.assignProject = async (req, res, next) => {
           message: "Invalid Project",
         });
       }
+
       const endDate = moment().add(duration, "weeks");
       const request = {
         serviceProviderId: userId,
@@ -1477,6 +1478,13 @@ exports.bidForProject = async (req, res, next) => {
         { where, transaction: t }
       );
 
+      const projectBid = ProjectBidding.findOne({where: {userId, projectId}});
+      if(projectBid !== null){
+        return res.status(400).send({
+          success: false,
+          message: "You cannot bid for a project twice!"
+        })
+      }
       const bid = await ProjectBidding.create(data, { transaction: t });
 
       return res.status(200).send({
