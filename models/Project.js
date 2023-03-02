@@ -4,6 +4,7 @@ const BuildingProject = require("./BuildingProject");
 const ContractorProject = require("./ContractorProject");
 const DrawingProject = require("./DrawingProject");
 const LandSurveyProject = require("./LandSurveyProject");
+const ServicePartner = require("./ServicePartner");
 // const User = require("./User");
 
 const Project = sequelise.define(
@@ -78,6 +79,16 @@ const Project = sequelise.define(
   },
   { paranoid: true }
 );
+
+Project.belongsTo(ServicePartner, {
+  foreignKey: "serviceProviderId",
+  as: "serviceProvider",
+});
+
+// ServicePartner.hasMany(Project, {
+//   foreignKey: "serviceProviderId",
+//   as: "serviceProvider",
+// })
 
 // User.hasOne(Project, {
 //   foreignKey: "userId",
