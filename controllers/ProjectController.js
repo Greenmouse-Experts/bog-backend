@@ -250,6 +250,14 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
       });
     }
 
+    let userDetails = {};
+    if (project.serviceProvider !== null) {
+      userDetails = await User.findOne({
+        where: {id: project.serviceProvider.userId},
+        attributes: ['name', 'email', 'phone', 'userType', 'createdAt', 'isActive', 'address', 'state', 'city', 'street']
+      });
+    }
+
     const project_reviews = await ProjectReviews.findAll({
       include: [{model: User, as: "client"}],
       attributes: {exclude: ["password"]},
@@ -278,6 +286,7 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
       success: true,
       data: {
         ...project.toJSON(),
+        clientDetails: userDetails,
         projectData: requestData,
         reviews: project_reviews,
         client
