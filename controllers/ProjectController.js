@@ -27,6 +27,7 @@ const ProjectBidding = require("../models/ProjectBidding");
 const ServicesFormBuilders = require("../models/ServicesFormBuilder");
 const PrivateClient = require("../models/PrivateClient");
 const CorporateClient = require("../models/CorporateClient");
+const { request } = require("express");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
@@ -251,6 +252,7 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
 
     const project_reviews = await ProjectReviews.findAll({
       include: [{model: User, as: "client"}],
+      attributes: {exclude: ["password"]},
       where: {projectId: req.params.projectId}
     });
 
@@ -261,6 +263,7 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
       where: { projectID: project.id },
     });
 
+    // console.log(requestData)
     let client = {}
     if (requestData.length > 0) {
       const userId = requestData[0].userID;
@@ -314,7 +317,7 @@ exports.updateProjectProgress = async (req, res, next) => {
       });
     }
 
-    console.log(project.progress)
+    // console.log(project.progress)
     // Forbid a service partner from reducing the project percentage
     if(project.progress > percent){
       return res.status(403).send({

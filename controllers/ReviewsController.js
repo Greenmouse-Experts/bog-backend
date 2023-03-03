@@ -8,6 +8,7 @@ const Product = require("../models/Product");
 const User = require("../models/User");
 const Notification = require("../helpers/notification");
 const Order = require("../models/Order");
+const ProjectReview = require("../models/ProjectReviews")
 
 // create reviews
 exports.createReview = async (req, res, next) => {
@@ -230,6 +231,117 @@ exports.deleteServiceReview = async (req, res, next) => {
       }
 
       await ServiceReview.destroy({
+        where: { id: reviewId },
+        transaction: t
+      });
+      return res.status(200).send({
+        success: true,
+        message: "Review deleted successfully"
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+
+/**
+ * Project review
+ */
+
+// create reviews
+exports.createProjectReview = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const ownerId = req.user.id;
+      req.body.userId = ownerId;
+
+      const myReview = await ProjectReview.create(req.body, {
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        message: "Review submitted",
+        myReview
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+// update review
+
+exports.updateProjectReview = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { reviewId, ...others } = req.body;
+      const review = await ProjectReview.findOne({ where: { id: reviewId } });
+      if (!review) {
+        return res.status(404).send({
+          success: false,
+          message: "Review Not Found"
+        });
+      }
+
+      await ProjectReview.update(others, {
+        where: { id: reviewId },
+        transaction: t
+      });
+
+      return res.status(200).send({
+        success: true,
+        message: "Review updated"
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+// get all project review
+exports.getAllProjectReview = async (req, res, next) => {
+  try {
+    const {clientId} = req.params;
+    const where = {
+      userId: clientId
+    };
+
+    const reviews = await ProjectReview.findAll({
+      where,
+      order: [["createdAt", "DESC"]]
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: reviews
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// delete reviews
+
+exports.deleteProjectReview = async (req, res, next) => {
+  sequelize.transaction(async t => {
+    try {
+      const { reviewId } = req.query;
+      const where = { id: reviewId };
+
+      const isExist = await ProjectReview.findOne({ where });
+      if (!isExist) {
+        return res.status(404).send({
+          success: false,
+          message: "Review Not Found"
+        });
+      }
+
+      await ProjectReview.destroy({
         where: { id: reviewId },
         transaction: t
       });

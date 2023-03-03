@@ -39,4 +39,22 @@ router
   .route("/review/service/delete-review")
   .delete([Auth, Access.verifyAccess], ReviewController.deleteServiceReview);
 
+
+// review project partner working/worked on project
+router
+.route("/review/project/create-review")
+.post([Auth, Access.verifyAccess, Access.verifyUser], ReviewController.createProjectReview);
+
+router
+.route("/review/project/update-review")
+.patch(validate, [Auth, Access.verifyAccess, Access.verifyUser], ReviewController.updateProjectReview);
+
+router
+.route("/review/project/get-review/:clientId")
+.get([Auth, Access.verifyAccess, Access.verifyUser], ReviewController.getAllProjectReview);
+
+router
+.route("/review/project/delete-review")
+.delete([Auth, Access.verifyAccess, Access.verifyUser], ReviewController.deleteProjectReview);
+
 module.exports = router;
