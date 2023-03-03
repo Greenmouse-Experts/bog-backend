@@ -37,6 +37,7 @@ router
   .route("/projects/assigned-projects/:userId")
   .get(Auth, ProjectController.getAssignedProjects);
 
+// Update project's progress
 router
   .route("/projects/progress/:providerId/:projectId")
   .put(
