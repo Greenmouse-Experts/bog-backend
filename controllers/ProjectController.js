@@ -536,6 +536,7 @@ exports.requestForService = async (req, res, next) => {
           title: serviceForm.serviceName,
           userId: profile.id,
           projectTypes: serviceForm.serviceType.slug,
+          progress: 0
         };
 
         if (_project === null) {
