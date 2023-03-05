@@ -146,6 +146,16 @@ router
   .route("/projects/approve-project/:projectId")
   .patch(Auth, ProjectController.approveProjectRequest);
 
+// 1 // list competent providers 
+router
+  .route("/projects/list-providers/:projectId")
+  .put([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.listCapableServiceProviders)
+
+// 2 // dispatch to selected providers from the list
+router
+  .route("/projects/v2/dispatch-project/:projectId")
+  .put([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.selectivelyDispatchProject)
+
 router
   .route("/projects/dispatch-project/:projectId")
   .patch(Auth, ProjectController.dispatchProject);

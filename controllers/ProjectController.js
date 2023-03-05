@@ -253,33 +253,42 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
     let userDetails = {};
     if (project.serviceProvider !== null) {
       userDetails = await User.findOne({
-        where: {id: project.serviceProvider.userId},
-        attributes: ['name', 'email', 'phone', 'userType', 'createdAt', 'isActive', 'address', 'state', 'city', 'street']
+        where: { id: project.serviceProvider.userId },
+        attributes: [
+          "name",
+          "email",
+          "phone",
+          "userType",
+          "createdAt",
+          "isActive",
+          "address",
+          "state",
+          "city",
+          "street",
+        ],
       });
     }
 
     const project_reviews = await ProjectReviews.findAll({
-      include: [{model: User, as: "client"}],
-      attributes: {exclude: ["password"]},
-      where: {projectId: req.params.projectId}
+      include: [{ model: User, as: "client" }],
+      attributes: { exclude: ["password"] },
+      where: { projectId: req.params.projectId },
     });
 
     const requestData = await ServiceFormProjects.findAll({
-      include: [
-        { model: ServicesFormBuilders, as: "serviceForm" },
-      ],
+      include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
       where: { projectID: project.id },
     });
 
     // console.log(requestData)
-    let client = {}
+    let client = {};
     if (requestData.length > 0) {
       const userId = requestData[0].userID;
       const user = await User.findOne({
-        where: {id: userId},
-        attributes: {exclude: ['password']}
+        where: { id: userId },
+        attributes: { exclude: ["password"] },
       });
-      client = user === null ? {} : user
+      client = user === null ? {} : user;
     }
 
     return res.status(200).send({
@@ -289,7 +298,7 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
         clientDetails: userDetails,
         projectData: requestData,
         reviews: project_reviews,
-        client
+        client,
       },
     });
   } catch (error) {
@@ -299,17 +308,17 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
 
 /**
  * update project's progress - service partner
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
  */
 exports.updateProjectProgress = async (req, res, next) => {
   try {
-    const {providerId, projectId} = req.params;
-    const {percent} = req.body;
+    const { providerId, projectId } = req.params;
+    const { percent } = req.body;
 
     const project = await Project.findOne({
-      where: {id: projectId},
+      where: { id: projectId },
     });
 
     if (project === null) {
@@ -319,7 +328,7 @@ exports.updateProjectProgress = async (req, res, next) => {
       });
     }
 
-    if(project.serviceProviderId !== providerId){
+    if (project.serviceProviderId !== providerId) {
       return res.status(401).send({
         status: false,
         message: "You are not assigned to this project!",
@@ -328,42 +337,42 @@ exports.updateProjectProgress = async (req, res, next) => {
 
     // console.log(project.progress)
     // Forbid a service partner from reducing the project percentage
-    if(project.progress > percent){
+    if (project.progress > percent) {
       return res.status(403).send({
         status: false,
-        message: "You're not allowed to reduce the percentage of the project!"
-      })
+        message: "You're not allowed to reduce the percentage of the project!",
+      });
     }
 
-    await Project.update({progress: percent}, {where: {id: projectId}});
-    
+    await Project.update({ progress: percent }, { where: { id: projectId } });
+
     return res.status(200).send({
       success: true,
-      message: `Project has been updated to ${percent}%`
+      message: `Project has been updated to ${percent}%`,
     });
   } catch (error) {
     return next(error);
   }
-}
+};
 
 /**
  * Get user's project based on the specified status in req.query.status
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
  */
 exports.userProjects = async (req, res, next) => {
   try {
-    const {status} = req.query;
-    const {id} = req.params;
+    const { status } = req.query;
+    const { id } = req.params;
     const where = {};
     if (status === undefined) {
-      where = {id}
+      where = { id };
     } else {
-      where = {id, status}
+      where = { id, status };
     }
     const project = await Project.findOne({
-      where
+      where,
     });
 
     if (project === null) {
@@ -390,7 +399,7 @@ exports.userProjects = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-}
+};
 
 exports.createProject = async (data, transaction) => {
   try {
@@ -545,7 +554,7 @@ exports.requestForService = async (req, res, next) => {
           title: serviceForm.serviceName,
           userId: profile.id,
           projectTypes: serviceForm.serviceType.slug,
-          progress: 0
+          progress: 0,
         };
 
         if (_project === null) {
@@ -1239,6 +1248,131 @@ exports.approveProjectRequest = async (req, res, next) => {
   });
 };
 
+// List Capable Service Providers
+exports.listCapableServiceProviders = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { projectId } = req.params;
+      const { score } = req.body;
+
+      const project = await Project.findByPk(projectId);
+      if (!project) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Project",
+        });
+      }
+
+      const providers = await this.getQualifiedProvidersOnly(project, score, t);
+      return res.send({
+        success: true,
+        data: providers
+      });
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+/**
+ * Dispatch to selected service partners
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+exports.selectivelyDispatchProject = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { projectId } = req.params;
+      const { partners } = req.body;
+
+      const project = await Project.findByPk(projectId);
+      if (!project) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Project",
+        });
+      }
+
+      if(project.approvalStatus !== 'approved'){
+        return res.status(400).send({
+          success: false,
+          message: `You cannot dispatch a project of the '${project.approvalStatus}' approval status!`
+        })
+      }
+      if(project.status !== 'approved') {
+        return res.status(400).send({
+          success: false,
+          message: `You cannot dispatch a project of the '${project.status}' status!`
+        })
+      }
+
+      if (partners.length > 0) {
+        let providerData = [];
+        for (let index = 0; index < partners.length; index++) {
+          const partnerId = partners[index];
+          const servicePartner = await ServicePartner.findOne({
+            where: { id: partnerId },
+          });
+
+          if (servicePartner === null) {
+            return res.status(404).send({
+              success: false,
+              message: "Account not found!",
+            });
+          }
+
+          const hasOngoingProject = await this.verifyServicePartnerByProject(
+            partnerId
+          );
+
+          if (hasOngoingProject !== null) {
+            return res.status(403).send({
+              success: false,
+              message: `The partner ${servicePartner.company_name} has an ongoing project!`,
+            });
+          }
+          providerData.push({
+            userId: partnerId,
+            status: "pending",
+            projectId: project.id,
+          });
+        }
+
+        if (providerData.length > 0) {
+          await ServiceProvider.bulkCreate(providerData, {
+            transaction: t,
+          });
+          project.update({ status: "dispatched" }, { transaction: t });
+          if (providerData.length > 0) {
+            await Promise.all(
+              providerData.map(async (service) => {
+                await this.notifyServicePartner(req, service.userId);
+              })
+            );
+          }
+          return res.status(200).send({
+            success: true,
+            message: "Project dispatched to service partner",
+          });
+        }
+      }
+      else{
+        return res.status(422).send({
+          success: false,
+          message: "Request cannot be processed!"
+        })
+      }
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
 // Dispatch Project request
 exports.dispatchProject = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -1257,7 +1391,7 @@ exports.dispatchProject = async (req, res, next) => {
         providerData: serviceProviders,
         completed,
       } = await this.getQualifiedServiceProviders(project, score, t);
-      console.log(completed);
+      // console.log(completed);
       if (completed === true) {
         project.update({ status: "dispatched" }, { transaction: t });
         if (serviceProviders.length > 0) {
@@ -1285,6 +1419,13 @@ exports.dispatchProject = async (req, res, next) => {
   });
 };
 
+/**
+ * Get qualified service providers and dispatch to them
+ * @param {*} project
+ * @param {*} score
+ * @param {*} transaction
+ * @returns
+ */
 exports.getQualifiedServiceProviders = async (project, score, transaction) => {
   try {
     // check project type
@@ -1372,6 +1513,110 @@ exports.getQualifiedServiceProviders = async (project, score, transaction) => {
   }
 };
 
+/**
+ * Get qualified providers only
+ * @param {*} project
+ * @param {*} score
+ * @param {*} transaction
+ * @returns
+ */
+exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
+  try {
+    // check project type
+    const { projectTypes, title } = project;
+    // console.log(project)
+    // get service types for project types
+    const serviceTypes = await ServiceType.findOne({
+      where: { slug: projectTypes, title },
+    });
+    // query all service partners with service type id
+    // kyc point greater than the passed score
+    // user is verified
+    // user has active subscription
+    const wherePartner = {
+      serviceTypeId: serviceTypes.id,
+      kycPoint: {
+        [Op.gte]: score,
+      },
+      hasActiveSubscription: true,
+      isVerified: true,
+    };
+    const servicePartners = JSON.parse(
+      JSON.stringify(
+        await ServicePartner.findAll({
+          include: [{ model: User, as: "service_user" }],
+          where: wherePartner,
+          order: [[Sequelize.literal("RAND()")]],
+        })
+      )
+    );
+    // console.log({ servicePartners });
+    if (servicePartners.length === 0) {
+      return {
+        message: "Not enough service providers",
+        providerData: [],
+      };
+    }
+
+    // remove service partners with ongoing projects
+    const where = {
+      status: "ongoing",
+      approvalStatus: "approved",
+      serviceProviderId: {
+        [Op.ne]: null,
+      },
+    };
+    const ongoingProjects = await Project.findAll({
+      where,
+      attributes: ["serviceProviderId"],
+    });
+
+    const partnersWithProjects = ongoingProjects.map(
+      (p) => p.serviceProviderId
+    );
+    // console.log(partnersWithProjects)
+    const filteredServicePartners = servicePartners.filter((partner) => {
+      if (!partnersWithProjects.includes(partner.id)) {
+        return partner;
+      }
+      return null;
+    });
+
+    const qualifiedPartners = filteredServicePartners.filter(
+      (pat) => pat !== null
+    );
+
+    let providers = [...qualifiedPartners];
+
+    return {
+      message: "Competent Service Providers",
+      providerData: providers
+    }
+  } catch (error) {
+    // console.log(error);
+    // transaction.rollback();
+    return error;
+  }
+};
+
+/**
+ * Verify that a service partner does not have an ongoing project
+ * @param {*} partnerId
+ */
+exports.verifyServicePartnerByProject = async (partnerId) => {
+  const where = {
+    status: "ongoing",
+    approvalStatus: "approved",
+    serviceProviderId: partnerId,
+  };
+  const ongoingProject = await Project.findOne({
+    where,
+    attributes: ["serviceProviderId"],
+  });
+
+  return ongoingProject;
+};
+
 exports.getRandom = (arr, n) => {
   const result = new Array(n);
   let len = arr.length;
@@ -1379,10 +1624,14 @@ exports.getRandom = (arr, n) => {
   if (n > len)
     throw new RangeError("getRandom: more elements taken than available");
   while (n--) {
+    // console.log(len)
     const x = Math.floor(Math.random() * len);
+    // console.log(x)
     result[n] = arr[x in taken ? taken[x] : x];
+    // console.log(taken[x])
     taken[x] = --len in taken ? taken[len] : len;
   }
+  // console.log(taken)
   return result;
 };
 
@@ -1421,39 +1670,39 @@ exports.getDispatchedProject = async (req, res, next) => {
         })
       )
     );
-   
-    
+
     const data = await Promise.all(
-      requests.filter(request => request.project !== null).map(async (request) => {
-        
-        if (request.project !== null) {
-          const projectDetails = await ServiceFormProjects.findAll({
-            where: { projectID: request.projectId },
-          });
-          // console.log(projectDetails)
-          if (projectDetails !== null) {
-            const bid = JSON.parse(
-              JSON.stringify(
-                await ProjectBidding.findOne({
-                  where: {
-                    userId,
-                    projectId:
-                      request.project === null ? "" : request.project.id,
-                  },
-                })
-              )
-            );
-            request.hasBid = false;
-            request.bid = null;
-            if (bid) {
-              request.hasBid = true;
-              request.bid = bid;
+      requests
+        .filter((request) => request.project !== null)
+        .map(async (request) => {
+          if (request.project !== null) {
+            const projectDetails = await ServiceFormProjects.findAll({
+              where: { projectID: request.projectId },
+            });
+            // console.log(projectDetails)
+            if (projectDetails !== null) {
+              const bid = JSON.parse(
+                JSON.stringify(
+                  await ProjectBidding.findOne({
+                    where: {
+                      userId,
+                      projectId:
+                        request.project === null ? "" : request.project.id,
+                    },
+                  })
+                )
+              );
+              request.hasBid = false;
+              request.bid = null;
+              if (bid) {
+                request.hasBid = true;
+                request.bid = bid;
+              }
+              request.projectDetails = projectDetails;
+              return request;
             }
-            request.projectDetails = projectDetails;
-            return request;
           }
-        }
-      })
+        })
     );
 
     return res.status(200).send({
@@ -1480,8 +1729,10 @@ exports.getAssignedProjects = async (req, res, next) => {
     );
     const data = await Promise.all(
       projects.map(async (project) => {
-        const requestData = await ServiceFormProjects.findAll({where: {projectID: project.id}})
-        
+        const requestData = await ServiceFormProjects.findAll({
+          where: { projectID: project.id },
+        });
+
         project.projectData = requestData;
         return project;
       })
@@ -1559,12 +1810,14 @@ exports.bidForProject = async (req, res, next) => {
         { where, transaction: t }
       );
 
-      const projectBid = ProjectBidding.findOne({where: {userId, projectId}});
-      if(projectBid !== null){
+      const projectBid = ProjectBidding.findOne({
+        where: { userId, projectId },
+      });
+      if (projectBid !== null) {
         return res.status(400).send({
           success: false,
-          message: "You cannot bid for a project twice!"
-        })
+          message: "You cannot bid for a project twice!",
+        });
       }
       const bid = await ProjectBidding.create(data, { transaction: t });
 
