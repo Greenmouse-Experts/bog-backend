@@ -79,6 +79,7 @@ exports.allAdminMessages = async (req, res, next) => {
       where,
       order: [["createdAt", "DESC"]]
     });
+    console.log(messages)
     return res.status(200).send({
       success: true,
       data: messages
