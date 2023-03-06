@@ -1,5 +1,5 @@
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-await-in-loop */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
@@ -27,6 +27,7 @@ const ProjectBidding = require("../models/ProjectBidding");
 const ServicesFormBuilders = require("../models/ServicesFormBuilder");
 const PrivateClient = require("../models/PrivateClient");
 const CorporateClient = require("../models/CorporateClient");
+const Transaction = require("../models/Transaction");
 const { request } = require("express");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
@@ -280,7 +281,6 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
       where: { projectID: project.id },
     });
 
-    // console.log(requestData)
     let client = {};
     if (requestData.length > 0) {
       const userId = requestData[0].userID;
@@ -291,6 +291,13 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
       client = user === null ? {} : user;
     }
 
+    // project commitment fee
+    const commitmentFee = await Transaction.findOne({where: {
+      description: {
+        [Op.like]: `%${project.projectSlug}%`
+      }
+    }})
+
     return res.status(200).send({
       success: true,
       data: {
@@ -299,6 +306,9 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
         projectData: requestData,
         reviews: project_reviews,
         client,
+        transactions: {
+          commitmentFee: commitmentFee === null ? {} : commitmentFee
+        }
       },
     });
   } catch (error) {
@@ -1165,7 +1175,9 @@ exports.updateGeoTechnicalInvestigationRequest = async (req, res, next) => {
 exports.requestProjectApproval = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
+      const userId = req.user.id;
       const { projectId } = req.params;
+      const {amount} = req.body;
       const project = await Project.findOne({ where: { id: projectId } });
       if (!project) {
         return res.status(404).send({
@@ -1177,10 +1189,26 @@ exports.requestProjectApproval = async (req, res, next) => {
         approvalStatus: "in_review",
       };
       await Project.update(requestData, {
-        where: { id: projectId },
-        transaction: t,
+        where: { id: projectId }
       });
-      const userId = req.user.id;
+
+      const paymentReference = `TR-${Math.floor(
+        190000000000 + Math.random() * 990000000000
+      )}`;
+      const slug = Math.floor(190000000 + Math.random() * 990000000);
+      const TransactionId = `BOG/TXN/PRJ/${slug}`;
+      const trxData = {
+        TransactionId,
+        userId,
+        status: "PAID",
+        type: "Projects",
+        amount,
+        paymentReference,
+        description: `Commitment fee for ${project.projectSlug}`,
+      };
+
+      const response = await Transaction.create(trxData);
+     
       const user = await User.findByPk(userId, { attributes: ["name"] });
       const reqData = {
         req,
@@ -1193,8 +1221,54 @@ exports.requestProjectApproval = async (req, res, next) => {
         message: "Project sent for approval",
       });
     } catch (error) {
+      console.log(error)
       t.rollback();
       return next(error);
+    }
+  });
+};
+
+exports.payCommitmentFee = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const userId = req.user.id;
+      const { amount, projectSlug } = req.body;
+      const project = await Project.findOne({ where: { projectSlug } });
+      if (project === null) {
+        return res.status(404).send({
+          success: false,
+          message: "Project not found!",
+        });
+      }
+
+      const paymentReference = `TR-${Math.floor(
+        190000000 + Math.random() * 990000000
+      )}`;
+      const slug = Math.floor(190000000 + Math.random() * 990000000);
+      const TransactionId = `BOG/TXN/PRJ/${slug}`;
+      const trxData = {
+        TransactionId,
+        userId,
+        status: "PAID",
+        type: "Projects",
+        discount,
+        amount,
+        paymentReference,
+        description: `Commitment fee for ${projectSlug}`,
+      };
+
+      const response = await Transaction.create(trxData);
+      const prjResponse = await Project.update(
+        { status: "in_review" },
+        { where: { projectSlug } }
+      );
+
+      return res.send({
+        success: true,
+        message: "Commitment fee has been paid successfully!",
+      });
+    } catch (error) {
+      next(error);
     }
   });
 };

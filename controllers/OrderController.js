@@ -16,11 +16,13 @@ const helpTransaction = require("../helpers/transactions");
 const ContactDetails = require("../models/ContactDetails");
 const ProductReview = require("../models/Reviews");
 const Notification = require("../helpers/notification");
+const Project = require("../models/Project");
+const Transaction = require("../models/Transaction");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
     const where = {
-      userId: req.user.id
+      userId: req.user.id,
     };
     if (req.query.status) {
       where.status = req.query.status;
@@ -32,7 +34,7 @@ exports.getMyOrders = async (req, res, next) => {
       include: [
         {
           model: ContactDetails,
-          as: "contact"
+          as: "contact",
         },
         {
           model: OrderItem,
@@ -41,16 +43,16 @@ exports.getMyOrders = async (req, res, next) => {
             {
               model: User,
               as: "product_owner",
-              attributes: ["id", "fname", "lname", "email", "phone"]
-            }
-          ]
-        }
-      ]
+              attributes: ["id", "fname", "lname", "email", "phone"],
+            },
+          ],
+        },
+      ],
     });
 
     return res.status(200).send({
       success: true,
-      data: orders
+      data: orders,
     });
   } catch (error) {
     return next(error);
@@ -60,7 +62,7 @@ exports.getMyOrders = async (req, res, next) => {
 exports.getOrderDetails = async (req, res, next) => {
   try {
     const where = {
-      id: req.params.orderId
+      id: req.params.orderId,
     };
 
     const orders = await Order.findOne({
@@ -68,7 +70,7 @@ exports.getOrderDetails = async (req, res, next) => {
       include: [
         {
           model: ContactDetails,
-          as: "contact"
+          as: "contact",
         },
         {
           model: OrderItem,
@@ -77,25 +79,25 @@ exports.getOrderDetails = async (req, res, next) => {
             {
               model: User,
               as: "product_owner",
-              attributes: ["id", "fname", "lname", "email", "phone"]
-            }
-          ]
+              attributes: ["id", "fname", "lname", "email", "phone"],
+            },
+          ],
         },
         {
           model: User,
           as: "client",
-          attributes: ["id", "fname", "lname", "email", "phone", "photo"]
+          attributes: ["id", "fname", "lname", "email", "phone", "photo"],
         },
         {
           model: ProductReview,
-          as: "review"
-        }
-      ]
+          as: "review",
+        },
+      ],
     });
 
     return res.status(200).send({
       success: true,
-      data: orders
+      data: orders,
     });
   } catch (error) {
     return next(error);
@@ -105,7 +107,7 @@ exports.getOrderDetails = async (req, res, next) => {
 exports.getOrderRequest = async (req, res, next) => {
   try {
     const where = {
-      productOwner: req.user.id
+      productOwner: req.user.id,
     };
     if (req.query.status) {
       where.status = req.query.status;
@@ -118,7 +120,7 @@ exports.getOrderRequest = async (req, res, next) => {
         {
           model: User,
           as: "user",
-          attributes: ["id", "fname", "lname", "email", "phone", "photo"]
+          attributes: ["id", "fname", "lname", "email", "phone", "photo"],
         },
         {
           model: Order,
@@ -126,29 +128,30 @@ exports.getOrderRequest = async (req, res, next) => {
           include: [
             {
               model: ContactDetails,
-              as: "contact"
-            }
-          ]
-        }
-      ]
+              as: "contact",
+            },
+          ],
+        },
+      ],
     });
 
     return res.status(200).send({
       success: true,
-      data: orders
+      data: orders,
     });
   } catch (error) {
     return next(error);
   }
 };
 
+
 exports.createOrder = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
       const ownerId = req.user.id;
       const user = await User.findByPk(userId, {
-        attributes: ["email", "name", "fname", "lname"]
+        attributes: ["email", "name", "fname", "lname"],
       });
       const {
         shippingAddress,
@@ -156,7 +159,7 @@ exports.createOrder = async (req, res, next) => {
         products,
         deliveryFee,
         discount,
-        totalAmount
+        totalAmount,
       } = req.body;
       const slug = Math.floor(190000000 + Math.random() * 990000000);
       const orderSlug = `BOG/ORD/${slug}`;
@@ -165,25 +168,24 @@ exports.createOrder = async (req, res, next) => {
         userId,
         deliveryFee,
         discount,
-        totalAmount
+        totalAmount,
       };
       const paymentData = {
         userId,
         payment_reference: paymentInfo.reference,
         amount: totalAmount,
-        payment_category: "Order"
+        payment_category: "Order",
       };
 
-      console.log(req.body)
-      
+      console.log(req.body);
 
       await Payment.create(paymentData, { transaction: t });
       const contact = {
         ...shippingAddress,
-        userId
+        userId,
       };
       const orders = await Promise.all(
-        products.map(async product => {
+        products.map(async (product) => {
           const prodData = await Product.findByPk(product.productId, {
             attributes: [
               "id",
@@ -192,8 +194,8 @@ exports.createOrder = async (req, res, next) => {
               "price",
               "unit",
               "image",
-              "description"
-            ]
+              "description",
+            ],
           });
           const amount = product.quantity * Number(prodData.price);
           const trackingId = `TRD-${Math.floor(
@@ -215,8 +217,8 @@ exports.createOrder = async (req, res, next) => {
               price: prodData.price,
               unit: prodData.unit,
               image: prodData.image,
-              description: prodData.description
-            }
+              description: prodData.description,
+            },
           };
         })
       );
@@ -227,14 +229,14 @@ exports.createOrder = async (req, res, next) => {
         include: [
           {
             model: OrderItem,
-            as: "order_items"
+            as: "order_items",
           },
           {
             model: ContactDetails,
-            as: "contact"
-          }
+            as: "contact",
+          },
         ],
-        transaction: t
+        transaction: t,
       });
 
       orderData.slug = orderSlug;
@@ -245,8 +247,8 @@ exports.createOrder = async (req, res, next) => {
         const files = [
           {
             path: `uploads/${slug}.pdf`,
-            filename: `${slug}.pdf`
-          }
+            filename: `${slug}.pdf`,
+          },
         ];
         const message = helpers.invoiceMessage(user.name);
         sendMail(user.email, message, "BOG Invoice", files);
@@ -259,7 +261,7 @@ exports.createOrder = async (req, res, next) => {
       const { io } = req.app;
       await Notification.createNotification({
         type: notifyType,
-        message: mesg
+        message: mesg,
       });
       io.emit("getNotifications", await Notification.fetchAdminNotification());
 
@@ -267,7 +269,7 @@ exports.createOrder = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         message: "Order Request submitted",
-        order
+        order,
       });
     } catch (error) {
       console.log(error);
@@ -289,26 +291,26 @@ exports.generateOrderInvoice = async (orders, res, next) => {
 };
 
 exports.updateOrder = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { orderId, status } = req.body;
       const order = await Order.findOne({ where: { id: orderId } });
       if (!order) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Order"
+          message: "Invalid Order",
         });
       }
 
       const data = {
         status,
-        ...req.body
+        ...req.body,
       };
       await Order.update(data, { where: { id: orderId }, transaction: t });
 
       return res.status(200).send({
         success: true,
-        message: "Order updated"
+        message: "Order updated",
       });
     } catch (error) {
       t.rollback();
@@ -318,32 +320,32 @@ exports.updateOrder = async (req, res, next) => {
 };
 
 exports.updateOrderRequest = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { requestId, status } = req.body;
       const order = await OrderItem.findOne({
         where: { id: requestId },
-        attributes: ["id"]
+        attributes: ["id"],
       });
       if (!order) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Order"
+          message: "Invalid Order",
         });
       }
 
       const data = {
         status,
-        ...req.body
+        ...req.body,
       };
       await OrderItem.update(data, {
         where: { id: requestId },
-        transaction: t
+        transaction: t,
       });
 
       return res.status(200).send({
         success: true,
-        message: "Order Request updated"
+        message: "Order Request updated",
       });
     } catch (error) {
       t.rollback();
@@ -359,7 +361,7 @@ exports.getAllOrders = async (req, res, next) => {
       include: [
         {
           model: ContactDetails,
-          as: "contact"
+          as: "contact",
         },
         {
           model: OrderItem,
@@ -368,21 +370,21 @@ exports.getAllOrders = async (req, res, next) => {
             {
               model: User,
               as: "product_owner",
-              attributes: ["id", "fname", "lname", "email", "phone"]
+              attributes: ["id", "fname", "lname", "email", "phone"],
             },
             {
               model: User,
               as: "user",
-              attributes: ["id", "fname", "lname", "email", "phone"]
-            }
-          ]
-        }
-      ]
+              attributes: ["id", "fname", "lname", "email", "phone"],
+            },
+          ],
+        },
+      ],
     });
 
     return res.status(200).send({
       success: true,
-      data: orders
+      data: orders,
     });
   } catch (error) {
     return next(error);

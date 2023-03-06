@@ -12,4 +12,6 @@ router.route("/transactions/user").get(Auth, Transaction.getAllUserTxns);
 
 router.route("/transaction/:txId").get(Auth, Transaction.getOneTxns);
 
+// route.route("/transactions/project/commitment").post(Auth, Transaction.)
+
 module.exports = router;
