@@ -8,7 +8,8 @@
     "dev": "supervisor app.js",
     "serve": "nodemon app.js",
     "migrate": "npx sequelize db:migrate",
-    "migrate:db": "./node_modules/.bin/sequelize db:migrate"
+    "migrate:db": "./node_modules/.bin/sequelize db:migrate",
+    "seed": "npx sequelize-cli db:seed:all"
   },
   "repository": {
     "type": "git",
