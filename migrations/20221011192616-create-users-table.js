@@ -58,6 +58,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
+      kycScore: {
+        type: Sequelize.INTEGER,
+        defaultValue: false
+      },
+      kycTotal: {
+        type: Sequelize.INTEGER,
+        defaultValue: false
+      },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE },
       deletedAt: { allowNull: true, type: Sequelize.DATE }

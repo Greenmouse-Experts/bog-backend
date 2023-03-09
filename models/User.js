@@ -96,6 +96,14 @@ const User = sequelise.define(
     isSuspended: {
       type: Sequelize.BOOLEAN,
       defaultValue: false
+    },
+    kycScore: {
+      type: Sequelize.INTEGER,
+      defaultValue: false
+    },
+    kycTotal: {
+      type: Sequelize.INTEGER,
+      defaultValue: false
     }
   },
   { paranoid: true }
