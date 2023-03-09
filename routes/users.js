@@ -13,7 +13,8 @@ const {
   resetPasswordValidation,
   changePasswordValidation,
   adminValidation,
-  resetAdminPasswordValidation
+  resetAdminPasswordValidation,
+  contactValidation
 } = require("../helpers/validators");
 
 // @route  api/signup
@@ -58,6 +59,9 @@ router
     Auth,
     UserController.changePassword
   );
+
+router.route("/user/contact-admin")
+    .post(contactValidation(), validate, UserController.contactAdmin)
 
 router
   .route("/user/reset-password")
