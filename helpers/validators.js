@@ -76,6 +76,16 @@ const changePasswordValidation = () => {
   ];
 };
 
+const contactValidation = () => {
+  return [
+    check("first_name", "First name is required!").notEmpty(),
+    check("last_name", "Last name is required!").notEmpty(),
+    check("email", "Email is required!").notEmpty(),
+    check("phone", "Phone number is required!").notEmpty(),
+    check("message", "Message is required!").notEmpty(),
+  ];
+};
+
 
 const bankValidation = () => {
   return [
@@ -300,6 +310,7 @@ module.exports = {
   updateOrderRequestValidation,
   BlogCategoryValidation,
   CalculatorCalculator,
+  contactValidation,
   BlogValidation,
   TestimonyValidation,
   ServiceTypeValidation,

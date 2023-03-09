@@ -372,6 +372,42 @@ exports.getAccounts = async (req, res, next) => {
   });
 };
 
+exports.contactAdmin = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const {first_name, last_name, phone, email, message, captcha} = req.body;
+      
+      if (!req.body.platform) {
+        const validateCaptcha = await UserService.validateCaptcha(captcha);
+        if (!validateCaptcha) {
+          return res.status(400).send({
+            success: false,
+            message: "Please answer the captcha correctly",
+            validateCaptcha,
+          });
+        }
+      }
+
+      const html_data = `
+        Name: ${first_name} ${last_name}<br/>
+        Phone Number: ${phone}<br/>
+        Email: ${email}<br/><br/>
+        Message: <br/>
+        ${message}
+      `
+      await EmailService.sendMail(process.env.EMAIL_FROM, html_data, "Contact Us");
+
+      return res.status(200).send({
+        success: true,
+        message: "Message sent successfully!"
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+}
+
 exports.getAccountsData = async (userId) => {
   try {
     const attributes = ["id", "userId", "userType"];
