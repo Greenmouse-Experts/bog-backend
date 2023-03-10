@@ -208,6 +208,82 @@ exports.getAllProjectRequestV2 = async (req, res, next) => {
   }
 };
 
+/**
+ * View project analysis
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.analyzeProjects = async (req, res, next) => {
+  try {
+
+    const {id} = req.user
+    let {y} = req.query;
+
+    if (y === undefined){
+      y = new Date().getFullYear()
+    } 
+
+    const projectsByYear = await Project.findAll({
+      where: {
+        userId: id,
+        [Op.and]: sequelize.where(sequelize.fn('YEAR', sequelize.col('createdAt')), y)
+      }
+    })
+    
+    return res.send({
+      success: true,
+      projects: projectsByYear
+    })
+    
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
+ * View service partners project analysis
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
+exports.analyzeServicePartnerProjects = async (req, res, next) => {
+  try {
+
+    const {id} = req.user
+
+    const servicePartner = await ServicePartner.findOne({where: {userId: id}})
+
+    if (servicePartner === null) {
+      return res.status(404).send({
+        success: false,
+        message: "Account not found!"
+      })
+    }
+    let {y} = req.query;
+
+    if (y === undefined){
+      y = new Date().getFullYear()
+    } 
+
+    const projectsByYear = await Project.findAll({
+      where: {
+        serviceProviderId: servicePartner?.id,
+        [Op.and]: sequelize.where(sequelize.fn('YEAR', sequelize.col('createdAt')), y)
+      }
+    })
+    
+    return res.send({
+      success: true,
+      projects: projectsByYear
+    })
+    
+  } catch (error) {
+    return next(error);
+  }
+}
+
 exports.viewProjectRequest = async (req, res, next) => {
   try {
     const where = { id: req.params.projectId };

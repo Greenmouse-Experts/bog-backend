@@ -13,7 +13,15 @@ const Services = sequelise.define(
     name: {
       allowNull: true,
       type: Sequelize.STRING
-    }
+    },
+    slug: {
+      allowNull: true,
+      type: Sequelize.STRING
+    },
+    icon: {
+      allowNull: true,
+      type: Sequelize.STRING
+    },
   },
   { paranoid: true }
 );

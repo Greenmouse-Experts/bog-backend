@@ -910,6 +910,32 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+exports.analyzeUser = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      let { y } = req.query;
+
+      if (y === undefined){
+        y = new Date().getFullYear()
+      } 
+  
+      const usersByYear = await User.findAll({
+        where: sequelize.where(sequelize.fn('YEAR', sequelize.col('createdAt')), y)
+      })
+      
+      return res.send({
+        success: true,
+        users: usersByYear
+      })
+    
+      
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+}
+
 exports.getAllAdmin = async (req, res) => {
   try {
     const user = await UserService.getUserDetails({ id: req.user.id });

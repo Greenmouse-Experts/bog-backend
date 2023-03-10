@@ -5,7 +5,7 @@ const Auth = require("../middleware/auth");
 const Access = require("../middleware/access");
 
 const ServiceController = require("../controllers/ServiceController");
-const { validate, ServiceTypeValidation } = require("../helpers/validators");
+const { validate, ServiceTypeValidation, ServiceValidation } = require("../helpers/validators");
 
 router
   .route("/service/type/create")
@@ -28,7 +28,7 @@ router
   .delete(validate, [Auth, Access.verifyAccess], ServiceController.deleteCategory);
 
 // BOG Services
-router.route("/services/create").post([Auth, Access.verifyAccess], ServiceController.createService);
+router.route("/services/create").post([Auth, Access.verifyAccess], ServiceValidation(), validate, ServiceController.createService);
 
 router
   .route("/services/update/:id")

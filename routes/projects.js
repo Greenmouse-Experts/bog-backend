@@ -54,10 +54,18 @@ router
 
 router.route("/projects/all").get(Auth, ProjectController.getAllProjectRequest);
 
-// View all project v2
+
 router
   .route("/projects/v2/all")
   .get(Auth, ProjectController.getAllProjectRequestV2);
+
+// View all project v2 ?y=${year} default is present year
+router.route("/projects/analyze")
+  .get([Auth, Access.verifyAccess], ProjectController.analyzeProjects)
+
+// View all project v2 ?y=${year} default is present year
+router.route("/projects/service-partner-analyze")
+  .get([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.analyzeServicePartnerProjects)
 
 router
   .route("/projects/view-project/:projectId")
