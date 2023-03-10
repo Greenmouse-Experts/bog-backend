@@ -177,7 +177,7 @@ exports.updateService = async (req, res, next) => {
         });
       }
       await Services.update(
-        { name },
+        req.body,
         {
           where: { id },
           transaction: t

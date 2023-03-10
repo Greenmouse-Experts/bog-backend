@@ -197,6 +197,14 @@ const ServiceTypeValidation = () => {
   ];
 };
 
+const ServiceValidation = () => {
+  return [
+    check("name", "Name is required!").notEmpty(),
+    check("slug", "Slug is required!").notEmpty(),
+    check("icon", "Icon is required!").notEmpty()
+  ];
+};
+
 const ServiceFormBuilderValidation = () => {
   return [
     check("serviceName", "Service Name is required").notEmpty(),
@@ -327,5 +335,6 @@ module.exports = {
   projectProgressValidation,
   subscriptionRequestValidation,
   subscribeRequestValidation,
-  ServiceFormBuilderValidation
+  ServiceFormBuilderValidation,
+  ServiceValidation
 };

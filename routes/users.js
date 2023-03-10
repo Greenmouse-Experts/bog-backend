@@ -88,6 +88,11 @@ router
   .route("/all/users")
   .get([Auth, Access.verifyAccess], UserController.getAllUsers);
 
+// Get users analysis ?y=${year}
+router
+  .route("/all/users/analyze") 
+  .get([Auth, Access.verifyAccess, Access.verifyAdmin], UserController.analyzeUser);
+
 router
   .route("/admin/signup")
   .post(adminValidation(), validate, UserController.registerAdmin);
