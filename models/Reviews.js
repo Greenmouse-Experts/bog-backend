@@ -1,6 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
 const Order = require("./Order");
+const Products = require("./Product")
+const User = require("./User")
 
 const ProductReview = sequelise.define(
   "reviews",
@@ -31,11 +33,38 @@ const ProductReview = sequelise.define(
   { paranoid: true }
 );
 
-Order.hasOne(ProductReview, {
-  foreignKey: "productId",
-  as: "review",
-  onDelete: "cascade",
-  hooks: true
-});
+// Order.hasOne(ProductReview, {
+//   foreignKey: "productId",
+//   as: "review",
+//   onDelete: "cascade",
+//   hooks: true
+// });
+
+ProductReview.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'client'
+})
+
+// ProductReview.belongsTo(Products, {
+//   foreignKey: "productId",
+//   as: "product_info"
+// })
+
+// ProductReview.belongsTo(Products, {
+//   foreignKey: "productId",
+//   as: "review",
+//   onDelete: "cascade",
+//   hooks: true
+// })
+
+// ProductReview.hasMany(Products, {
+//   foreignKey: "productId",
+//   as: "review",
+// })
+
+// Products.hasMany(ProductReview, {
+//   foreignKey: "productId",
+//   as: "review",
+// })
 
 module.exports = ProductReview;

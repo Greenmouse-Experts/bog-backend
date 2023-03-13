@@ -11,6 +11,9 @@ router
   .route("/review/product/create-review")
   .post([Auth, Access.verifyAccess], ReviewController.createReview);
 
+router.route("/review/product/v2/create-review")
+  .post([Auth, Access.verifyAccess], ReviewController.createReviewV2);
+
 router
   .route("/review/product/update-review")
   .patch(validate, [Auth, Access.verifyAccess], ReviewController.updateReview);

@@ -13,7 +13,6 @@ const {
   updateOrderRequestValidation
 } = require("../helpers/validators");
 
-
 router.route("/orders/my-orders").get([Auth, Access.verifyAccess], OrderController.getMyOrders);
 
 router

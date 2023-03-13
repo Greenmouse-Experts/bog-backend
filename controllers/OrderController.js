@@ -15,6 +15,7 @@ const helpers = require("../helpers/message");
 const helpTransaction = require("../helpers/transactions");
 const ContactDetails = require("../models/ContactDetails");
 const ProductReview = require("../models/Reviews");
+const OrderReview = require("../models/order_reviews")
 const Notification = require("../helpers/notification");
 const Project = require("../models/Project");
 const Transaction = require("../models/Transaction");
@@ -89,8 +90,8 @@ exports.getOrderDetails = async (req, res, next) => {
           attributes: ["id", "fname", "lname", "email", "phone", "photo"],
         },
         {
-          model: ProductReview,
-          as: "review",
+          model: OrderReview,
+          as: "orderReview",
         },
       ],
     });
@@ -197,6 +198,13 @@ exports.createOrder = async (req, res, next) => {
               "description",
             ],
           });
+          if (prodData === null) {
+            return res.status(404).send({
+              success: false,
+              message: "Product not found!"
+            });
+          }
+          
           const amount = product.quantity * Number(prodData.price);
           const trackingId = `TRD-${Math.floor(
             190000000 + Math.random() * 990000000

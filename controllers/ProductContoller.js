@@ -27,6 +27,10 @@ exports.getProducts = async (req, res, next) => {
           attributes: ["id", "name", "email", "phone", "photo"],
         },
         {
+          model: Reviews,
+          as: "review",
+        },
+        {
           model: Category,
           as: "category",
           attributes: ["id", "name", "description"],
@@ -406,9 +410,16 @@ exports.getSingleProducts = async (req, res, next) => {
         },
       ],
     });
+    const review_details = await Reviews.findAll({
+      where: { productId: req.params.productId },
+      include: [{model: User, as: 'client'}]
+    });
     return res.status(200).send({
       success: true,
-      data: product,
+      data: {
+        product_details: product === null ? {} : null,
+        reviews: review_details
+      }
     });
   } catch (error) {
     return next(error);
