@@ -3,6 +3,7 @@ const sequelise = require("../config/database/connection");
 const ContactDetails = require("./ContactDetails");
 const OrderItem = require("./OrderItem");
 const User = require("./User");
+const OrderReviews = require("./order_reviews")
 
 const Order = sequelise.define(
   "orders",
@@ -66,5 +67,11 @@ Order.hasOne(ContactDetails, {
   foreignKey: "orderId",
   as: "contact"
 });
+
+Order.hasMany(OrderReviews, {
+  foreignKey: "orderId",
+  as: "orderReview"
+})
+
 
 module.exports = Order;

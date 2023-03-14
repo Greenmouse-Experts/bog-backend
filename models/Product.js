@@ -3,6 +3,7 @@ const sequelise = require("../config/database/connection");
 const ProductCategory = require("./ProductCategory");
 const ProductImage = require("./ProductImage");
 const User = require("./User");
+const Review = require("./Reviews");
 
 const Product = sequelise.define(
   "products",
@@ -79,6 +80,18 @@ Product.belongsTo(User, {
   foreignKey: "creatorId",
   as: "creator"
 });
+
+// Product.belongsTo(Review)
+// Review.
+// Product.belongsTo(Review, {
+//   foreignKey: 'productId',
+//   as: 'review'
+// })
+
+Product.hasMany(Review, {
+  foreignKey: 'productId',
+  as: 'review'
+})
 
 User.hasMany(Product, {
   foreignKey: "creatorId",
