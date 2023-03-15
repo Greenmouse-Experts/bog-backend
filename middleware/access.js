@@ -3,6 +3,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable consistent-return */
 require("dotenv").config();
+const axios = require('axios')
 const UserService = require("../service/UserService");
 const User = require("../models/User");
 
@@ -108,6 +109,58 @@ exports.verifyUser = (req, res, next) => {
   }
 }
 
+exports.authenticateFBSignup = async (req, res, next) => {
+  try {
+    const {facebook_access_token} = req.body;
+    const { data } = await axios({
+      url: 'https://graph.facebook.com/me',
+      method: 'get',
+      params: {
+        fields: ['id', 'email', 'first_name', 'last_name'].join(','),
+        access_token: facebook_access_token,
+      },
+    });
+    // console.log(data); // { id, email, first_name, last_name }
+    next();
+  } catch (error) {
+    return res.status(400).json({
+      success: false, 
+      msg: "FB access error",
+    })
+  }
+  
+};
+
+exports.authenticateFBSignin = async (req, res, next) => {
+  try {
+    const {facebook_access_token, facebook_id} = req.body;
+    const { data } = await axios({
+      url: 'https://graph.facebook.com/me',
+      method: 'get',
+      params: {
+        fields: ['id', 'email', 'first_name', 'last_name'].join(','),
+        access_token: facebook_access_token,
+      },
+    });
+
+    
+    if(data.id !== facebook_id){
+      return res.status(401).json({
+        success: false,
+        message: "This account has not been registered!"
+      })
+    }
+
+    next()
+  
+  } catch (error) {
+    return res.status(400).json({
+      success: false, 
+      msg: "FB access error",
+    })
+  }
+  
+};
 // module.exports = function(req, res, next) {
 //   const token = req.header("authorization");
 //   if (!token) {
