@@ -6,10 +6,10 @@ const validate = (req, res, next) => {
     return next();
   }
   const extractedErrors = [];
-  errors.array().map(err => extractedErrors.push({ message: err.msg }));
+  errors.array().map((err) => extractedErrors.push({ message: err.msg }));
 
   return res.status(422).json({
-    errors: extractedErrors
+    errors: extractedErrors,
   });
 };
 
@@ -21,7 +21,7 @@ const registerValidation = () => {
     check(
       "password",
       "Please enter a password with 5 or more characters"
-    ).isLength({ min: 5 })
+    ).isLength({ min: 5 }),
   ];
 };
 
@@ -34,7 +34,7 @@ const adminValidation = () => {
     check(
       "password",
       "Please enter a password with 5 or more characters"
-    ).isLength({ min: 5 })
+    ).isLength({ min: 5 }),
   ];
 };
 
@@ -44,7 +44,41 @@ const loginValidation = () => {
     check(
       "password",
       "Please enter a password with 5 or more characters"
-    ).isLength({ min: 5 })
+    ).isLength({ min: 5 }),
+  ];
+};
+
+const facebookLoginValidation = () => {
+  return [
+    check("facebook_id", "Facebook ID is required!").notEmpty(),
+    check("facebook_access_token", "Facebook access token is required!").notEmpty()
+  ];
+};
+
+const googleLoginValidation = () => {
+  return [check("google_id", "Google ID is required!").notEmpty()];
+};
+
+const facebookSignupValidation = () => {
+  return [
+    check("facebook_first_name", "Facebook first name is required!").notEmpty(),
+    check("facebook_access_token", "Facebook access token is required!").notEmpty(),
+    check("facebook_last_name", "Facebook last name is required!").notEmpty(),
+    check("facebook_email", "Facebook email is required!").notEmpty(),
+    check("facebook_id", "Facebook ID is required!").notEmpty(),
+    check("user_type", "User type is required!").notEmpty(),
+    check("company_name", "Company name is required!").notEmpty(),
+  ];
+};
+
+const googleSignupValidation = () => {
+  return [
+    check("google_first_name", "Google first name is required!").notEmpty(),
+    check("google_last_name", "Google last name is required!").notEmpty(),
+    check("google_email", "Google email is required!").notEmpty(),
+    check("google_id", "Google ID is required!").notEmpty(),
+    check("user_type", "User type is required!").notEmpty(),
+    check("company_name", "Company name is required!").notEmpty(),
   ];
 };
 
@@ -53,9 +87,9 @@ const resetAdminPasswordValidation = () => {
     check(
       "password",
       "Please enter a password with 5 or more characters"
-    ).isLength({ min: 5 })
-  ]
-}
+    ).isLength({ min: 5 }),
+  ];
+};
 
 const resetPasswordValidation = () => {
   return [
@@ -64,7 +98,7 @@ const resetPasswordValidation = () => {
     check(
       "password",
       "Please enter a password with 5 or more characters"
-    ).isLength({ min: 5 })
+    ).isLength({ min: 5 }),
   ];
 };
 
@@ -72,7 +106,7 @@ const changePasswordValidation = () => {
   return [
     check("oldPassword", "Please enter the Old Password").notEmpty(),
     check("newPassword", "Please enter new Password").notEmpty(),
-    check("confirmPassword", "Confirm new Password").notEmpty()
+    check("confirmPassword", "Confirm new Password").notEmpty(),
   ];
 };
 
@@ -86,13 +120,12 @@ const contactValidation = () => {
   ];
 };
 
-
 const bankValidation = () => {
   return [
     check("bank_code", "Please Select a bank").notEmpty(),
     check("bank_name", "Please Select a bank").notEmpty(),
     check("account_number", "Please enter Account number").notEmpty(),
-    check("account_name", "Please enter Account name").notEmpty()
+    check("account_name", "Please enter Account name").notEmpty(),
   ];
 };
 
@@ -103,7 +136,7 @@ const meetingValidation = () => {
     check("date", "Please enter meeting date").notEmpty(),
     check("time", "Please enter meeting time").notEmpty(),
     check("description", "Please describe the meeting").notEmpty(),
-    check("requestEmail", "Unexpected error, try to login again").notEmpty()
+    check("requestEmail", "Unexpected error, try to login again").notEmpty(),
   ];
 };
 
@@ -120,7 +153,7 @@ const addressValidation = () => {
 const meetingStatusValidation = () => {
   return [
     check("meetingId", "Account not found").notEmpty(),
-    check("status", "No action").notEmpty()
+    check("status", "No action").notEmpty(),
   ];
 };
 
@@ -138,42 +171,42 @@ const productValidation = () => {
     check(
       "unit",
       "Please enter the unit measurement for this product"
-    ).notEmpty()
+    ).notEmpty(),
   ];
 };
 
 const productApprovalValidation = () => {
   return [
     check("productId", "Product id is required").isUUID(),
-    check("status", "Please approval status").notEmpty()
+    check("status", "Please approval status").notEmpty(),
   ];
 };
 
 const orderValidation = () => {
   return [
     check("products", "Product is required").isArray(),
-    check("shippingAddress", "Shipping address is required").notEmpty()
+    check("shippingAddress", "Shipping address is required").notEmpty(),
   ];
 };
 
 const updateOrderValidation = () => {
   return [
     check("orderId", "Order Id is required").isUUID(),
-    check("status", "Order status is required").notEmpty()
+    check("status", "Order status is required").notEmpty(),
   ];
 };
 
 const updateOrderRequestValidation = () => {
   return [
     check("requestId", "Request Id is required").isUUID(),
-    check("status", "Order status is required").notEmpty()
+    check("status", "Order status is required").notEmpty(),
   ];
 };
 
 const TestimonyValidation = () => {
   return [
     check("message", "Message is required").notEmpty(),
-    check("star", "Rating is required").isInt({ min: 0, max: 5 })
+    check("star", "Rating is required").isInt({ min: 0, max: 5 }),
   ];
 };
 
@@ -185,7 +218,7 @@ const BlogValidation = () => {
     check("title", "Title is required").notEmpty(),
     check("categoryId", "No category selected").notEmpty(),
     check("status", "Status is required").notEmpty(),
-    check("body", "body is required").notEmpty()
+    check("body", "body is required").notEmpty(),
   ];
 };
 
@@ -193,7 +226,7 @@ const ServiceTypeValidation = () => {
   return [
     check("title", "Title is required").notEmpty(),
     check("description", "No category selected").notEmpty(),
-    check("serviceId", "Service Type is required").isUUID()
+    check("serviceId", "Service Type is required").isUUID(),
   ];
 };
 
@@ -201,7 +234,7 @@ const ServiceValidation = () => {
   return [
     check("name", "Name is required!").notEmpty(),
     check("slug", "Slug is required!").notEmpty(),
-    check("icon", "Icon is required!").notEmpty()
+    check("icon", "Icon is required!").notEmpty(),
   ];
 };
 
@@ -210,7 +243,7 @@ const ServiceFormBuilderValidation = () => {
     check("serviceName", "Service Name is required").notEmpty(),
     check("label", "Label is required").notEmpty(),
     check("inputType", "Input Type is required").notEmpty(),
-    check("name", "Name is required").notEmpty()
+    check("name", "Name is required").notEmpty(),
   ];
 };
 
@@ -222,7 +255,7 @@ const landSurveyRequestValidation = () => {
     check("propertyLga", "property Lga is required").notEmpty(),
     check("landSize", "land Size is required").notEmpty(),
     check("propertyType", "property Type is required").notEmpty(),
-    check("surveyType", "survey Type is required").notEmpty()
+    check("surveyType", "survey Type is required").notEmpty(),
   ];
 };
 
@@ -232,7 +265,7 @@ const contractorRequestValidation = () => {
     check("clientName", "Client Name is required").notEmpty(),
     check("projectLocation", "project Location is required").notEmpty(),
     check("projectType", "project Type is required").notEmpty(),
-    check("buildingType", "Building Type is required").notEmpty()
+    check("buildingType", "Building Type is required").notEmpty(),
   ];
 };
 
@@ -242,7 +275,7 @@ const BasicKYCRequirements = () => {
 const CalculatorCalculator = () => {
   return [
     check("name", "Please provide the rate name").notEmpty(),
-    check("rate", "Please provide the rate value").notEmpty()
+    check("rate", "Please provide the rate value").notEmpty(),
   ];
 };
 
@@ -254,7 +287,7 @@ const KYCApprovalValidation = () => {
     check(
       "verificationStatus",
       "verificationStatus is required and it's boolean"
-    ).isBoolean()
+    ).isBoolean(),
   ];
 };
 
@@ -264,7 +297,7 @@ const projectAssignmentRequestValidation = () => {
     check("projectId", "projectId is required").isUUID(),
     check("duration", "duration is required").isNumeric(),
     check("totalCost", "totalCost is required").isNumeric(),
-    check("estimatedCost", "estimatedCost is required").isNumeric()
+    check("estimatedCost", "estimatedCost is required").isNumeric(),
   ];
 };
 
@@ -275,21 +308,19 @@ const projectBidRequestValidation = () => {
     check("deliveryTimeLine", "deliveryTimeLine is required").isNumeric(),
     check("areYouInterested", "areYouInterested is required").isBoolean(),
     check("projectCost", "projectCost is required").isNumeric(),
-    check("reasonOfInterest", "reasonOfInterest is required").notEmpty()
+    check("reasonOfInterest", "reasonOfInterest is required").notEmpty(),
   ];
 };
 
 const projectProgressValidation = () => {
-  return [
-    check("percent", "percent is required").notEmpty()
-  ];
+  return [check("percent", "percent is required").notEmpty()];
 };
 
 const subscriptionRequestValidation = () => {
   return [
     check("duration", "duration is required").isNumeric(),
     check("amount", "amount is required").isFloat(),
-    check("name", "name is required").notEmpty()
+    check("name", "name is required").notEmpty(),
   ];
 };
 
@@ -298,7 +329,7 @@ const subscribeRequestValidation = () => {
     check("userId", "userId is required").isUUID(),
     check("planId", "planId is required").isUUID(),
     check("reference", "reference is required").notEmpty(),
-    check("userType", "userType is required").notEmpty()
+    check("userType", "userType is required").notEmpty(),
   ];
 };
 
@@ -306,6 +337,10 @@ module.exports = {
   validate,
   registerValidation,
   loginValidation,
+  facebookLoginValidation,
+  googleLoginValidation,
+  facebookSignupValidation,
+  googleSignupValidation,
   resetPasswordValidation,
   resetAdminPasswordValidation,
   changePasswordValidation,
@@ -336,5 +371,5 @@ module.exports = {
   subscriptionRequestValidation,
   subscribeRequestValidation,
   ServiceFormBuilderValidation,
-  ServiceValidation
+  ServiceValidation,
 };

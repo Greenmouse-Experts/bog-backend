@@ -66,6 +66,18 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: false
       },
+      app: {
+        type: Sequelize.STRING,
+        defaultValue: false
+      },
+      facebook_id: {
+        type: Sequelize.STRING,
+        defaultValue: false
+      },
+      google_id: {
+        type: Sequelize.STRING,
+        defaultValue: false
+      },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE },
       deletedAt: { allowNull: true, type: Sequelize.DATE }

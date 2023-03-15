@@ -9,6 +9,10 @@
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
+const passport = require("passport-facebook")
+const FacebookStrategy = require("passport-facebook-token")
+
 const randomstring = require("randomstring");
 const { Op } = require("sequelize");
 const sequelize = require("../config/database/connection");
@@ -25,6 +29,8 @@ const Notification = require("../helpers/notification");
 
 const { adminLevels, adminPrivileges } = require("../helpers/utility");
 const ServiceProvider = require("../models/ServiceProvider");
+const axios = require("axios");
+
 
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -158,6 +164,307 @@ exports.registerUser = async (req, res, next) => {
   });
 };
 
+exports.testfblogin = async (req, res) => {
+  passport.authenticate('facebook')
+}
+
+/**
+ *
+ * @method POST
+ * @param {string} facebook_first_name
+ * @param {string} facebook_last_name
+ * @param {string} facebook_email
+ * @param {string} facebook_id
+ * @param {string} user_type
+ * @param {string} company_name
+ * @return {json} response
+ */
+exports.facebookSignup = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    let first_name = req.body.facebook_first_name;
+    let last_name = req.body.facebook_last_name;
+    let name = `${first_name} ${last_name}`;
+    let email = req.body.facebook_email;
+    let facebook_id = req.body.facebook_id;
+    let user_type = req.body.user_type;
+    let company_name = req.body.company_name;
+
+    try {
+
+      const user = await User.findOne({ where: { email } });
+      if (user !== null) {
+        return res.status(404).json({
+          success: false,
+          message: "Account exists!",
+        });
+      }
+
+      const user_ = await User.create({
+        name,
+        fname: first_name,
+        lname: last_name,
+        email,
+        userType: user_type,
+        level: 1,
+        facebook_id,
+        isActive: true,
+        app: "facebook",
+      });
+
+      if (user_type !== "admin" || user_type !== "other") {
+        const request = {
+          userId: user_.id,
+          userType: user_type,
+          company_name,
+        };
+        const result = await this.addUserProfile(request, t);
+      }
+
+      const type = ["corporate_client"];
+      if (type.includes(user_type)) {
+        const data = {
+          userId: user_.id,
+          company_name,
+        };
+        await UserService.createProfile(data, t);
+      }
+
+      const mesg = `A new user just signed up as ${UserService.getUserType(
+        user_type
+      )}`;
+      const userId = user_.id;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        userId,
+        type: notifyType,
+        message: mesg,
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
+
+      return res.status(201).send({
+        success: true,
+        message: "User Created Successfully",
+      });
+    } catch (err) {
+      console.error(err);
+      t.rollback();
+      return next(err);
+    }
+  });
+};
+
+/**
+ *
+ * @method POST
+ * @param {string} access_token
+ * @param {string} google_first_name
+ * @param {string} google_last_name
+ * @param {string} google_email
+ * @param {string} google_id
+ * @param {string} user_type
+ * @param {string} company_name
+ * @return {json} response
+ */
+exports.googleSignup = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    let first_name = req.body.google_first_name;
+    let last_name = req.body.google_last_name;
+    let name = `${first_name} ${last_name}`;
+    let email = req.body.google_email;
+    let google_id = req.body.google_id;
+    let user_type = req.body.user_type;
+    let company_name = req.body.company_name;
+
+
+    try {
+      const user = await User.findOne({ where: { email } });
+      if (user !== null) {
+        return res.status(404).json({
+          success: false,
+          message: "Account exists!",
+        });
+      }
+
+      const user_ = await User.create({
+        name,
+        fname: first_name,
+        lname: last_name,
+        email,
+        userType: user_type,
+        level: 1,
+        google_id,
+        isActive: true,
+        app: "google",
+      });
+
+      if (user_type !== "admin" || user_type !== "other") {
+        const request = {
+          userId: user_.id,
+          userType: user_type,
+          company_name: req.body.company_name,
+        };
+        const result = await this.addUserProfile(request, t);
+      }
+
+      const type = ["corporate_client"];
+      if (type.includes(user_type)) {
+        const data = {
+          userId: user_.id,
+          company_name,
+        };
+        await UserService.createProfile(data, t);
+      }
+
+      const mesg = `A new user just signed up as ${UserService.getUserType(
+        user_type
+      )}`;
+      const userId = user_.id;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        userId,
+        type: notifyType,
+        message: mesg,
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
+
+      return res.status(201).send({
+        success: true,
+        message: "User Created Successfully",
+      });
+    } catch (err) {
+      console.error(err);
+      t.rollback();
+      return next(err);
+    }
+  });
+};
+
+/**
+ * Sign in using facebook account
+ * @method  POST
+ * @param   {string} facebook_id
+ * @return    {json} response
+ */
+exports.facebookSignin = async (req, res) => {
+  let facebook_id = req.body.facebook_id;
+
+  try {
+    const user = await User.findOne({
+      where: {
+        facebook_id,
+      },
+    });
+
+    if (user === null) {
+      return res.status(404).json({
+        success: false,
+        message: "Facebook account not found!",
+      });
+    }
+
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: 36000,
+    });
+    let profile;
+    const data = {
+      ...user.toJSON(),
+    };
+    const userId = user.id;
+    if (req.body.userType && req.body.userType !== "") {
+      const { userType } = req.body;
+      profile = await UserService.getUserTypeProfile(userType, userId);
+      if (profile) {
+        data.profile = profile;
+        data.userType = userType;
+      }
+    } else {
+      profile = await UserService.getUserTypeProfile(user.userType, userId);
+      if (profile) {
+        data.profile = profile;
+        data.userType = user.userType;
+      }
+    }
+
+    return res.status(200).send({
+      success: true,
+      message: "User Logged In Sucessfully",
+      token,
+      user: data,
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+/**
+ * Sign in using google account
+ * @method  POST
+ * @param   {string} facebook_id
+ * @return    {json} response
+ */
+exports.googleSignin = async (req, res) => {
+  let google_id = req.body.google_id;
+
+  try {
+    const user = await User.findOne({
+      where: {
+        google_id,
+      },
+    });
+
+    if (user === null) {
+      return res.status(404).json({
+        success: false,
+        message: "Google account not found!",
+      });
+    }
+
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: 36000,
+    });
+    let profile;
+    const data = {
+      ...user,
+    };
+    const userId = user.id;
+    if (req.body.userType && req.body.userType !== "") {
+      const { userType } = req.body;
+      profile = await UserService.getUserTypeProfile(userType, userId);
+      if (profile) {
+        data.profile = profile;
+        data.userType = userType;
+      }
+    } else {
+      profile = await UserService.getUserTypeProfile(user.userType, userId);
+      if (profile) {
+        data.profile = profile;
+        data.userType = user.userType;
+      }
+    }
+
+    return res.status(200).send({
+      success: true,
+      message: "User Logged In Sucessfully",
+      token,
+      user: data,
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 exports.registerAdmin = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -240,6 +547,7 @@ exports.loginUser = async (req, res, next) => {
         message: "Incorrect Password!",
       });
     }
+
     const payload = {
       user: {
         id: user.id,
@@ -375,8 +683,15 @@ exports.getAccounts = async (req, res, next) => {
 exports.contactAdmin = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const {first_name, last_name, phone, email, message, captcha} = req.body;
-      
+      const {
+        first_name,
+        last_name,
+        phone,
+        email,
+        message,
+        captcha,
+      } = req.body;
+
       if (!req.body.platform) {
         const validateCaptcha = await UserService.validateCaptcha(captcha);
         if (!validateCaptcha) {
@@ -394,19 +709,23 @@ exports.contactAdmin = async (req, res, next) => {
         Email: ${email}<br/><br/>
         Message: <br/>
         ${message}
-      `
-      await EmailService.sendMail(process.env.EMAIL_FROM, html_data, "Contact Us");
+      `;
+      await EmailService.sendMail(
+        process.env.EMAIL_FROM,
+        html_data,
+        "Contact Us"
+      );
 
       return res.status(200).send({
         success: true,
-        message: "Message sent successfully!"
+        message: "Message sent successfully!",
       });
     } catch (error) {
       t.rollback();
       return next(error);
     }
   });
-}
+};
 
 exports.getAccountsData = async (userId) => {
   try {
@@ -474,7 +793,6 @@ exports.verifyLogin = async (req, res, next) => {
           }
         }
       }
-
     } catch (error) {
       t.rollback();
       return next(error);
@@ -915,26 +1233,27 @@ exports.analyzeUser = async (req, res, next) => {
     try {
       let { y } = req.query;
 
-      if (y === undefined){
-        y = new Date().getFullYear()
-      } 
-  
+      if (y === undefined) {
+        y = new Date().getFullYear();
+      }
+
       const usersByYear = await User.findAll({
-        where: sequelize.where(sequelize.fn('YEAR', sequelize.col('createdAt')), y)
-      })
-      
+        where: sequelize.where(
+          sequelize.fn("YEAR", sequelize.col("createdAt")),
+          y
+        ),
+      });
+
       return res.send({
         success: true,
-        users: usersByYear
-      })
-    
-      
+        users: usersByYear,
+      });
     } catch (error) {
       t.rollback();
       return next(error);
     }
   });
-}
+};
 
 exports.getAllAdmin = async (req, res) => {
   try {

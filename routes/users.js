@@ -1,4 +1,5 @@
 const express = require("express");
+const passport = require("passport")
 
 const router = express.Router();
 const UserController = require("../controllers/UserController");
@@ -14,8 +15,16 @@ const {
   changePasswordValidation,
   adminValidation,
   resetAdminPasswordValidation,
-  contactValidation
+  contactValidation,
+  facebookLoginValidation,
+  googleLoginValidation,
+  facebookSignupValidation,
+  googleSignupValidation,
 } = require("../helpers/validators");
+
+var passportConfig = require('../helpers/passport-facebook');
+
+passportConfig()
 
 // @route  api/signup
 // @method POST
@@ -33,6 +42,23 @@ router
   .route("/user/login")
   .post(loginValidation(), validate, UserController.loginUser);
 
+/**
+ * Facebook signin * signup
+ */
+router.route("/user/facebook/login").post(passport.authenticate('facebook', { session: false }) 
+// UserController.testfblogin
+);
+router
+  .route("/user/auth/facebook-signup")
+  .post(facebookSignupValidation(), validate, [Access.authenticateFBSignup], UserController.facebookSignup);
+router.route("/user/auth/facebook-signin").post([facebookLoginValidation(), validate], [Access.authenticateFBSignin], UserController.facebookSignin);
+
+/**
+ * Google signin and signup
+ */
+router.route("/user/auth/google-signup").post([googleSignupValidation(), validate], UserController.googleSignup);
+router.route("/user/auth/google-signin").post([googleLoginValidation(), validate], UserController.googleSignin);
+
 router.route("/user/switch-account").post(Auth, UserController.switchAccount);
 
 router.route("/user/get-accounts").get(Auth, UserController.getAccounts);
@@ -45,7 +71,9 @@ router.route("/user/me").get(Auth, UserController.getLoggedInUser);
 
 router.route("/user/verify").get(UserController.verifyUser);
 
-router.route("/user/verify/login").post(loginValidation(), validate, UserController.verifyLogin);
+router
+  .route("/user/verify/login")
+  .post(loginValidation(), validate, UserController.verifyLogin);
 
 router.route("/user/resend-token").post(UserController.resendCode);
 
@@ -60,8 +88,9 @@ router
     UserController.changePassword
   );
 
-router.route("/user/contact-admin")
-    .post(contactValidation(), validate, UserController.contactAdmin)
+router
+  .route("/user/contact-admin")
+  .post(contactValidation(), validate, UserController.contactAdmin);
 
 router
   .route("/user/reset-password")
@@ -90,8 +119,11 @@ router
 
 // Get users analysis ?y=${year}
 router
-  .route("/all/users/analyze") 
-  .get([Auth, Access.verifyAccess, Access.verifyAdmin], UserController.analyzeUser);
+  .route("/all/users/analyze")
+  .get(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    UserController.analyzeUser
+  );
 
 router
   .route("/admin/signup")

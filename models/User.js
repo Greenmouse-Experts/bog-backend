@@ -104,7 +104,19 @@ const User = sequelise.define(
     kycTotal: {
       type: Sequelize.INTEGER,
       defaultValue: false
-    }
+    },
+    app: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    facebook_id: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    google_id: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
   },
   { paranoid: true }
 );
