@@ -410,6 +410,7 @@ exports.getSingleProducts = async (req, res, next) => {
         },
       ],
     });
+
     const review_details = await Reviews.findAll({
       where: { productId: req.params.productId },
       include: [{model: User, as: 'client'}]
@@ -417,7 +418,7 @@ exports.getSingleProducts = async (req, res, next) => {
     return res.status(200).send({
       success: true,
       data: {
-        product_details: product === null ? {} : null,
+        ...product.toJSON(),
         reviews: review_details
       }
     });
