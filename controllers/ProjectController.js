@@ -218,7 +218,13 @@ exports.analyzeProjects = async (req, res, next) => {
   try {
 
     const {id} = req.user
+    const {userType} = req._credentials
     let {y} = req.query;
+
+    const profile = await userService.getUserTypeProfile(
+      userType,
+      id
+    );
 
     if (y === undefined){
       y = new Date().getFullYear()
@@ -226,7 +232,7 @@ exports.analyzeProjects = async (req, res, next) => {
 
     const projectsByYear = await Project.findAll({
       where: {
-        userId: id,
+        userId: profile.id,
         [Op.and]: sequelize.where(sequelize.fn('YEAR', sequelize.col('createdAt')), y)
       }
     })
