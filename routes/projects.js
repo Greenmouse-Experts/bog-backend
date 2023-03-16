@@ -11,7 +11,9 @@ const {
   landSurveyRequestValidation,
   projectAssignmentRequestValidation,
   projectBidRequestValidation,
-  projectProgressValidation
+  projectProgressValidation,
+  projectInstallmentValidation,
+  paymentInstallmentValidation
   //   contractorRequestValidation
 } = require("../helpers/validators");
 const ProjectController = require("../controllers/ProjectController");
@@ -150,6 +152,7 @@ router
   .route("/projects/request-for-approval/:projectId")
   .patch(Auth, ProjectController.requestProjectApproval);
 
+
 router
   .route("/projects/approve-project/:projectId")
   .patch(Auth, ProjectController.approveProjectRequest);
@@ -176,6 +179,16 @@ router
     Auth,
     ProjectController.assignProject
   );
+
+router.route("/projects/installments/create")
+  .post([Auth, Access.verifyAccess, Access.verifyAdmin], projectInstallmentValidation(), validate, ProjectController.createProjectInstallment)
+
+router.route("/projects/installments/:project_id/view")
+  .get([Auth, Access.verifyAccess], ProjectController.viewProjectInstallment)
+
+// Pay project installment
+router.route("/projects/installments/:projectId/payment")
+  .post([Auth, Access.verifyAccess, Access.verifyUser], paymentInstallmentValidation(), validate, ProjectController.payProjectInstallment);
 
 router
   .route("/projects/bid-project")

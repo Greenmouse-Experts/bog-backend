@@ -19,24 +19,4 @@ router.route("/fees/update-commitment")
 router.route("/fees/commitment")
     .get(Auth, FeeController.viewCommitmentFee)
 
-// router.route("/meeting/all").get(Auth, MeetingController.getAllMeeting);
-
-// router.route("/meeting/my-meeting").get(Auth, MeetingController.myMeeting);
-
-// router
-//   .route("/meeting/service-meeting")
-//   .get(Auth, MeetingController.servicePartnerMeetings);
-
-// router
-//   .route("/meeting/action")
-//   .post(meetingStatusValidation(), Auth, MeetingController.meetingAction);
-
-// router
-//   .route("/meeting/create")
-//   .post(meetingValidation(), validate, Auth, MeetingController.createMeeting);
-
-// router
-//   .route("/meeting/delete/:meetingId")
-//   .patch(Auth, MeetingController.deleteMeeting);
-
 module.exports = router;
