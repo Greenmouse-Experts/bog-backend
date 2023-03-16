@@ -301,6 +301,21 @@ const projectAssignmentRequestValidation = () => {
   ];
 };
 
+const projectInstallmentValidation = () => {
+  return [
+    check("title", "Title is required").notEmpty(),
+    check("amount", "Amount is required").notEmpty(),
+    check("project_slug", "Project slug is required").notEmpty()
+  ];
+};
+
+const paymentInstallmentValidation = () => {
+  return [
+    check("amount", "Amount is required").notEmpty(),
+    check("installmentId", "Installment ID is required").notEmpty()
+  ];
+};
+
 const projectBidRequestValidation = () => {
   return [
     check("userId", "userId is required").isUUID(),
@@ -368,6 +383,8 @@ module.exports = {
   projectAssignmentRequestValidation,
   projectBidRequestValidation,
   projectProgressValidation,
+  projectInstallmentValidation,
+  paymentInstallmentValidation,
   subscriptionRequestValidation,
   subscribeRequestValidation,
   ServiceFormBuilderValidation,

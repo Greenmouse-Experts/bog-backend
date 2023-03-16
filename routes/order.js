@@ -42,7 +42,6 @@ router
 
 router.route("/orders/all").get([Auth, Access.verifyAccess], OrderController.getAllOrders);
 
-
 // Router
 router
   .route("/orders/generateInvoice")
