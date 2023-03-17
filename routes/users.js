@@ -19,7 +19,7 @@ const {
   facebookLoginValidation,
   googleLoginValidation,
   facebookSignupValidation,
-  googleSignupValidation,
+  googleSignValidation,
 } = require("../helpers/validators");
 
 var passportConfig = require('../helpers/passport-facebook');
@@ -51,12 +51,12 @@ router.route("/user/facebook/login").post(passport.authenticate('facebook', { se
 router
   .route("/user/auth/facebook-signup")
   .post(facebookSignupValidation(), validate, [Access.authenticateFBSignup], UserController.facebookSignup);
-router.route("/user/auth/facebook-signin").post([facebookLoginValidation(), validate], [Access.authenticateFBSignin], UserController.facebookSignin);
+// router.route("/user/auth/facebook-signin").post([facebookLoginValidation(), validate], [Access.authenticateFBSignin], UserController.facebookSignin);
 
 /**
  * Google signin and signup
  */
-router.route("/user/auth/google-signup").post([googleSignupValidation(), validate], UserController.googleSignup);
+router.route("/users/auth/google").post([googleSignValidation(), validate], Access.authenticateGoogleSignin, UserController.googleSign);
 router.route("/user/auth/google-signin").post([googleLoginValidation(), validate], UserController.googleSignin);
 
 router.route("/user/switch-account").post(Auth, UserController.switchAccount);

@@ -10,8 +10,8 @@ require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const passport = require("passport-facebook")
-const FacebookStrategy = require("passport-facebook-token")
+const passport = require("passport-facebook");
+const FacebookStrategy = require("passport-facebook-token");
 
 const randomstring = require("randomstring");
 const { Op } = require("sequelize");
@@ -30,7 +30,6 @@ const Notification = require("../helpers/notification");
 const { adminLevels, adminPrivileges } = require("../helpers/utility");
 const ServiceProvider = require("../models/ServiceProvider");
 const axios = require("axios");
-
 
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -165,8 +164,8 @@ exports.registerUser = async (req, res, next) => {
 };
 
 exports.testfblogin = async (req, res) => {
-  passport.authenticate('facebook')
-}
+  passport.authenticate("facebook");
+};
 
 /**
  *
@@ -190,7 +189,6 @@ exports.facebookSignup = async (req, res, next) => {
     let company_name = req.body.company_name;
 
     try {
-
       const user = await User.findOne({ where: { email } });
       if (user !== null) {
         return res.status(404).json({
@@ -255,7 +253,7 @@ exports.facebookSignup = async (req, res, next) => {
 };
 
 /**
- *
+ * Google login/signup for clients only
  * @method POST
  * @param {string} access_token
  * @param {string} google_first_name
@@ -266,34 +264,55 @@ exports.facebookSignup = async (req, res, next) => {
  * @param {string} company_name
  * @return {json} response
  */
-exports.googleSignup = async (req, res, next) => {
+exports.googleSign = async (req, res, next) => {
   sequelize.transaction(async (t) => {
-    let first_name = req.body.google_first_name;
-    let last_name = req.body.google_last_name;
-    let name = `${first_name} ${last_name}`;
-    let email = req.body.google_email;
-    let google_id = req.body.google_id;
-    let user_type = req.body.user_type;
-    let company_name = req.body.company_name;
-
+    const { user_type, company_name } = req.body;
+    const { id, email, verified_email, name } = req.google_details;
 
     try {
+      
+
       const user = await User.findOne({ where: { email } });
+
+      /**
+       * If user is found, login, else signup
+       */
       if (user !== null) {
-        return res.status(404).json({
-          success: false,
-          message: "Account exists!",
+        const payload = {
+          user: {
+            id: user.id,
+          },
+        };
+        const token = jwt.sign(payload, process.env.JWT_SECRET, {
+          expiresIn: 36000,
+        });
+        let profile;
+        const data = {
+          ...user.toJSON(),
+        };
+        const userId = user.id;
+        profile = await UserService.getUserTypeProfile(user_type, userId);
+        if (profile) {
+          data.profile = profile;
+          data.userType = user_type;
+        }
+
+        return res.status(200).send({
+          success: true,
+          message: "User Logged In Sucessfully",
+          token,
+          user: data,
         });
       }
 
       const user_ = await User.create({
         name,
-        fname: first_name,
-        lname: last_name,
+        fname: name.split(" ")[0],
+        lname: name.split(" ")[1],
         email,
         userType: user_type,
         level: 1,
-        google_id,
+        google_id: id,
         isActive: true,
         app: "google",
       });
@@ -302,7 +321,7 @@ exports.googleSignup = async (req, res, next) => {
         const request = {
           userId: user_.id,
           userType: user_type,
-          company_name: req.body.company_name,
+          company_name: company_name !== undefined ? company_name : null,
         };
         const result = await this.addUserProfile(request, t);
       }
@@ -311,14 +330,14 @@ exports.googleSignup = async (req, res, next) => {
       if (type.includes(user_type)) {
         const data = {
           userId: user_.id,
-          company_name,
+          company_name: company_name !== undefined ? company_name : null,
         };
         await UserService.createProfile(data, t);
       }
 
       const mesg = `A new user just signed up as ${UserService.getUserType(
         user_type
-      )}`;
+      )} through ${"google"}`;
       const userId = user_.id;
       const notifyType = "admin";
       const { io } = req.app;
@@ -1574,3 +1593,4 @@ exports.unsuspendUser = async (req, res) => {
     });
   }
 };
+
