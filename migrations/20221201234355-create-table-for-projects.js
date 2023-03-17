@@ -37,6 +37,10 @@ module.exports = {
         values: ["pending", "approved", "ongoing", "cancelled", "completed"],
         defaultValue: "pending"
       },
+      service_partner_progress: {
+        type: Sequelize.DOUBLE,
+        allowNull: true
+      },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE },
       deletedAt: { allowNull: true, type: Sequelize.DATE }
