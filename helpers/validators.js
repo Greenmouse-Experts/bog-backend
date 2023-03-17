@@ -71,14 +71,10 @@ const facebookSignupValidation = () => {
   ];
 };
 
-const googleSignupValidation = () => {
+const googleSignValidation = () => {
   return [
-    check("google_first_name", "Google first name is required!").notEmpty(),
-    check("google_last_name", "Google last name is required!").notEmpty(),
-    check("google_email", "Google email is required!").notEmpty(),
-    check("google_id", "Google ID is required!").notEmpty(),
+    check("access_token", "Google access token is required!").notEmpty(),
     check("user_type", "User type is required!").notEmpty(),
-    check("company_name", "Company name is required!").notEmpty(),
   ];
 };
 
@@ -355,7 +351,7 @@ module.exports = {
   facebookLoginValidation,
   googleLoginValidation,
   facebookSignupValidation,
-  googleSignupValidation,
+  googleSignValidation,
   resetPasswordValidation,
   resetAdminPasswordValidation,
   changePasswordValidation,

@@ -3,7 +3,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable consistent-return */
 require("dotenv").config();
-const axios = require('axios')
+const axios = require("axios");
 const UserService = require("../service/UserService");
 const User = require("../models/User");
 
@@ -14,109 +14,104 @@ exports.verifyAccess = async (req, res, next) => {
   const { path } = req.route;
 
   try {
-    
-    const userDetails = await User.findOne({where: { id }});
+    const userDetails = await User.findOne({ where: { id } });
 
     if (userDetails === null) {
       res.status(404).send({
         status: false,
-        message: "Admin not found!"
+        message: "Admin not found!",
       });
     } else {
       // Level number 1 is for super admin role
       if (userDetails.level === 1 || userDetails.userType !== "admin") {
         req._credentials = {
-          ...userDetails.toJSON()
+          ...userDetails.toJSON(),
         };
         next();
       } else {
         // Get the level of the admin
         const levelDetails = adminLevels.find(
-          _level => _level.level === userDetails.level
+          (_level) => _level.level === userDetails.level
         );
         if (Object.keys(levelDetails).length === 0) {
           return res.status(404).send({
             success: false,
-            message: "Admin level does not exist!"
+            message: "Admin level does not exist!",
           });
         }
 
         // Get the privileges of the admin's level
         const _adminPrivileges = adminPrivileges.find(
-          _privilege => _privilege.type === levelDetails.type
+          (_privilege) => _privilege.type === levelDetails.type
         );
         if (Object.keys(_adminPrivileges).length === 0) {
           return res.status(404).send({
             success: false,
-            message: `Admin with the level type ${type} is not recognized!`
+            message: `Admin with the level type ${type} is not recognized!`,
           });
         }
 
         const _path = _adminPrivileges.privileges.filter(
-          _privilege => _privilege && path.includes(_privilege.toLowerCase())
+          (_privilege) => _privilege && path.includes(_privilege.toLowerCase())
         );
 
         if (_path.length === 0) {
           return res.status(403).send({
             success: false,
-            message: `Access to this route is denied!`
+            message: `Access to this route is denied!`,
           });
         }
 
         req._credentials = {
           role: _adminPrivileges,
-          ...userDetails.toJSON()
+          ...userDetails.toJSON(),
         };
         next();
       }
     }
-
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(400).send({
       status: false,
-      error
-    })
+      error,
+    });
   }
-
 };
 
 exports.verifyAdmin = (req, res, next) => {
-  const {_credentials} = req;
+  const { _credentials } = req;
 
-  if (_credentials.userType !== 'admin') {
+  if (_credentials.userType !== "admin") {
     return res.status(403).send({
       status: false,
-      message: "Unauthorized Access!"
-    })
+      message: "Unauthorized Access!",
+    });
+  } else {
+    next();
   }
-  else{
-    next()
-  }
-}
+};
 
 exports.verifyUser = (req, res, next) => {
-  const {_credentials} = req;
+  const { _credentials } = req;
 
-  if (_credentials.userType === 'admin') {
+  if (_credentials.userType === "admin") {
     return res.status(403).send({
       status: false,
-      message: "Unauthorized Access!"
-    })
+      message: "Unauthorized Access!",
+    });
+  } else {
+    next();
   }
-  else{
-    next()
-  }
-}
+};
 
 exports.authenticateFBSignup = async (req, res, next) => {
   try {
-    const {facebook_access_token} = req.body;
+    const { facebook_access_token } = req.body;
     const { data } = await axios({
-      url: 'https://graph.facebook.com/me',
-      method: 'get',
+      url: "https://graph.facebook.com/me",
+      method: "get",
       params: {
-        fields: ['id', 'email', 'first_name', 'last_name'].join(','),
+        fields: ["id", "email", "first_name", "last_name"].join(","),
         access_token: facebook_access_token,
       },
     });
@@ -124,42 +119,41 @@ exports.authenticateFBSignup = async (req, res, next) => {
     next();
   } catch (error) {
     return res.status(400).json({
-      success: false, 
+      success: false,
       msg: "FB access error",
-    })
+    });
   }
-  
 };
 
-exports.authenticateFBSignin = async (req, res, next) => {
+exports.authenticateGoogleSignin = async (req, res, next) => {
   try {
-    const {facebook_access_token, facebook_id} = req.body;
-    const { data } = await axios({
-      url: 'https://graph.facebook.com/me',
-      method: 'get',
-      params: {
-        fields: ['id', 'email', 'first_name', 'last_name'].join(','),
-        access_token: facebook_access_token,
-      },
-    });
+    const { access_token } = req.body;
+    console.log(access_token)
+    const { data } = await axios.get(
+      `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${access_token}`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          Accept: "application/json",
+        },
+      }
+    );
 
-    
-    if(data.id !== facebook_id){
-      return res.status(401).json({
-        success: false,
-        message: "This account has not been registered!"
-      })
+    if (data.verified_email === false) {
+      return res.status(400).json({
+        success: true,
+        message: "This email address is not verified!",
+      });
     }
 
-    next()
-  
+    req.google_details = data;
+    next();
   } catch (error) {
     return res.status(400).json({
-      success: false, 
+      success: false,
       msg: "FB access error",
-    })
+    });
   }
-  
 };
 // module.exports = function(req, res, next) {
 //   const token = req.header("authorization");
