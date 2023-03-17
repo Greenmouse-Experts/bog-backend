@@ -430,14 +430,14 @@ exports.updateProjectProgress = async (req, res, next) => {
 
     // console.log(project.progress)
     // Forbid a service partner from reducing the project percentage
-    if (project.progress > percent) {
+    if (project.service_partner_progress > percent) {
       return res.status(403).send({
         status: false,
         message: "You're not allowed to reduce the percentage of the project!",
       });
     }
 
-    await Project.update({ progress: percent }, { where: { id: projectId } });
+    await Project.update({ service_partner_progress: percent }, { where: { id: projectId } });
 
     return res.status(200).send({
       success: true,
@@ -447,6 +447,36 @@ exports.updateProjectProgress = async (req, res, next) => {
     return next(error);
   }
 };
+
+/**
+ * Update Project by projectID
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.updateProjectDetails = async (req, res, next) => {
+  try {
+    const {projectId} = req.params;
+    // Check project
+    const _project = await Project.findOne({where: {id: projectId}});
+    if(_project === null){
+      return res.status(404).json({
+        success: false,
+        message: "Project not found!"
+      })
+    }
+
+    await Project.update(req.body, {where: {id: projectId}})
+
+    return res.json({
+      success: true,
+      message: "Project saved successfully!"
+    })
+
+  } catch (error) {
+    next(error)
+  }
+}
 
 /**
  * Get user's project based on the specified status in req.query.status
@@ -2187,7 +2217,7 @@ exports.viewProjectInstallment = async (req, res, next) => {
       })
     }
 
-    const _r2 = await ProjectInstallments.findAll();
+    const _r2 = await ProjectInstallments.findAll({where: {project_id}});
 
     return res.status(201).json({
       success: true,

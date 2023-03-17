@@ -49,6 +49,9 @@ router
     ProjectController.updateProjectProgress
   );
 
+router.route("/projects/update/:projectId")
+    .put([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.updateProjectDetails);
+
 // Get assigned projects v2
 // router
 //   .route("/projects/v2/assigned-projects/:userId")

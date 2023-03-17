@@ -151,7 +151,7 @@ exports.authenticateGoogleSignin = async (req, res, next) => {
   } catch (error) {
     return res.status(400).json({
       success: false,
-      msg: "FB access error",
+      msg: "Google auth access error",
     });
   }
 };
