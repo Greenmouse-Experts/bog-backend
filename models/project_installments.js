@@ -17,7 +17,13 @@ const ProjectInstallments = sequelise.define(
     },
     type: {
       allowNull: true,
-      type: Sequelize.STRING
+      type: Sequelize.ENUM(
+        "professional",
+        "vendor",
+        "private_client",
+        "corporate_client",
+        "admin"
+      ),
     },
     amount: {
       allowNull: true,
