@@ -15,6 +15,10 @@ const ProjectInstallments = sequelise.define(
       allowNull: true,
       type: Sequelize.STRING
     },
+    type: {
+      allowNull: true,
+      type: Sequelize.STRING
+    },
     amount: {
       allowNull: true,
       type: Sequelize.DOUBLE

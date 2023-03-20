@@ -12,6 +12,9 @@ module.exports = {
       title: {
         type: Sequelize.STRING
       },
+      type: {
+        type: Sequelize.STRING
+      },
       amount: {
         type: Sequelize.DOUBLE
       },

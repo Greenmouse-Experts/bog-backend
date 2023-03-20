@@ -186,7 +186,8 @@ router
 router.route("/projects/installments/create")
   .post([Auth, Access.verifyAccess, Access.verifyAdmin], projectInstallmentValidation(), validate, ProjectController.createProjectInstallment)
 
-router.route("/projects/installments/:project_id/view")
+// Get project installments ?type=${cost | installment}
+router.route("/projects/installments/:project_id/view") 
   .get([Auth, Access.verifyAccess], ProjectController.viewProjectInstallment)
 
 // Pay project installment

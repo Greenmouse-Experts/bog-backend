@@ -1362,7 +1362,7 @@ exports.payProjectInstallment = async (req, res, next) => {
       }
 
       // Get project installment details
-      const pr_installment = await ProjectInstallments.findOne({where: {id: installmentId}})
+      const pr_installment = await ProjectInstallments.findOne({where: {id: installmentId, type: 'installment'}})
 
       if (pr_installment === null) {
         return res.status(404).send({
@@ -2160,13 +2160,19 @@ exports.getIndividualProjectBid = async (req, res, next) => {
 /**
  * Create project installments
  * @param {*} title 
+ * @param {*} type // cost | installment 
  * @param {*} amount 
  * @param {*} project_slug 
  * @returns response
  */
 exports.createProjectInstallment = async (req, res, next) => {
   try {
-    const {title, amount, project_slug} = req.body;
+    let {title, amount, type, project_slug} = req.body;
+
+    if(type === undefined){
+      type = 'cost' 
+    }
+   
 
     const _response = await Project.findOne({where: {projectSlug: project_slug}})
     if(_response === null){
@@ -2176,7 +2182,7 @@ exports.createProjectInstallment = async (req, res, next) => {
       })
     }
 
-    const _response01 = await ProjectInstallments.findOne({where: {title, project_id: _response.id}})
+    const _response01 = await ProjectInstallments.findOne({where: {title, type, project_id: _response.id}})
     if (_response01 !== null) {
       return res.status(403).json({
         success: false,
@@ -2185,11 +2191,11 @@ exports.createProjectInstallment = async (req, res, next) => {
     }
     
 
-    const _r2 = await ProjectInstallments.create({title, amount, project_id: _response.id, paid: false})
+    const _r2 = await ProjectInstallments.create({title, amount, type, project_id: _response.id, paid: false})
 
     return res.status(201).json({
       success: true,
-      message: "Project installment created!",
+      message: `Project ${type} created!`,
       data: _r2
     })
 
@@ -2208,16 +2214,22 @@ exports.createProjectInstallment = async (req, res, next) => {
 exports.viewProjectInstallment = async (req, res, next) => {
   try {
     const {project_id} = req.params;
+    let {type} = req.query;
+
+    if(type === undefined){
+      type = 'cost'
+    }
 
     const _response = await Project.findOne({where: {id: project_id}})
     if(_response === null){
       return res.status(404).json({
         success: false,
-        message: "Project not found!"
+        message: `Project ${type} not found!`
       })
     }
 
-    const _r2 = await ProjectInstallments.findAll({where: {project_id}});
+    
+    const _r2 = await ProjectInstallments.findAll({where: {project_id, type}});
 
     return res.status(201).json({
       success: true,
