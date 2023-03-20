@@ -13,7 +13,14 @@ module.exports = {
         type: Sequelize.STRING
       },
       type: {
-        type: Sequelize.STRING
+        allowNull: true,
+        type: Sequelize.ENUM(
+          "professional",
+          "vendor",
+          "private_client",
+          "corporate_client",
+          "admin"
+        ),
       },
       amount: {
         type: Sequelize.DOUBLE
