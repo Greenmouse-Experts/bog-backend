@@ -31,6 +31,11 @@ const CorporateClient = require("../models/CorporateClient");
 const Transaction = require("../models/Transaction");
 const { request } = require("express");
 
+const {
+  ClientProjectRequestMailer
+} = require('../helpers/mailer/samples');
+
+
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
   const { io } = req.app;
@@ -625,6 +630,7 @@ exports.deleteProjectTypeData = async (projectId, type, t) => {
 exports.requestForService = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
+      
       const userId = req.user.id;
       const user = await User.findOne({ where: { id: userId } });
 
@@ -702,6 +708,14 @@ exports.requestForService = async (req, res, next) => {
 
         const data = await ServiceFormProjects.create(request);
       }
+
+
+      // setup mail credentials
+      const response_ = await ClientProjectRequestMailer({
+        email: user.email,
+        first_name: user.fname
+      }, _project)
+      console.log(response_)
 
       return res.status(200).send({
         success: true,
@@ -1394,6 +1408,9 @@ exports.payProjectInstallment = async (req, res, next) => {
       };
 
       const response = await Transaction.create(trxData);
+
+      // Update installment paid status
+      let __response = await ProjectInstallments.update({paid: true}, {where: {id: installmentId}})
      
       const user = await User.findByPk(userId, { attributes: ["name"] });
       const reqData = {
