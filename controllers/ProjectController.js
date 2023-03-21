@@ -29,12 +29,9 @@ const ServicesFormBuilders = require("../models/ServicesFormBuilder");
 const PrivateClient = require("../models/PrivateClient");
 const CorporateClient = require("../models/CorporateClient");
 const Transaction = require("../models/Transaction");
-const { request } = require("express");
+const ProjectNotifications = require("../models/project_notifications");
 
-const {
-  ClientProjectRequestMailer
-} = require('../helpers/mailer/samples');
-
+const { ClientProjectRequestMailer } = require("../helpers/mailer/samples");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
@@ -216,85 +213,86 @@ exports.getAllProjectRequestV2 = async (req, res, next) => {
 
 /**
  * View project analysis
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
  */
 exports.analyzeProjects = async (req, res, next) => {
   try {
+    const { id } = req.user;
+    const { userType } = req._credentials;
+    let { y } = req.query;
 
-    const {id} = req.user
-    const {userType} = req._credentials
-    let {y} = req.query;
+    const profile = await userService.getUserTypeProfile(userType, id);
 
-    const profile = await userService.getUserTypeProfile(
-      userType,
-      id
-    );
-
-    if (y === undefined){
-      y = new Date().getFullYear()
-    } 
+    if (y === undefined) {
+      y = new Date().getFullYear();
+    }
 
     const projectsByYear = await Project.findAll({
       where: {
         userId: profile.id,
-        [Op.and]: sequelize.where(sequelize.fn('YEAR', sequelize.col('createdAt')), y)
-      }
-    })
-    
+        [Op.and]: sequelize.where(
+          sequelize.fn("YEAR", sequelize.col("createdAt")),
+          y
+        ),
+      },
+    });
+
     return res.send({
       success: true,
-      projects: projectsByYear
-    })
-    
+      projects: projectsByYear,
+    });
   } catch (error) {
     return next(error);
   }
-}
+};
 
 /**
  * View service partners project analysis
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- * @returns 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
  */
 exports.analyzeServicePartnerProjects = async (req, res, next) => {
   try {
+    const { id } = req.user;
 
-    const {id} = req.user
-
-    const servicePartner = await ServicePartner.findOne({where: {userId: id}})
+    const servicePartner = await ServicePartner.findOne({
+      where: { userId: id },
+    });
 
     if (servicePartner === null) {
       return res.status(404).send({
         success: false,
-        message: "Account not found!"
-      })
+        message: "Account not found!",
+      });
     }
-    let {y} = req.query;
+    let { y } = req.query;
 
-    if (y === undefined){
-      y = new Date().getFullYear()
-    } 
+    if (y === undefined) {
+      y = new Date().getFullYear();
+    }
 
     const projectsByYear = await Project.findAll({
       where: {
         serviceProviderId: servicePartner?.id,
-        [Op.and]: sequelize.where(sequelize.fn('YEAR', sequelize.col('createdAt')), y)
-      }
-    })
-    
+        [Op.and]: sequelize.where(
+          sequelize.fn("YEAR", sequelize.col("createdAt")),
+          y
+        ),
+      },
+    });
+
     return res.send({
       success: true,
-      projects: projectsByYear
-    })
-    
+      projects: projectsByYear,
+    });
   } catch (error) {
     return next(error);
   }
-}
+};
 
 exports.viewProjectRequest = async (req, res, next) => {
   try {
@@ -380,11 +378,13 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
     }
 
     // project commitment fee
-    const commitmentFee = await Transaction.findOne({where: {
-      description: {
-        [Op.like]: `%${project.projectSlug}%`
-      }
-    }})
+    const commitmentFee = await Transaction.findOne({
+      where: {
+        description: {
+          [Op.like]: `%${project.projectSlug}%`,
+        },
+      },
+    });
 
     return res.status(200).send({
       success: true,
@@ -395,8 +395,8 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
         reviews: project_reviews,
         client,
         transactions: {
-          commitmentFee: commitmentFee === null ? {} : commitmentFee
-        }
+          commitmentFee: commitmentFee === null ? {} : commitmentFee,
+        },
       },
     });
   } catch (error) {
@@ -442,7 +442,10 @@ exports.updateProjectProgress = async (req, res, next) => {
       });
     }
 
-    await Project.update({ service_partner_progress: percent }, { where: { id: projectId } });
+    await Project.update(
+      { service_partner_progress: percent },
+      { where: { id: projectId } }
+    );
 
     return res.status(200).send({
       success: true,
@@ -455,33 +458,32 @@ exports.updateProjectProgress = async (req, res, next) => {
 
 /**
  * Update Project by projectID
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
  */
 exports.updateProjectDetails = async (req, res, next) => {
   try {
-    const {projectId} = req.params;
+    const { projectId } = req.params;
     // Check project
-    const _project = await Project.findOne({where: {id: projectId}});
-    if(_project === null){
+    const _project = await Project.findOne({ where: { id: projectId } });
+    if (_project === null) {
       return res.status(404).json({
         success: false,
-        message: "Project not found!"
-      })
+        message: "Project not found!",
+      });
     }
 
-    await Project.update(req.body, {where: {id: projectId}})
+    await Project.update(req.body, { where: { id: projectId } });
 
     return res.json({
       success: true,
-      message: "Project saved successfully!"
-    })
-
+      message: "Project saved successfully!",
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 /**
  * Get user's project based on the specified status in req.query.status
@@ -630,7 +632,6 @@ exports.deleteProjectTypeData = async (projectId, type, t) => {
 exports.requestForService = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      
       const userId = req.user.id;
       const user = await User.findOne({ where: { id: userId } });
 
@@ -709,13 +710,15 @@ exports.requestForService = async (req, res, next) => {
         const data = await ServiceFormProjects.create(request);
       }
 
-
       // setup mail credentials
-      const response_ = await ClientProjectRequestMailer({
-        email: user.email,
-        first_name: user.fname
-      }, _project)
-      console.log(response_)
+      const response_ = await ClientProjectRequestMailer(
+        {
+          email: user.email,
+          first_name: user.fname,
+        },
+        _project
+      );
+      console.log(response_);
 
       return res.status(200).send({
         success: true,
@@ -1304,7 +1307,7 @@ exports.requestProjectApproval = async (req, res, next) => {
     try {
       const userId = req.user.id;
       const { projectId } = req.params;
-      const {amount} = req.body;
+      const { amount } = req.body;
       const project = await Project.findOne({ where: { id: projectId } });
       if (!project) {
         return res.status(404).send({
@@ -1316,7 +1319,7 @@ exports.requestProjectApproval = async (req, res, next) => {
         approvalStatus: "in_review",
       };
       await Project.update(requestData, {
-        where: { id: projectId }
+        where: { id: projectId },
       });
 
       const paymentReference = `TR-${Math.floor(
@@ -1335,7 +1338,7 @@ exports.requestProjectApproval = async (req, res, next) => {
       };
 
       const response = await Transaction.create(trxData);
-     
+
       const user = await User.findByPk(userId, { attributes: ["name"] });
       const reqData = {
         req,
@@ -1348,7 +1351,7 @@ exports.requestProjectApproval = async (req, res, next) => {
         message: "Project sent for approval",
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -1356,8 +1359,8 @@ exports.requestProjectApproval = async (req, res, next) => {
 };
 
 /**
- * 
- * @param {*} amount 
+ *
+ * @param {*} amount
  * @param {*} installmentId
  * @return response
  */
@@ -1366,7 +1369,7 @@ exports.payProjectInstallment = async (req, res, next) => {
     try {
       const userId = req.user.id;
       const { projectId } = req.params;
-      const {installmentId, amount} = req.body;
+      const { installmentId, amount } = req.body;
       const project = await Project.findOne({ where: { id: projectId } });
       if (!project) {
         return res.status(404).send({
@@ -1376,7 +1379,9 @@ exports.payProjectInstallment = async (req, res, next) => {
       }
 
       // Get project installment details
-      const pr_installment = await ProjectInstallments.findOne({where: {id: installmentId, type: 'installment'}})
+      const pr_installment = await ProjectInstallments.findOne({
+        where: { id: installmentId, type: "installment" },
+      });
 
       if (pr_installment === null) {
         return res.status(404).send({
@@ -1385,13 +1390,13 @@ exports.payProjectInstallment = async (req, res, next) => {
         });
       }
 
-      if(amount < pr_installment.amount){
+      if (amount < pr_installment.amount) {
         return res.status(400).send({
           success: false,
           message: "Installment amount cannot be processed!",
         });
       }
-      
+
       const paymentReference = `TR-${Math.floor(
         190000000000 + Math.random() * 990000000000
       )}`;
@@ -1410,13 +1415,18 @@ exports.payProjectInstallment = async (req, res, next) => {
       const response = await Transaction.create(trxData);
 
       // Update installment paid status
-      let __response = await ProjectInstallments.update({paid: true}, {where: {id: installmentId}})
-     
+      let __response = await ProjectInstallments.update(
+        { paid: true },
+        { where: { id: installmentId } }
+      );
+
       const user = await User.findByPk(userId, { attributes: ["name"] });
       const reqData = {
         req,
         userId,
-        message: `${user.name} has paid an installment: ${pr_installment.title} of NGN${amount.toLocaleString()} for ${project.projectSlug}`,
+        message: `${user.name} has paid an installment: ${
+          pr_installment.title
+        } of NGN${amount.toLocaleString()} for ${project.projectSlug}`,
       };
       await this.notifyAdmin(reqData);
       return res.status(200).send({
@@ -1424,13 +1434,12 @@ exports.payProjectInstallment = async (req, res, next) => {
         message: "Installment paid successfully!",
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       t.rollback();
       return next(error);
     }
   });
 };
-
 
 exports.payCommitmentFee = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -1544,7 +1553,7 @@ exports.listCapableServiceProviders = async (req, res, next) => {
       const providers = await this.getQualifiedProvidersOnly(project, score, t);
       return res.send({
         success: true,
-        data: providers
+        data: providers,
       });
     } catch (error) {
       console.log(error);
@@ -1574,17 +1583,17 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
         });
       }
 
-      if(project.approvalStatus !== 'approved'){
+      if (project.approvalStatus !== "approved") {
         return res.status(400).send({
           success: false,
-          message: `You cannot dispatch a project of the '${project.approvalStatus}' approval status!`
-        })
+          message: `You cannot dispatch a project of the '${project.approvalStatus}' approval status!`,
+        });
       }
-      if(project.status !== 'approved') {
+      if (project.status !== "approved") {
         return res.status(400).send({
           success: false,
-          message: `You cannot dispatch a project of the '${project.status}' status!`
-        })
+          message: `You cannot dispatch a project of the '${project.status}' status!`,
+        });
       }
 
       if (partners.length > 0) {
@@ -1636,12 +1645,11 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
             message: "Project dispatched to service partner",
           });
         }
-      }
-      else{
+      } else {
         return res.status(422).send({
           success: false,
-          message: "Request cannot be processed!"
-        })
+          message: "Request cannot be processed!",
+        });
       }
     } catch (error) {
       console.log(error);
@@ -1868,8 +1876,8 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
 
     return {
       message: "Competent Service Providers",
-      providerData: providers
-    }
+      providerData: providers,
+    };
   } catch (error) {
     // console.log(error);
     // transaction.rollback();
@@ -2176,84 +2184,202 @@ exports.getIndividualProjectBid = async (req, res, next) => {
 
 /**
  * Create project installments
- * @param {*} title 
- * @param {*} type // cost | installment 
- * @param {*} amount 
- * @param {*} project_slug 
+ * @param {*} title
+ * @param {*} type // cost | installment
+ * @param {*} amount
+ * @param {*} project_slug
  * @returns response
  */
 exports.createProjectInstallment = async (req, res, next) => {
   try {
-    let {title, amount, type, project_slug} = req.body;
+    let { title, amount, type, project_slug } = req.body;
 
-    if(type === undefined){
-      type = 'cost' 
+    if (type === undefined) {
+      type = "cost";
     }
-   
 
-    const _response = await Project.findOne({where: {projectSlug: project_slug}})
-    if(_response === null){
+    const _response = await Project.findOne({
+      where: { projectSlug: project_slug },
+    });
+    if (_response === null) {
       return res.status(404).json({
         success: false,
-        message: "Project not found!"
-      })
+        message: "Project not found!",
+      });
     }
 
-    const _response01 = await ProjectInstallments.findOne({where: {title, type, project_id: _response.id}})
+    const _response01 = await ProjectInstallments.findOne({
+      where: { title, type, project_id: _response.id },
+    });
     if (_response01 !== null) {
       return res.status(403).json({
         success: false,
-        message: `Title for this project: ${project_slug} exists!`
-      })
+        message: `Title for this project: ${project_slug} exists!`,
+      });
     }
-    
 
-    const _r2 = await ProjectInstallments.create({title, amount, type, project_id: _response.id, paid: false})
+    const _r2 = await ProjectInstallments.create({
+      title,
+      amount,
+      type,
+      project_id: _response.id,
+      paid: false,
+    });
 
     return res.status(201).json({
       success: true,
       message: `Project ${type} created!`,
-      data: _r2
-    })
-
+      data: _r2,
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 /**
- * View project installments by project id
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- * @returns 
+ * Create project notification
+ * @param {*} body
+ * @param {*} image
+ * @param {*} service_partner_id
+ * @param {*} by
  */
-exports.viewProjectInstallment = async (req, res, next) => {
+exports.createProjectNotification = async (req, res, next) => {
   try {
-    const {project_id} = req.params;
-    let {type} = req.query;
+    let { body, image, project_slug } = req.body;
+    let by = null;
+    let service_partner_id = null;
+    const {userType, id} = req._credentials;
 
-    if(type === undefined){
-      type = 'cost'
-    }
+    // Check project
+    const project = await Project.findOne({
+      where: { projectSlug: project_slug },
+    });
 
-    const _response = await Project.findOne({where: {id: project_id}})
-    if(_response === null){
+    if (project === null) {
       return res.status(404).json({
         success: false,
-        message: `Project ${type} not found!`
-      })
+        message: "Project not found!",
+      });
     }
 
-    
-    const _r2 = await ProjectInstallments.findAll({where: {project_id, type}});
+    //  Service partner
+    if (userType === 'professional') {
+      const user = await ServicePartner.findOne({where: {userId: id}})
+      if(user === null){
+        return res.status(404).json({
+          success: false,
+          message: "Service Partner account not found!"
+        })
+      }
+
+      if (project.serviceProviderId !== user.id) {
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized access to perform this action!"
+        })
+      }
+
+      by = 'service_partner'
+      service_partner_id = user.id
+    }
+    // Check if not a service partner and not an admin
+    else if(userType !== 'admin' && userType !== 'professional'){
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized access to perform this action!"
+      })
+    }
+    else{
+      by = 'admin'
+    }
+
+    // Add project notification
+    const _r2 = await ProjectNotifications.create({
+      body,
+      image: image === undefined ? null : image,
+      serviceProviderID: service_partner_id,
+      projectId: project.id,
+      by
+    });
 
     return res.status(201).json({
       success: true,
-      data: _r2
-    })
-
+      message: `Project Notification created!`,
+      data: _r2,
+    });
   } catch (error) {
-    next(error)
+    console.log(error)
+    next(error);
   }
-}
+};
+
+/**
+ * View project notifications
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+exports.viewProjectNotifications = async (req, res, next) => {
+  try {
+    const { projectId } = req.params;
+
+    // Check project
+    const project = await Project.findOne({ where: { id: projectId } });
+
+    if (project === null) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found!",
+      });
+    }
+
+    // View project notification
+    const notifications = await ProjectNotifications.findAll({
+      where: { projectId },
+    });
+
+    return res.status(201).json({
+      success: true,
+      data: notifications,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * View project installments by project id
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
+ */
+exports.viewProjectInstallment = async (req, res, next) => {
+  try {
+    const { project_id } = req.params;
+    let { type } = req.query;
+
+    if (type === undefined) {
+      type = "cost";
+    }
+
+    const _response = await Project.findOne({ where: { id: project_id } });
+    if (_response === null) {
+      return res.status(404).json({
+        success: false,
+        message: `Project ${type} not found!`,
+      });
+    }
+
+    const _r2 = await ProjectInstallments.findAll({
+      where: { project_id, type },
+    });
+
+    return res.status(201).json({
+      success: true,
+      data: _r2,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -13,8 +13,8 @@ const {
   projectBidRequestValidation,
   projectProgressValidation,
   projectInstallmentValidation,
-  paymentInstallmentValidation
-  //   contractorRequestValidation
+  paymentInstallmentValidation,
+  projectNotificationValidation
 } = require("../helpers/validators");
 const ProjectController = require("../controllers/ProjectController");
 
@@ -193,6 +193,14 @@ router.route("/projects/installments/:project_id/view")
 // Pay project installment
 router.route("/projects/installments/:projectId/payment")
   .post([Auth, Access.verifyAccess, Access.verifyUser], paymentInstallmentValidation(), validate, ProjectController.payProjectInstallment);
+
+// Add Project notification
+router.route("/projects/notification/create")
+  .post([Auth, Access.verifyAccess], projectNotificationValidation(), validate, ProjectController.createProjectNotification)
+
+// View project notifications
+router.route("/projects/notification/:projectId/view")
+  .get([Auth, Access.verifyAccess], ProjectController.viewProjectNotifications)
 
 router
   .route("/projects/bid-project")

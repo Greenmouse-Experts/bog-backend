@@ -312,6 +312,13 @@ const paymentInstallmentValidation = () => {
   ];
 };
 
+const projectNotificationValidation = () => {
+  return [
+    check("body", "Body field is required").notEmpty(),
+    check("project_slug", "Project slug is required").notEmpty()
+  ];
+};
+
 const projectBidRequestValidation = () => {
   return [
     check("userId", "userId is required").isUUID(),
@@ -381,6 +388,7 @@ module.exports = {
   projectProgressValidation,
   projectInstallmentValidation,
   paymentInstallmentValidation,
+  projectNotificationValidation,
   subscriptionRequestValidation,
   subscribeRequestValidation,
   ServiceFormBuilderValidation,
