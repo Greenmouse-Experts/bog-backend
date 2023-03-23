@@ -164,11 +164,11 @@ module.exports = {
       params.body = `<p style="font-size:1.7em;"><b>Hi, Service partner ${partner.fname}</b></p>`;
       params.body += `
                     <p style="font-size: 1.4em;">This is to inform you that the project with the ID of ${_project.projectSlug} has been ${status} to you</p><br/>
-                    <p style="font-size: 1.4em;">To view project details and bid for it, click the button below!</p>
+                    <p style="font-size: 1.4em;">To view project submission and bid for it, click the button below!</p>
                 `;
       params.body += `
                     <p style="margin-top:30px; font-size: 1em;">
-                        <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Submission</a>
+                        <a href="${link}" target="_BLANK" title="View submission" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Submission</a>
                     </p>
                 `;
       params.footer = "";
@@ -189,7 +189,6 @@ module.exports = {
   /**
    * Mailer for service partner on project bid
    * @param {{email: string, first_name: string}} service_partner
-   * @param {string} status
    * @param {{}} _project
    */
   ServicePartnerMailerForProjectBid: async (service_partner, _project) => {
@@ -203,12 +202,12 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Service partner ${first_name}</b></p>`;
     params.body += `
-                    <p style="font-size: 1.4em;">This is to inform you that have bidden for project with the ID of ${_project.projectSlug}</p><br/>
-                    <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+                    <p style="font-size: 1.4em;">This is to inform you that you have bidden for the project with the ID of ${_project.projectSlug}</p><br/>
+                    <p style="font-size: 1.4em;">To view project submission, click the button below!</p>
                 `;
     params.body += `
                     <p style="margin-top:30px; font-size: 1em;">
-                        <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Submission</a>
+                        <a href="${link}" target="_BLANK" title="View submission" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Submission</a>
                     </p>
                 `;
     params.footer = "";
@@ -216,7 +215,46 @@ module.exports = {
 
     let params2 = {
       email,
-      subject: `You have bidden for Project [${_project.projectSlug}]`,
+      subject: `You have bidden for the Project [${_project.projectSlug}]`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Mailer for service partner that a project has been assigned to
+   * @param {{email: string, first_name: string}} service_partner
+   * @param {{}} _project
+   */
+  ServicePartnerMailerForProjectAssignment: async (service_partner, _project) => {
+    const { email, first_name } = service_partner;
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/projectfile?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Service partner ${first_name}</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that the project with the ID of ${_project.projectSlug} has been assigned to you</p>
+                `;
+   
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Project Assignment [${_project.projectSlug}]`,
     };
 
     const template = mailer_template(params);
@@ -389,59 +427,6 @@ module.exports = {
       });
   },
 
-
-  /**
-   * Admins mailer for service partner's bids
-   * @param {{name: string, userType: string, id: string}} user
-   * @param {[]} admins
-   * @param {string} status
-   * @param {{}} _project
-   */
-  AdminProjectUpdateMailer: async (user, admins, status, _project) => {
-    const { name, userType, id } = user;
-
-    // Get project and super admin email addresses
-    let admin_emails = [];
-    admins.forEach((admin) => {
-      admin_emails.push(admin.email);
-    });
-
-    let params = {};
-    params.logo = Logo;
-    params.header_color = "white";
-
-    const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
-
-    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
-    params.body += `
-                    <p style="font-size: 1.4em;">This is to inform you that the project with the ID of ${_project.projectSlug} belonging to ${name} (${userType}) with the userID of #${id} has been ${status}.</p><br/>
-                    <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
-                `;
-    params.body += `
-                <p style="margin-top:30px; font-size: 1em;">
-                    <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
-                </p>
-            `;
-    params.footer = "";
-    params.date = new Date().getFullYear();
-
-    let params2 = {
-      email: admin_emails,
-      subject: `Project [${_project.projectSlug}] has been ${status}`,
-    };
-
-    const template = mailer_template(params);
-
-    // Send Mail
-    Mailer(template, params2)
-      .then((response) => {
-        return Promise.resolve("Successful!");
-      })
-      .catch((err) => {
-        throw Promise.reject(err);
-      });
-  },
-
   /**
    * Admins mailer for project dispatched to service partners
    * @param {{name: string, userType: string, id: string}} user
@@ -497,6 +482,114 @@ module.exports = {
     let params2 = {
       email: admin_emails,
       subject: `Project [${_project.projectSlug}] has been ${status}`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+
+  /**
+   * Admins mailer for service partner's bids
+   * @param {{name: string, userType: string, id: string}} user
+   * @param {{first_name:string, name:string, email:string, id:string}} service_partner
+   * @param {[]} admins
+   * @param {string} status
+   * @param {{}} _project
+   */
+  AdminProjectBidUpdateMailer: async (user, service_partner, admins, status, _project) => {
+    const { name, userType, id } = user;
+
+    // Get project and super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that the project with the ID of ${_project.projectSlug} belonging to ${name} (${userType}) with the userID of #${id} has been ${status} by ${service_partner.name} (${service_partner.email})</p><br/>
+                    <p style="font-size: 1.4em;">To view project bids, you have to click the button below!</p>
+                `;
+    params.body += `
+                <p style="margin-top:30px; font-size: 1em;">
+                    <a href="${link}" target="_BLANK" title="View bids" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Bids</a>
+                </p>
+            `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Project [${_project.projectSlug}] bid from ${service_partner.first_name} #${service_partner.id}`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+
+  /**
+   * Admins mailer on project assignment to a service partner
+   * @param {{name: string, userType: string, id: string}} user
+   * @param {{first_name:string, name:string, email:string, id:string}} service_partner
+   * @param {[]} admins
+   * @param {string} status
+   * @param {{}} _project
+   */
+  AdminProjectAssigmentUpdateMailer: async (user, service_partner, admins, status, _project) => {
+    const { name, userType, id } = user;
+
+    // Get project and super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that the project with the ID of ${_project.projectSlug} belonging to ${name} (${userType}) with the userID of #${id} has been assigned to ${service_partner.name} (${service_partner.email})</p><br/>
+                    <p style="font-size: 1.4em;">To view project details, click the button below!</p>
+                `;
+    params.body += `
+                <p style="margin-top:30px; font-size: 1em;">
+                    <a href="${link}" target="_BLANK" title="View project details" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View project details</a>
+                </p>
+            `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Project Assignment [${_project.projectSlug}] to ${service_partner.first_name} #${service_partner.id}`,
     };
 
     const template = mailer_template(params);

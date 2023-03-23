@@ -40,6 +40,10 @@ const {
   AdminProjectUpdateMailer,
   ServicePartnersMailerForProjectDispatch,
   AdminProjectDispatchMailer,
+  ServicePartnerMailerForProjectBid,
+  AdminProjectBidUpdateMailer,
+  ServicePartnerMailerForProjectAssignment,
+  AdminProjectAssigmentUpdateMailer,
 } = require("../helpers/mailer/samples");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
@@ -1716,13 +1720,15 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
 
       if (partners.length > 0) {
         let providerData = [];
-        let servicePartnersData = []
+        let servicePartnersData = [];
         for (let index = 0; index < partners.length; index++) {
           const partnerId = partners[index];
           const servicePartner = await ServicePartner.findOne({
             where: { id: partnerId },
           });
-          const service_partner_detail = await User.findOne({where: {id: servicePartner.userId}})
+          const service_partner_detail = await User.findOne({
+            where: { id: servicePartner.userId },
+          });
 
           if (servicePartner === null) {
             return res.status(404).send({
@@ -1746,7 +1752,7 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
             status: "pending",
             projectId: project.id,
           });
-          servicePartnersData.push(service_partner_detail.toJSON())
+          servicePartnersData.push(service_partner_detail.toJSON());
         }
 
         if (providerData.length > 0) {
@@ -1786,11 +1792,11 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
             where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
           });
           const admins = [...project_admins, ...super_admins];
-      
+
           // service partners mailer on project dispatched to them
           await ServicePartnersMailerForProjectDispatch(
             servicePartnersData,
-            'dispatched',
+            "dispatched",
             project
           );
 
@@ -1799,7 +1805,7 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
             client,
             servicePartnersData,
             admins,
-            'dispatched',
+            "dispatched",
             project
           );
 
@@ -2202,6 +2208,25 @@ exports.assignProject = async (req, res, next) => {
         totalCost,
         duration,
       } = req.body;
+
+      // Get service partner details
+      const partner_business_details = await ServicePartner.findOne({where: {id: userId}})
+      if(partner_business_details === null){
+        return res.status(404).json({
+          success: false,
+          message: "Service partner business details not found!"
+        })
+      }
+
+      // Get service partner personal details
+      const partner_detail = await User.findOne({where: {id: partner_business_details.userId}});
+      if(partner_detail === null){
+        return res.status(404).json({
+          success: false,
+          message: "Service partner account not found!"
+        })
+      }
+
       const project = await Project.findByPk(projectId);
       if (!project) {
         return res.status(404).send({
@@ -2221,6 +2246,46 @@ exports.assignProject = async (req, res, next) => {
       };
       await project.update(request, { transaction: t });
 
+      // Get client details
+      const userData = await ServiceFormProjects.findOne({
+        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        where: { projectID: project.id },
+      });
+
+      let client = {};
+      if (userData.length !== null) {
+        const userId = userData.userID;
+        const user = await User.findOne({
+          where: { id: userId },
+          attributes: { exclude: ["password"] },
+        });
+        client = user === null ? {} : user;
+      }
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // Service partner mailer on project assignment
+      await ServicePartnerMailerForProjectAssignment(
+        { email: partner_detail.email, first_name: partner_detail.fname },
+        project
+      );
+
+      // Admin mailer on service partner's project assignment
+      await AdminProjectAssigmentUpdateMailer(
+        client,
+        { first_name: partner_detail.fname, name: partner_detail.name, email: partner_detail.email, id: partner_detail.id },
+        admins,
+        "assigned",
+        project
+      );
+
       return res.status(200).send({
         success: true,
         message: "Project assigned to service partner",
@@ -2238,6 +2303,7 @@ exports.bidForProject = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const { userId, projectId } = req.body;
+      const { name, email, fname, id } = req._credentials;
       const data = req.body;
       const project = await Project.findByPk(data.projectId);
       if (!project) {
@@ -2265,6 +2331,46 @@ exports.bidForProject = async (req, res, next) => {
         });
       }
       const bid = await ProjectBidding.create(data, { transaction: t });
+
+      // Get client details
+      const userData = await ServiceFormProjects.findOne({
+        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        where: { projectID: project.id },
+      });
+
+      let client = {};
+      if (userData.length !== null) {
+        const userId = userData.userID;
+        const user = await User.findOne({
+          where: { id: userId },
+          attributes: { exclude: ["password"] },
+        });
+        client = user === null ? {} : user;
+      }
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // Service partner mailer on project bid
+      await ServicePartnerMailerForProjectBid(
+        { email, first_name: fname },
+        project
+      );
+
+      // Admin mailer on service partner's project bid
+      await AdminProjectBidUpdateMailer(
+        client,
+        { first_name: fname, name, email, id },
+        admins,
+        "bade for",
+        project
+      );
 
       return res.status(200).send({
         success: true,

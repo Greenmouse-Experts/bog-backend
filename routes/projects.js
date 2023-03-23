@@ -207,7 +207,7 @@ router
   .post(
     projectBidRequestValidation(),
     validate,
-    Auth,
+    [Auth, Access.verifyAccess, Access.verifyUser],
     ProjectController.bidForProject
   );
 
