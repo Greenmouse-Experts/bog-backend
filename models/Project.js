@@ -93,6 +93,8 @@ Project.belongsTo(ServicePartner, {
   as: "serviceProvider",
 });
 
+
+
 // ServicePartner.hasMany(Project, {
 //   foreignKey: "serviceProviderId",
 //   as: "serviceProvider",

@@ -3,7 +3,7 @@ const { mailer_template, Mailer, Logo } = require("./Engine");
 module.exports = {
   /**
    * Mailer for client project request
-   * @param {{email, first_name}} user
+   * @param {{email: string, first_name: string}} user
    * @param {{}} _project
    */
   ClientProjectRequestMailer: async (user, _project) => {
@@ -22,7 +22,7 @@ module.exports = {
                 `;
     params.body += `
                     <p style="margin-top:30px; font-size: 1em;">
-                        <a href="${link}" target="_BLANK" title="View project" style="padding:20px;color:white;font-size:1.2em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                        <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                     </p>
                 `;
     params.footer = "";
@@ -30,7 +30,308 @@ module.exports = {
 
     let params2 = {
       email,
-      subject: `${process.env.APP_NAME} - Project Request [${_project.projectSlug}]`,
+      subject: `Project Request [${_project.projectSlug}]`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Mailer for client project commencement
+   * @param {{email: string, first_name: string}} user
+   * @param {{fee: number, ref: string}} trx
+   * @param {{}} _project
+   */
+  ClientProjectCommencementMailer: async (user, trx, _project) => {
+    const { email, first_name } = user;
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/myprojectdetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, ${first_name}</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that you just commenced your project with the ID of ${
+                      _project.projectSlug
+                    } by paying the commitment fee of NGN ${trx.fee.toLocaleString()}</p><br/>
+                    <p style="font-size: 1.4em;">Reference: ${trx.ref}</p><br/>
+                    <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+                `;
+    params.body += `
+                    <p style="margin-top:30px; font-size: 1em;">
+                        <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                    </p>
+                `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Project Commencement [${_project.projectSlug}]`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Mailer for client on project update
+   * @param {{email: string, first_name: string}} user
+   * @param {string} status
+   * @param {{}} _project
+   */
+  ClientMailerForProjectUpdate: async (user, status, _project) => {
+    const { email, first_name } = user;
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/myprojectdetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, ${first_name}</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that your project with the ID of ${
+                      _project.projectSlug
+                    } has been ${status}</p><br/>
+                    <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+                `;
+    params.body += `
+                    <p style="margin-top:30px; font-size: 1em;">
+                        <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                    </p>
+                `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Project [${_project.projectSlug}] has been ${status}`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+  
+
+  /**
+   * Mailer for service partners on project dispatch
+   * @param {{email: string, first_name: string}} user
+   * @param {string} status
+   * @param {{}} _project
+   */
+  ServicePartnersMailerForProjectDispatch: async (service_partner, status, _project) => {
+    const { email, first_name } = user;
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/myprojectdetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, service partner</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that your project with the ID of ${
+                      _project.projectSlug
+                    } has been updated to '${status}' status</p><br/>
+                    <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+                `;
+    params.body += `
+                    <p style="margin-top:30px; font-size: 1em;">
+                        <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                    </p>
+                `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Project [${_project.projectSlug}] status updated to '${status}'`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Mailer for super admin and project admins on project request
+   * @param {{name: string, userType: string, id: string}} user
+   * @param {[]} admins
+   * @param {{}} _project
+   */
+  AdminProjectRequestMailer: async (user, admins, _project) => {
+    const { name, userType, id } = user;
+
+    // Get project and super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that ${name} (${userType}) with the userID of #${id} just created a project with the ID of ${_project.projectSlug}</p><br/>
+                    <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+                `;
+    params.body += `
+                <p style="margin-top:30px; font-size: 1em;">
+                    <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                </p>
+            `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Project Request [${_project.projectSlug}] from userID #${id}`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Mailer for super admins and project admins on project commencement
+   * @param {{name: string, userType: string, id: string}} user
+   * @param {[]} admins
+   * @param {{fee: number, ref: string}} trx
+   * @param {{}} _project
+   */
+  AdminProjectCommencementMailer: async (user, admins, trx, _project) => {
+    const { name, userType, id } = user;
+
+    // Get project and super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that ${name} (${userType}) with the userID of #${id} just commenced the project with the ID of ${
+      _project.projectSlug
+    } by paying the commitment fee of NGN ${trx.fee.toLocaleString()}.</p><br/>
+                    <p style="font-size: 1.4em;">Reference: ${trx.ref}</p><br/>
+                    <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+                `;
+    params.body += `
+                <p style="margin-top:30px; font-size: 1em;">
+                    <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                </p>
+            `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Project Commencement [${_project.projectSlug}] from userID #${id}`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Admins mailer for updating project status
+   * @param {{name: string, userType: string, id: string}} user
+   * @param {[]} admins
+   * @param {string} status
+   * @param {{}} _project
+   */
+  AdminProjectUpdateMailer: async (user, admins, status, _project) => {
+    const { name, userType, id } = user;
+
+    // Get project and super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that the project with the ID of ${_project.projectSlug} belonging to ${name} (${userType}) with the userID of #${id} has been ${status}.</p><br/>
+                    <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+                `;
+    params.body += `
+                <p style="margin-top:30px; font-size: 1em;">
+                    <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                </p>
+            `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Project [${_project.projectSlug}] has been ${status}`,
     };
 
     const template = mailer_template(params);
@@ -88,7 +389,7 @@ module.exports = {
 
     let params2 = {
       email,
-      subject: `${process.env.APP_NAME} - New Order [${ref_no}]`,
+      subject: `New Order [${ref_no}]`,
     };
 
     const template = mailer_template(params);
