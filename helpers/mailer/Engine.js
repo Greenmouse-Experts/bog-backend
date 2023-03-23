@@ -32,10 +32,12 @@ exports.Mailer = async (template, data) => {
     },
   });
 
+  const receivers = typeof data.email === "string" ? data.email : data.email.toString()
+
   // send mail with defined transport object
   let info = await transporter.sendMail({
-    from: process.env.EMAIL_USERNAME, // sender address
-    to: data.email, // list of receivers
+    from: `${process.env.APP_NAME} <${process.env.EMAIL_USERNAME}>`, // sender address
+    to: receivers, // list of receivers
     subject: data.subject, // Subject line
     html: template, // html body
   });

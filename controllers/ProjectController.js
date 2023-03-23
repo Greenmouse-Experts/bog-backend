@@ -31,7 +31,14 @@ const CorporateClient = require("../models/CorporateClient");
 const Transaction = require("../models/Transaction");
 const ProjectNotifications = require("../models/project_notifications");
 
-const { ClientProjectRequestMailer } = require("../helpers/mailer/samples");
+const {
+  ClientProjectRequestMailer,
+  AdminProjectRequestMailer,
+  ClientProjectCommencementMailer,
+  AdminProjectCommencementMailer,
+  ClientMailerForProjectUpdate,
+  AdminProjectUpdateMailer,
+} = require("../helpers/mailer/samples");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
@@ -710,7 +717,16 @@ exports.requestForService = async (req, res, next) => {
         const data = await ServiceFormProjects.create(request);
       }
 
-      // setup mail credentials
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // client mailer
       const response_ = await ClientProjectRequestMailer(
         {
           email: user.email,
@@ -718,7 +734,17 @@ exports.requestForService = async (req, res, next) => {
         },
         _project
       );
-      console.log(response_);
+
+      // admins mailer
+      const response__ = await AdminProjectRequestMailer(
+        {
+          name: user.name,
+          userType: user.userType,
+          id: user.id,
+        },
+        admins,
+        _project
+      );
 
       return res.status(200).send({
         success: true,
@@ -1339,13 +1365,53 @@ exports.requestProjectApproval = async (req, res, next) => {
 
       const response = await Transaction.create(trxData);
 
-      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const user = await User.findByPk(userId, {
+        attributes: ["name", "fname", "email", "id", "userType"],
+      });
       const reqData = {
         req,
         userId,
         message: `${user.name} has requested to commence with ${project.projectSlug}`,
       };
       await this.notifyAdmin(reqData);
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // Client mailer
+      const _mailer_res1 = await ClientProjectCommencementMailer(
+        {
+          email: user.email,
+          first_name: user.fname,
+        },
+        {
+          fee: amount,
+          ref: TransactionId,
+        },
+        project
+      );
+
+      // Admins mailer
+      const _mailer_res2 = await AdminProjectCommencementMailer(
+        {
+          name: user.name,
+          userType: user.userType,
+          id: user.id,
+        },
+        admins,
+        {
+          fee: amount,
+          ref: TransactionId,
+        },
+        project
+      );
+
       return res.status(200).send({
         success: true,
         message: "Project sent for approval",
@@ -1524,11 +1590,60 @@ exports.approveProjectRequest = async (req, res, next) => {
         "getNotifications",
         await Notification.fetchUserNotificationApi({ userId })
       );
+
+      // Get client details
+      const userData = await ServiceFormProjects.findOne({
+        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        where: { projectID: project.id },
+      });
+
+      let client = {};
+      if (userData.length !== null) {
+        const userId = userData.userID;
+        const user = await User.findOne({
+          where: { id: userId },
+          attributes: { exclude: ["password"] },
+        });
+        client = user === null ? {} : user;
+      }
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // Client mailer on project approval
+      await ClientMailerForProjectUpdate(
+        {
+          email: client.email,
+          first_name: client.fname,
+        },
+        requestData.status,
+        project
+      );
+
+      // Admins mailer on project approval
+      await AdminProjectUpdateMailer(
+        {
+          name: client.name,
+          userType: client.userType,
+          id: client.id,
+        },
+        admins,
+        requestData.status,
+        project
+      );
+
       return res.status(200).send({
         success: true,
         message: "Project approved for commencement",
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -1640,6 +1755,61 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
               })
             );
           }
+
+          ////////////////////////////////////////
+          ////////////////////////////////////////
+          ////////////////////////////////////////
+          //////////////////here//////////////////////
+          ////////////////////////////////////////
+          ////////////////////////////////////////
+          ////////////////////////////////////////ß
+          // Get client details
+          const userData = await ServiceFormProjects.findOne({
+            include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+            where: { projectID: project.id },
+          });
+
+          let client = {};
+          if (userData.length !== null) {
+            const userId = userData.userID;
+            const user = await User.findOne({
+              where: { id: userId },
+              attributes: { exclude: ["password"] },
+            });
+            client = user === null ? {} : user;
+          }
+
+          // Get active project admins
+          const project_admins = await User.findAll({
+            where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+          });
+          const super_admins = await User.findAll({
+            where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+          });
+          const admins = [...project_admins, ...super_admins];
+
+          // Client mailer on project approval
+          await ClientMailerForProjectUpdate(
+            {
+              email: client.email,
+              first_name: client.fname,
+            },
+            requestData.status,
+            project
+          );
+
+          // Admins mailer on project approval
+          await AdminProjectUpdateMailer(
+            {
+              name: client.name,
+              userType: client.userType,
+              id: client.id,
+            },
+            admins,
+            requestData.status,
+            project
+          );
+
           return res.status(200).send({
             success: true,
             message: "Project dispatched to service partner",
@@ -2096,7 +2266,7 @@ exports.bidForProject = async (req, res, next) => {
         { where, transaction: t }
       );
 
-      const projectBid = ProjectBidding.findOne({
+      const projectBid = await ProjectBidding.findOne({
         where: { userId, projectId },
       });
       if (projectBid !== null) {
@@ -2248,7 +2418,7 @@ exports.createProjectNotification = async (req, res, next) => {
     let { body, image, project_slug } = req.body;
     let by = null;
     let service_partner_id = null;
-    const {userType, id} = req._credentials;
+    const { userType, id } = req._credentials;
 
     // Check project
     const project = await Project.findOne({
@@ -2263,34 +2433,33 @@ exports.createProjectNotification = async (req, res, next) => {
     }
 
     //  Service partner
-    if (userType === 'professional') {
-      const user = await ServicePartner.findOne({where: {userId: id}})
-      if(user === null){
+    if (userType === "professional") {
+      const user = await ServicePartner.findOne({ where: { userId: id } });
+      if (user === null) {
         return res.status(404).json({
           success: false,
-          message: "Service Partner account not found!"
-        })
+          message: "Service Partner account not found!",
+        });
       }
 
       if (project.serviceProviderId !== user.id) {
         return res.status(401).json({
           success: false,
-          message: "Unauthorized access to perform this action!"
-        })
+          message: "Unauthorized access to perform this action!",
+        });
       }
 
-      by = 'service_partner'
-      service_partner_id = user.id
+      by = "service_partner";
+      service_partner_id = user.id;
     }
     // Check if not a service partner and not an admin
-    else if(userType !== 'admin' && userType !== 'professional'){
+    else if (userType !== "admin" && userType !== "professional") {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized access to perform this action!"
-      })
-    }
-    else{
-      by = 'admin'
+        message: "Unauthorized access to perform this action!",
+      });
+    } else {
+      by = "admin";
     }
 
     // Add project notification
@@ -2299,7 +2468,7 @@ exports.createProjectNotification = async (req, res, next) => {
       image: image === undefined ? null : image,
       serviceProviderID: service_partner_id,
       projectId: project.id,
-      by
+      by,
     });
 
     return res.status(201).json({
@@ -2308,7 +2477,7 @@ exports.createProjectNotification = async (req, res, next) => {
       data: _r2,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     next(error);
   }
 };

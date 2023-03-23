@@ -22,9 +22,6 @@ const {
   googleSignValidation,
 } = require("../helpers/validators");
 
-var passportConfig = require('../helpers/passport-facebook');
-
-passportConfig()
 
 // @route  api/signup
 // @method POST
