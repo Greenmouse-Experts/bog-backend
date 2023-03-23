@@ -38,6 +38,8 @@ const {
   AdminProjectCommencementMailer,
   ClientMailerForProjectUpdate,
   AdminProjectUpdateMailer,
+  ServicePartnersMailerForProjectDispatch,
+  AdminProjectDispatchMailer,
 } = require("../helpers/mailer/samples");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
@@ -1714,11 +1716,13 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
 
       if (partners.length > 0) {
         let providerData = [];
+        let servicePartnersData = []
         for (let index = 0; index < partners.length; index++) {
           const partnerId = partners[index];
           const servicePartner = await ServicePartner.findOne({
             where: { id: partnerId },
           });
+          const service_partner_detail = await User.findOne({where: {id: servicePartner.userId}})
 
           if (servicePartner === null) {
             return res.status(404).send({
@@ -1742,6 +1746,7 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
             status: "pending",
             projectId: project.id,
           });
+          servicePartnersData.push(service_partner_detail.toJSON())
         }
 
         if (providerData.length > 0) {
@@ -1757,13 +1762,6 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
             );
           }
 
-          ////////////////////////////////////////
-          ////////////////////////////////////////
-          ////////////////////////////////////////
-          //////////////////here//////////////////////
-          ////////////////////////////////////////
-          ////////////////////////////////////////
-          ////////////////////////////////////////ß
           // Get client details
           const userData = await ServiceFormProjects.findOne({
             include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
@@ -1788,32 +1786,26 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
             where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
           });
           const admins = [...project_admins, ...super_admins];
-
-          // Client mailer on project approval
-          await ClientMailerForProjectUpdate(
-            {
-              email: client.email,
-              first_name: client.fname,
-            },
-            requestData.status,
+      
+          // service partners mailer on project dispatched to them
+          await ServicePartnersMailerForProjectDispatch(
+            servicePartnersData,
+            'dispatched',
             project
           );
 
-          // Admins mailer on project approval
-          await AdminProjectUpdateMailer(
-            {
-              name: client.name,
-              userType: client.userType,
-              id: client.id,
-            },
+          // Admins mailer on project dispatched to service partners
+          await AdminProjectDispatchMailer(
+            client,
+            servicePartnersData,
             admins,
-            requestData.status,
+            'dispatched',
             project
           );
 
           return res.status(200).send({
             success: true,
-            message: "Project dispatched to service partner",
+            message: "Project dispatched to service partners",
           });
         }
       } else {
