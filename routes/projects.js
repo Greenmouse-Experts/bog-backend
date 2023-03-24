@@ -45,7 +45,7 @@ router
   .put(
     projectProgressValidation(),
     validate,
-    Auth,
+    [Auth, Access.verifyAccess, Access.verifyUser],
     ProjectController.updateProjectProgress
   );
 
