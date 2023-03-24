@@ -44,6 +44,10 @@ const {
   AdminProjectBidUpdateMailer,
   ServicePartnerMailerForProjectAssignment,
   AdminProjectAssigmentUpdateMailer,
+  ServicePartnerMailerForProjectUpdate,
+  AdminProjectUpdateMailerFromServicePartner,
+  ClientMailerForProjectProgress,
+  AdminProjectProgressMailer,
 } = require("../helpers/mailer/samples");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
@@ -427,6 +431,7 @@ exports.updateProjectProgress = async (req, res, next) => {
   try {
     const { providerId, projectId } = req.params;
     const { percent } = req.body;
+    const { email, fname, name, id } = req._credentials;
 
     const project = await Project.findOne({
       where: { id: projectId },
@@ -460,6 +465,31 @@ exports.updateProjectProgress = async (req, res, next) => {
       { where: { id: projectId } }
     );
 
+    // Get active project admins
+    const project_admins = await User.findAll({
+      where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+    });
+    const super_admins = await User.findAll({
+      where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+    });
+    const admins = [...project_admins, ...super_admins];
+
+    await ServicePartnerMailerForProjectUpdate(
+      {
+        email,
+        first_name: fname,
+      },
+      percent,
+      project
+    );
+
+    await AdminProjectUpdateMailerFromServicePartner(
+      { name, first_name: fname, email, id },
+      admins,
+      percent,
+      project
+    );
+
     return res.status(200).send({
       success: true,
       message: `Project has been updated to ${percent}%`,
@@ -478,6 +508,8 @@ exports.updateProjectProgress = async (req, res, next) => {
 exports.updateProjectDetails = async (req, res, next) => {
   try {
     const { projectId } = req.params;
+    const { progress } = req.body;
+
     // Check project
     const _project = await Project.findOne({ where: { id: projectId } });
     if (_project === null) {
@@ -488,6 +520,58 @@ exports.updateProjectDetails = async (req, res, next) => {
     }
 
     await Project.update(req.body, { where: { id: projectId } });
+
+    // Get latest project status
+    const __project = await Project.findOne({ where: { id: projectId } });
+
+    // Get client details
+    const userData = await ServiceFormProjects.findOne({
+      include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+      where: { projectID: _project.id },
+    });
+
+    let client = {};
+    if (userData.length !== null) {
+      const userId = userData.userID;
+      const user = await User.findOne({
+        where: { id: userId },
+        attributes: { exclude: ["password"] },
+      });
+      client = user === null ? {} : user;
+    }
+
+    // Get active project admins
+    const project_admins = await User.findAll({
+      where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+    });
+    const super_admins = await User.findAll({
+      where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+    });
+    const admins = [...project_admins, ...super_admins];
+
+    // Client mailer on project progress
+    await ClientMailerForProjectProgress(
+      {
+        email: client.email,
+        first_name: client.fname,
+      },
+      __project.status,
+      progress,
+      _project
+    );
+
+    // Admins mailer on project progress
+    await AdminProjectProgressMailer(
+      {
+        name: client.name,
+        userType: client.userType,
+        id: client.id,
+      },
+      admins,
+      __project.status,
+      progress,
+      _project
+    );
 
     return res.json({
       success: true,
@@ -2210,21 +2294,25 @@ exports.assignProject = async (req, res, next) => {
       } = req.body;
 
       // Get service partner details
-      const partner_business_details = await ServicePartner.findOne({where: {id: userId}})
-      if(partner_business_details === null){
+      const partner_business_details = await ServicePartner.findOne({
+        where: { id: userId },
+      });
+      if (partner_business_details === null) {
         return res.status(404).json({
           success: false,
-          message: "Service partner business details not found!"
-        })
+          message: "Service partner business details not found!",
+        });
       }
 
       // Get service partner personal details
-      const partner_detail = await User.findOne({where: {id: partner_business_details.userId}});
-      if(partner_detail === null){
+      const partner_detail = await User.findOne({
+        where: { id: partner_business_details.userId },
+      });
+      if (partner_detail === null) {
         return res.status(404).json({
           success: false,
-          message: "Service partner account not found!"
-        })
+          message: "Service partner account not found!",
+        });
       }
 
       const project = await Project.findByPk(projectId);
@@ -2280,7 +2368,12 @@ exports.assignProject = async (req, res, next) => {
       // Admin mailer on service partner's project assignment
       await AdminProjectAssigmentUpdateMailer(
         client,
-        { first_name: partner_detail.fname, name: partner_detail.name, email: partner_detail.email, id: partner_detail.id },
+        {
+          first_name: partner_detail.fname,
+          name: partner_detail.name,
+          email: partner_detail.email,
+          id: partner_detail.id,
+        },
         admins,
         "assigned",
         project

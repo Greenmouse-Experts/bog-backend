@@ -139,6 +139,53 @@ module.exports = {
   },
 
   /**
+   * Client mailer on project's progress
+   * @param {{email:string, first_name:string}} user 
+   * @param {string} status 
+   * @param {number} percent 
+   * @param {{}} _project 
+   */
+  ClientMailerForProjectProgress: async (user, status, percent, _project) => {
+    const { email, first_name } = user;
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/myprojectdetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, ${first_name}</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">Your project with the ID of ${_project.projectSlug} is ${status}</p>
+                    <p style="font-size: 1.4em;">Progress: ${percent}%</p><br/>
+                    <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+                `;
+    params.body += `
+                    <p style="margin-top:30px; font-size: 1em;">
+                        <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                    </p>
+                `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Project [${_project.projectSlug}] progress update`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
    * Mailer for service partners on project dispatch
    * @param {[]} service_partners
    * @param {string} status
@@ -235,7 +282,10 @@ module.exports = {
    * @param {{email: string, first_name: string}} service_partner
    * @param {{}} _project
    */
-  ServicePartnerMailerForProjectAssignment: async (service_partner, _project) => {
+  ServicePartnerMailerForProjectAssignment: async (
+    service_partner,
+    _project
+  ) => {
     const { email, first_name } = service_partner;
 
     let params = {};
@@ -248,13 +298,53 @@ module.exports = {
     params.body += `
                     <p style="font-size: 1.4em;">This is to inform you that the project with the ID of ${_project.projectSlug} has been assigned to you</p>
                 `;
-   
+
     params.footer = "";
     params.date = new Date().getFullYear();
 
     let params2 = {
       email,
       subject: `Project Assignment [${_project.projectSlug}]`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Mailer for service partner on project updates
+   * @param {{email: string, first_name: string}} service_partner
+   * @param {number} percent
+   * @param {{}} _project
+   */
+  ServicePartnerMailerForProjectUpdate: async (service_partner, percent, _project) => {
+    const { email, first_name } = service_partner;
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/projectfile?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Service partner ${first_name}</b></p><br/>`;
+    params.body += `
+                    <p style="font-size: 1.2em;">You updated the project with the ID of ${_project.projectSlug} to ${percent}%</p>
+                `;
+
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Project Update [${_project.projectSlug}]`,
     };
 
     const template = mailer_template(params);
@@ -496,7 +586,6 @@ module.exports = {
       });
   },
 
-
   /**
    * Admins mailer for service partner's bids
    * @param {{name: string, userType: string, id: string}} user
@@ -505,7 +594,13 @@ module.exports = {
    * @param {string} status
    * @param {{}} _project
    */
-  AdminProjectBidUpdateMailer: async (user, service_partner, admins, status, _project) => {
+  AdminProjectBidUpdateMailer: async (
+    user,
+    service_partner,
+    admins,
+    status,
+    _project
+  ) => {
     const { name, userType, id } = user;
 
     // Get project and super admin email addresses
@@ -550,7 +645,6 @@ module.exports = {
       });
   },
 
-
   /**
    * Admins mailer on project assignment to a service partner
    * @param {{name: string, userType: string, id: string}} user
@@ -559,7 +653,13 @@ module.exports = {
    * @param {string} status
    * @param {{}} _project
    */
-  AdminProjectAssigmentUpdateMailer: async (user, service_partner, admins, status, _project) => {
+  AdminProjectAssigmentUpdateMailer: async (
+    user,
+    service_partner,
+    admins,
+    status,
+    _project
+  ) => {
     const { name, userType, id } = user;
 
     // Get project and super admin email addresses
@@ -590,6 +690,116 @@ module.exports = {
     let params2 = {
       email: admin_emails,
       subject: `Project Assignment [${_project.projectSlug}] to ${service_partner.first_name} #${service_partner.id}`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Update project and super admins on project updates
+   * @param {{}} service_partner
+   * @param {[]} admins
+   * @param {number} percent
+   * @param {{}} _project
+   */
+  AdminProjectUpdateMailerFromServicePartner: async (
+    service_partner,
+    admins,
+    percent,
+    _project
+  ) => {
+
+    // Get project and super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that the project with the ID of ${_project.projectSlug} has been updated to ${percent}% by ${service_partner.name} (${service_partner.email})</p><br/>
+                    <p style="font-size: 1.4em;">To view project details, click the button below!</p>
+                `;
+    params.body += `
+                <p style="margin-top:30px; font-size: 1em;">
+                    <a href="${link}" target="_BLANK" title="View project details" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View project details</a>
+                </p>
+            `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Project Update [${_project.projectSlug}] from ${service_partner.first_name} #${service_partner.id}`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Admins mailer for updating project progress
+   * @param {{name: string, userType: string, id: string}} user
+   * @param {[]} admins
+   * @param {string} status
+   * @param {number} percent
+   * @param {{}} _project
+   */
+  AdminProjectProgressMailer: async (user, admins, status, percent, _project) => {
+    const { name, userType, id } = user;
+
+    // Get project and super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">Project with the ID of ${_project.projectSlug} belonging to ${name} (${userType}) with the userID of #${id} is ${status}.</p>
+                    <p style="font-size: 1.4em;">Progress: ${percent}%</p><br/>
+                    <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+                `;
+    params.body += `
+                <p style="margin-top:30px; font-size: 1em;">
+                    <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                </p>
+            `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Project [${_project.projectSlug}] progress update`,
     };
 
     const template = mailer_template(params);
