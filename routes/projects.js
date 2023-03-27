@@ -158,7 +158,7 @@ router
 
 router
   .route("/projects/approve-project/:projectId")
-  .patch(Auth, ProjectController.approveProjectRequest);
+  .patch([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.approveProjectRequest);
 
 // 1 // list competent providers 
 router
@@ -179,7 +179,7 @@ router
   .post(
     projectAssignmentRequestValidation(),
     validate,
-    Auth,
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
     ProjectController.assignProject
   );
 

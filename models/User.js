@@ -117,6 +117,10 @@ const User = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true
     },
+    apple_id: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
   },
   { paranoid: true }
 );

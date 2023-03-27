@@ -78,6 +78,13 @@ const googleSignValidation = () => {
   ];
 };
 
+const appleSignValidation = () => {
+  return [
+    check("access_token", "Apple access token is required!").notEmpty(),
+    check("user_type", "User type is required!").notEmpty(),
+  ];
+};
+
 const resetAdminPasswordValidation = () => {
   return [
     check(
@@ -359,6 +366,7 @@ module.exports = {
   googleLoginValidation,
   facebookSignupValidation,
   googleSignValidation,
+  appleSignValidation,
   resetPasswordValidation,
   resetAdminPasswordValidation,
   changePasswordValidation,

@@ -253,6 +253,113 @@ exports.facebookSignup = async (req, res, next) => {
 };
 
 /**
+ * Apple login/signup for clients only
+ * @method POST
+ * @param {string} access_token
+ * @param {string} google_first_name
+ * @param {string} google_last_name
+ * @param {string} google_email
+ * @param {string} google_id
+ * @param {string} user_type
+ * @param {string} company_name
+ * @return {json} response
+ */
+exports.appleSign = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    const { user_type, company_name } = req.body;
+    const { id, email, name } = req.apple_details;
+
+    try {
+
+      const user = await User.findOne({ where: { email } });
+
+      /**
+       * If user is found, login, else signup
+       */
+      if (user !== null) {
+        const payload = {
+          user: {
+            id: user.id,
+          },
+        };
+        const token = jwt.sign(payload, process.env.JWT_SECRET, {
+          expiresIn: 36000,
+        });
+        let profile;
+        const data = {
+          ...user.toJSON(),
+        };
+        const userId = user.id;
+        profile = await UserService.getUserTypeProfile(user_type, userId);
+        if (profile) {
+          data.profile = profile;
+          data.userType = user_type;
+        }
+
+        return res.status(200).send({
+          success: true,
+          message: "User Logged In Sucessfully",
+          token,
+          user: data,
+        });
+      }
+
+      const user_ = await User.create({
+        name,
+        fname: name.split(" ")[0],
+        lname: name.split(" ")[1],
+        email,
+        userType: user_type,
+        level: 1,
+        apple_id: id,
+        isActive: true,
+        app: "apple",
+      });
+
+      if (user_type !== "admin" || user_type !== "other") {
+        const request = {
+          userId: user_.id,
+          userType: user_type,
+          company_name: company_name !== undefined ? company_name : null,
+        };
+        const result = await this.addUserProfile(request, t);
+      }
+
+      const type = ["corporate_client"];
+      if (type.includes(user_type)) {
+        const data = {
+          userId: user_.id,
+          company_name: company_name !== undefined ? company_name : null,
+        };
+        await UserService.createProfile(data, t);
+      }
+
+      const mesg = `A new user just signed up as ${UserService.getUserType(
+        user_type
+      )} through ${"apple"}`;
+      const userId = user_.id;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        userId,
+        type: notifyType,
+        message: mesg,
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
+
+      return res.status(201).send({
+        success: true,
+        message: "User Created Successfully",
+      });
+    } catch (err) {
+      console.error(err);
+      t.rollback();
+      return next(err);
+    }
+  });
+};
+
+/**
  * Google login/signup for clients only
  * @method POST
  * @param {string} access_token

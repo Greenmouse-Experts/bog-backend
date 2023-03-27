@@ -140,10 +140,10 @@ module.exports = {
 
   /**
    * Client mailer on project's progress
-   * @param {{email:string, first_name:string}} user 
-   * @param {string} status 
-   * @param {number} percent 
-   * @param {{}} _project 
+   * @param {{email:string, first_name:string}} user
+   * @param {string} status
+   * @param {number} percent
+   * @param {{}} _project
    */
   ClientMailerForProjectProgress: async (user, status, percent, _project) => {
     const { email, first_name } = user;
@@ -171,6 +171,113 @@ module.exports = {
     let params2 = {
       email,
       subject: `Project [${_project.projectSlug}] progress update`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Client mailer on project's installment payment
+   * @param {{email:string, first_name:string}} user
+   * @param {{}} project_installment
+   * @param {{}} _project
+   */
+  ClientMailerForProjectInstallmentPayment: async (
+    user,
+    project_installment,
+    _project
+  ) => {
+    const { email, first_name } = user;
+    const { amount, title } = project_installment;
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/myprojectdetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, ${first_name}</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">You have paid the ${title} of NGN ${amount.toLocaleString()} for the project with the ID of ${
+      _project.projectSlug
+    }</p>
+                    <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+                `;
+    params.body += `
+                    <p style="margin-top:30px; font-size: 1em;">
+                        <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                    </p>
+                `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Project [${_project.projectSlug}] installment payment`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Client mailer on project's progress note update
+   * @param {{email:string, first_name:string}} user
+   * @param {string} note
+   * @param {string} image
+   * @param {{}} _project
+   */
+  ClientMailerForProjectProgressNoteUpdate: async (
+    user,
+    note,
+    image,
+    _project
+  ) => {
+    const { email, first_name } = user;
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/myprojectdetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, ${first_name}</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">Here's the update for the project with the ID of ${
+                      _project.projectSlug
+                    }</p><br/>
+                    ${image &&
+                      `<p style="font-size: 1.2em;"><img src="${image}" style="width: 10em; object-fit: contain;" /></p>`}
+                    <p style="font-size: 1.2em;"> - ${note}</p><br/>
+                `;
+    params.body += `
+                    <p style="margin-top:30px; font-size: 1em;">
+                        <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                    </p>
+                `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Project [${_project.projectSlug}] Notification`,
     };
 
     const template = mailer_template(params);
@@ -325,7 +432,11 @@ module.exports = {
    * @param {number} percent
    * @param {{}} _project
    */
-  ServicePartnerMailerForProjectUpdate: async (service_partner, percent, _project) => {
+  ServicePartnerMailerForProjectUpdate: async (
+    service_partner,
+    percent,
+    _project
+  ) => {
     const { email, first_name } = service_partner;
 
     let params = {};
@@ -717,7 +828,6 @@ module.exports = {
     percent,
     _project
   ) => {
-
     // Get project and super admin email addresses
     let admin_emails = [];
     admins.forEach((admin) => {
@@ -768,7 +878,13 @@ module.exports = {
    * @param {number} percent
    * @param {{}} _project
    */
-  AdminProjectProgressMailer: async (user, admins, status, percent, _project) => {
+  AdminProjectProgressMailer: async (
+    user,
+    admins,
+    status,
+    percent,
+    _project
+  ) => {
     const { name, userType, id } = user;
 
     // Get project and super admin email addresses
@@ -800,6 +916,127 @@ module.exports = {
     let params2 = {
       email: admin_emails,
       subject: `Project [${_project.projectSlug}] progress update`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Admins mailer for project note update mailer
+   * @param {{name: string, userType: string, id: string}} user
+   * @param {[]} admins
+   * @param {string} note
+   * @param {string} image
+   * @param {{}} _project
+   */
+  AdminProjectProgressNoteUpdateMailer: async (
+    admins,
+    note,
+    image,
+    _project
+  ) => {
+
+    // Get project and super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">A notification on the project ${_project.slug} with the ID #${_project.id} was sent.</p><br/>
+                    ${image &&
+                      `<p style="font-size: 1.2em;"><img src="${image}" style="width: 10em; object-fit: contain;" /></p>`}
+                    <p style="font-size: 1.2em;"> - ${note}</p><br/>
+                    <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+                `;
+    params.body += `
+                <p style="margin-top:30px; font-size: 1em;">
+                    <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                </p>
+            `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Project [${_project.projectSlug}] Notification`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Admins mailer for project progress note update
+   * @param {{name: string, userType: string, id: string}} user
+   * @param {[]} admins
+   * @param {string} note
+   * @param {string} image
+   * @param {{}} _project
+   */
+  AdminProjectInstallmentPaymentMailer: async (
+    user,
+    admins,
+    note,
+    image,
+    _project
+  ) => {
+    const { name, userType, id } = user;
+
+    // Get project and super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">Project ${name} (${userType}) with the ID #${id} paid the ${title} of NGN ${amount.toLocaleString()} for the project with the ID of ${
+      _project.slug
+    }.</p>
+                  <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+              `;
+    params.body += `
+              <p style="margin-top:30px; font-size: 1em;">
+                  <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+              </p>
+          `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Project [${_project.projectSlug}] installment payment`,
     };
 
     const template = mailer_template(params);

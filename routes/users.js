@@ -20,6 +20,7 @@ const {
   googleLoginValidation,
   facebookSignupValidation,
   googleSignValidation,
+  appleSignValidation
 } = require("../helpers/validators");
 
 
@@ -49,6 +50,12 @@ router
   .route("/user/auth/facebook-signup")
   .post(facebookSignupValidation(), validate, [Access.authenticateFBSignup], UserController.facebookSignup);
 // router.route("/user/auth/facebook-signin").post([facebookLoginValidation(), validate], [Access.authenticateFBSignin], UserController.facebookSignin);
+
+/**
+ * Apple signin and signup
+ */
+router.route("/users/auth/apple").post([appleSignValidation(), validate], Access.authenticateAppleSignin, UserController.appleSign);
+
 
 /**
  * Google signin and signup

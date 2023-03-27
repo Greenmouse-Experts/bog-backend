@@ -1,0 +1,15 @@
+{
+    "msTeamsSecrets": {
+        "clientId": "/run/secrets/teams-client-id",
+        "clientSecret": "/run/secrets/teams-client-id",
+        "tenancyId": "/run/secrets/teams-client-id"
+    },
+    "externalApiUrls": {
+        "microsoftAuthUrl": "https://login.microsoftonline.com/",
+        "graphApiUrl": "https://graph.microsoft.com/v1.0/"
+    },
+    "logger":{
+        "level": "info",
+        "logOnConsole": false
+    }
+}
