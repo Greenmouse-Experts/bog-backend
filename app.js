@@ -18,6 +18,9 @@ const Notification = require("./helpers/notification");
 
 const cloudinary = require("./helpers/cloudinaryMediaProvider");
 
+const logger = require('./helpers/ms-team/logger/logger')
+const msTeamsService = require('./helpers/ms-team/ms-team-service')
+
 const Routes = require("./routes");
 const Subscription = require("./models/Subscription");
 const ServicePartner = require("./models/ServicePartner");
@@ -148,6 +151,34 @@ app.use((err, req, res, next) => {
       .send({ success: false, message: error.message });
   }
 });
+
+
+const teamCreationPayload = {
+  authorization: '',
+  teamName: '',
+  teamMembers: [{
+    userId: 'vkesakar@gmail.com',
+    role: 'admin'
+  },
+  {
+    userId: 'dummy_1@gmail.com',
+    role: 'admin'
+  }]
+}
+
+class Index {
+  async invoke () {
+    try {
+      const { message } = await msTeamsService.createTeam(teamCreationPayload)
+      logger.info('Index:invoke: Team created ', { message })
+    } catch (error) {
+      logger.error('Index:invoke: Error during team creation ', { error })
+    }
+  }
+}
+
+new Index()
+  .invoke()
 
 // Not found route
 app.use((req, res) => {

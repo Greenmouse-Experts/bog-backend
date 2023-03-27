@@ -48,6 +48,10 @@ const {
   AdminProjectUpdateMailerFromServicePartner,
   ClientMailerForProjectProgress,
   AdminProjectProgressMailer,
+  ClientMailerForProjectInstallmentPayment,
+  AdminProjectInstallmentPaymentMailer,
+  ClientMailerForProjectProgressNoteUpdate,
+  AdminProjectProgressNoteUpdateMailer,
 } = require("../helpers/mailer/samples");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
@@ -162,7 +166,7 @@ exports.getAllProjectRequest = async (req, res, next) => {
           project.projectTypes
         );
         let projectOwner = await PrivateClient.findByPk(project.userId, {
-          include: ["private_user"],
+          include: ["privateclient"],
         });
         if (!projectOwner) {
           projectOwner = await CorporateClient.findByPk(project.userId, {
@@ -1576,7 +1580,7 @@ exports.payProjectInstallment = async (req, res, next) => {
         { where: { id: installmentId } }
       );
 
-      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const user = await User.findByPk(userId, { attributes: ["name", "email", "id", "userType"] });
       const reqData = {
         req,
         userId,
@@ -1585,6 +1589,30 @@ exports.payProjectInstallment = async (req, res, next) => {
         } of NGN${amount.toLocaleString()} for ${project.projectSlug}`,
       };
       await this.notifyAdmin(reqData);
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // Client mailer
+      await ClientMailerForProjectInstallmentPayment(
+        { email: user.email, first_name: user.fname },
+        pr_installment,
+        project
+      );
+      // Admins mailer
+      await AdminProjectInstallmentPaymentMailer(
+        user,
+        admins,
+        pr_installment,
+        project
+      );
+
       return res.status(200).send({
         success: true,
         message: "Installment paid successfully!",
@@ -2658,6 +2686,39 @@ exports.createProjectNotification = async (req, res, next) => {
       projectId: project.id,
       by,
     });
+
+    if(userType === 'admin'){
+      // Get client details
+      const userData = await ServiceFormProjects.findOne({
+        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        where: { projectID: project.id },
+      });
+
+      let client = {};
+      if (userData.length !== null) {
+        const userId = userData.userID;
+        const _user = await User.findOne({
+          where: { id: userId },
+          attributes: { exclude: ["password"] },
+        });
+        client = _user === null ? {} : _user;
+      }
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      let _img = image === undefined ? '' : image;
+      // Client mailer
+      await ClientMailerForProjectProgressNoteUpdate({email: client.email, first_name: client.fname}, body, _img, project)
+      // Admins mailer
+      await AdminProjectProgressNoteUpdateMailer(admins, body, _img, project);
+    }
 
     return res.status(201).json({
       success: true,
