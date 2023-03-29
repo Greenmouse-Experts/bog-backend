@@ -78,6 +78,10 @@ module.exports = {
         type: Sequelize.STRING,
         defaultValue: false
       },
+      apple_id: {
+        type: Sequelize.STRING,
+        defaultValue: false
+      },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE },
       deletedAt: { allowNull: true, type: Sequelize.DATE }
