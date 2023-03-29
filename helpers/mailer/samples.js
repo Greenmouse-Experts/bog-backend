@@ -1052,6 +1052,91 @@ module.exports = {
   },
 
   /**
+   * Mailer for forgot password
+   * @param {{email: string, first_name: string}} user
+   * @param {string} token
+   */
+  ClientForgotPasswordMailer: async (user, token) => {
+    const { email, first_name } = user;
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/resetpassword?email=${email}&token=${token}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, ${first_name}</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that you just initiated a password change action.</p><br/>
+                    <p style="font-size: 1.4em;">To reset your password, you have to click the button below!</p>
+                    <p style="font-size: 1.4em;">If this was not initiated by you, do not proceed.</p>
+                `;
+    params.body += `
+                    <p style="margin-top:30px; font-size: 1em;">
+                        <a href="${link}" target="_BLANK" title="Reset Password" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">Reset Password</a>
+                    </p>
+                `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Password reset`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
+   * Mailer for forgot password for mobile
+   * @param {{email: string, first_name: string}} user
+   * @param {string} token
+   */
+  ClientForgotPasswordMobileMailer: async (user, token) => {
+    const { email, first_name } = user;
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+    
+    params.body = `<p style="font-size:1.7em;"><b>Hi, ${first_name}</b></p>`;
+    params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that you requested to change your password.</p><br/>
+                    <h3 style="font-size: 1.4em;">${token}</h3>
+                    <p style="font-size: 1.4em;">Use the token to reset your password!</p>
+                    <p style="font-size: 1.4em;">If this was not initiated by you, do not proceed.</p>
+                `;
+  
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Password reset`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
    * Mailer for new orders for buyers
    * @param {*} user
    * @param {*} orders

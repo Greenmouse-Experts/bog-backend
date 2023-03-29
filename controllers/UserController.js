@@ -29,6 +29,9 @@ const Notification = require("../helpers/notification");
 
 const { adminLevels, adminPrivileges } = require("../helpers/utility");
 const ServiceProvider = require("../models/ServiceProvider");
+
+const { ClientForgotPasswordMobileMailer, ClientForgotPasswordMailer } = require("../helpers/mailer/samples");
+
 const axios = require("axios");
 
 exports.registerUser = async (req, res, next) => {
@@ -1204,13 +1207,18 @@ exports.forgotPassword = async (req, res, next) => {
         });
       }
 
-      let token = helpers.generateWebToken();
-      let message = helpers.resetPasswordMessage(email, token);
+      let token = '';
       if (req.body.platform === "mobile") {
         token = helpers.generateMobileToken();
-        message = helpers.resetPasswordMobileMessage(token);
+        await ClientForgotPasswordMobileMailer({email, first_name: user.fname}, token);
+        // message = helpers.resetPasswordMobileMessage(token);
       }
-      await EmailService.sendMail(email, message, "Reset Password");
+      else{
+        token = helpers.generateWebToken();
+        await ClientForgotPasswordMailer({email, first_name: user.fname}, token);
+        // let message = helpers.resetPasswordMessage(email, token);
+      }
+      // await EmailService.sendMail(email, message, "Reset Password");
       const data = {
         token,
         id: user.id,
