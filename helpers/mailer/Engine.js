@@ -40,6 +40,7 @@ exports.Mailer = async (template, data) => {
     to: receivers, // list of receivers
     subject: data.subject, // Subject line
     html: template, // html body
+    attachments: data.files !== undefined ? data.files : ''
   });
 
   return info;

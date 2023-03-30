@@ -19,6 +19,7 @@ const OrderReview = require("../models/order_reviews")
 const Notification = require("../helpers/notification");
 const Project = require("../models/Project");
 const Transaction = require("../models/Transaction");
+const { AdminNewOrderMailer, ClientUpdateOrderMailer, AdminUpdateOrderMailer } = require("../helpers/mailer/samples");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -152,7 +153,7 @@ exports.createOrder = async (req, res, next) => {
       const userId = req.user.id;
       const ownerId = req.user.id;
       const user = await User.findByPk(userId, {
-        attributes: ["email", "name", "fname", "lname"],
+        attributes: ["id", "email", "name", "fname", "lname"],
       });
       const {
         shippingAddress,
@@ -178,7 +179,7 @@ exports.createOrder = async (req, res, next) => {
         payment_category: "Order",
       };
 
-      console.log(req.body);
+      // console.log(req.body);
 
       await Payment.create(paymentData, { transaction: t });
       const contact = {
@@ -260,6 +261,17 @@ exports.createOrder = async (req, res, next) => {
         ];
         const message = helpers.invoiceMessage(user.name);
         sendMail(user.email, message, "BOG Invoice", files);
+
+        // Get active product admins
+        const product_admins = await User.findAll({
+          where: { userType: "admin", level: 4, isActive: 1, isSuspended: 0 },
+        });
+        const super_admins = await User.findAll({
+          where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        });
+        const _admins = [...product_admins, ...super_admins];
+
+        await AdminNewOrderMailer(user, _admins, orders, files, {ref: orderSlug})
       }
 
       const mesg = `A new order was made by ${
@@ -316,11 +328,33 @@ exports.updateOrder = async (req, res, next) => {
       };
       await Order.update(data, { where: { id: orderId }, transaction: t });
 
+      const user = await User.findOne({
+        where: { id: order.userId },
+        attributes: { exclude: ["password"] },
+      });
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // mailer for clients
+      await ClientUpdateOrderMailer(user, status, {
+        id: order.id, ref: order.orderSlug
+      })
+      // mailer for admins
+      await AdminUpdateOrderMailer(user, admins, status, {id: order.id, ref: order.orderSlug})
+
       return res.status(200).send({
         success: true,
         message: "Order updated",
       });
     } catch (error) {
+      console.log(error)
       t.rollback();
       return next(error);
     }
