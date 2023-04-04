@@ -720,8 +720,6 @@ exports.loginUser = async (req, res, next) => {
       }
     }
 
-    await Client.del('loginTrials');
-
     return res.status(201).send({
       success: true,
       message: "User Logged In Sucessfully",
