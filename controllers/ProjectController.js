@@ -411,7 +411,10 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
       success: true,
       data: {
         ...project.toJSON(),
-        clientDetails: userDetails,
+        serviceProvider: {
+          ...project.toJSON().serviceProvider,
+          details: userDetails,
+        },    
         projectData: requestData,
         reviews: project_reviews,
         client,
@@ -553,29 +556,32 @@ exports.updateProjectDetails = async (req, res, next) => {
     });
     const admins = [...project_admins, ...super_admins];
 
-    // Client mailer on project progress
-    await ClientMailerForProjectProgress(
-      {
-        email: client.email,
-        first_name: client.fname,
-      },
-      __project.status,
-      progress,
-      _project
-    );
+    if(progress){
 
-    // Admins mailer on project progress
-    await AdminProjectProgressMailer(
-      {
-        name: client.name,
-        userType: client.userType,
-        id: client.id,
-      },
-      admins,
-      __project.status,
-      progress,
-      _project
-    );
+      // Client mailer on project progress
+      await ClientMailerForProjectProgress(
+        {
+          email: client.email,
+          first_name: client.fname,
+        },
+        __project.status,
+        progress,
+        _project
+      );
+  
+      // Admins mailer on project progress
+      await AdminProjectProgressMailer(
+        {
+          name: client.name,
+          userType: client.userType,
+          id: client.id,
+        },
+        admins,
+        __project.status,
+        progress,
+        _project
+      );
+    }
 
     return res.json({
       success: true,

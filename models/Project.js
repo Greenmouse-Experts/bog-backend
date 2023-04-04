@@ -83,6 +83,10 @@ const Project = sequelise.define(
     endDate: {
       allowNull: true,
       type: Sequelize.DATE
+    },
+    totalEndDate: {
+      allowNull: true,
+      type: Sequelize.DATE
     }
   },
   { paranoid: true }
