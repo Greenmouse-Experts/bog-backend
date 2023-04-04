@@ -10,6 +10,8 @@ const { Server } = require("socket.io");
 const path = require("path");
 const bodyParser = require("body-parser");
 const cron = require("node-cron");
+const session = require('express-session')
+const cookieParser = require('cookie-parser')
 
 const server = http.createServer(app);
 require("./config/database/connection");
@@ -28,6 +30,16 @@ const ProductPartner = require("./models/ProductPartner");
 // set up public folder
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "uploads")));
+
+// app.use(session({
+//   secret: 'keyboard cat',
+//   resave: false,
+//   saveUninitialized: true,
+//   name: "mycookiesession",
+//   cookie: { secure: false }
+// }))
+
+
 // Static Files
 // dashboard
 app.use("/uploads", express.static(`${__dirname}/uploads`));
@@ -46,6 +58,7 @@ app.use(
   })
 );
 
+app.use(cookieParser())
 
 const io = new Server(server, {
   cors: {

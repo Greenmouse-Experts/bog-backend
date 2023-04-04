@@ -12,6 +12,8 @@ const jwt = require("jsonwebtoken");
 
 const passport = require("passport-facebook");
 const FacebookStrategy = require("passport-facebook-token");
+// const store = require('store2')
+// const createClient = require('redis');
 
 const randomstring = require("randomstring");
 const { Op } = require("sequelize");
@@ -33,6 +35,18 @@ const ServiceProvider = require("../models/ServiceProvider");
 const { ClientForgotPasswordMobileMailer, ClientForgotPasswordMailer } = require("../helpers/mailer/samples");
 
 const axios = require("axios");
+
+// const Client = require("../helpers/storage")
+
+// createClient({
+//   url: process.env.REDIS_URL
+// });
+
+// const client = createClient();
+
+// client.on('error', err => console.log('Redis Client Error', err));
+
+
 
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -637,8 +651,9 @@ exports.registerAdmin = async (req, res, next) => {
 };
 
 exports.loginUser = async (req, res, next) => {
-  // sequelize.transaction(async t => {
+  sequelize.transaction(async t => {
   try {
+
     const { email, password } = req.body;
     const user = JSON.parse(
       JSON.stringify(await UserService.findUser({ email }))
@@ -705,6 +720,8 @@ exports.loginUser = async (req, res, next) => {
       }
     }
 
+    await Client.del('loginTrials');
+
     return res.status(201).send({
       success: true,
       message: "User Logged In Sucessfully",
@@ -713,10 +730,10 @@ exports.loginUser = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
-    // t.rollback();
+    t.rollback();
     return next(error);
   }
-  // });
+  });
 };
 
 exports.switchAccount = async (req, res, next) => {

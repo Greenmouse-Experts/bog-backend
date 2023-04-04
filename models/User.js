@@ -121,6 +121,10 @@ const User = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true
     },
+    login_trials: {
+      type: Sequelize.INTEGER,
+      allowNull: true
+    },
   },
   { paranoid: true }
 );
