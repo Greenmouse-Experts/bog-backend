@@ -100,7 +100,6 @@ exports.verifyAccount = async (req, res, next) => {
       const userId = req.user.id;
       const {account_number, bank_code} = req.body;
 
-      console.log(req.body)
       const headers = {
         Authorization: `Bearer ${process.env.PAYSTACK_SECRET}`
       }
