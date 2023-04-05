@@ -194,6 +194,10 @@ router.route("/projects/installments/:project_id/view")
 router.route("/projects/installments/:projectId/payment")
   .post([Auth, Access.verifyAccess, Access.verifyUser], paymentInstallmentValidation(), validate, ProjectController.payProjectInstallment);
 
+// Transfer to service partners
+router.route("/projects/transfer/:projectId")
+  .post([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.transferToServicePartner);
+
 // Add Project notification
 router.route("/projects/notification/create")
   .post([Auth, Access.verifyAccess], projectNotificationValidation(), validate, ProjectController.createProjectNotification)

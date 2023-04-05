@@ -6,11 +6,36 @@ const config = require("./config");
 const Service = {
   Flutterwave: {
     url: process.env.FLW_BASEURL,
-    async transfer(accountNumber, bankCode) {
+    /**
+     * Transfer
+     * @param {*} accountNumber 
+     * @param {*} bankCode 
+     * @param {*} amount 
+     * @param {*} narration 
+     * @param {*} currency 
+     * @param {*} reference 
+     * @returns 
+     */
+    async transfer(
+      accountNumber,
+      bankCode,
+      amount,
+      narration,
+      currency,
+      reference
+    ) {
+      const data = {
+        account_bank: bankCode,
+        account_number: accountNumber,
+        amount,
+        narration,
+        currency,
+        reference
+      };
       try {
         const url = `${this.url}/v3/transfers`;
-        const res = await axios.get(url, {
-          headers: config.header
+        const res = await axios.post(url, data, {
+          headers: config.flw_header,
         });
         // console.log(res.data);
         return res.data;
@@ -21,6 +46,15 @@ const Service = {
         externalError.status = error.response.status;
         return err;
         // throw externalError;
+      }
+    },
+    async viewBanks(){
+      try{
+        const result = await axios.get(`https://maylancer.org/api/nuban/banklist.php`);
+        return result;
+      }
+      catch(err){
+        return err;
       }
     }
     // async createTransferReceipt(accountName, accountNumber, bankCode) {
@@ -83,7 +117,7 @@ const Service = {
     //     return err;
     //   }
     // }
-  }
+  },
 };
 
 module.exports = { Service };
