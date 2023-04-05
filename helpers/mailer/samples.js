@@ -427,14 +427,14 @@ module.exports = {
   },
 
   /**
-   * Mailer for service partner on project updates
+   * Mailer for service partner on project payout
    * @param {{email: string, first_name: string}} service_partner
-   * @param {number} percent
+   * @param {number} amount
    * @param {{}} _project
    */
-  ServicePartnerMailerForProjectUpdate: async (
+  ServicePartnerMailerForProjectPayout: async (
     service_partner,
-    percent,
+    amount,
     _project
   ) => {
     const { email, first_name } = service_partner;
@@ -447,15 +447,21 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Service partner ${first_name}</b></p><br/>`;
     params.body += `
-                    <p style="font-size: 1.2em;">You updated the project with the ID of ${_project.projectSlug} to ${percent}%</p>
+                    <p style="font-size: 1.2em;">You been paid an amount of NGN ${amount} for the project [${_project.projectSlug} that has been assigned to you.</p>
                 `;
+
+    params.body += `
+                <p style="margin-top:30px; font-size: 1em;">
+                    <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+                </p>
+            `;
 
     params.footer = "";
     params.date = new Date().getFullYear();
 
     let params2 = {
       email,
-      subject: `Project Update [${_project.projectSlug}]`,
+      subject: `Project Payout [${_project.projectSlug}]`,
     };
 
     const template = mailer_template(params);
@@ -944,7 +950,6 @@ module.exports = {
     image,
     _project
   ) => {
-
     // Get project and super admin email addresses
     let admin_emails = [];
     admins.forEach((admin) => {
@@ -959,7 +964,9 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
     params.body += `
-                    <p style="font-size: 1.4em;">A notification on the project ${_project.slug} with the ID #${_project.id} was sent.</p><br/>
+                    <p style="font-size: 1.4em;">A notification on the project ${
+                      _project.slug
+                    } with the ID #${_project.id} was sent.</p><br/>
                     ${image &&
                       `<p style="font-size: 1.2em;"><img src="${image}" style="width: 10em; object-fit: contain;" /></p>`}
                     <p style="font-size: 1.2em;"> - ${note}</p><br/>
@@ -1052,6 +1059,63 @@ module.exports = {
   },
 
   /**
+   * Admins mailer for project progress note update
+   * @param {{company_name:string}} service_partner
+   * @param {[]} admins
+   * @param {string} amount
+   * @param {{}} _project
+   */
+  AdminProjectPayoutMailer: async (
+    service_partner,
+    admins,
+    amount,
+    _project
+  ) => {
+    const { company_name } = service_partner;
+
+    // Get project and super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">Service partner ${company_name} has been paid an amount of NGN ${amount.toLocaleString()} for the project [${_project.projectSlug}].</p>
+                  <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
+              `;
+    params.body += `
+              <p style="margin-top:30px; font-size: 1em;">
+                  <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
+              </p>
+          `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Project [${_project.projectSlug}] payout to service partner`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        throw Promise.reject(err);
+      });
+  },
+
+  /**
    * Mailer for forgot password
    * @param {{email: string, first_name: string}} user
    * @param {string} token
@@ -1107,7 +1171,7 @@ module.exports = {
     let params = {};
     params.logo = Logo;
     params.header_color = "white";
-    
+
     params.body = `<p style="font-size:1.7em;"><b>Hi, ${first_name}</b></p>`;
     params.body += `
                     <p style="font-size: 1.4em;">This is to inform you that you requested to change your password.</p><br/>
@@ -1115,7 +1179,7 @@ module.exports = {
                     <p style="font-size: 1.4em;">Use the token to reset your password!</p>
                     <p style="font-size: 1.4em;">If this was not initiated by you, do not proceed.</p>
                 `;
-  
+
     params.footer = "";
     params.date = new Date().getFullYear();
 
@@ -1202,8 +1266,7 @@ module.exports = {
    * @param {string} invoice
    * @param {{}} trx
    */
-  AdminNewOrderMailer: async (client, admins, orders, invoice,  trx) => {
-
+  AdminNewOrderMailer: async (client, admins, orders, invoice, trx) => {
     // Get product and super admin email addresses
     let admin_emails = [];
     admins.forEach((admin) => {
@@ -1224,11 +1287,13 @@ module.exports = {
                   <p style="font-size: 1.4em;">Email: ${client.email}</p>
               `;
     params.body += `<p style="font-size: 1.4em;">Order Items (${orders.length})</p>`;
-    
+
     orders.forEach((order) => {
       params.body += `
             <div class='flex'>
-                <img src='${order.product.image}' style='width: 10em; object-fit:contain;'/>&nbsp;
+                <img src='${
+                  order.product.image
+                }' style='width: 10em; object-fit:contain;'/>&nbsp;
                 <div>
                     <p style="font-size: 1.4em;">${order.product.name}</p>
                     <p style="font-size: 1.4em;">NGN ${order.product.price.toLocaleString()}</p>
@@ -1249,7 +1314,7 @@ module.exports = {
     let params2 = {
       email: admin_emails,
       subject: `New Order [${trx.ref}] from ${client.fname}`,
-      files: invoice
+      files: invoice,
     };
 
     const template = mailer_template(params);
@@ -1271,7 +1336,6 @@ module.exports = {
    * @param {{}} trx
    */
   ClientUpdateOrderMailer: async (user, status, trx) => {
- 
     // setup mail credentials
     let params = {};
     params.logo = Logo;
@@ -1281,7 +1345,9 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, ${user.name}</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">We are glad to inform you that your order has been ${status === 'pending' ? 'updated to pending' : status}</p><br/>
+                  <p style="font-size: 1.4em;">We are glad to inform you that your order has been ${
+                    status === "pending" ? "updated to pending" : status
+                  }</p><br/>
               `;
     params.body += `<p style="font-size: 1.4em;">Reference No: (${trx.ref})</p>`;
     params.body += `<br/><p style="font-size: 1.4em;">For more info, you have to click the button below!</p>`;
@@ -1318,7 +1384,6 @@ module.exports = {
    * @param {{}} trx
    */
   AdminUpdateOrderMailer: async (client, admins, status, trx) => {
-
     // Get product and super admin email addresses
     let admin_emails = [];
     admins.forEach((admin) => {
@@ -1332,7 +1397,11 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">This is to inform you that the order [${trx.ref}] has been ${status === 'pending' ? 'updated to pending' : status}</p><br/>
+                  <p style="font-size: 1.4em;">This is to inform you that the order [${
+                    trx.ref
+                  }] has been ${
+      status === "pending" ? "updated to pending" : status
+    }</p><br/>
                   <p style="font-size: 1.4em;">Name: ${client.name}</p>
                   <p style="font-size: 1.4em;">Email: ${client.email}</p>
               `;
