@@ -411,11 +411,19 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
     // project commitment fee
     const commitmentFee = await Transaction.findOne({
       where: {
-        description: {
-          [Op.like]: `%${project.projectSlug}%`,
-        },
+        description: `Commitment fee for ${project.projectSlug}`
       },
     });
+
+    // payout transactions
+    const payoutTransactions = await Transaction.findAll({
+      where: {
+        type: 'Project Payout to service partner',
+        description: {
+          [Op.like]: `%${project.projectSlug}%`
+        }
+      }
+    })
 
     return res.status(200).send({
       success: true,
@@ -430,6 +438,7 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
         client,
         transactions: {
           commitmentFee: commitmentFee === null ? {} : commitmentFee,
+          payouts: payoutTransactions
         },
       },
     });

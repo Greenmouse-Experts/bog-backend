@@ -62,7 +62,7 @@ router.route("/projects/all").get(Auth, ProjectController.getAllProjectRequest);
 
 router
   .route("/projects/v2/all")
-  .get(Auth, ProjectController.getAllProjectRequestV2);
+  .get([Auth, Access.verifyAccess], ProjectController.getAllProjectRequestV2);
 
 // View all project v2 ?y=${year} default is present year
 router.route("/projects/analyze")
@@ -74,16 +74,16 @@ router.route("/projects/service-partner-analyze")
 
 router
   .route("/projects/view-project/:projectId")
-  .get(Auth, ProjectController.viewProjectRequest);
+  .get([Auth, Access.verifyAccess], ProjectController.viewProjectRequest);
 
 // Project request view v2
 router
   .route("/projects/v2/view-project/:projectId")
-  .get(Auth, ProjectController.viewProjectRequestV2);
+  .get([Auth, Access.verifyAccess], ProjectController.viewProjectRequestV2);
 
 router
   .route("/projects/delete/:requestId")
-  .delete(Auth, ProjectController.deleteProjectRequest);
+  .delete([Auth, Access.verifyAccess], ProjectController.deleteProjectRequest);
 
 // Request service type
 router

@@ -11,6 +11,8 @@ const User = require("../models/User");
 // const cloudinary = require("../helpers/cloudinary");
 const Reviews = require("../models/Reviews");
 const Notification = require("../helpers/notification");
+const OrderItem = require("../models/OrderItem");
+const Order = require("../models/Order");
 
 exports.getProducts = async (req, res, next) => {
   try {
@@ -379,6 +381,12 @@ exports.getAllProducts = async (req, res, next) => {
       ],
       order: [["createdAt", "DESC"]],
     });
+
+    // const orders = await Order.findAll({where: {userId: creatorId}});
+    
+    
+    // const orderItems = await OrderItem.findAll();
+    
     return res.status(200).send({
       success: true,
       data: products,

@@ -102,6 +102,13 @@ exports.getOneTxns = async (req, res, next) => {
         })
       )
     );
+    
+    if(Txns === null){
+      return res.status(404).json({
+        success: false,
+        message: "Txn not found!"
+      })
+    }
     const { TransactionId, userId, type, amount } = Txns;
     const detail = await this.getTransactionDetail({
       txId: TransactionId,
