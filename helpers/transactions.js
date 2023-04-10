@@ -11,6 +11,7 @@ const OrderItem = require("../models/OrderItem");
 const Subscription = require("../models/Subscription");
 const ServicePartner = require("../models/ServicePartner");
 const ProductPartner = require("../models/ProductPartner");
+const Project = require("../models/Project");
 
 const generateDesc = order_items => {
   const data = order_items.map(
@@ -114,12 +115,16 @@ exports.getOneTxns = async (req, res, next) => {
       txId: TransactionId,
       userId,
       type,
-      amount
+      amount,
+      Txns
     });
     return res.status(200).send({
       success: true,
       data: {
-        transaction: Txns,
+        transaction: {
+          ...Txns,
+          user: detail.user ? detail?.user : Txns.user
+        },
         detail
       }
     });
@@ -128,7 +133,7 @@ exports.getOneTxns = async (req, res, next) => {
   }
 };
 
-exports.getTransactionDetail = async ({ type, userId, txId, amount = 0 }) => {
+exports.getTransactionDetail = async ({ type, userId, txId, amount = 0, Txns }) => {
   try {
     let detail;
     if (type === "Products") {
@@ -184,7 +189,27 @@ exports.getTransactionDetail = async ({ type, userId, txId, amount = 0 }) => {
           )
         );
       }
-      detail.user = user;
+      detail.user = user.product_user ? user.product_user : user.service_user;
+    }
+    if(type.includes('Project')){
+      const {description} = Txns;
+      let projectSlug = description.split(' ')[description.split(' ').length - 1];
+      ['[',']'].forEach((values) => {
+        projectSlug = projectSlug.split('').filter(character => character !== values).join('')
+      })
+
+      // Get project
+      const project_details = await Project.findOne({where: {projectSlug}});
+      if(project_details !== null){
+        const service_partner_details = await ServicePartner.findOne({where: {id: project_details.serviceProviderId}});
+        if(service_partner_details !== null){
+          const user_details = await User.findOne({where: {id: service_partner_details.userId}});
+          if(user_details !== null){
+            detail = project_details;
+            detail.user = user_details;
+          }
+        }
+      }
     }
     return detail;
   } catch (error) {

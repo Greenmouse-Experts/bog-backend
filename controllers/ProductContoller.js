@@ -382,19 +382,39 @@ exports.getAllProducts = async (req, res, next) => {
       order: [["createdAt", "DESC"]],
     });
 
-    // const orders = await Order.findAll({where: {userId: creatorId}});
-    
-    
+    // const orders = await OrderItem.findAll({
+    //   where: { productOwner: creatorId },
+    // });
+
+    // console.log(orders)
+    // const products_ = getRemainingStock(products, orders);
+
     // const orderItems = await OrderItem.findAll();
-    
+
     return res.status(200).send({
       success: true,
-      data: products,
+      data: products_,
     });
   } catch (error) {
     return next(error);
   }
 };
+
+// function getRemainingStock(products, orders) {
+//   let products_ = products.map((product) => {
+//     const productOrders = orders.filter(
+//       (order) =>
+//         order.productOwner === product.creatorId
+//     );
+    
+//     product = {
+//       ...product,
+//       remainingStock: productOrders.length
+//     };
+//     return product;
+//   });
+//   return products_;
+// }
 
 exports.getSingleProducts = async (req, res, next) => {
   try {
@@ -421,14 +441,14 @@ exports.getSingleProducts = async (req, res, next) => {
 
     const review_details = await Reviews.findAll({
       where: { productId: req.params.productId },
-      include: [{model: User, as: 'client'}]
+      include: [{ model: User, as: "client" }],
     });
     return res.status(200).send({
       success: true,
       data: {
         ...product.toJSON(),
-        reviews: review_details
-      }
+        reviews: review_details,
+      },
     });
   } catch (error) {
     return next(error);

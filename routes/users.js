@@ -74,6 +74,7 @@ router
 router.route("/user/me").get(Auth, UserController.getLoggedInUser);
 
 router.route("/user/verify").post(UserController.verifyUser);
+router.route("/user/verifyemail").get(UserController.verifyUserEmail);
 
 router
   .route("/user/verify/login")
