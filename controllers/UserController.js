@@ -1081,6 +1081,37 @@ exports.verifyUser = async (req, res, next) => {
   });
 };
 
+exports.verifyUserEmail = async (req, res, next) => {
+  sequelize.transaction(async (transaction) => {
+    try {
+      const { email, token } = req.query;
+
+      const user = await UserService.findUser({ email, token});
+  
+      if (!user) {
+        return res.status(404).send({
+          success: false,
+          message: "No User found with this email",
+        });
+      }
+
+      const data = {
+        id: user.id,
+        isActive: true,
+        token: null,
+      };
+      await UserService.updateUser(data, transaction);
+      return res.status(200).send({
+        success: true,
+        message: "Account Activated Successfully",
+      });
+    } catch (error) {
+      transaction.rollback();
+      return next(error);
+    }
+  });
+};
+
 exports.updateUserAccount = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {

@@ -166,32 +166,32 @@ app.use((err, req, res, next) => {
 });
 
 
-const teamCreationPayload = {
-  authorization: '',
-  teamName: '',
-  teamMembers: [{
-    userId: 'vkesakar@gmail.com',
-    role: 'admin'
-  },
-  {
-    userId: 'dummy_1@gmail.com',
-    role: 'admin'
-  }]
-}
+// const teamCreationPayload = {
+//   authorization: '',
+//   teamName: '',
+//   teamMembers: [{
+//     userId: 'vkesakar@gmail.com',
+//     role: 'admin'
+//   },
+//   {
+//     userId: 'dummy_1@gmail.com',
+//     role: 'admin'
+//   }]
+// }
 
-class Index {
-  async invoke () {
-    try {
-      const { message } = await msTeamsService.createTeam(teamCreationPayload)
-      logger.info('Index:invoke: Team created ', { message })
-    } catch (error) {
-      logger.error('Index:invoke: Error during team creation ', { error })
-    }
-  }
-}
+// class Index {
+//   async invoke () {
+//     try {
+//       const { message } = await msTeamsService.createTeam(teamCreationPayload)
+//       logger.info('Index:invoke: Team created ', { message })
+//     } catch (error) {
+//       logger.error('Index:invoke: Error during team creation ', { error })
+//     }
+//   }
+// }
 
-new Index()
-  .invoke()
+// new Index()
+//   .invoke()
 
 // Not found route
 app.use((req, res) => {
