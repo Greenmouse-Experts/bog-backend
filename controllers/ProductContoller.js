@@ -393,7 +393,7 @@ exports.getAllProducts = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: products_,
+      data: products,
     });
   } catch (error) {
     return next(error);
