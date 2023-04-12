@@ -34,6 +34,12 @@ module.exports = {
         values: ["pending", "approved", "cancelled", "shipped", "completed"],
         defaultValue: "pending"
       },
+      refundStatus: {
+        allowNull: true,
+        type: Sequelize.ENUM,
+        values: ["request refund", "refunded", "not refunded"],
+        defaultValue: "not refunded"
+      },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE },
       deletedAt: { allowNull: true, type: Sequelize.DATE }

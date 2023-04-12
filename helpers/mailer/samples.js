@@ -1377,6 +1377,94 @@ module.exports = {
   },
 
   /**
+   * Mailer for order refund request for clients
+   * @param {{}} user
+   * @param {{}} trx
+   */
+  ClientOrderRefundRequestMailer: async (user, trx) => {
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/order-detail/${trx.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, ${user.name}</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">We are glad to inform you that your refund request on your order has been sent!</p><br/>
+              `;
+    params.body += `<p style="font-size: 1.4em;">Reference No: (${trx.ref})</p>`;
+    params.body += `<br/><p style="font-size: 1.4em;">For more info, you have to click the button below!</p>`;
+    params.body += `
+                  <p style="margin-top:30px; font-size: 1em;">
+                      <a href="${link}" target="_BLANK" title="click to view your order" style="padding:20px;color:white;font-size:1.2em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Order</a>
+                  </p>
+              `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: user.email,
+      subject: `Refund request on Order [${trx.ref}]`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
+
+  /**
+   * Mailer for refunding order for clients
+   * @param {{}} user
+   * @param {{}} trx
+   */
+  ClientOrderRefundMailer: async (user, trx) => {
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/order-detail/${trx.id}`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, ${user.name}</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">This is to inform you that your order has been refunded!</p><br/>
+              `;
+    params.body += `<p style="font-size: 1.4em;">Reference No: (${trx.ref})</p>`;
+    params.body += `<br/><p style="font-size: 1.4em;">For more info, you have to click the button below!</p>`;
+    params.body += `
+                  <p style="margin-top:30px; font-size: 1em;">
+                      <a href="${link}" target="_BLANK" title="click to view your order" style="padding:20px;color:white;font-size:1.2em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Order</a>
+                  </p>
+              `;
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: user.email,
+      subject: `Order has been refunded [${trx.ref}]`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
+
+  /**
    * Mailer for updating orders for admins
    * @param {{}} client
    * @param {[]} admins
@@ -1411,7 +1499,101 @@ module.exports = {
 
     let params2 = {
       email: admin_emails,
-      subject: `${process.env.APP_NAME} - Your Order [${trx.ref}] from ${client.fname}`,
+      subject: `Order update [${trx.ref}] - client ${client.fname}`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
+
+  /**
+   * Mailer for order refund request for admins
+   * @param {{}} client
+   * @param {[]} admins
+   * @param {{}} trx
+   */
+  AdminOrderRefundRequestMailer: async (client, admins, trx) => {
+    // Get product and super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">This is to inform you that a refund request for the order [${
+                    trx.ref
+                  }] has been sent!</p><br/>
+                  <p style="font-size: 1.4em;">Name: ${client.name}</p>
+                  <p style="font-size: 1.4em;">Email: ${client.email}</p>
+              `;
+
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Refund request on order [${trx.ref}] from ${client.fname}`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
+
+  /**
+   * Mailer on refunding order for admins
+   * @param {{}} client
+   * @param {[]} admins
+   * @param {{}} trx
+   */
+  AdminOrderRefundMailer: async (client, admins, trx) => {
+    // Get product and super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">This is to inform you that your order [${
+                    trx.ref
+                  }] has been refunded!</p><br/>
+                  <p style="font-size: 1.4em;">Name: ${client.name}</p>
+                  <p style="font-size: 1.4em;">Email: ${client.email}</p>
+              `;
+
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Order [${trx.ref}] has been refunded - Client ${client.fname}`,
     };
 
     const template = mailer_template(params);
