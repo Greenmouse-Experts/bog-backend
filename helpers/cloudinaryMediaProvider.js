@@ -67,7 +67,7 @@ const validateImage = (imageArr) => {
 
   // Check if they are all images
   const isValidFormat = imageArr.every((image) =>
-    validImageFormats.includes(image.originalFilename.split('.')[1])
+    validImageFormats.includes(image.originalFilename.split('.')[image.originalFilename.split('.').length - 1])
   );
   if (!isValidFormat)
     return `Unsupported image format detected. Images must be in ${validImageFormats.join(
