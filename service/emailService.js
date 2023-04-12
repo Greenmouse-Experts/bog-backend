@@ -15,8 +15,8 @@ exports.sendMail = async (email, message, subject, files = []) => {
   try {
     // send mail with defined transport object
     const mailOptions = {
-      from: process.env.EMAIL_FROM, // sender address
-      to: `${process.env.APP_NAME} <${email}>`, // list of receivers
+      from: `${process.env.APP_NAME} <${process.env.EMAIL_FROM}>`, // sender address
+      to: email, // list of receivers
       subject, // Subject line
       text: "BOG LTD", // plain text body
       html: message, // html body
