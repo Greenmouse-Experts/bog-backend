@@ -39,7 +39,13 @@ const Order = sequelise.define(
       type: Sequelize.ENUM,
       values: ["pending", "approved", "cancelled", "shipped", "completed"],
       defaultValue: "pending"
-    }
+    },
+    refundStatus: {
+      allowNull: true,
+      type: Sequelize.ENUM,
+      values: ["request refund", "refunded", "not refunded"],
+      defaultValue: "not refunded"
+    },
   },
   { paranoid: true }
 );

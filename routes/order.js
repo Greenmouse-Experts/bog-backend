@@ -25,8 +25,21 @@ router
 
 router
   .route("/orders/update-order")
-  .patch(updateOrderValidation(), validate, [Auth, Access.verifyAccess], OrderController.updateOrder);
-
+  .patch(updateOrderValidation(), validate, [Auth, Access.verifyAccess, Access.verifyAdmin], OrderController.updateOrder);
+  
+  router
+  .route("/orders/cancel-order/:orderId")
+  .get([Auth, Access.verifyAccess, Access.verifyUser], OrderController.cancelOrder);
+  
+  router
+    .route("/orders/request-refund/:orderId")
+    .get([Auth, Access.verifyAccess, Access.verifyUser], OrderController.requestRefund);
+  
+    
+  router
+    .route("/orders/refund/:orderId")
+    .get([Auth, Access.verifyAccess, Access.verifyAdmin], OrderController.refundOrder);
+  
 router
   .route("/orders/request/update-order")
   .patch(

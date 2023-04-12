@@ -382,15 +382,6 @@ exports.getAllProducts = async (req, res, next) => {
       order: [["createdAt", "DESC"]],
     });
 
-    // const orders = await OrderItem.findAll({
-    //   where: { productOwner: creatorId },
-    // });
-
-    // console.log(orders)
-    // const products_ = getRemainingStock(products, orders);
-
-    // const orderItems = await OrderItem.findAll();
-
     return res.status(200).send({
       success: true,
       data: products,
@@ -399,22 +390,6 @@ exports.getAllProducts = async (req, res, next) => {
     return next(error);
   }
 };
-
-// function getRemainingStock(products, orders) {
-//   let products_ = products.map((product) => {
-//     const productOrders = orders.filter(
-//       (order) =>
-//         order.productOwner === product.creatorId
-//     );
-    
-//     product = {
-//       ...product,
-//       remainingStock: productOrders.length
-//     };
-//     return product;
-//   });
-//   return products_;
-// }
 
 exports.getSingleProducts = async (req, res, next) => {
   try {
@@ -439,6 +414,13 @@ exports.getSingleProducts = async (req, res, next) => {
       ],
     });
 
+  
+    const orders = JSON.parse(JSON.stringify(await OrderItem.findAll({
+      where: { productOwner: product.creatorId, product: {[Op.like]: `%${product.id}%`} },
+      raw: true,
+    })));
+  
+   
     const review_details = await Reviews.findAll({
       where: { productId: req.params.productId },
       include: [{ model: User, as: "client" }],
@@ -448,6 +430,9 @@ exports.getSingleProducts = async (req, res, next) => {
       data: {
         ...product.toJSON(),
         reviews: review_details,
+        orders: orders.length,
+        in_stock: orders.length < parseInt(product.quantity) ? true : false,
+        remaining: parseInt(product.quantity) - orders.length
       },
     });
   } catch (error) {

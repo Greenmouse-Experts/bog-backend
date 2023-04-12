@@ -30,7 +30,7 @@ exports.verifyAccess = async (req, res, next) => {
 
     if (userDetails === null) {
       res.status(404).send({
-        status: false,
+        success: false,
         message: "Admin not found!",
       });
     } else {
@@ -84,7 +84,7 @@ exports.verifyAccess = async (req, res, next) => {
   } catch (error) {
     console.log(error);
     return res.status(400).send({
-      status: false,
+      success: false,
       error,
     });
   }
@@ -95,7 +95,7 @@ exports.verifyAdmin = (req, res, next) => {
 
   if (_credentials.userType !== "admin") {
     return res.status(403).send({
-      status: false,
+      success: false,
       message: "Unauthorized Access!",
     });
   } else {
@@ -108,7 +108,7 @@ exports.verifyUser = (req, res, next) => {
 
   if (_credentials.userType === "admin") {
     return res.status(403).send({
-      status: false,
+      success: false,
       message: "Unauthorized Access!",
     });
   } else {

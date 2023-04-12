@@ -15,11 +15,19 @@ const helpers = require("../helpers/message");
 const helpTransaction = require("../helpers/transactions");
 const ContactDetails = require("../models/ContactDetails");
 const ProductReview = require("../models/Reviews");
-const OrderReview = require("../models/order_reviews")
+const OrderReview = require("../models/order_reviews");
 const Notification = require("../helpers/notification");
 const Project = require("../models/Project");
 const Transaction = require("../models/Transaction");
-const { AdminNewOrderMailer, ClientUpdateOrderMailer, AdminUpdateOrderMailer } = require("../helpers/mailer/samples");
+const {
+  AdminNewOrderMailer,
+  ClientUpdateOrderMailer,
+  AdminUpdateOrderMailer,
+  ClientOrderRefundRequestMailer,
+  AdminOrderRefundRequestMailer,
+  ClientOrderRefundMailer,
+  AdminOrderRefundMailer,
+} = require("../helpers/mailer/samples");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -146,7 +154,6 @@ exports.getOrderRequest = async (req, res, next) => {
   }
 };
 
-
 exports.createOrder = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -202,10 +209,10 @@ exports.createOrder = async (req, res, next) => {
           if (prodData === null) {
             return res.status(404).send({
               success: false,
-              message: "Product not found!"
+              message: "Product not found!",
             });
           }
-          
+
           const amount = product.quantity * Number(prodData.price);
           const trackingId = `TRD-${Math.floor(
             190000000 + Math.random() * 990000000
@@ -271,7 +278,9 @@ exports.createOrder = async (req, res, next) => {
         });
         const _admins = [...product_admins, ...super_admins];
 
-        await AdminNewOrderMailer(user, _admins, orders, files, {ref: orderSlug})
+        await AdminNewOrderMailer(user, _admins, orders, files, {
+          ref: orderSlug,
+        });
       }
 
       const mesg = `A new order was made by ${
@@ -344,17 +353,230 @@ exports.updateOrder = async (req, res, next) => {
 
       // mailer for clients
       await ClientUpdateOrderMailer(user, status, {
-        id: order.id, ref: order.orderSlug
-      })
+        id: order.id,
+        ref: order.orderSlug,
+      });
       // mailer for admins
-      await AdminUpdateOrderMailer(user, admins, status, {id: order.id, ref: order.orderSlug})
+      await AdminUpdateOrderMailer(user, admins, status, {
+        id: order.id,
+        ref: order.orderSlug,
+      });
 
       return res.status(200).send({
         success: true,
         message: "Order updated",
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.cancelOrder = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { id } = req._credentials;
+      const { orderId } = req.params;
+      const status = "cancelled";
+      const order = await Order.findOne({ where: { id: orderId } });
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: "Invalid Order",
+        });
+      }
+
+      if(order.status === 'cancelled'){
+        return res.status(200).json({
+          success: true,
+          message: "Order has already been cancelled!"
+        }) 
+      }
+      else if (order.status !== "pending" || order.userId !== id) {
+        return res.status(401).json({
+          success: false,
+          message: "Order cannot be cancelled!",
+        });
+      }
+
+      const data = {
+        status,
+      };
+      await Order.update(data, { where: { id: orderId }, transaction: t });
+
+      const user = await User.findOne({
+        where: { id: order.userId },
+        attributes: { exclude: ["password"] },
+      });
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // mailer for clients
+      await ClientUpdateOrderMailer(user, status, {
+        id: order.id,
+        ref: order.orderSlug,
+      });
+      // mailer for admins
+      await AdminUpdateOrderMailer(user, admins, status, {
+        id: order.id,
+        ref: order.orderSlug,
+      });
+
+      return res.status(200).send({
+        success: true,
+        message: `Order ${status}`,
+      });
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.requestRefund = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { id } = req._credentials;
+      const { orderId } = req.params;
+      const refundStatus = "request refund";
+      const order = await Order.findOne({ where: { id: orderId } });
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: "Invalid Order",
+        });
+      }
+
+      if(order.refundStatus === 'request refund'){
+        return res.status(200).json({
+          success: true,
+          message: "Refund request has already been sent!"
+        }) 
+      }
+      if (order.status !== "cancelled" || order.userId !== id) {
+        return res.status(401).json({
+          success: false,
+          message: "Refund request on this order cannot be performed!",
+        });
+      }
+
+      const data = {
+        refundStatus,
+      };
+      await Order.update(data, { where: { id: orderId }, transaction: t });
+
+      const user = await User.findOne({
+        where: { id: order.userId },
+        attributes: { exclude: ["password"] },
+      });
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // mailer for clients
+      await ClientOrderRefundRequestMailer(user, {
+        id: order.id,
+        ref: order.orderSlug,
+      });
+      
+      // mailer for admins
+      await AdminOrderRefundRequestMailer(user, admins, {
+        id: order.id,
+        ref: order.orderSlug,
+      });
+
+      return res.status(200).send({
+        success: true,
+        message: `Refund request has been sent successfully!`,
+      });
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.refundOrder = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { id } = req._credentials;
+      const { orderId } = req.params;
+      const refundStatus = "refunded";
+      const order = await Order.findOne({ where: { id: orderId } });
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: "Invalid Order",
+        });
+      }
+
+      if(order.refundStatus === 'refunded' && order.status === 'cancelled' ){
+        return res.status(200).json({
+          success: true,
+          message: "Order has already been refunded!"
+        }) 
+      }
+      if (order.status !== 'cancelled' || order.refundStatus !== "request refund") {
+        return res.status(401).json({
+          success: false,
+          message: "Order cannot be refunded!",
+        });
+      }
+
+      const data = {
+        refundStatus,
+      };
+      await Order.update(data, { where: { id: orderId }, transaction: t });
+
+      const user = await User.findOne({
+        where: { id: order.userId },
+        attributes: { exclude: ["password"] },
+      });
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // mailer for clients
+      await ClientOrderRefundMailer(user, {
+        id: order.id,
+        ref: order.orderSlug,
+      });
+      
+      // mailer for admins
+      await AdminOrderRefundMailer(user, admins, {
+        id: order.id,
+        ref: order.orderSlug,
+      });
+
+      return res.status(200).send({
+        success: true,
+        message: `Order has been refunded successfully!`,
+      });
+    } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
