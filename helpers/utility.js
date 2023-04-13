@@ -48,7 +48,7 @@ exports.adminPrivileges = [
   { type: "finance admin", privileges: ["TRANSACTION", "PROFILE"] },
   {
     type: "product admin",
-    privileges: ["PRODUCT", "DELIVERY",  "ORDER", "NOTIFICATION", "PROFILE"],
+    privileges: ["PRODUCT", "ADDRESS",  "ORDER", "NOTIFICATION", "PROFILE"],
   },
   {
     type: "project admin",
