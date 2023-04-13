@@ -62,7 +62,12 @@ exports.ReadSupplyCategories = async (req, res, next) => {
       const result = await SupplyCategory.findOne({
         where: { userId: profile.id }
       });
-      result.categories = result.categories.split(",");
+      if (result.categories.includes(',')) {
+        result.categories = result.categories.split(",");
+      }
+      else{
+        result.categories = []
+      }
       return res.status(200).send({
         success: true,
         data: result
