@@ -24,10 +24,9 @@ exports.updateCommitment = async (req, res, next) => {
     });
 
     if (commitmentFee === null) {
-      return res.status(404).send({
-        success: false,
-        message: "Commitment fee not found!",
-      });
+      const _response = await Fees.create(
+        { amount, title: "commitment fee" }
+      );
     }
 
     const response = await Fees.update(
@@ -36,7 +35,7 @@ exports.updateCommitment = async (req, res, next) => {
     );
     return res.send({
       success: true,
-      message: "Commitment fee updated successfully!",
+      message: "Commitment fee saved successfully!",
     });
   } catch (error) {
     return next(error);
