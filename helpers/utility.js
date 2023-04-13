@@ -52,7 +52,7 @@ exports.adminPrivileges = [
   },
   {
     type: "project admin",
-    privileges: ["PROJECT", "SERVICE", "MEETING", "NOTIFICATION", "PROFILE"],
+    privileges: ["PROJECT", "FEE", "SERVICE", "MEETING", "NOTIFICATION", "PROFILE"],
   },
 ];
 
