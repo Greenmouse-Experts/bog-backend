@@ -59,14 +59,15 @@ exports.ReadSupplyCategories = async (req, res, next) => {
       const { userType } = req.query;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
-      const result = await SupplyCategory.findOne({
+      let result = await SupplyCategory.findOne({
         where: { userId: profile.id }
       });
-      if (result.categories !== null) {
-        result.categories = result.categories.split(",");
+      console.log(result)
+      if (result !== null) {
+        result.categories = result.categories !== null ? result.categories.split(",") : {};
       }
       else{
-        result.categories = []
+        result = {}
       }
       return res.status(200).send({
         success: true,
