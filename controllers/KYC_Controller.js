@@ -62,7 +62,7 @@ exports.ReadSupplyCategories = async (req, res, next) => {
       const result = await SupplyCategory.findOne({
         where: { userId: profile.id }
       });
-      if (result.categories) {
+      if (result.categories !== null) {
         result.categories = result.categories.split(",");
       }
       else{
