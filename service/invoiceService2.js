@@ -29,12 +29,12 @@ exports.createInvoice = async (orderData, user) => {
   let _subtotal = 0;
   const _products = orderData.order_items.map((orderItem) => {
     // const productDetails = await Product.findOne({where: {id: }})
-    _subtotal += orderItem.amount * orderItem.quantity;
+    _subtotal += orderItem.product.price * orderItem.quantity;
     return {
       description: orderItem.product.name,
       quantity: orderItem.quantity,
-      price: orderItem.amount.toLocaleString(),
-      row_total: (orderItem.amount * orderItem.quantity).toLocaleString(),
+      price: orderItem.product.price.toLocaleString(),
+      row_total: (orderItem.product.price * orderItem.quantity).toLocaleString(),
     };
   });
 
