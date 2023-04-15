@@ -419,6 +419,11 @@ exports.getSingleProducts = async (req, res, next) => {
       where: { productOwner: product.creatorId, product: {[Op.like]: `%${product.id}%`} },
       raw: true,
     })));
+
+    const orderTotal = 0;
+    orders.forEach(order => {
+      orderTotal += order.quantity
+    });
   
    
     const review_details = await Reviews.findAll({
@@ -430,7 +435,7 @@ exports.getSingleProducts = async (req, res, next) => {
       data: {
         ...product.toJSON(),
         reviews: review_details,
-        orders: orders.length,
+        orders: orderTotal,
         in_stock: orders.length < parseInt(product.quantity) ? true : false,
         remaining: parseInt(product.quantity) - orders.length
       },
