@@ -20,7 +20,7 @@ exports.getProducts = async (req, res, next) => {
       status: "approved",
       showInShop: true,
     };
-    const products = await Product.findAll({
+    let products = await Product.findAll({
       where,
       include: [
         {
@@ -44,7 +44,31 @@ exports.getProducts = async (req, res, next) => {
         },
       ],
       order: [["createdAt", "DESC"]],
+      raw: true
     });
+    
+
+    for (let index = 0; index < products.length; index++) {
+      const product = products[index];
+      const orders = JSON.parse(JSON.stringify(await OrderItem.findAll({
+        where: { productOwner: product.creatorId, product: {[Op.like]: `%${product.id}%`} },
+        raw: true,
+      })));
+
+      let orderTotal = 0;
+      orders.forEach(order => {
+        orderTotal += order.quantity
+      });
+
+      products[index] = {
+        ...product,
+        orderTotal,
+        in_stock: orderTotal < parseInt(product.quantity) ? true : false,
+        remaining: parseInt(product.quantity) - orderTotal
+      }
+
+    }
+    
     return res.status(200).send({
       success: true,
       data: products,
@@ -380,7 +404,29 @@ exports.getAllProducts = async (req, res, next) => {
         },
       ],
       order: [["createdAt", "DESC"]],
+      raw: true
     });
+
+    for (let index = 0; index < products.length; index++) {
+      const product = products[index];
+      const orders = JSON.parse(JSON.stringify(await OrderItem.findAll({
+        where: { productOwner: product.creatorId, product: {[Op.like]: `%${product.id}%`} },
+        raw: true,
+      })));
+
+      let orderTotal = 0;
+      orders.forEach(order => {
+        orderTotal += order.quantity
+      });
+
+      products[index] = {
+        ...product,
+        orderTotal,
+        in_stock: orderTotal < parseInt(product.quantity) ? true : false,
+        remaining: parseInt(product.quantity) - orderTotal
+      }
+
+    }
 
     return res.status(200).send({
       success: true,
@@ -414,7 +460,6 @@ exports.getSingleProducts = async (req, res, next) => {
       ],
     });
 
-  
     const orders = JSON.parse(JSON.stringify(await OrderItem.findAll({
       where: { productOwner: product.creatorId, product: {[Op.like]: `%${product.id}%`} },
       raw: true,
