@@ -420,7 +420,7 @@ exports.getSingleProducts = async (req, res, next) => {
       raw: true,
     })));
 
-    const orderTotal = 0;
+    let orderTotal = 0;
     orders.forEach(order => {
       orderTotal += order.quantity
     });
@@ -436,8 +436,8 @@ exports.getSingleProducts = async (req, res, next) => {
         ...product.toJSON(),
         reviews: review_details,
         orders: orderTotal,
-        in_stock: orders.length < parseInt(product.quantity) ? true : false,
-        remaining: parseInt(product.quantity) - orders.length
+        in_stock: orderTotal < parseInt(product.quantity) ? true : false,
+        remaining: parseInt(product.quantity) - orderTotal
       },
     });
   } catch (error) {
