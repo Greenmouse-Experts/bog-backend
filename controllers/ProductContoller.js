@@ -44,31 +44,39 @@ exports.getProducts = async (req, res, next) => {
         },
       ],
       order: [["createdAt", "DESC"]],
-      raw: true
+      raw: true,
     });
-    
 
     for (let index = 0; index < products.length; index++) {
       const product = products[index];
-      const orders = JSON.parse(JSON.stringify(await OrderItem.findAll({
-        where: { productOwner: product.creatorId, product: {[Op.like]: `%${product.id}%`} },
-        raw: true,
-      })));
+      const orders = JSON.parse(
+        JSON.stringify(
+          await OrderItem.findAll({
+            where: {
+              productOwner: product.creatorId,
+              product: { [Op.like]: `%${product.id}%` },
+            },
+            raw: true,
+          })
+        )
+      );
 
       let orderTotal = 0;
-      orders.forEach(order => {
-        orderTotal += order.quantity
+      orders.forEach(async order => {
+        const orderTrx = await Order.findOne({where: {id: order.orderId, status: 'cancelled'}});
+        if(orderTrx === null){
+          orderTotal += order.quantity
+        }
       });
 
       products[index] = {
         ...product,
         orderTotal,
         in_stock: orderTotal < parseInt(product.quantity) ? true : false,
-        remaining: parseInt(product.quantity) - orderTotal
-      }
-
+        remaining: parseInt(product.quantity) - orderTotal,
+      };
     }
-    
+
     return res.status(200).send({
       success: true,
       data: products,
@@ -404,28 +412,39 @@ exports.getAllProducts = async (req, res, next) => {
         },
       ],
       order: [["createdAt", "DESC"]],
-      raw: true
+      raw: true,
     });
 
     for (let index = 0; index < products.length; index++) {
       const product = products[index];
-      const orders = JSON.parse(JSON.stringify(await OrderItem.findAll({
-        where: { productOwner: product.creatorId, product: {[Op.like]: `%${product.id}%`} },
-        raw: true,
-      })));
+      const orders = JSON.parse(
+        JSON.stringify(
+          await OrderItem.findAll({
+            where: {
+              productOwner: product.creatorId,
+              product: { [Op.like]: `%${product.id}%` },
+            },
+            raw: true,
+          })
+        )
+      );
 
       let orderTotal = 0;
-      orders.forEach(order => {
-        orderTotal += order.quantity
+      orders.forEach(async (order) => {
+        const orderTrx = await Order.findOne({
+          where: { id: order.orderId, status: "cancelled" },
+        });
+        if (orderTrx === null) {
+          orderTotal += order.quantity;
+        }
       });
 
       products[index] = {
         ...product,
         orderTotal,
         in_stock: orderTotal < parseInt(product.quantity) ? true : false,
-        remaining: parseInt(product.quantity) - orderTotal
-      }
-
+        remaining: parseInt(product.quantity) - orderTotal,
+      };
     }
 
     return res.status(200).send({
@@ -460,17 +479,28 @@ exports.getSingleProducts = async (req, res, next) => {
       ],
     });
 
-    const orders = JSON.parse(JSON.stringify(await OrderItem.findAll({
-      where: { productOwner: product.creatorId, product: {[Op.like]: `%${product.id}%`} },
-      raw: true,
-    })));
+    const orders = JSON.parse(
+      JSON.stringify(
+        await OrderItem.findAll({
+          where: {
+            productOwner: product.creatorId,
+            product: { [Op.like]: `%${product.id}%` },
+          },
+          raw: true,
+        })
+      )
+    );
 
     let orderTotal = 0;
-    orders.forEach(order => {
-      orderTotal += order.quantity
+    orders.forEach(async (order) => {
+      const orderTrx = await Order.findOne({
+        where: { id: order.orderId, status: "cancelled" },
+      });
+      if (orderTrx === null) {
+        orderTotal += order.quantity;
+      }
     });
-  
-   
+
     const review_details = await Reviews.findAll({
       where: { productId: req.params.productId },
       include: [{ model: User, as: "client" }],
@@ -482,7 +512,7 @@ exports.getSingleProducts = async (req, res, next) => {
         reviews: review_details,
         orders: orderTotal,
         in_stock: orderTotal < parseInt(product.quantity) ? true : false,
-        remaining: parseInt(product.quantity) - orderTotal
+        remaining: parseInt(product.quantity) - orderTotal,
       },
     });
   } catch (error) {

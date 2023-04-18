@@ -214,7 +214,7 @@ exports.subscribeToPlan = async (req, res, next) => {
       // Notify admin
       const mesg = `${
         user.name ? user.name : `${user.fname} ${user.lname}`
-      } Just subscribe to ${name} with their ${UserService.getUserType(
+      } just subscribed to ${name} with their ${UserService.getUserType(
         userType
       )} account`;
       const notifyType = "admin";

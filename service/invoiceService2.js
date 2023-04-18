@@ -66,7 +66,7 @@ exports.createInvoice = async (orderData, user) => {
     products: _products,
     subtotal: _subtotal.toLocaleString(),
     delivery_fee: orderData.deliveryFee.toLocaleString(),
-    total: (_subtotal + orderData.deliveryFee).toLocaleString(),
+    total: (parseInt(_subtotal) + parseInt(orderData.deliveryFee)).toLocaleString(),
   };
   const preparedInvoiceTemplate = invoice(invoiceData);
   const data = {

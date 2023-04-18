@@ -160,8 +160,9 @@ exports.createOrder = async (req, res, next) => {
       const userId = req.user.id;
       const ownerId = req.user.id;
       const user = await User.findByPk(userId, {
-        attributes: ["id", "email", "name", "fname", "lname"],
+        attributes: ["id", "email", "name", "fname", "lname", "userType"],
       });
+
       const {
         shippingAddress,
         paymentInfo,
@@ -170,6 +171,10 @@ exports.createOrder = async (req, res, next) => {
         discount,
         totalAmount,
       } = req.body;
+
+      // const profile = await UserService.getUserTypeProfile(user.userType, userId);
+      // const { id } = profile;
+
       const slug = Math.floor(190000000 + Math.random() * 990000000);
       const orderSlug = `BOG/ORD/${slug}`;
       const orderData = {
@@ -217,6 +222,21 @@ exports.createOrder = async (req, res, next) => {
           const trackingId = `TRD-${Math.floor(
             190000000 + Math.random() * 990000000
           )}`;
+
+          // Notify product partner
+          const mesg = `A user just bought ${product.quantity} of your product - ${product.name}`;
+          const notifyType = "user";
+          const { io } = req.app;
+          await Notification.createNotification({
+            type: notifyType,
+            message: mesg,
+            userId: prodData.creatorId,
+          });
+          io.emit(
+            "getNotifications",
+            await Notification.fetchUserNotificationApi()
+          );
+
           return {
             status: "paid",
             trackingId,
@@ -388,13 +408,12 @@ exports.cancelOrder = async (req, res, next) => {
         });
       }
 
-      if(order.status === 'cancelled'){
+      if (order.status === "cancelled") {
         return res.status(200).json({
           success: true,
-          message: "Order has already been cancelled!"
-        }) 
-      }
-      else if (order.status !== "pending" || order.userId !== id) {
+          message: "Order has already been cancelled!",
+        });
+      } else if (order.status !== "pending" || order.userId !== id) {
         return res.status(401).json({
           success: false,
           message: "Order cannot be cancelled!",
@@ -457,11 +476,11 @@ exports.requestRefund = async (req, res, next) => {
         });
       }
 
-      if(order.refundStatus === 'request refund'){
+      if (order.refundStatus === "request refund") {
         return res.status(200).json({
           success: true,
-          message: "Refund request has already been sent!"
-        }) 
+          message: "Refund request has already been sent!",
+        });
       }
       if (order.status !== "cancelled" || order.userId !== id) {
         return res.status(401).json({
@@ -494,7 +513,7 @@ exports.requestRefund = async (req, res, next) => {
         id: order.id,
         ref: order.orderSlug,
       });
-      
+
       // mailer for admins
       await AdminOrderRefundRequestMailer(user, admins, {
         id: order.id,
@@ -527,13 +546,16 @@ exports.refundOrder = async (req, res, next) => {
         });
       }
 
-      if(order.refundStatus === 'refunded' && order.status === 'cancelled' ){
+      if (order.refundStatus === "refunded" && order.status === "cancelled") {
         return res.status(200).json({
           success: true,
-          message: "Order has already been refunded!"
-        }) 
+          message: "Order has already been refunded!",
+        });
       }
-      if (order.status !== 'cancelled' || order.refundStatus !== "request refund") {
+      if (
+        order.status !== "cancelled" ||
+        order.refundStatus !== "request refund"
+      ) {
         return res.status(401).json({
           success: false,
           message: "Order cannot be refunded!",
@@ -564,7 +586,7 @@ exports.refundOrder = async (req, res, next) => {
         id: order.id,
         ref: order.orderSlug,
       });
-      
+
       // mailer for admins
       await AdminOrderRefundMailer(user, admins, {
         id: order.id,
