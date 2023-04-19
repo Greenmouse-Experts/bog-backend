@@ -20,32 +20,37 @@ exports.getProducts = async (req, res, next) => {
       status: "approved",
       showInShop: true,
     };
-    let products = await Product.findAll({
-      where,
-      include: [
-        {
-          model: User,
-          as: "creator",
-          attributes: ["id", "name", "email", "phone", "photo"],
-        },
-        {
-          model: Reviews,
-          as: "review",
-        },
-        {
-          model: Category,
-          as: "category",
-          attributes: ["id", "name", "description"],
-        },
-        {
-          model: ProductImage,
-          as: "product_image",
-          attributes: ["id", "name", "image", "url"],
-        },
-      ],
-      order: [["createdAt", "DESC"]],
-      raw: true,
-    });
+    let _orders = await Order.findAll();
+
+    let products = JSON.parse(
+      JSON.stringify(
+        await Product.findAll({
+          where,
+          include: [
+            {
+              model: User,
+              as: "creator",
+              attributes: ["id", "name", "email", "phone", "photo"],
+            },
+            {
+              model: Reviews,
+              as: "review",
+            },
+            {
+              model: Category,
+              as: "category",
+              attributes: ["id", "name", "description"],
+            },
+            {
+              model: ProductImage,
+              as: "product_image",
+              attributes: ["id", "name", "image", "url"],
+            },
+          ],
+          order: [["createdAt", "DESC"]],
+        })
+      )
+    );
 
     for (let index = 0; index < products.length; index++) {
       const product = products[index];
@@ -56,18 +61,21 @@ exports.getProducts = async (req, res, next) => {
               productOwner: product.creatorId,
               product: { [Op.like]: `%${product.id}%` },
             },
-            raw: true,
           })
         )
       );
 
       let orderTotal = 0;
-      orders.forEach(async order => {
-        const orderTrx = await Order.findOne({where: {id: order.orderId, status: 'cancelled'}});
-        if(orderTrx === null){
-          orderTotal += order.quantity
+      for (let index2 = 0; index2 < orders.length; index2++) {
+        const order_ = orders[index2];
+        const orderTrx = _orders.filter(
+          (_order) =>
+            _order.id === order_.orderId && _order.status !== "cancelled"
+        );
+        if (orderTrx.length > 0) {
+          orderTotal += order_.quantity;
         }
-      });
+      }
 
       products[index] = {
         ...product,
@@ -397,23 +405,29 @@ exports.getAllProducts = async (req, res, next) => {
     if (req.query.status) {
       where.status = req.query.status;
     }
-    const products = await Product.findAll({
-      where,
-      include: [
-        {
-          model: Category,
-          as: "category",
-          attributes: ["id", "name", "description"],
-        },
-        {
-          model: ProductImage,
-          as: "product_image",
-          attributes: ["id", "name", "image", "url"],
-        },
-      ],
-      order: [["createdAt", "DESC"]],
-      raw: true,
-    });
+
+    let _orders = await Order.findAll();
+
+    const products = JSON.parse(
+      JSON.stringify(
+        await Product.findAll({
+          where,
+          include: [
+            {
+              model: Category,
+              as: "category",
+              attributes: ["id", "name", "description"],
+            },
+            {
+              model: ProductImage,
+              as: "product_image",
+              attributes: ["id", "name", "image", "url"],
+            },
+          ],
+          order: [["createdAt", "DESC"]],
+        })
+      )
+    );
 
     for (let index = 0; index < products.length; index++) {
       const product = products[index];
@@ -424,20 +438,21 @@ exports.getAllProducts = async (req, res, next) => {
               productOwner: product.creatorId,
               product: { [Op.like]: `%${product.id}%` },
             },
-            raw: true,
           })
         )
       );
 
       let orderTotal = 0;
-      orders.forEach(async (order) => {
-        const orderTrx = await Order.findOne({
-          where: { id: order.orderId, status: "cancelled" },
-        });
-        if (orderTrx === null) {
-          orderTotal += order.quantity;
+      for (let index2 = 0; index2 < orders.length; index2++) {
+        const order_ = orders[index2];
+        const orderTrx = _orders.filter(
+          (_order) =>
+            _order.id === order_.orderId && _order.status !== "cancelled"
+        );
+        if (orderTrx.length > 0) {
+          orderTotal += order_.quantity;
         }
-      });
+      }
 
       products[index] = {
         ...product,
@@ -458,6 +473,7 @@ exports.getAllProducts = async (req, res, next) => {
 
 exports.getSingleProducts = async (req, res, next) => {
   try {
+    let _orders = await Order.findAll();
     const product = await Product.findOne({
       where: { id: req.params.productId },
       include: [
@@ -486,20 +502,21 @@ exports.getSingleProducts = async (req, res, next) => {
             productOwner: product.creatorId,
             product: { [Op.like]: `%${product.id}%` },
           },
-          raw: true,
         })
       )
     );
 
     let orderTotal = 0;
-    orders.forEach(async (order) => {
-      const orderTrx = await Order.findOne({
-        where: { id: order.orderId, status: "cancelled" },
-      });
-      if (orderTrx === null) {
-        orderTotal += order.quantity;
+    for (let index2 = 0; index2 < orders.length; index2++) {
+      const order_ = orders[index2];
+      const orderTrx = _orders.filter(
+        (_order) =>
+          _order.id === order_.orderId && _order.status !== "cancelled"
+      );
+      if (orderTrx.length > 0) {
+        orderTotal += order_.quantity;
       }
-    });
+    }
 
     const review_details = await Reviews.findAll({
       where: { productId: req.params.productId },

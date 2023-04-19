@@ -224,7 +224,7 @@ exports.createOrder = async (req, res, next) => {
           )}`;
 
           // Notify product partner
-          const mesg = `A user just bought ${product.quantity} of your product - ${product.name}`;
+          const mesg = `A user just bought ${product.quantity} of your product - ${prodData.name}`;
           const notifyType = "user";
           const { io } = req.app;
           await Notification.createNotification({
