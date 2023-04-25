@@ -10,6 +10,7 @@ const Notification = require("../helpers/notification");
 const Order = require("../models/Order");
 const ProjectReview = require("../models/ProjectReviews");
 const OrderReview = require("../models/order_reviews");
+const OrderItem = require("../models/OrderItem");
 
 // create reviews
 exports.createReview = async (req, res, next) => {
@@ -18,14 +19,23 @@ exports.createReview = async (req, res, next) => {
       const userId = req.user.id;
       req.body.userId = userId;
 
-      // console.log(req.body)
+      const {orderId, star, review} = req.body;
 
-      const myReview = await ProductReview.create(req.body, {
-        transaction: t,
+      const order_items = JSON.parse(JSON.stringify(await OrderItem.findAll({where: {orderId}})));
+
+      await OrderReview.create(req.body, {transaction: t});
+
+      order_items.forEach(async item => {
+        const myReview = await ProductReview.create({
+          star, review, userId, productId: item.product.id
+        }, {
+          transaction: t,
+        });
       });
 
       const user = await User.findByPk(userId, { attributes: ["name"] });
-      const order = await Order.findByPk(req.body.productId, {
+      const order = await Order.findOne({
+        where: {id: orderId},
         attributes: ["orderSlug"],
       });
       // console.log(order)
@@ -42,7 +52,6 @@ exports.createReview = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         message: "Review submitted",
-        myReview,
       });
     } catch (error) {
       t.rollback();
