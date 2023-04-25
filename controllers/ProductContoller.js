@@ -65,6 +65,14 @@ exports.getProducts = async (req, res, next) => {
         )
       );
 
+      let review = 0; let total = 0;
+      if(product.review.length > 0){
+        product.review.forEach(rev => {
+          review += rev.star;
+          total += 5
+        });
+      }
+
       let orderTotal = 0;
       for (let index2 = 0; index2 < orders.length; index2++) {
         const order_ = orders[index2];
@@ -82,6 +90,7 @@ exports.getProducts = async (req, res, next) => {
         orderTotal,
         in_stock: orderTotal < parseInt(product.quantity) ? true : false,
         remaining: parseInt(product.quantity) - orderTotal,
+        star: review > 0 ? (review/total * 5): 0
       };
     }
 
