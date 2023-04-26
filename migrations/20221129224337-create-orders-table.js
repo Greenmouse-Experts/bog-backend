@@ -16,6 +16,10 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: true
       },
+      userType: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       discount: {
         type: Sequelize.FLOAT,
         allowNull: true

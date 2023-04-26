@@ -31,11 +31,17 @@ const {
 
 exports.getMyOrders = async (req, res, next) => {
   try {
+
+    const {userType} = req.query;
     const where = {
       userId: req.user.id,
     };
+    
     if (req.query.status) {
       where.status = req.query.status;
+    }
+    if (userType) {
+      where.userType = userType
     }
 
     const orders = await Order.findAll({
@@ -180,6 +186,7 @@ exports.createOrder = async (req, res, next) => {
       const orderData = {
         orderSlug,
         userId,
+        userType: user.userType,
         deliveryFee,
         discount,
         totalAmount,
@@ -241,6 +248,7 @@ exports.createOrder = async (req, res, next) => {
             status: "paid",
             trackingId,
             userId,
+
             ownerId,
             productOwner: prodData.creatorId,
             amount,
