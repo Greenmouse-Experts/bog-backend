@@ -19,10 +19,10 @@ router
 
 router
   .route("/notifications/mark-read/:notificationId")
-  .patch(NotificationController.markNotificationAsRead);
+  .patch(Auth, NotificationController.markNotificationAsRead);
 
 router
   .route("/notifications/delete/:notificationId")
-  .delete(NotificationController.deleteNotification);
+  .delete(Auth, NotificationController.deleteNotification);
 
 module.exports = router;
