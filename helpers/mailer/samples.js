@@ -1756,4 +1756,146 @@ module.exports = {
         return Promise.reject(err);
       });
   },
+
+  
+  /**
+   * Mailer for new signup for clients
+   * @param {{first_name:string, email:string}} client
+   */
+  clientWelcomeMessage: async (client) => {
+
+    const {first_name, email} = client;
+
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/shop`;
+    const link2 = `${process.env.SITE_URL}/services`;
+
+
+    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${process.env.APP_NAME}, ${!first_name ? 'user' : first_name}</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
+                  <p style="font-size: 1.4em;">You can proceed to <a href="${link}">placing your orders</a>, <a href="${link2}">requesting for a service</a> etc.</p>
+                  <p style="font-size: 1.4em;">Thanks for registering with us.</p><br/>
+                  <p style="font-size: 1.4em;">Regards, <br/></p>
+                  <p style="font-size: 1.4em;">${process.env.APP_NAME} team.</p>
+              `;
+
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Welcome`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
+  
+  /**
+   * Mailer for new signup for service partners
+   * @param {{first_name:string, email:string}} partner
+   */
+  servicePartnerWelcomeMessage: async (partner) => {
+
+    const {first_name, email} = partner;
+
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/kyc`;
+    const link2 = `${process.env.SITE_URL}/dashboard/subscription`;
+    const link3 = `${process.env.SITE_URL}/dashboard/projects`;
+
+
+    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${process.env.APP_NAME}, ${!first_name ? 'user' : first_name}</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
+                  <p style="font-size: 1.4em;">You can proceed to <a href="${link}">completing your KYC</a>, <a href="${link2}">subscribing,</a> <a href="${link3}">bid for projects</a> etc.</p>
+                  <p style="font-size: 1.4em;">Thanks for registering with us.</p><br/>
+                  <p style="font-size: 1.4em;">Regards, <br/></p>
+                  <p style="font-size: 1.4em;">${process.env.APP_NAME} team.</p>
+              `;
+
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Welcome`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
+  
+  /**
+   * Mailer for new signup for product partners
+   * @param {{first_name:string, email:string}} partner
+   */
+  productPartnerWelcomeMessage: async (partner) => {
+
+    const {first_name, email} = partner;
+
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/dashboard/kyc`;
+    const link2 = `${process.env.SITE_URL}/dashboard/subscription`;
+    const link3 = `${process.env.SITE_URL}/dashboard/products`;
+    const link4 = `${process.env.SITE_URL}/dashboard/order-request`;
+
+
+    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${process.env.APP_NAME}, ${!first_name ? 'user' : first_name}</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
+                  <p style="font-size: 1.4em;">You can proceed to <a href="${link}">completing your KYC</a>, <a href="${link2}">subscribing,</a> <a href="${link3}">listing products</a>, <a href="${link4}">tracking orders</a> etc.</p>
+                  <p style="font-size: 1.4em;">Thanks for registering with us.</p><br/>
+                  <p style="font-size: 1.4em;">Regards, <br/></p>
+                  <p style="font-size: 1.4em;">${process.env.APP_NAME} team.</p>
+              `;
+
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Welcome`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
 };

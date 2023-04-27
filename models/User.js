@@ -129,6 +129,10 @@ const User = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true
     },
+    last_login: {
+      type: Sequelize.DATE,
+      allowNull: true
+    }
   },
   { paranoid: true }
 );
