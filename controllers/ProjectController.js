@@ -88,6 +88,7 @@ exports.getProjectRequest = async (req, res, next) => {
     if (req.query.status) {
       where.status = req.query.status;
     }
+    console.log(profile)
     const projects = JSON.parse(
       JSON.stringify(
         await Project.findAll({
@@ -96,6 +97,7 @@ exports.getProjectRequest = async (req, res, next) => {
         })
       )
     );
+    console.log(projects)
     const data = await Promise.all(
       projects.map(async (project) => {
         const requestData = await this.getProjectTypeData(
@@ -760,7 +762,7 @@ exports.requestForService = async (req, res, next) => {
       const userId = req.user.id;
       const user = await User.findOne({ where: { id: userId } });
 
-      const { form } = req.body;
+      const { form,userType } = req.body;
 
       let _project = null;
       const serviceRequestForm = [];
@@ -801,10 +803,13 @@ exports.requestForService = async (req, res, next) => {
         });
 
         const profile = await userService.getUserTypeProfile(
-          user.userType,
+          userType,
           userId
         );
 
+        console.log(profile);
+
+        console.log(serviceForm)
         const projectData = {
           title: serviceForm.serviceName,
           userId: profile.id,
@@ -814,7 +819,7 @@ exports.requestForService = async (req, res, next) => {
 
         if (_project === null) {
           _project = await this.createProject(projectData, t);
-          // console.log(_project)
+          console.log(_project)
           serviceNameRes = `${user.name} has opened a project request for ${serviceForm.serviceType.title}`;
           const reqData = {
             req,
@@ -857,7 +862,7 @@ exports.requestForService = async (req, res, next) => {
       const response__ = await AdminProjectRequestMailer(
         {
           name: user.name,
-          userType: user.userType,
+          userType,
           id: user.id,
         },
         admins,
