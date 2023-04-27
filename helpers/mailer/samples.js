@@ -1386,7 +1386,12 @@ module.exports = {
     params.logo = Logo;
     params.header_color = "white";
 
-    const link = `${process.env.SITE_URL}/dashboard/order-detail/${trx.id}`;
+    let link = '';
+    if(status === 'completed'){
+      link = `${process.env.SITE_URL}/dashboard/order-detail/${trx.id}?f=1`;
+    }else{
+      link = `${process.env.SITE_URL}/dashboard/order-detail/${trx.id}`;
+    }
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, ${user.name}</b></p>`;
     params.body += `
@@ -1395,18 +1400,29 @@ module.exports = {
                   }</p><br/>
               `;
     params.body += `<p style="font-size: 1.4em;">Reference No: (${trx.ref})</p>`;
-    params.body += `<br/><p style="font-size: 1.4em;">For more info, you have to click the button below!</p>`;
-    params.body += `
-                  <p style="margin-top:30px; font-size: 1em;">
-                      <a href="${link}" target="_BLANK" title="click to view your order" style="padding:20px;color:white;font-size:1.2em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Order</a>
-                  </p>
-              `;
+    if(status === 'completed'){
+      params.body += `<br/><p style="font-size: 1.4em;">Please click the button below to tell us your experience on the delivery and the product in Order Review box leaving star rating. Thanks!</p>`;
+      params.body += `
+                    <p style="margin-top:30px; font-size: 1em;">
+                        <a href="${link}" target="_BLANK" title="click to review order" style="padding:20px;color:white;font-size:1.2em;background-color:#000;text-decoration:none;border-radius:5px;border:0">Review</a>
+                    </p>
+                `;
+    }
+    else{
+
+      params.body += `<br/><p style="font-size: 1.4em;">For more info, you have to click the button below!</p>`;
+      params.body += `
+                    <p style="margin-top:30px; font-size: 1em;">
+                        <a href="${link}" target="_BLANK" title="click to view your order" style="padding:20px;color:white;font-size:1.2em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Order</a>
+                    </p>
+                `;
+    }
     params.footer = "";
     params.date = new Date().getFullYear();
 
     let params2 = {
       email: user.email,
-      subject: `Your Order [${trx.ref}]`,
+      subject: `Your Order [${trx.ref}] ${status === 'completed' ? status : ''}`,
     };
 
     const template = mailer_template(params);
@@ -1639,6 +1655,94 @@ module.exports = {
     let params2 = {
       email: admin_emails,
       subject: `Order [${trx.ref}] has been refunded - Client ${client.fname}`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
+
+  /**
+   * Mailer for suspending a user by admin to user
+   * @param {{first_name:string, email:string}} client
+   * @param {string} reason
+   */
+  AdminSuspendUserMailerForUser: async (client, reason) => {
+
+    const {first_name, email} = client;
+
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, ${!first_name ? 'user' : first_name}</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">This is to inform you that your account has been suspended.</p><br/>
+                  <p style="font-size: 1.4em;"><b>Reason for suspension:</b></p>
+                  <p style="font-size: 1.2em;">${reason}</p>
+              `;
+
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Account suspension`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
+
+  /**
+   * Mailer for suspending a user by admin to admin
+   * @param {{}} client
+   * @param {[]} admins
+   * @param {{}} reason
+   */
+  AdminSuspendUserMailerForAdmin: async (client, admins, reason) => {
+    // Get super admin email addresses
+    let admin_emails = [];
+    admins.forEach((admin) => {
+      admin_emails.push(admin.email);
+    });
+
+    const {first_name, last_name, email} = client
+
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">This is to inform you a user's account [${!first_name ? 'user' : `${first_name} ${last_name}`}] has been suspended.</p><br/>
+                  <p style="font-size: 1.4em;">Email: ${email}</p>
+                  <p style="font-size: 1.4em;">Reason: ${reason}</p>
+              `;
+
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Account suspension [${!first_name ? 'user' : first_name}]`,
     };
 
     const template = mailer_template(params);
