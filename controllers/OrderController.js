@@ -176,6 +176,7 @@ exports.createOrder = async (req, res, next) => {
         deliveryFee,
         discount,
         totalAmount,
+        userType,
       } = req.body;
 
       // const profile = await UserService.getUserTypeProfile(user.userType, userId);
@@ -186,7 +187,7 @@ exports.createOrder = async (req, res, next) => {
       const orderData = {
         orderSlug,
         userId,
-        userType: user.userType,
+        userType,
         deliveryFee,
         discount,
         totalAmount,
