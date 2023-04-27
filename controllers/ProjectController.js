@@ -806,10 +806,7 @@ exports.requestForService = async (req, res, next) => {
           userType,
           userId
         );
-
-        console.log(profile);
-
-        console.log(serviceForm)
+        
         const projectData = {
           title: serviceForm.serviceName,
           userId: profile.id,

@@ -125,6 +125,10 @@ const User = sequelise.define(
       type: Sequelize.INTEGER,
       allowNull: true
     },
+    reason_for_suspension: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
   },
   { paranoid: true }
 );

@@ -32,7 +32,7 @@ const Notification = require("../helpers/notification");
 const { adminLevels, adminPrivileges } = require("../helpers/utility");
 const ServiceProvider = require("../models/ServiceProvider");
 
-const { ClientForgotPasswordMobileMailer, ClientForgotPasswordMailer } = require("../helpers/mailer/samples");
+const { ClientForgotPasswordMobileMailer, ClientForgotPasswordMailer, AdminSuspendUserMailerForUser, AdminSuspendUserMailerForAdmin } = require("../helpers/mailer/samples");
 
 const axios = require("axios");
 
@@ -1640,7 +1640,7 @@ exports.checkIfAccountExist = async (userType, userId) => {
 
 exports.suspendUser = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId, reason } = req.body;
     const user = await UserService.getUserDetails({ id: req.user.id });
     if (!user) {
       return res.status(404).send({
@@ -1651,15 +1651,28 @@ exports.suspendUser = async (req, res) => {
 
     const update = {
       isSuspended: true,
+      reason_for_suspension: reason
     };
+    
+    const userdetails = await User.findOne({where: {id: userId}});
+
+    const super_admins = JSON.parse(JSON.stringify(await User.findAll({
+      where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+    })));
 
     await User.update(update, { where: { id: userId } });
+
+
+    // Mailer methods
+    await AdminSuspendUserMailerForUser({first_name: userdetails.first_name, email: userdetails.email}, reason);
+    await AdminSuspendUserMailerForAdmin(userdetails, super_admins, reason);
 
     return res.status(200).send({
       success: true,
       message: "User suspended",
     });
   } catch (error) {
+    console.log(error)
     return res.status(500).send({
       success: false,
       message: "Server Error",

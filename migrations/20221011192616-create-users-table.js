@@ -86,6 +86,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true
       },
+      reason_for_suspension: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE },
       deletedAt: { allowNull: true, type: Sequelize.DATE }
