@@ -90,6 +90,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
+      last_login: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE },
       deletedAt: { allowNull: true, type: Sequelize.DATE }

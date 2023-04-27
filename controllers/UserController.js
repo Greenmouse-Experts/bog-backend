@@ -32,7 +32,7 @@ const Notification = require("../helpers/notification");
 const { adminLevels, adminPrivileges } = require("../helpers/utility");
 const ServiceProvider = require("../models/ServiceProvider");
 
-const { ClientForgotPasswordMobileMailer, ClientForgotPasswordMailer, AdminSuspendUserMailerForUser, AdminSuspendUserMailerForAdmin } = require("../helpers/mailer/samples");
+const { ClientForgotPasswordMobileMailer, ClientForgotPasswordMailer, AdminSuspendUserMailerForUser, AdminSuspendUserMailerForAdmin, clientWelcomeMessage, servicePartnerWelcomeMessage, productPartnerWelcomeMessage } = require("../helpers/mailer/samples");
 
 const axios = require("axios");
 
@@ -718,6 +718,19 @@ exports.loginUser = async (req, res, next) => {
         data.profile = profile;
         data.userType = user.userType;
       }
+    }
+
+    if(user.last_login === null){
+      if(user.userType.includes("client")){ // for corporate and private clients
+        await clientWelcomeMessage(user)
+      }
+      else if(user.userType === "professional"){ // for service partners
+        await servicePartnerWelcomeMessage(user)
+      }
+      else if (user.userType === "vendor") { // for product partners
+        await productPartnerWelcomeMessage(user)
+      }
+      await User.update({last_login: new Date()}, {where: {id: user.id}})
     }
 
     return res.status(201).send({
