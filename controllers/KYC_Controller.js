@@ -482,7 +482,7 @@ exports.approveKycVerification = async (req, res, next) => {
       if (profile == null){
          return res.status(200).send({
            success: true,
-           message: "User is not a professonal",
+           message: "User is not a professional",
          });
       }
       const data = {
@@ -500,7 +500,7 @@ exports.approveKycVerification = async (req, res, next) => {
         transaction: t
       });
 
-      //send email to user
+      //send email to user     
         const encodeEmail = encodeURIComponent(user.email);
         let message = helpers.kycApprovalMessage(user.fname, encodeEmail);
         await EmailService.sendMail(user.email, message, "Kyc Approval success");

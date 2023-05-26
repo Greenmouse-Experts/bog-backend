@@ -84,16 +84,16 @@ exports.getProducts = async (req, res, next) => {
           orderTotal += order_.quantity;
         }
       }
-
+     let star1 = review > 0 ? (review/total * 5): 0
+    let  star = (Math.round(star1)*10) / 10
       products[index] = {
         ...product,
         orderTotal,
         in_stock: orderTotal < parseInt(product.quantity) ? true : false,
         remaining: parseInt(product.quantity) - orderTotal,
-        star: review > 0 ? (review/total * 5): 0
+        star: star
       };
     }
-
     return res.status(200).send({
       success: true,
       data: products,
