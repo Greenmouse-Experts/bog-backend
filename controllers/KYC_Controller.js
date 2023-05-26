@@ -478,6 +478,13 @@ exports.approveKycVerification = async (req, res, next) => {
     try {
       const { userType, userId, verificationStatus, kycPoint } = req.body;
       const profile = await getUserTypeProfile(userType, userId);
+      console.log(profile)
+      if (profile == null){
+         return res.status(200).send({
+           success: true,
+           message: "User is not a professonal",
+         });
+      }
       const data = {
         isVerified: verificationStatus,
         kycPoint: verificationStatus === true ? kycPoint : 0
@@ -518,6 +525,7 @@ exports.approveKycVerification = async (req, res, next) => {
         message: "Profile updated successfully"
       });
     } catch (error) {
+      console.log(error)
       t.rollback();
       return next(error);
     }
