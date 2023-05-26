@@ -12,6 +12,7 @@ const ProjectReview = require("../models/ProjectReviews");
 const OrderReview = require("../models/order_reviews");
 const OrderItem = require("../models/OrderItem");
 
+
 // create reviews
 exports.createReview = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -21,23 +22,25 @@ exports.createReview = async (req, res, next) => {
 
       const {orderId, star, review} = req.body;
 
-      const order_items = JSON.parse(JSON.stringify(await OrderItem.findAll({where: {orderId}})));
+      const orderconfirm = await OrderItem.findAll({where: {orderId}, ownerId: userId});
+  
+
+      if (orderconfirm === null || orderconfirm === "undefined" || orderconfirm == "undefined" || orderconfirm.length < 1 ) {
+        return res.status(404).send({
+          success: false,
+          message: "You cant review an order youve not made!",
+        });
+      }
 
       await OrderReview.create(req.body, {transaction: t});
 
-      order_items.forEach(async item => {
-        const myReview = await ProductReview.create({
-          star, review, userId, productId: item.product.id
-        }, {
-          transaction: t,
+        const user = await User.findByPk(userId, { attributes: ["name"] });
+        const order = await Order.findOne({
+          where: { id: orderId },
+          attributes: ["orderSlug"],
         });
-      });
 
-      const user = await User.findByPk(userId, { attributes: ["name"] });
-      const order = await Order.findOne({
-        where: {id: orderId},
-        attributes: ["orderSlug"],
-      });
+      
       // console.log(order)
       const mesg = `${user.name} gave a review on an order ${order.orderSlug}`;
       const notifyType = "admin";
@@ -51,7 +54,7 @@ exports.createReview = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: "Review submitted",
+        message: "Order Review submitted",
       });
     } catch (error) {
       t.rollback();
@@ -143,6 +146,75 @@ exports.createReviewV2 = async (req, res, next) => {
         message: "Review submitted",
       });
     } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.createProductReview = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { name } = req._credentials;
+
+      const { review, star, productId, userId} = req.body;
+      console.log(productId)
+
+      const product = await Product.findOne({ where: { id: productId } });
+      if (product === null) {
+        return res.status(404).send({
+          success: false,
+          message: "product not found!",
+        });
+      }
+      const p = JSON.stringify(product);
+      console.log(userId)
+
+      /**
+       * Verify that order exists by slug
+       */
+      const r01 = await OrderItem.findAll({ where: {
+        ownerId : userId,
+        product: {[Op.substring]: `%${productId}%`},
+        status: "paid"
+      }});
+      console.log(r01.length)
+      if (r01 === null || r01 === 'undefined' || r01 == 'undefined' || r01.length < 1) {
+        return res.status(404).send({
+          success: false,
+          message: "You cant review a product youve not bought before!",
+        });
+      }
+
+      
+
+
+        let r2 = await ProductReview.create({
+          review,
+          star,
+          productId,
+          userId,
+        });
+
+      /**
+       * Notification with sockets
+       */
+      const mesg = `${name} gave a review on an product ${product}`;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg,
+        userId,
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
+
+      return res.send({
+        success: true,
+        message: "Review submitted",
+      });
+    } catch (error) {
+      console.log(error)
       t.rollback();
       return next(error);
     }

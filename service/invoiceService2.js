@@ -42,7 +42,7 @@ exports.createInvoice = async (orderData, user) => {
 
   const invoiceData = {
     logo:
-      "https://res.cloudinary.com/yhomi1996/image/upload/v1665783638/bog_moijdl.png",
+      "https://res.cloudinary.com/greenmouse-tech/image/upload/v1669563824/BOG/logo_1_1_ubgtnr.png",
     document_title: "INVOICE",
     company_from: "Sample Street 123",
     zip_from: "1234 AB",

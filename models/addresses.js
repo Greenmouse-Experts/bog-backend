@@ -11,52 +11,56 @@ const Addresses = sequelise.define(
       type: Sequelize.UUID,
       defaultValue: Sequelize.UUIDV4,
       unique: true,
-      primaryKey: true
+      primaryKey: true,
     },
     title: {
       allowNull: true,
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     address: {
       allowNull: true,
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     state: {
       allowNull: true,
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     country: {
       allowNull: true,
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     longitude: {
       allowNull: true,
-      type: Sequelize.FLOAT
+      type: Sequelize.FLOAT,
     },
     latitude: {
       allowNull: true,
-      type: Sequelize.FLOAT
+      type: Sequelize.FLOAT,
     },
     zipcode: {
       allowNull: true,
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     charge: {
       allowNull: true,
-      type: Sequelize.FLOAT
+      type: Sequelize.FLOAT,
     },
     delivery_type: {
       allowNull: true,
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     delivery_time: {
       allowNull: true,
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     status: {
       allowNull: true,
-      type: Sequelize.BOOLEAN
-    }
+      type: Sequelize.BOOLEAN,
+    },
+    insurancecharge: {
+      allowNull: true,
+      type: Sequelize.STRING,
+    },
   },
   { paranoid: true }
 );

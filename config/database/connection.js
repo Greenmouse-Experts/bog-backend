@@ -9,7 +9,7 @@ const sequelize = new Sequelize(
   {
     host: config.host,
     port: config.port,
-    dialect: "mysql",
+    dialect: 'mysql',
     raw: true,
     pool: {
       max: 15,
@@ -19,6 +19,7 @@ const sequelize = new Sequelize(
     }
   }
 );
+
 
 sequelize
   .authenticate()

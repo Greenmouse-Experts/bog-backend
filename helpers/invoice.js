@@ -84,8 +84,8 @@ exports.invoice = (data) => {
     }
 
     #logo{
-        max-width: 200px;
-        max-height: 75px;
+        max-width: 100px;
+        max-height: 33px;
     }
 
     #document-type-wrapper{
@@ -177,7 +177,7 @@ exports.invoice = (data) => {
     </tr>
     <tr>
         <td id="logo-wrapper">
-            <img src="${data.logo}" style="width: 200px" />
+            <img src="${data.logo}" style="width: 100px" />
         </td>
         <td id="document-type-wrapper">
             <p id="document-type">${data.document_title}</p><br/>

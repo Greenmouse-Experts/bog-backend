@@ -159,6 +159,7 @@ exports.getAllCategories = async (req, res, next) => {
           id: category.id,
           name: category.name,
           description: category.description,
+          unit: category.unit,
           totalProducts: count,
         };
       })
@@ -189,9 +190,9 @@ exports.getCategory = async (req, res, next) => {
 exports.createCategory = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { name, description } = req.body;
+      const { name, description, unit } = req.body;
       const [category, created] = await Category.findOrCreate({
-        where: { name, description },
+        where: { name, description, unit },
         transaction: t,
       });
       return res.status(200).send({
@@ -199,6 +200,7 @@ exports.createCategory = async (req, res, next) => {
         data: category,
       });
     } catch (error) {
+      console.log(error)
       t.rollback();
       return next(error);
     }
@@ -208,7 +210,7 @@ exports.createCategory = async (req, res, next) => {
 exports.updateCategory = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { name, description } = req.body;
+      const { name, description, unit } = req.body;
       const { categoryId } = req.params;
       const category = await Category.findOne({
         where: { id: categoryId },
@@ -223,6 +225,7 @@ exports.updateCategory = async (req, res, next) => {
         {
           name,
           description,
+          unit,
         },
         { where: { id: categoryId }, transaction: t }
       );

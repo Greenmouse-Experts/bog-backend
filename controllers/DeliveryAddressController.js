@@ -9,7 +9,7 @@ const Addresses = require("../models/addresses");
 exports.createAddress = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { title, address, state, country } = req.body;
+      const { title, address, state, country, insurancecharge } = req.body;
 
       const _address = await Addresses.findOne({
         where: { title, address, state, country },

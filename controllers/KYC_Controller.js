@@ -14,6 +14,11 @@ const {
   updateUserTypeProfile
 } = require("../service/UserService");
 const Notification = require("../helpers/notification");
+const helpers = require("../helpers/message");
+const EmailService = require("../service/emailService");
+const UserService = require("../service/UserService");
+
+
 
 // supply Categories controllers
 exports.createSupplyCategories = async (req, res, next) => {
@@ -478,6 +483,9 @@ exports.approveKycVerification = async (req, res, next) => {
         kycPoint: verificationStatus === true ? kycPoint : 0
       };
 
+      const id = userId
+     const user = await UserService.findUser( {id});
+
       await updateUserTypeProfile({
         userType,
         id: profile.id,
@@ -485,13 +493,19 @@ exports.approveKycVerification = async (req, res, next) => {
         transaction: t
       });
 
-      const message =
+      //send email to user
+        const encodeEmail = encodeURIComponent(user.email);
+        let message = helpers.kycApprovalMessage(user.fname, encodeEmail);
+        await EmailService.sendMail(user.email, message, "Kyc Approval success");
+
+
+      const messages =
         "Your KYC was successful, your profile has been verified.";
 
       const { io } = req.app;
       await Notification.createNotification({
         type: "user",
-        message,
+        message: messages,
         userId: profile.id
       });
       io.emit(

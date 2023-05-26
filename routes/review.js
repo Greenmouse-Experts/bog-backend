@@ -11,6 +11,10 @@ router
   .route("/review/product/create-review")
   .post([Auth, Access.verifyAccess], ReviewController.createReview);
 
+router
+  .route("/review/product/create-product-review")
+  .post([Auth, Access.verifyAccess], ReviewController.createProductReview);
+
 router.route("/review/product/v2/create-review")
   .post([Auth, Access.verifyAccess], ReviewController.createReviewV2);
 

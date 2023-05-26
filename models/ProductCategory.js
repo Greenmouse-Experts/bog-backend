@@ -8,16 +8,20 @@ const ProductCategory = sequelise.define(
       type: Sequelize.UUID,
       defaultValue: Sequelize.UUIDV4,
       unique: true,
-      primaryKey: true
+      primaryKey: true,
     },
     name: {
       allowNull: true,
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     description: {
       allowNull: true,
-      type: Sequelize.TEXT
-    }
+      type: Sequelize.TEXT,
+    },
+    unit: {
+      allowNull: true,
+      type: Sequelize.STRING,
+    },
   },
   { paranoid: true }
 );
