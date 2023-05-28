@@ -188,33 +188,50 @@ exports.createProductReview = async (req, res, next) => {
         });
       }
 
+         const productreviewcheck = await ProductReview.findAll({ where: { productId: productId, userId: userId } });
+         console.log(productreviewcheck)
+         if (
+           productreviewcheck == null ||
+           productreviewcheck === "undefined" ||
+           productreviewcheck == "undefined" ||
+           productreviewcheck.length < 1
+         ) {
+                let r2 = await ProductReview.create({
+                  review,
+                  star,
+                  productId,
+                  userId,
+                });
+
+                /**
+                 * Notification with sockets
+                 */
+                const mesg = `${name} gave a review on an product ${product}`;
+                const notifyType = "admin";
+                const { io } = req.app;
+                await Notification.createNotification({
+                  type: notifyType,
+                  message: mesg,
+                  userId,
+                });
+                io.emit(
+                  "getNotifications",
+                  await Notification.fetchAdminNotification()
+                );
+
+                return res.send({
+                  success: true,
+                  message: "Review submitted",
+                });
+         }
       
 
 
-        let r2 = await ProductReview.create({
-          review,
-          star,
-          productId,
-          userId,
-        });
-
-      /**
-       * Notification with sockets
-       */
-      const mesg = `${name} gave a review on an product ${product}`;
-      const notifyType = "admin";
-      const { io } = req.app;
-      await Notification.createNotification({
-        type: notifyType,
-        message: mesg,
-        userId,
-      });
-      io.emit("getNotifications", await Notification.fetchAdminNotification());
-
-      return res.send({
-        success: true,
-        message: "Review submitted",
-      });
+           return res.status(404).send({
+             success: false,
+             message: "You already reviewed this product before!",
+           });
+   
     } catch (error) {
       console.log(error)
       t.rollback();
@@ -266,13 +283,12 @@ exports.getAllProductReview = async (req, res, next) => {
     const reviews = await ProductReview.findAll({
       where,
       order: [["createdAt", "DESC"]],
-      // include: [
-      //   {
-      //     model: Product,
-      //     as: "product_info",
-      //     attributes: ["id", "name", "price", "image"]
-      //   }
-      // ]
+      include: [
+        {
+          model: User,
+          as: "client",
+        }
+      ]
     });
 
       let review = 0;
@@ -283,11 +299,13 @@ exports.getAllProductReview = async (req, res, next) => {
           for (let i = 0; i < reviews.length; i++) {
                    review += reviews[i].star;
                    total += 5;
-                   let id = reviews[i].id;
-                   let user = UserService.findUserById( id );
-                   reviews[i].username = user.name;
+                
        }
+
+
        }
+
+      console.log(reviews)
 
       
 
