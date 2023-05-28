@@ -287,7 +287,17 @@ exports.getAllProductReview = async (req, res, next) => {
             console.log(user.name)
             rev.username = user.name
          });
+
+          for (let i = 0; i < reviews.length; i++) {
+                   review += reviews[i].star;
+                   total += 5;
+                   let id = reviews[i].id;
+                   let user = UserService.findUser({ id });
+                   reviews[i].username = user.name;
        }
+       }
+
+      
 
        let star1 = review > 0 ? (review / total) * 5 : 0;
        let star = (Math.round(star1) * 10) / 10;
