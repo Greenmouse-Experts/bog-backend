@@ -284,6 +284,7 @@ exports.getAllProductReview = async (req, res, next) => {
            total += 5;
            let id = rev.id 
             let user = UserService.findUser({ id });
+            console.log(user.name)
             rev.username = user.name
          });
        }
