@@ -273,9 +273,30 @@ exports.getAllProductReview = async (req, res, next) => {
       // ]
     });
 
+      let review = 0;
+      let total = 0;
+
+       if (reviews.length > 0) {
+         reviews.forEach((rev) => {
+           review += rev.star;
+           total += 5;
+           let id = rev.id 
+            let user = UserService.findUser({ id });
+            rev.username = user.name
+         });
+       }
+
+       let star1 = review > 0 ? (review / total) * 5 : 0;
+       let star = (Math.round(star1) * 10) / 10;
+
+          let reviewsfinal = {
+            reviews: reviews,
+            star: star,
+          };
+
     return res.status(200).send({
       success: true,
-      data: reviews,
+      data: reviewsfinal,
     });
   } catch (error) {
     return next(error);
