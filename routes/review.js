@@ -24,7 +24,7 @@ router
 
 router
   .route("/review/product/get-review")
-  .get([Auth, Access.verifyAccess], ReviewController.getAllProductReview);
+  .get( ReviewController.getAllProductReview);
 
 router
   .route("/review/product/delete-review")
