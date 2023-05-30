@@ -9,7 +9,7 @@
     "serve": "nodemon app.js",
     "migrate": "npx sequelize db:migrate",
     "migrate:db": "./node_modules/.bin/sequelize db:migrate",
-    "migration:db": "./node_modules/.bin/sequelize-auto-migrations/makemigration --name initial",
+    "db:makemigrations": "node ./node_modules/sequelize-auto-migrations/bin/makemigration.js",
     "seed": "npx sequelize-cli db:seed:all"
   },
   "repository": {
@@ -61,7 +61,7 @@
     "request": "^2.88.2",
     "requestretry": "^7.1.0",
     "sequelize": "^6.25.0",
-    "sequelize-auto-migrations": "^1.0.3",
+    "sequelize-auto-migrations": "github:scimonster/sequelize-auto-migrations#a063aa6535a3f580623581bf866cef2d609531ba",
     "sequelize-cli": "^6.5.1",
     "socket.io": "^4.5.4",
     "store2": "^2.14.2",

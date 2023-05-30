@@ -29,6 +29,7 @@ const ServicesFormBuilders = require("../models/ServicesFormBuilder");
 const PrivateClient = require("../models/PrivateClient");
 const CorporateClient = require("../models/CorporateClient");
 const Transaction = require("../models/Transaction");
+const TransactionPending = require("../models/TransactionPending");
 const ProjectNotifications = require("../models/project_notifications");
 
 const KycFinancialData = require("../models/KycFinancialData");
