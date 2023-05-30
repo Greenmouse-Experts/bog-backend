@@ -36,6 +36,7 @@ const KycFinancialData = require("../models/KycFinancialData");
 const {
   getUserTypeProfile,
   updateUserTypeProfile,
+  findUserById,
 } = require("../service/UserService");
 
 const {
@@ -89,7 +90,7 @@ exports.getProjectRequest = async (req, res, next) => {
     if (req.query.status) {
       where.status = req.query.status;
     }
-    console.log(profile)
+    console.log(profile);
     const projects = JSON.parse(
       JSON.stringify(
         await Project.findAll({
@@ -98,7 +99,7 @@ exports.getProjectRequest = async (req, res, next) => {
         })
       )
     );
-    console.log(projects)
+    console.log(projects);
     const data = await Promise.all(
       projects.map(async (project) => {
         const requestData = await this.getProjectTypeData(
@@ -414,19 +415,19 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
     // project commitment fee
     const commitmentFee = await Transaction.findOne({
       where: {
-        description: `Commitment fee for ${project.projectSlug}`
+        description: `Commitment fee for ${project.projectSlug}`,
       },
     });
 
     // payout transactions
     const payoutTransactions = await Transaction.findAll({
       where: {
-        type: 'Project Payout to service partner',
+        type: "Project Payout to service partner",
         description: {
-          [Op.like]: `%${project.projectSlug}%`
-        }
-      }
-    })
+          [Op.like]: `%${project.projectSlug}%`,
+        },
+      },
+    });
 
     return res.status(200).send({
       success: true,
@@ -441,7 +442,7 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
         client,
         transactions: {
           commitmentFee: commitmentFee === null ? {} : commitmentFee,
-          payouts: payoutTransactions
+          payouts: payoutTransactions,
         },
       },
     });
@@ -763,7 +764,7 @@ exports.requestForService = async (req, res, next) => {
       const userId = req.user.id;
       const user = await User.findOne({ where: { id: userId } });
 
-      const { form,userType } = req.body;
+      const { form, userType } = req.body;
 
       let _project = null;
       const serviceRequestForm = [];
@@ -803,11 +804,8 @@ exports.requestForService = async (req, res, next) => {
           where: { id: s.serviceFormID },
         });
 
-        const profile = await userService.getUserTypeProfile(
-          userType,
-          userId
-        );
-        
+        const profile = await userService.getUserTypeProfile(userType, userId);
+
         const projectData = {
           title: serviceForm.serviceName,
           userId: profile.id,
@@ -817,7 +815,7 @@ exports.requestForService = async (req, res, next) => {
 
         if (_project === null) {
           _project = await this.createProject(projectData, t);
-          console.log(_project)
+          console.log(_project);
           serviceNameRes = `${user.name} has opened a project request for ${serviceForm.serviceType.title}`;
           const reqData = {
             req,
@@ -1667,7 +1665,8 @@ exports.transferToServicePartner = async (req, res, next) => {
       const { projectId } = req.params;
       const { amount, bank_code, account_number, bank_name } = req.body;
       const project = await Project.findOne({ where: { id: projectId } });
-      if (!project) {
+      if (!project || project == null) {
+        console.log(project);
         return res.status(404).send({
           success: false,
           message: "Invalid Project!",
@@ -1682,7 +1681,7 @@ exports.transferToServicePartner = async (req, res, next) => {
         });
       }
 
-       const paymentReference = `TR-${Math.floor(
+      const paymentReference = `TR-${Math.floor(
         190000000000 + Math.random() * 990000000000
       )}`;
 
@@ -1701,92 +1700,326 @@ exports.transferToServicePartner = async (req, res, next) => {
         let myFinancial = await KycFinancialData.findOne({
           where: { userId: profile.id },
         });
-        let _service_partner = await User.findOne({where: {id: service_partner_details.userId}});
-        
-        if(_service_partner !== null){
+        let _service_partner = await User.findOne({
+          where: { id: service_partner_details.userId },
+        });
+        console.log(project);
 
+        if (_service_partner !== null) {
           let narration = `Transfer to service partner ${profile.company_name} [${project.projectSlug}]`;
-  
+
           if (myFinancial !== null) {
-            console.log(_service_partner)
+            // console.log(_service_partner)
             // Trigger transfer
-            const transferResponse = await Service.Flutterwave.transfer(
-              account_number,
-              bank_code,
-              amount,
-              narration,
-              'NGN',
-              paymentReference
-            );
-  
-            if(transferResponse.status === 'error'){
-              return res.status(400).json({
-                success: false,
-                message: "Transfer failed!"
-              })
-            }
+            // const transferResponse = await Service.Flutterwave.transfer(
+            //   account_number,
+            //   bank_code,
+            //   amount,
+            //   narration,
+            //   'NGN',
+            //   paymentReference
+            // );
+            const transfer = {
+              account_number: account_number,
+              bank_code: bank_code,
+              amount: amount,
+              narration: narration,
+              NGN: "NGN",
+              paymentReference: paymentReference,
+            };
+
+            // if(transferResponse.status === 'error'){
+            //   return res.status(400).json({
+            //     success: false,
+            //     message: "Transfer failed!"
+            //   })
+            // }
             const slug = Math.floor(190000000 + Math.random() * 990000000);
             const TransactionId = `BOG/TXN/PRJ/${slug}`;
-            const trxData = {
-              TransactionId,
+
+            console.log(project);
+
+            const transaction = {
+              TransactionId: TransactionId,
               userId: null,
               status: "PAID",
               type: "Project Payout to service partner",
-              amount,
-              paymentReference,
+              amount: amount,
+              paymentReference: paymentReference,
               description: narration,
+              project: project,
             };
-  
-            const response = await Transaction.create(trxData, {t});
-  
-            const user = await User.findByPk(userId, { attributes: ["name", "email", "id", "userType"] });
+
+            const trxData = {
+              TransactionId: TransactionId,
+              userId: null,
+              transaction,
+              transfer: transfer,
+            };
+
+            const response = await TransactionPending.create(trxData);
+
+            const user = await User.findByPk(userId, {
+              attributes: ["name", "email", "id", "userType"],
+            });
             const reqData = {
               req,
               userId: null,
-              message: `Admin has made a payout of NGN ${amount} to service partner ${
-                profile.company_name
-              } [${project.projectSlug}]`,
+              message: `Admin has initiated a payout of NGN ${amount} to service partner ${profile.company_name} [${project.projectSlug}]`,
             };
             await this.notifyAdmin(reqData);
-  
+
             // Get active project admins
             const project_admins = await User.findAll({
-              where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+              where: {
+                userType: "admin",
+                level: 5,
+                isActive: 1,
+                isSuspended: 0,
+              },
             });
             const super_admins = await User.findAll({
-              where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+              where: {
+                userType: "admin",
+                level: 1,
+                isActive: 1,
+                isSuspended: 0,
+              },
             });
             const admins = [...project_admins, ...super_admins];
-  
-            // Client mailer
-            await ServicePartnerMailerForProjectPayout(
-              { email: _service_partner.email, first_name: _service_partner.fname },
-              amount,
-              project
-            );
-            // Admins mailer
-            await AdminProjectPayoutMailer(
-              {company_name: profile.company_name},
-              admins,
-              amount,
-              project
-            );
-  
+
+            // // Client mailer
+            // await ServicePartnerMailerForProjectPayout(
+            //   { email: _service_partner.email, first_name: _service_partner.fname },
+            //   amount,
+            //   project
+            // );
+            // // Admins mailer
+            // await AdminProjectPayoutMailer(
+            //   {company_name: profile.company_name},
+            //   admins,
+            //   amount,
+            //   project
+            // );
+
             return res.status(200).send({
               success: true,
-              message: "Transfer was successful!",
+              message: "Transfer Initiation was successful!",
             });
-  
           }
-          
         }
-
       }
-
     } catch (error) {
       console.log(error);
       t.rollback();
       return next(error);
+    }
+  });
+};
+
+exports.approveTransferToServicePartner = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const userId = req.user.id;
+      const { id } = req.params;
+      // const { tranactionId } = req.body;
+      const pendingTransaction = await TransactionPending.findOne({
+        where: { id },
+      });
+      if (!pendingTransaction || pendingTransaction == null) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Pending Transaction!",
+        });
+      }
+
+      let user = await findUserById(userId);
+      if (!user || user == null) {
+        return res.status(404).send({
+          success: false,
+          message: "No user found!",
+        });
+      }
+      const userLevel = user.level;
+      const transaction = pendingTransaction.transaction
+      const transfer = pendingTransaction.transfer
+
+      const {
+        TransactionId,
+        status,
+        type,
+        amount,
+        paymentReference,
+        description,
+        project,
+      } = transaction;
+      const { account_number, bank_code, narration } = transfer;
+
+      if (userLevel == 1 || userLevel == 3) {
+        if (userLevel == 3 && pendingTransaction.superadmin == false) {
+          
+          return res.status(404).send({
+            success: false,
+            message: "Cant approve transfer until super admin approves it",
+          });
+        } else if (userLevel == 3 && pendingTransaction.superadmin == true) {
+              await TransactionPending.update(
+                { financialadmin: true },
+                { where: { id } }
+              );
+          const service_partner_details = await ServicePartner.findOne({
+            where: { id: project.serviceProviderId },
+          });
+          const profile = await getUserTypeProfile(
+            "service_partner",
+            service_partner_details.userId
+          );
+          const data = {
+            ...req.body,
+            userId: profile.id,
+          };
+          let myFinancial = await KycFinancialData.findOne({
+            where: { userId: profile.id },
+          });
+          let _service_partner = await User.findOne({
+            where: { id: service_partner_details.userId },
+          });
+
+          if (_service_partner !== null) {
+            if (myFinancial !== null) {
+              console.log(_service_partner);
+              // Trigger transfer
+              const transferResponse = await Service.Flutterwave.transfer(
+                account_number,
+                bank_code,
+                amount,
+                narration,
+                "NGN",
+                paymentReference
+              );
+
+              if (transferResponse.status === "error") {
+                return res.status(400).json({
+                  success: false,
+                  message: "Transfer failed!",
+                });
+              }
+              const trxData = {
+                TransactionId,
+                userId: null,
+                status: "PAID",
+                type: "Project Payout to service partner",
+                amount,
+                paymentReference,
+                description: narration,
+              };
+
+              const response = await Transaction.create(trxData, { t });
+
+              const user = await User.findByPk(userId, {
+                attributes: ["name", "email", "id", "userType"],
+              });
+              const reqData = {
+                req,
+                userId: null,
+                message: `Admin has made a payout of NGN ${amount} to service partner ${profile.company_name} [${project.projectSlug}]`,
+              };
+              await this.notifyAdmin(reqData);
+
+              // Get active project admins
+              const project_admins = await User.findAll({
+                where: {
+                  userType: "admin",
+                  level: 5,
+                  isActive: 1,
+                  isSuspended: 0,
+                },
+              });
+              const super_admins = await User.findAll({
+                where: {
+                  userType: "admin",
+                  level: 1,
+                  isActive: 1,
+                  isSuspended: 0,
+                },
+              });
+              const admins = [...project_admins, ...super_admins];
+
+              // Client mailer
+              await ServicePartnerMailerForProjectPayout(
+                {
+                  email: _service_partner.email,
+                  first_name: _service_partner.fname,
+                },
+                amount,
+                project
+              );
+              // Admins mailer
+              await AdminProjectPayoutMailer(
+                { company_name: profile.company_name },
+                admins,
+                amount,
+                project
+              );
+
+              return res.status(200).send({
+                success: true,
+                message: "Transfer was successful!",
+              });
+            }
+          }
+        } else if (userLevel == 1 && pendingTransaction.financialadmin == false
+        ) {
+          console.log('yippe')
+           await TransactionPending.update(
+            { superadmin: true },
+            { where: { id} }
+          );
+
+          
+              return res.status(200).send({
+                success: true,
+                message: "Approved, Transfer would be done once finance admin approves!",
+              });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.getPendingTransfers = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const userId = req.user.id;
+      const pendingTransaction = await TransactionPending.findAll();
+      if (!pendingTransaction || pendingTransaction == null) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Pending Transaction!",
+        });
+      }
+      for (let i = 0; i < pendingTransaction.length; i++) {
+        console.log(pendingTransaction[i])
+        // let transfer = JSON.parse(pendingTransaction[i].transfer);
+        // let transaction = JSON.parse(pendingTransaction[i].transaction);
+        // delete pendingTransaction[i].transfer;
+        // delete pendingTransaction[i].transfer;
+        // console.log(pendingTransaction[i]);
+        // pendingTransaction[i].transfer = transfer;
+        // pendingTransaction[i].transaction = transaction;
+      }
+
+      return res.send({
+        success: true,
+        message: "Commitment fee has been paid successfully!",
+        data: pendingTransaction,
+      });
+    } catch (error) {
+      next(error);
     }
   });
 };

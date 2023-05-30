@@ -3,7 +3,7 @@ const sequelise = require("../config/database/connection");
 const User = require("./User");
 
 const TransactionPending = sequelise.define(
-  "transactions_pending",
+  "pendingtransaction",
   {
     id: {
       type: Sequelize.UUID,
@@ -19,23 +19,36 @@ const TransactionPending = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true,
     },
-    super_admin: {
+    superadmin: {
       type: Sequelize.BOOLEAN,
       default: false,
     },
-    financial_admin: {
+    financialadmin: {
       type: Sequelize.BOOLEAN,
       default: false,
     },
     transaction: {
       allowNull: true,
       type: Sequelize.TEXT,
-      get() {
-        const data = this.getDataValue("transaction");
-        return JSON.parse(data);
+      get: function() {
+        if (this.getDataValue("transaction") !== undefined) {
+          return JSON.parse(this.getDataValue("transaction"));
+        }
       },
       set(value) {
         this.setDataValue("transaction", JSON.stringify(value));
+      },
+    },
+    transfer: {
+      allowNull: true,
+      type: Sequelize.TEXT,
+      get: function() {
+        if (this.getDataValue("transfer") !== undefined) {
+          return JSON.parse(this.getDataValue("transfer"));
+        }
+      },
+      set(value) {
+        this.setDataValue("transfer", JSON.stringify(value));
       },
     },
   },
@@ -44,7 +57,7 @@ const TransactionPending = sequelise.define(
 
 User.hasMany(TransactionPending, {
   foreignKey: "userId",
-  as: "transactions_pending",
+  as: "pendingtransactions",
 });
 
 TransactionPending.belongsTo(User, {

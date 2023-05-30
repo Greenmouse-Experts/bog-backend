@@ -198,6 +198,19 @@ router.route("/projects/installments/:projectId/payment")
 router.route("/projects/transfer/:projectId")
   .post([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.transferToServicePartner);
 
+router
+  .route("/projects/pendingTransfers")
+  .get([Auth, Access.verifyAccess, Access.verifyAdmin],
+    ProjectController.getPendingTransfers
+  );
+
+router
+  .route("/projects/approveTransfer/:id")
+  .post(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    ProjectController.approveTransferToServicePartner
+  );
+
 // Add Project notification
 router.route("/projects/notification/create")
   .post([Auth, Access.verifyAccess], projectNotificationValidation(), validate, ProjectController.createProjectNotification)
