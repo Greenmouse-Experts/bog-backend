@@ -339,7 +339,7 @@ exports.createOrder = async (req, res, next) => {
       // save the details of the transaction
       return res.status(200).send({
         success: true,
-        message: "Order Request submitted",
+        message: "Order Request submittedjjj",
         order,
       });
     } catch (error) {
