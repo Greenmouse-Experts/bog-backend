@@ -183,7 +183,9 @@ exports.createOrder = async (req, res, next) => {
 
       // const profile = await UserService.getUserTypeProfile(user.userType, userId);
       // const { id } = profile;
-
+   const address = await Addresses.findOne({
+     where: { id: deliveryaddressId },
+   });
       const slug = Math.floor(190000000 + Math.random() * 990000000);
       const orderSlug = `BOG/ORD/${slug}`;
       const orderData = {
@@ -193,6 +195,7 @@ exports.createOrder = async (req, res, next) => {
         deliveryFee,
         discount,
         totalAmount,
+        address
       };
       const paymentData = {
         userId,
@@ -204,7 +207,7 @@ exports.createOrder = async (req, res, next) => {
       // console.log(req.body);
 
 
-    const address = await Addresses.findOne({ where: { id: deliveryaddressId } });
+ 
 
 
       await Payment.create(paymentData, { transaction: t });
@@ -277,7 +280,6 @@ exports.createOrder = async (req, res, next) => {
 
       orderData.order_items = orders;
       orderData.contact = contact;
-      orderData.address = address
       const order = await Order.create(orderData, {
         include: [
           {
