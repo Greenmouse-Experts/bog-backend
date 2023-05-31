@@ -345,6 +345,7 @@ exports.createOrder = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         message: "Order Request submitted",
+        address,
         order,
       });
     } catch (error) {
