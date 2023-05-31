@@ -277,6 +277,7 @@ exports.createOrder = async (req, res, next) => {
 
       orderData.order_items = orders;
       orderData.contact = contact;
+      orderData.address = address
       const order = await Order.create(orderData, {
         include: [
           {
