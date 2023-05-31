@@ -19,6 +19,7 @@ const OrderReview = require("../models/order_reviews");
 const Notification = require("../helpers/notification");
 const Project = require("../models/Project");
 const Transaction = require("../models/Transaction");
+const Addresses = require("../models/addresses");
 const {
   AdminNewOrderMailer,
   ClientUpdateOrderMailer,
@@ -177,6 +178,7 @@ exports.createOrder = async (req, res, next) => {
         discount,
         totalAmount,
         userType,
+        deliveryaddressId
       } = req.body;
 
       // const profile = await UserService.getUserTypeProfile(user.userType, userId);
@@ -200,6 +202,10 @@ exports.createOrder = async (req, res, next) => {
       };
 
       // console.log(req.body);
+
+
+    const address = await Addresses.findOne({ where: { id: deliveryaddressId } });
+
 
       await Payment.create(paymentData, { transaction: t });
       const contact = {
@@ -256,6 +262,7 @@ exports.createOrder = async (req, res, next) => {
             shippingAddress,
             paymentInfo,
             quantity: product.quantity,
+            address,
             product: {
               id: prodData.id,
               name: prodData.name,

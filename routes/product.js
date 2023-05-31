@@ -68,7 +68,22 @@ router
     [Auth, Access.verifyAccess, Access.verifyAdmin],
     ProductController.approveProduct
   );
+// Transfer to service partners
+router.route("/products/transfer/:productId")
+  .post([Auth, Access.verifyAccess, Access.verifyAdmin], ProductController.transferToServicePartner);
 
+router
+  .route("/products/pendingTransfers")
+  .get([Auth, Access.verifyAccess, Access.verifyAdmin],
+    ProductController.getPendingTransfers
+  );
+
+router
+  .route("/products/approveTransfer/:id")
+  .post(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    ProductController.approveTransferToServicePartner
+  );
 
 
 module.exports = router;
