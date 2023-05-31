@@ -186,18 +186,20 @@ exports.createOrder = async (req, res, next) => {
    const address = await Addresses.findOne({
      where: { id: deliveryaddressId },
    });
+   
       const slug = Math.floor(190000000 + Math.random() * 990000000);
       const addresses = "hhh"
       const orderSlug = `BOG/ORD/${slug}`;
       const orderData = {
         orderSlug,
         userId,
-        addresses,
+        address,
         userType,
         deliveryFee,
         discount,
         totalAmount,
       };
+      console.log(orderData)
       const paymentData = {
         userId,
         payment_reference: paymentInfo.reference,
