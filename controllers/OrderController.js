@@ -183,9 +183,14 @@ exports.createOrder = async (req, res, next) => {
 
       // const profile = await UserService.getUserTypeProfile(user.userType, userId);
       // const { id } = profile;
-   const address = await Addresses.findOne({
+   let address = await Addresses.findOne({
      where: { id: deliveryaddressId },
    });
+
+   if (address == null){
+
+    address = "No address"
+   }
    
       const slug = Math.floor(190000000 + Math.random() * 990000000);
       const addresses = "hhh"
@@ -339,7 +344,7 @@ exports.createOrder = async (req, res, next) => {
       // save the details of the transaction
       return res.status(200).send({
         success: true,
-        message: "Order Request submittedjjj",
+        message: "Order Request submitted",
         order,
       });
     } catch (error) {
