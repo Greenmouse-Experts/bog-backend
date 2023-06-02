@@ -70,7 +70,7 @@ router
   );
 // Transfer to service partners
 router.route("/products/transfer/:productId")
-  .post([Auth, Access.verifyAccess, Access.verifyAdmin], ProductController.transferToServicePartner);
+  .post([Auth, Access.verifyAccess, Access.verifyAdmin], ProductController.transferToProductPartner);
 
 router
   .route("/products/pendingTransfers")
@@ -82,7 +82,7 @@ router
   .route("/products/approveTransfer/:id")
   .post(
     [Auth, Access.verifyAccess, Access.verifyAdmin],
-    ProductController.approveTransferToServicePartner
+    ProductController.approveTransferToProductPartner
   );
 
 

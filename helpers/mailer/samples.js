@@ -341,6 +341,54 @@ module.exports = {
   },
 
   /**
+   * Mailer for service partners on project dispatch
+   * @param {[]} service_partners
+   * @param {string} status
+   * @param {{}} _project
+   */
+  ProductPartnersMailerForProductDispatch: async (
+    service_partners,
+    status,
+    _product
+  ) => {
+    // const { email, first_name } = user;
+
+    // Get service partners email addresses
+    // let partner_emails = [];
+    service_partners.forEach(async (partner) => {
+      // partner_emails.push(partner.email);
+      let params = {};
+      params.logo = Logo;
+      params.header_color = "white";
+
+      const link = `${process.env.SITE_URL}/dashboard/projectfile?projectId=${_project.id}`;
+
+      params.body = `<p style="font-size:1.7em;"><b>Hi, Service partner ${partner.fname}</b></p>`;
+      params.body += `
+                    <p style="font-size: 1.4em;">This is to inform you that the project with the ID of ${_project.projectSlug} has been ${status} to you</p><br/>
+                    <p style="font-size: 1.4em;">To view project submission and bid for it, click the button below!</p>
+                `;
+      params.body += `
+                    <p style="margin-top:30px; font-size: 1em;">
+                        <a href="${link}" target="_BLANK" title="View submission" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Submission</a>
+                    </p>
+                `;
+      params.footer = "";
+      params.date = new Date().getFullYear();
+
+      let params2 = {
+        email: partner.email,
+        subject: `Project [${_project.projectSlug}] has been ${status} to you`,
+      };
+
+      const template = mailer_template(params);
+
+      // Send Mail
+      await Mailer(template, params2);
+    });
+  },
+
+  /**
    * Mailer for service partner on project bid
    * @param {{email: string, first_name: string}} service_partner
    * @param {{}} _project
@@ -390,7 +438,11 @@ module.exports = {
    * @param {number} percent
    * @param {{}} project
    */
-  ServicePartnerMailerForProjectUpdate: async (service_partner, percent, project) => {
+  ServicePartnerMailerForProjectUpdate: async (
+    service_partner,
+    percent,
+    project
+  ) => {
     const { email, first_name } = service_partner;
 
     let params = {};
@@ -1132,7 +1184,9 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">Service partner ${company_name} has been paid an amount of NGN ${amount.toLocaleString()} for the project [${_project.projectSlug}].</p>
+                  <p style="font-size: 1.4em;">Service partner ${company_name} has been paid an amount of NGN ${amount.toLocaleString()} for the project [${
+      _project.projectSlug
+    }].</p>
                   <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
               `;
     params.body += `
@@ -1386,10 +1440,10 @@ module.exports = {
     params.logo = Logo;
     params.header_color = "white";
 
-    let link = '';
-    if(status === 'completed'){
+    let link = "";
+    if (status === "completed") {
       link = `${process.env.SITE_URL}/dashboard/order-detail/${trx.id}?f=1`;
-    }else{
+    } else {
       link = `${process.env.SITE_URL}/dashboard/order-detail/${trx.id}`;
     }
 
@@ -1400,16 +1454,14 @@ module.exports = {
                   }</p><br/>
               `;
     params.body += `<p style="font-size: 1.4em;">Reference No: (${trx.ref})</p>`;
-    if(status === 'completed'){
+    if (status === "completed") {
       params.body += `<br/><p style="font-size: 1.4em;">Please click the button below to tell us your experience on the delivery and the product in Order Review box leaving star rating. Thanks!</p>`;
       params.body += `
                     <p style="margin-top:30px; font-size: 1em;">
                         <a href="${link}" target="_BLANK" title="click to review order" style="padding:20px;color:white;font-size:1.2em;background-color:#000;text-decoration:none;border-radius:5px;border:0">Review</a>
                     </p>
                 `;
-    }
-    else{
-
+    } else {
       params.body += `<br/><p style="font-size: 1.4em;">For more info, you have to click the button below!</p>`;
       params.body += `
                     <p style="margin-top:30px; font-size: 1em;">
@@ -1422,7 +1474,9 @@ module.exports = {
 
     let params2 = {
       email: user.email,
-      subject: `Your Order [${trx.ref}] ${status === 'completed' ? status : ''}`,
+      subject: `Your Order [${trx.ref}] ${
+        status === "completed" ? status : ""
+      }`,
     };
 
     const template = mailer_template(params);
@@ -1595,9 +1649,7 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">This is to inform you that a refund request for the order [${
-                    trx.ref
-                  }] has been sent!</p><br/>
+                  <p style="font-size: 1.4em;">This is to inform you that a refund request for the order [${trx.ref}] has been sent!</p><br/>
                   <p style="font-size: 1.4em;">Name: ${client.name}</p>
                   <p style="font-size: 1.4em;">Email: ${client.email}</p>
               `;
@@ -1642,9 +1694,7 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">This is to inform you that your order [${
-                    trx.ref
-                  }] has been refunded!</p><br/>
+                  <p style="font-size: 1.4em;">This is to inform you that your order [${trx.ref}] has been refunded!</p><br/>
                   <p style="font-size: 1.4em;">Name: ${client.name}</p>
                   <p style="font-size: 1.4em;">Email: ${client.email}</p>
               `;
@@ -1675,15 +1725,16 @@ module.exports = {
    * @param {string} reason
    */
   AdminSuspendUserMailerForUser: async (client, reason) => {
-
-    const {first_name, email} = client;
+    const { first_name, email } = client;
 
     // setup mail credentials
     let params = {};
     params.logo = Logo;
     params.header_color = "white";
 
-    params.body = `<p style="font-size:1.7em;"><b>Hi, ${!first_name ? 'user' : first_name}</b></p>`;
+    params.body = `<p style="font-size:1.7em;"><b>Hi, ${
+      !first_name ? "user" : first_name
+    }</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">This is to inform you that your account has been suspended.</p><br/>
                   <p style="font-size: 1.4em;"><b>Reason for suspension:</b></p>
@@ -1723,7 +1774,7 @@ module.exports = {
       admin_emails.push(admin.email);
     });
 
-    const {first_name, last_name, email} = client
+    const { first_name, last_name, email } = client;
 
     // setup mail credentials
     let params = {};
@@ -1732,7 +1783,9 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">This is to inform you a user's account [${!first_name ? 'user' : `${first_name} ${last_name}`}] has been suspended.</p><br/>
+                  <p style="font-size: 1.4em;">This is to inform you a user's account [${
+                    !first_name ? "user" : `${first_name} ${last_name}`
+                  }] has been suspended.</p><br/>
                   <p style="font-size: 1.4em;">Email: ${email}</p>
                   <p style="font-size: 1.4em;">Reason: ${reason}</p>
               `;
@@ -1742,7 +1795,7 @@ module.exports = {
 
     let params2 = {
       email: admin_emails,
-      subject: `Account suspension [${!first_name ? 'user' : first_name}]`,
+      subject: `Account suspension [${!first_name ? "user" : first_name}]`,
     };
 
     const template = mailer_template(params);
@@ -1757,14 +1810,12 @@ module.exports = {
       });
   },
 
-  
   /**
    * Mailer for new signup for clients
    * @param {{first_name:string, email:string}} client
    */
   clientWelcomeMessage: async (client) => {
-
-    const {first_name, email} = client;
+    const { first_name, email } = client;
 
     // setup mail credentials
     let params = {};
@@ -1774,8 +1825,9 @@ module.exports = {
     const link = `${process.env.SITE_URL}/shop`;
     const link2 = `${process.env.SITE_URL}/services`;
 
-
-    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${process.env.APP_NAME}, ${!first_name ? 'user' : first_name}</b></p>`;
+    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
+      process.env.APP_NAME
+    }, ${!first_name ? "user" : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
                   <p style="font-size: 1.4em;">You can proceed to <a href="${link}">placing your orders</a>, <a href="${link2}">requesting for a service</a> etc.</p>
@@ -1803,14 +1855,13 @@ module.exports = {
         return Promise.reject(err);
       });
   },
-  
+
   /**
    * Mailer for new signup for service partners
    * @param {{first_name:string, email:string}} partner
    */
   servicePartnerWelcomeMessage: async (partner) => {
-
-    const {first_name, email} = partner;
+    const { first_name, email } = partner;
 
     // setup mail credentials
     let params = {};
@@ -1821,8 +1872,9 @@ module.exports = {
     const link2 = `${process.env.SITE_URL}/dashboard/subscription`;
     const link3 = `${process.env.SITE_URL}/dashboard/projects`;
 
-
-    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${process.env.APP_NAME}, ${!first_name ? 'user' : first_name}</b></p>`;
+    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
+      process.env.APP_NAME
+    }, ${!first_name ? "user" : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
                   <p style="font-size: 1.4em;">You can proceed to <a href="${link}">completing your KYC</a>, <a href="${link2}">subscribing,</a> <a href="${link3}">bid for projects</a> etc.</p>
@@ -1850,14 +1902,13 @@ module.exports = {
         return Promise.reject(err);
       });
   },
-  
+
   /**
    * Mailer for new signup for product partners
    * @param {{first_name:string, email:string}} partner
    */
   productPartnerWelcomeMessage: async (partner) => {
-
-    const {first_name, email} = partner;
+    const { first_name, email } = partner;
 
     // setup mail credentials
     let params = {};
@@ -1869,8 +1920,9 @@ module.exports = {
     const link3 = `${process.env.SITE_URL}/dashboard/products`;
     const link4 = `${process.env.SITE_URL}/dashboard/order-request`;
 
-
-    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${process.env.APP_NAME}, ${!first_name ? 'user' : first_name}</b></p>`;
+    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
+      process.env.APP_NAME
+    }, ${!first_name ? "user" : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
                   <p style="font-size: 1.4em;">You can proceed to <a href="${link}">completing your KYC</a>, <a href="${link2}">subscribing,</a> <a href="${link3}">listing products</a>, <a href="${link4}">tracking orders</a> etc.</p>
@@ -1898,16 +1950,15 @@ module.exports = {
         return Promise.reject(err);
       });
   },
-  
+
   /**
    * Mailer of complaint to iuser
    * @param {{first_name:string, email:string}} user
    * @param {{issue_type, issue_no, title, description, status}} issue
    */
   complaintMessageToUser: async (user, issue) => {
-
-    const {first_name, email} = user;
-    const {issue_type, issue_no, title, description, status} = issue;
+    const { first_name, email } = user;
+    const { issue_type, issue_no, title, description, status } = issue;
 
     // setup mail credentials
     let params = {};
@@ -1916,8 +1967,9 @@ module.exports = {
 
     const link = `${process.env.SITE_URL}/dashboard/complaints`;
 
-
-    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${process.env.APP_NAME}, ${!first_name ? 'user' : first_name}</b></p>`;
+    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
+      process.env.APP_NAME
+    }, ${!first_name ? "user" : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">This is to inform you that you just made a complaint for the ticket issue ${issue_type} has been sent.</p><br/>
                   <p style="font-size: 1.4em;">Status: ${status}</p>
@@ -1947,16 +1999,15 @@ module.exports = {
         return Promise.reject(err);
       });
   },
-  
+
   /**
    * Mailer of complaint to admin
    * @param {{first_name:string, email:string}} user
    * @param {{issue_type, issue_no, title, description, status}} issue
    */
   complaintMessageToUser: async (user, issue) => {
-
-    const {first_name, email} = user;
-    const {issue_type, issue_no, title, description, status} = issue;
+    const { first_name, email } = user;
+    const { issue_type, issue_no, title, description, status } = issue;
 
     // setup mail credentials
     let params = {};
@@ -1965,8 +2016,9 @@ module.exports = {
 
     const link = `${process.env.SITE_URL}/dashboard/complaints`;
 
-
-    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${process.env.APP_NAME}, ${!first_name ? 'user' : first_name}</b></p>`;
+    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
+      process.env.APP_NAME
+    }, ${!first_name ? "user" : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">This is to inform you that you just made a complaint for the ticket issue ${issue_type} has been sent.</p><br/>
                   <p style="font-size: 1.4em;">Status: ${status}</p>

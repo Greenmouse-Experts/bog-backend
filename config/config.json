@@ -9,5 +9,6 @@
     "password": "root",
     "port": "3306",
     "host": "localhost",
-    "database": "bog"
+    "database": "bog",
+    "timezone": "+01:00"
 }

@@ -10,6 +10,7 @@ const sequelize = new Sequelize(
     host: config.host,
     port: config.port,
     dialect: 'mysql',
+    timezone: '+01:00',
     raw: true,
     pool: {
       max: 15,

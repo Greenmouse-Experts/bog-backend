@@ -1863,10 +1863,7 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
             message: "Cant approve transfer until super admin approves it",
           });
         } else if (userLevel == 3 && pendingTransaction.superadmin == true) {
-              await TransactionPending.update(
-                { financialadmin: true },
-                { where: { id } }
-              );
+
           const service_partner_details = await ServicePartner.findOne({
             where: { id: project.serviceProviderId },
           });
@@ -1915,6 +1912,10 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
               };
 
               const response = await Transaction.create(trxData, { t });
+                            await TransactionPending.update(
+                              { financialadmin: true },
+                              { where: { id } }
+                            );
 
               const user = await User.findByPk(userId, {
                 attributes: ["name", "email", "id", "userType"],
@@ -1995,7 +1996,12 @@ exports.getPendingTransfers = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
-      const pendingTransaction = await TransactionPending.findAll();
+      const pendingTransaction = await TransactionPending.findAll({
+        where: {
+          financialadmin: false,
+          TransactionId: { [Op.like]: `%PRJ%` },
+        },
+      });
       if (!pendingTransaction || pendingTransaction == null) {
         return res.status(404).send({
           success: false,
@@ -2015,7 +2021,7 @@ exports.getPendingTransfers = async (req, res, next) => {
 
       return res.send({
         success: true,
-        message: "Commitment fee has been paid successfully!",
+        message: "All pending transfers",
         data: pendingTransaction,
       });
     } catch (error) {

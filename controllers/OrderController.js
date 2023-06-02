@@ -29,6 +29,7 @@ const {
   ClientOrderRefundMailer,
   AdminOrderRefundMailer,
 } = require("../helpers/mailer/samples");
+const ProductEarning = require("../models/ProductEarnings");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -169,8 +170,7 @@ exports.createOrder = async (req, res, next) => {
       const user = await User.findByPk(userId, {
         attributes: ["id", "email", "name", "fname", "lname", "userType"],
       });
-
-      const {
+      let {
         shippingAddress,
         paymentInfo,
         products,
@@ -191,9 +191,13 @@ exports.createOrder = async (req, res, next) => {
 
     address = "No address"
    }
+
+      if (userType == null || userType == 'undefined') {
+        userType = user.userType;
+      }
+   
    
       const slug = Math.floor(190000000 + Math.random() * 990000000);
-      const addresses = "hhh"
       const orderSlug = `BOG/ORD/${slug}`;
       const orderData = {
         orderSlug,
@@ -204,7 +208,6 @@ exports.createOrder = async (req, res, next) => {
         discount,
         totalAmount,
       };
-      console.log(orderData)
       const paymentData = {
         userId,
         payment_reference: paymentInfo.reference,
@@ -223,6 +226,7 @@ exports.createOrder = async (req, res, next) => {
         ...shippingAddress,
         userId,
       };
+      let productEarnings = [];
       const orders = await Promise.all(
         products.map(async (product) => {
           const prodData = await Product.findByPk(product.productId, {
@@ -247,6 +251,14 @@ exports.createOrder = async (req, res, next) => {
           const trackingId = `TRD-${Math.floor(
             190000000 + Math.random() * 990000000
           )}`;
+
+          //define product earning for every product
+          const p = {
+            productOwnerId: prodData.creatorId,
+            amount,
+            qty: product.quantity,
+          };
+          productEarnings.push(p)
 
           // Notify product partner
           const mesg = `A user just bought ${product.quantity} of your product - ${prodData.name}`;
@@ -274,6 +286,7 @@ exports.createOrder = async (req, res, next) => {
             paymentInfo,
             quantity: product.quantity,
             address,
+            productEarnings,
             product: {
               id: prodData.id,
               name: prodData.name,
@@ -288,19 +301,39 @@ exports.createOrder = async (req, res, next) => {
 
       orderData.order_items = orders;
       orderData.contact = contact;
+      orderData.productEarnings = productEarnings;
       const order = await Order.create(orderData, {
         include: [
           {
             model: OrderItem,
             as: "order_items",
+            // include: [
+            //   {
+            //     model: ProductEarning,
+            //     as: "productEarnings",
+            //   },
+            // ],
           },
           {
             model: ContactDetails,
             as: "contact",
-          },
+          }
         ],
         transaction: t,
       });
+  
+
+
+      for(let i = 0; i < productEarnings.length; i++){
+
+        const prode = ProductEarning.create({
+          orderId: order.id,
+          orderItemId: order.order_items[i].id,
+          productOwnerId: productEarnings[i].productOwnerId,
+          amount: productEarnings[i].amount,
+          qty: productEarnings[i].qty,
+        });
+      }
 
       orderData.slug = orderSlug;
       await helpTransaction.saveTxn(orderData, "Products");
@@ -341,11 +374,12 @@ exports.createOrder = async (req, res, next) => {
       });
       io.emit("getNotifications", await Notification.fetchAdminNotification());
 
+      order.address = address
+      console.log(order.address)
       // save the details of the transaction
       return res.status(200).send({
         success: true,
         message: "Order Request submitted",
-        address,
         order,
       });
     } catch (error) {

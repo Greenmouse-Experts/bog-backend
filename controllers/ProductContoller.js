@@ -13,6 +13,28 @@ const Reviews = require("../models/Reviews");
 const Notification = require("../helpers/notification");
 const OrderItem = require("../models/OrderItem");
 const Order = require("../models/Order");
+const ProductEarning = require("../models/ProductEarnings");
+const ProductPartner = require("../models/ProductPartner");
+const TransactionPending = require("../models/TransactionPending");
+const { getUserTypeProfile, findUserById } = require("../service/UserService");
+const KycFinancialData = require("../models/KycFinancialData");
+const Transaction = require("../models/Transaction");
+const { Service } = require("../helpers/flutterwave");
+const {
+  ServicePartnerMailerForProjectPayout,
+  AdminProjectPayoutMailer,
+} = require("../helpers/mailer/samples");
+
+exports.notifyAdmin = async ({ userId, message, req }) => {
+  const notifyType = "admin";
+  const { io } = req.app;
+  await Notification.createNotification({
+    type: notifyType,
+    message,
+    userId,
+  });
+  io.emit("getNotifications", await Notification.fetchAdminNotification());
+};
 
 exports.getProducts = async (req, res, next) => {
   try {
@@ -65,11 +87,12 @@ exports.getProducts = async (req, res, next) => {
         )
       );
 
-      let review = 0; let total = 0;
-      if(product.review.length > 0){
-        product.review.forEach(rev => {
+      let review = 0;
+      let total = 0;
+      if (product.review.length > 0) {
+        product.review.forEach((rev) => {
           review += rev.star;
-          total += 5
+          total += 5;
         });
       }
 
@@ -84,14 +107,14 @@ exports.getProducts = async (req, res, next) => {
           orderTotal += order_.quantity;
         }
       }
-     let star1 = review > 0 ? (review/total * 5): 0
-    let  star = (Math.round(star1)*10) / 10
+      let star1 = review > 0 ? (review / total) * 5 : 0;
+      let star = (Math.round(star1) * 10) / 10;
       products[index] = {
         ...product,
         orderTotal,
         in_stock: orderTotal < parseInt(product.quantity) ? true : false,
         remaining: parseInt(product.quantity) - orderTotal,
-        star: star
+        star: star,
       };
     }
     return res.status(200).send({
@@ -200,7 +223,7 @@ exports.createCategory = async (req, res, next) => {
         data: category,
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -751,40 +774,62 @@ exports.approveProduct = async (req, res, next) => {
   });
 };
 
-exports.transferToServicePartner = async (req, res, next) => {
+exports.transferToProductPartner = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
       const { productId } = req.params;
-      const { amount, bank_code, account_number, bank_name } = req.body;
-      const project = await Product.findOne({ where: { id: projectId } });
-      if (!project || project == null) {
-        console.log(project);
+      const { bank_code, account_number, bank_name } = req.body;
+      const product = await Product.findOne({ where: { id: productId } });
+      if (!product || product == null || product == "undefined") {
+        console.log(product);
         return res.status(404).send({
           success: false,
-          message: "Invalid Project!",
+          message: "No Product!",
         });
       }
+      const pEarnings = await ProductEarning.findAll({
+        where: { productOwnerId: product.creatorId, status: "pending" },
+      });
+      if (!pEarnings || pEarnings == null || pEarnings == "undefined") {
+        return res.status(404).send({
+          success: false,
+          message: "Product hasnt been bought or all earnings has been paid!",
+        });
+      }
+      console.log(pEarnings);
+      //  return res.status(200).send({
+      //    success: true,
+      //    data: pEarnings,
+      //  });
+      let amount = 0;
+
+      for (let i = 0; i < pEarnings.length; i++) {
+        amount = amount + Number(pEarnings[i].amount);
+      }
+      console.log(amount);
 
       // Check to see if amount is not greater than the bid from the service partner
-      if (amount > project.estimatedCost) {
-        return res.status(422).send({
-          success: false,
-          message: "Amount cannot be processed!",
-        });
-      }
+      // if (amount > project.estimatedCost) {
+      //   return res.status(422).send({
+      //     success: false,
+      //     message: "Amount cannot be processed!",
+      //   });
+      // }
 
       const paymentReference = `TR-${Math.floor(
         190000000000 + Math.random() * 990000000000
       )}`;
 
-      if (project.serviceProviderId !== null) {
-        const service_partner_details = await ServicePartner.findOne({
-          where: { id: project.serviceProviderId },
+      if (product.creatorId !== null) {
+        const product_partner_details = await ProductPartner.findOne({
+          where: { userId: product.creatorId },
         });
+
+        console.log(product_partner_details);
         const profile = await getUserTypeProfile(
-          "service_partner",
-          service_partner_details.userId
+          "product_partner",
+          product_partner_details.userId
         );
         const data = {
           ...req.body,
@@ -793,13 +838,13 @@ exports.transferToServicePartner = async (req, res, next) => {
         let myFinancial = await KycFinancialData.findOne({
           where: { userId: profile.id },
         });
-        let _service_partner = await User.findOne({
-          where: { id: service_partner_details.userId },
+        let _product_partner = await User.findOne({
+          where: { id: product_partner_details.userId },
         });
-        console.log(project);
+        console.log(product);
 
-        if (_service_partner !== null) {
-          let narration = `Transfer to service partner ${profile.company_name} [${project.projectSlug}]`;
+        if (_product_partner !== null) {
+          let narration = `Transfer to product partner ${profile.company_name} [${product.description}]`;
 
           if (myFinancial !== null) {
             // console.log(_service_partner)
@@ -828,19 +873,19 @@ exports.transferToServicePartner = async (req, res, next) => {
             //   })
             // }
             const slug = Math.floor(190000000 + Math.random() * 990000000);
-            const TransactionId = `BOG/TXN/PRJ/${slug}`;
+            const TransactionId = `BOG/TXN/PROD/${slug}`;
 
-            console.log(project);
+            console.log(product);
 
             const transaction = {
               TransactionId: TransactionId,
               userId: null,
               status: "PAID",
-              type: "Project Payout to service partner",
+              type: "Product Payout to product partner",
               amount: amount,
               paymentReference: paymentReference,
               description: narration,
-              project: project,
+              product: product,
             };
 
             const trxData = {
@@ -858,15 +903,15 @@ exports.transferToServicePartner = async (req, res, next) => {
             const reqData = {
               req,
               userId: null,
-              message: `Admin has initiated a payout of NGN ${amount} to service partner ${profile.company_name} [${project.projectSlug}]`,
+              message: `Admin has initiated a payout of NGN ${amount} to product partner ${profile.company_name} [${product.description}]`,
             };
             await this.notifyAdmin(reqData);
 
             // Get active project admins
-            const project_admins = await User.findAll({
+            const product_admins = await User.findAll({
               where: {
                 userType: "admin",
-                level: 5,
+                level: 4,
                 isActive: 1,
                 isSuspended: 0,
               },
@@ -879,7 +924,7 @@ exports.transferToServicePartner = async (req, res, next) => {
                 isSuspended: 0,
               },
             });
-            const admins = [...project_admins, ...super_admins];
+            const admins = [...product_admins, ...super_admins];
 
             // // Client mailer
             // await ServicePartnerMailerForProjectPayout(
@@ -910,7 +955,7 @@ exports.transferToServicePartner = async (req, res, next) => {
   });
 };
 
-exports.approveTransferToServicePartner = async (req, res, next) => {
+exports.approveTransferToProductPartner = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
@@ -923,6 +968,17 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
         return res.status(404).send({
           success: false,
           message: "Invalid Pending Transaction!",
+        });
+      }
+
+      const prevTransfer = await Transaction.findOne({
+        where: { TransactionId: pendingTransaction.TransactionId },
+      });
+      if (prevTransfer !== null) {
+        console.log(prevTransfer);
+        return res.status(404).send({
+          success: false,
+          message: "Transaction Already Approved and Completed!",
         });
       }
 
@@ -944,9 +1000,36 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
         amount,
         paymentReference,
         description,
-        project,
+        product,
       } = transaction;
       const { account_number, bank_code, narration } = transfer;
+      console.log(product.createdAt);
+
+      const pEarnings = await ProductEarning.findAll({
+        where: {
+          productOwnerId: product.creatorId,
+          [Op.and]: [
+            sequelize.where(
+              sequelize.fn("date", sequelize.col("createdAt")),
+              "<",
+              sequelize.fn(
+                "DATE_SUB",
+                '2023-06-09 04:32:03',
+                sequelize.literal("INTERVAL " + 7 + " DAY")
+              )
+            ),
+          ],
+          status: "pending",
+        },
+      });
+      console.log(pEarnings);
+
+      if (!pEarnings || user == pEarnings) {
+        return res.status(404).send({
+          success: false,
+          message: "No user found!",
+        });
+      }
 
       if (userLevel == 1 || userLevel == 3) {
         if (userLevel == 3 && pendingTransaction.superadmin == false) {
@@ -955,16 +1038,12 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
             message: "Cant approve transfer until super admin approves it",
           });
         } else if (userLevel == 3 && pendingTransaction.superadmin == true) {
-          await TransactionPending.update(
-            { financialadmin: true },
-            { where: { id } }
-          );
-          const service_partner_details = await ServicePartner.findOne({
-            where: { id: project.serviceProviderId },
+          const product_partner_details = await ProductPartner.findOne({
+            where: { userId: product.creatorId },
           });
           const profile = await getUserTypeProfile(
-            "service_partner",
-            service_partner_details.userId
+            "product_partner",
+            product_partner_details.userId
           );
           const data = {
             ...req.body,
@@ -973,13 +1052,13 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
           let myFinancial = await KycFinancialData.findOne({
             where: { userId: profile.id },
           });
-          let _service_partner = await User.findOne({
-            where: { id: service_partner_details.userId },
+          let _product_partner = await User.findOne({
+            where: { id: product_partner_details.userId },
           });
 
-          if (_service_partner !== null) {
+          if (_product_partner !== null) {
             if (myFinancial !== null) {
-              console.log(_service_partner);
+              console.log(_product_partner);
               // Trigger transfer
               const transferResponse = await Service.Flutterwave.transfer(
                 account_number,
@@ -1000,7 +1079,7 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
                 TransactionId,
                 userId: null,
                 status: "PAID",
-                type: "Project Payout to service partner",
+                type: "Product Payout to product partner",
                 amount,
                 paymentReference,
                 description: narration,
@@ -1014,15 +1093,41 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
               const reqData = {
                 req,
                 userId: null,
-                message: `Admin has made a payout of NGN ${amount} to service partner ${profile.company_name} [${project.projectSlug}]`,
+                message: `Admin has made a payout of NGN ${amount} to product partner ${profile.company_name} [${product.description}]`,
               };
               await this.notifyAdmin(reqData);
 
+              //update fin admin approve to true when transfer complete
+              await TransactionPending.update(
+                { financialadmin: true },
+                { where: { id } }
+              );
+
+              //update transactio from pending to paid
+
+              await ProductEarning.update({status: 'paid'},{
+                where: {
+                  productOwnerId: product.creatorId,
+                  [Op.and]: [
+                    sequelize.where(
+                      sequelize.fn("date", sequelize.col("createdAt")),
+                      "<",
+                      sequelize.fn(
+                        "DATE_SUB",
+                        '2023-06-09 04:32:03',
+                        sequelize.literal("INTERVAL " + 7 + " DAY")
+                      )
+                    ),
+                  ],
+                  status: "pending",
+                },
+              });
+
               // Get active project admins
-              const project_admins = await User.findAll({
+              const product_admins = await User.findAll({
                 where: {
                   userType: "admin",
-                  level: 5,
+                  level: 4,
                   isActive: 1,
                   isSuspended: 0,
                 },
@@ -1035,24 +1140,24 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
                   isSuspended: 0,
                 },
               });
-              const admins = [...project_admins, ...super_admins];
+              const admins = [...product_admins, ...super_admins];
 
               // Client mailer
-              await ServicePartnerMailerForProjectPayout(
-                {
-                  email: _service_partner.email,
-                  first_name: _service_partner.fname,
-                },
-                amount,
-                project
-              );
-              // Admins mailer
-              await AdminProjectPayoutMailer(
-                { company_name: profile.company_name },
-                admins,
-                amount,
-                project
-              );
+              // await ServicePartnerMailerForProjectPayout(
+              //   {
+              //     email: _service_partner.email,
+              //     first_name: _service_partner.fname,
+              //   },
+              //   amount,
+              //   project
+              // );
+              // // Admins mailer
+              // await AdminProjectPayoutMailer(
+              //   { company_name: profile.company_name },
+              //   admins,
+              //   amount,
+              //   project
+              // );
 
               return res.status(200).send({
                 success: true,
@@ -1089,7 +1194,12 @@ exports.getPendingTransfers = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
-      const pendingTransaction = await TransactionPending.findAll();
+      const pendingTransaction = await TransactionPending.findAll({
+        where: {
+          financialadmin: false,
+          TransactionId: { [Op.like]: `%PROD%` },
+        },
+      });
       if (!pendingTransaction || pendingTransaction == null) {
         return res.status(404).send({
           success: false,
@@ -1109,7 +1219,7 @@ exports.getPendingTransfers = async (req, res, next) => {
 
       return res.send({
         success: true,
-        message: "Commitment fee has been paid successfully!",
+        message: "All Pending Product Earning Transfers!",
         data: pendingTransaction,
       });
     } catch (error) {

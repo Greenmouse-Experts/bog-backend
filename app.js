@@ -27,6 +27,7 @@ const Routes = require("./routes");
 const Subscription = require("./models/Subscription");
 const ServicePartner = require("./models/ServicePartner");
 const ProductPartner = require("./models/ProductPartner");
+const ProductEarning = require("./models/ProductEarnings");
 // set up public folder
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "uploads")));
