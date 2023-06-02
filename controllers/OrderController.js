@@ -183,26 +183,25 @@ exports.createOrder = async (req, res, next) => {
 
       // const profile = await UserService.getUserTypeProfile(user.userType, userId);
       // const { id } = profile;
-   let address = await Addresses.findOne({
+   let deliveryaddress = await Addresses.findOne({
      where: { id: deliveryaddressId },
    });
 
-   if (address == null){
+   if (deliveryaddress == null){
 
-    address = "No address"
+    deliveryaddress = "No address"
    }
 
       if (userType == null || userType == 'undefined') {
         userType = user.userType;
       }
-   
+   shippingAddress.deliveryaddress = deliveryaddress
    
       const slug = Math.floor(190000000 + Math.random() * 990000000);
       const orderSlug = `BOG/ORD/${slug}`;
       const orderData = {
         orderSlug,
         userId,
-        address,
         userType,
         deliveryFee,
         discount,
@@ -285,7 +284,6 @@ exports.createOrder = async (req, res, next) => {
             shippingAddress,
             paymentInfo,
             quantity: product.quantity,
-            address,
             productEarnings,
             product: {
               id: prodData.id,
@@ -374,8 +372,7 @@ exports.createOrder = async (req, res, next) => {
       });
       io.emit("getNotifications", await Notification.fetchAdminNotification());
 
-      order.address = address
-      console.log(order.address)
+  
       // save the details of the transaction
       return res.status(200).send({
         success: true,

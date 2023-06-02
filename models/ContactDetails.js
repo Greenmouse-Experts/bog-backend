@@ -8,48 +8,60 @@ const ContactDetails = sequelise.define(
       type: Sequelize.UUID,
       defaultValue: Sequelize.UUIDV4,
       unique: true,
-      primaryKey: true
+      primaryKey: true,
     },
     orderId: {
       type: Sequelize.UUID,
-      allowNull: true
+      allowNull: true,
     },
     userId: {
       type: Sequelize.UUID,
-      allowNull: true
+      allowNull: true,
     },
     contact_name: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     contact_email: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     contact_phone: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     address: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     city: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     state: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     country: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
+    },
+    deliveryaddress: {
+      type: Sequelize.TEXT,
+      allowNull: true,
+      get: function() {
+        if (this.getDataValue("deliveryaddress") !== undefined) {
+          return JSON.parse(this.getDataValue("deliveryaddress"));
+        }
+      },
+      set(value) {
+        this.setDataValue("deliveryaddress", JSON.stringify(value));
+      },
     },
     postal_code: {
       type: Sequelize.STRING,
-      allowNull: true
-    }
+      allowNull: true,
+    },
   },
   { paranoid: true }
 );
