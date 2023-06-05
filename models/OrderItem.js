@@ -50,7 +50,7 @@ const OrderItem = sequelise.define(
       },
       set(value) {
         this.setDataValue("shippingAddress", JSON.stringify(value));
-      }
+      }                                                                            
     },
     product: {
       allowNull: true,

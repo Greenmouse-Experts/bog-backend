@@ -15,6 +15,10 @@ const TransactionPending = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true,
     },
+    orderItemId: {
+      type: Sequelize.TEXT,
+      allowNull: true,
+    },
     userId: {
       type: Sequelize.STRING,
       allowNull: true,

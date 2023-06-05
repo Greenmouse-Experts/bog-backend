@@ -778,35 +778,78 @@ exports.transferToProductPartner = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
-      const { productId } = req.params;
+      const { orderItemId } = req.params;
+      console.log(req.params);
+      console.log(orderItemId);
       const { bank_code, account_number, bank_name } = req.body;
-      const product = await Product.findOne({ where: { id: productId } });
-      if (!product || product == null || product == "undefined") {
-        console.log(product);
+      const orderitem = await OrderItem.findOne({ where: { id: orderItemId } });
+      if (!orderitem || orderitem == null || orderitem == "undefined") {
+        console.log(orderitem);
         return res.status(404).send({
           success: false,
-          message: "No Product!",
+          message: "No Order!",
+        });
+      }
+
+      const orderCompletionCheck = await Order.findOne({
+        where: {
+          id: orderitem.orderId,
+        },
+      });
+      if (
+        !orderCompletionCheck ||
+        orderCompletionCheck == null ||
+        orderCompletionCheck == "undefined"
+      ) {
+        console.log(orderCompletionCheck);
+        return res.status(404).send({
+          success: false,
+          message: "Order hasnt been completed!",
         });
       }
       const pEarnings = await ProductEarning.findAll({
-        where: { productOwnerId: product.creatorId, status: "pending" },
+        where: { orderItemId, status: "pending" },
       });
       if (!pEarnings || pEarnings == null || pEarnings == "undefined") {
         return res.status(404).send({
           success: false,
-          message: "Product hasnt been bought or all earnings has been paid!",
+          message:
+            "Cant find an order for this product with that Id that hasnt been paid out",
         });
       }
       console.log(pEarnings);
+
+      const pendingTransaction = await TransactionPending.findOne({
+        where: { orderItemId },
+      });
+      if (pendingTransaction !== null) {
+        return res.status(404).send({
+          success: false,
+          message: "Already Initiated",
+        });
+      }
       //  return res.status(200).send({
       //    success: true,
       //    data: pEarnings,
       //  });
-      let amount = 0;
-
-      for (let i = 0; i < pEarnings.length; i++) {
-        amount = amount + Number(pEarnings[i].amount);
+      let dfee;
+      if (orderitem.deliveryFee == null) {
+        dfee = 0;
+      } else {
+        dfee = orderitem.deliveryFee;
       }
+      console.log("deliveryFee = " + dfee);
+
+      let discount;
+      if (orderitem.discount == null) {
+        discount = 0;
+      } else {
+        discount = orderitem.discount;
+      }
+      console.log("discount = " + discount);
+
+      let a1 = orderitem.amount - discount;
+      let amount = a1 + discount;
       console.log(amount);
 
       // Check to see if amount is not greater than the bid from the service partner
@@ -821,9 +864,9 @@ exports.transferToProductPartner = async (req, res, next) => {
         190000000000 + Math.random() * 990000000000
       )}`;
 
-      if (product.creatorId !== null) {
+      if (orderitem.productOwner !== null) {
         const product_partner_details = await ProductPartner.findOne({
-          where: { userId: product.creatorId },
+          where: { userId: orderitem.productOwner },
         });
 
         console.log(product_partner_details);
@@ -841,10 +884,9 @@ exports.transferToProductPartner = async (req, res, next) => {
         let _product_partner = await User.findOne({
           where: { id: product_partner_details.userId },
         });
-        console.log(product);
 
         if (_product_partner !== null) {
-          let narration = `Transfer to product partner ${profile.company_name} [${product.description}]`;
+          let narration = `Transfer to product partner ${profile.company_name} [${orderitem.product.description}]`;
 
           if (myFinancial !== null) {
             // console.log(_service_partner)
@@ -875,17 +917,20 @@ exports.transferToProductPartner = async (req, res, next) => {
             const slug = Math.floor(190000000 + Math.random() * 990000000);
             const TransactionId = `BOG/TXN/PROD/${slug}`;
 
+            console.log(orderitem.product);
+
+            const product = await Product.findByPk(orderitem.product.id);
             console.log(product);
 
             const transaction = {
               TransactionId: TransactionId,
               userId: null,
               status: "PAID",
-              type: "Product Payout to product partner",
+              type: "Products",
               amount: amount,
               paymentReference: paymentReference,
               description: narration,
-              product: product,
+              product,
             };
 
             const trxData = {
@@ -893,6 +938,7 @@ exports.transferToProductPartner = async (req, res, next) => {
               userId: null,
               transaction,
               transfer: transfer,
+              orderItemId,
             };
 
             const response = await TransactionPending.create(trxData);
@@ -903,7 +949,7 @@ exports.transferToProductPartner = async (req, res, next) => {
             const reqData = {
               req,
               userId: null,
-              message: `Admin has initiated a payout of NGN ${amount} to product partner ${profile.company_name} [${product.description}]`,
+              message: `Admin has initiated a payout of NGN ${amount} to product partner ${profile.company_name} [${orderitem.product.description}]`,
             };
             await this.notifyAdmin(reqData);
 
@@ -944,7 +990,17 @@ exports.transferToProductPartner = async (req, res, next) => {
               success: true,
               message: "Transfer Initiation was successful!",
             });
+          } else {
+            return res.status(404).send({
+              success: false,
+              message: "kyc not found",
+            });
           }
+        } else {
+          return res.status(404).send({
+            success: false,
+            message: "product partner not found",
+          });
         }
       }
     } catch (error) {
@@ -1005,29 +1061,19 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
       const { account_number, bank_code, narration } = transfer;
       console.log(product.createdAt);
 
-      const pEarnings = await ProductEarning.findAll({
+      const pEarning = await ProductEarning.findOne({
         where: {
           productOwnerId: product.creatorId,
-          [Op.and]: [
-            sequelize.where(
-              sequelize.fn("date", sequelize.col("createdAt")),
-              "<",
-              sequelize.fn(
-                "DATE_SUB",
-                '2023-06-09 04:32:03',
-                sequelize.literal("INTERVAL " + 7 + " DAY")
-              )
-            ),
-          ],
+          orderItemId: pendingTransaction.orderItemId,
           status: "pending",
         },
       });
-      console.log(pEarnings);
+      console.log(pEarning);
 
-      if (!pEarnings || user == pEarnings) {
+      if (!pEarning || user == pEarning) {
         return res.status(404).send({
           success: false,
-          message: "No user found!",
+          message: "No pending transaction found!",
         });
       }
 
@@ -1105,23 +1151,16 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
 
               //update transactio from pending to paid
 
-              await ProductEarning.update({status: 'paid'},{
-                where: {
-                  productOwnerId: product.creatorId,
-                  [Op.and]: [
-                    sequelize.where(
-                      sequelize.fn("date", sequelize.col("createdAt")),
-                      "<",
-                      sequelize.fn(
-                        "DATE_SUB",
-                        '2023-06-09 04:32:03',
-                        sequelize.literal("INTERVAL " + 7 + " DAY")
-                      )
-                    ),
-                  ],
-                  status: "pending",
-                },
-              });
+              await ProductEarning.update(
+                { status: "paid" },
+                {
+                  where: {
+                    productOwnerId: product.creatorId,
+                    orderItemId: pendingTransaction.orderItemId,
+                    status: "pending",
+                  },
+                }
+              );
 
               // Get active project admins
               const product_admins = await User.findAll({

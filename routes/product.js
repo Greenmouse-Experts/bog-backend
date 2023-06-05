@@ -69,7 +69,7 @@ router
     ProductController.approveProduct
   );
 // Transfer to service partners
-router.route("/products/transfer/:productId")
+router.route("/products/transfer/:orderItemId")
   .post([Auth, Access.verifyAccess, Access.verifyAdmin], ProductController.transferToProductPartner);
 
 router
