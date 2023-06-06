@@ -932,6 +932,7 @@ exports.transferToProductPartner = async (req, res, next) => {
               description: narration,
               product,
             };
+            console.log(orderCompletionCheck.id)
 
             const trxData = {
               TransactionId: TransactionId,
@@ -939,6 +940,8 @@ exports.transferToProductPartner = async (req, res, next) => {
               transaction,
               transfer: transfer,
               orderItemId,
+              orderId: orderCompletionCheck.id,
+              orderSlug: orderCompletionCheck.orderSlug,
             };
 
             const response = await TransactionPending.create(trxData);
@@ -1219,6 +1222,14 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
             message:
               "Approved, Transfer would be done once finance admin approves!",
           });
+        } else if (
+          userLevel == 1 &&
+          pendingTransaction.superadmin == true
+        ) {
+               return res.status(404).send({
+                 success: false,
+                 message: "Super Admin alreaady Approved",
+               });
         }
       }
     } catch (error) {

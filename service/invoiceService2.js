@@ -14,7 +14,7 @@ exports.createInvoice = async (orderData, user) => {
   if (!order_items && order_items.length < 1) {
     return false;
   }
-  console.log(orderData);
+  // console.log(orderData);
 
   const myProduct = order_items.map((items) => {
     console.log(items.product);
@@ -27,6 +27,10 @@ exports.createInvoice = async (orderData, user) => {
   });
 
   let _subtotal = 0;
+  let insurancecharge = 0
+  if (orderData.insuranceFee == true){
+    insurancecharge = orderData.order_items[0].shippingAddress.deliveryaddress.insurancecharge
+  }
   const _products = orderData.order_items.map((orderItem) => {
     // const productDetails = await Product.findOne({where: {id: }})
     _subtotal += orderItem.product.price * orderItem.quantity;
@@ -38,15 +42,15 @@ exports.createInvoice = async (orderData, user) => {
     };
   });
 
-  console.log(_products)
+ 
 
   const invoiceData = {
     logo:
       "https://res.cloudinary.com/greenmouse-tech/image/upload/v1669563824/BOG/logo_1_1_ubgtnr.png",
     document_title: "INVOICE",
-    company_from: "Sample Street 123",
-    zip_from: "1234 AB",
-    city_from: "Lagos",
+    company_from: "13, Olufunmilola Okikiolu Street",
+    zip_from: "Off Toyin Street, Ikeja",
+    city_from: "Lagos State",
     country_from: "Nigeria",
     sender_custom_1: "",
     sender_custom_2: "",
@@ -66,8 +70,13 @@ exports.createInvoice = async (orderData, user) => {
     products: _products,
     subtotal: _subtotal.toLocaleString(),
     delivery_fee: orderData.deliveryFee.toLocaleString(),
-    total: (parseInt(_subtotal) + parseInt(orderData.deliveryFee)).toLocaleString(),
+    insurancecharge: insurancecharge.toLocaleString(),
+    total: (
+      parseInt(_subtotal) + parseInt(orderData.deliveryFee) + parseInt(insurancecharge)
+    ).toLocaleString(),
   };
+
+  console.log("Invoice Generator")
   const preparedInvoiceTemplate = invoice(invoiceData);
   const data = {
     customize: {

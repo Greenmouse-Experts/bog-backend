@@ -273,6 +273,11 @@ exports.invoice = (data) => {
         <td><b>Delivery fee:</b></td>
         <td>${data.delivery_fee}</td>
     </tr>
+    <tr>
+        <td></td>
+        <td><b>Insurance Charge:</b></td>
+        <td>${data.insurancecharge}</td>
+    </tr>
     </thead>
     <tbody>
    

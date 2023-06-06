@@ -12,43 +12,47 @@ const Order = sequelise.define(
       type: Sequelize.UUID,
       defaultValue: Sequelize.UUIDV4,
       unique: true,
-      primaryKey: true
+      primaryKey: true,
     },
     orderSlug: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     userId: {
       type: Sequelize.UUID,
-      allowNull: true
+      allowNull: true,
     },
     userType: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     discount: {
       type: Sequelize.FLOAT,
-      allowNull: true
+      allowNull: true,
+    },
+    insuranceFee: {
+      type: Sequelize.BOOLEAN,
+      default: false
     },
     deliveryFee: {
       type: Sequelize.FLOAT,
-      allowNull: true
+      allowNull: true,
     },
     totalAmount: {
       type: Sequelize.FLOAT,
-      allowNull: true
+      allowNull: true,
     },
     status: {
       allowNull: true,
       type: Sequelize.ENUM,
       values: ["pending", "approved", "cancelled", "shipped", "completed"],
-      defaultValue: "pending"
+      defaultValue: "pending",
     },
     refundStatus: {
       allowNull: true,
       type: Sequelize.ENUM,
       values: ["request refund", "refunded", "not refunded"],
-      defaultValue: "not refunded"
+      defaultValue: "not refunded",
     },
   },
   { paranoid: true }

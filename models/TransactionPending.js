@@ -31,6 +31,14 @@ const TransactionPending = sequelise.define(
       type: Sequelize.BOOLEAN,
       default: false,
     },
+    orderId: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    orderSlug: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
     transaction: {
       allowNull: true,
       type: Sequelize.TEXT,
