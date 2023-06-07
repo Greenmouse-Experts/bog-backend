@@ -11,10 +11,11 @@ const {
   landSurveyRequestValidation,
   projectAssignmentRequestValidation,
   projectBidRequestValidation,
+  projectApplyRequestValidation,
   projectProgressValidation,
   projectInstallmentValidation,
   paymentInstallmentValidation,
-  projectNotificationValidation
+  projectNotificationValidation,
 } = require("../helpers/validators");
 const ProjectController = require("../controllers/ProjectController");
 
@@ -222,10 +223,18 @@ router.route("/projects/notification/:projectId/view")
 router
   .route("/projects/bid-project")
   .post(
-    projectBidRequestValidation(),
+    [Auth, Access.verifyAccess, Access.verifyUser],
+    upload.any(),
+    ProjectController.bidForProject
+  );
+
+router
+  .route("/projects/apply-project")
+  .post(
+    projectApplyRequestValidation(),
     validate,
     [Auth, Access.verifyAccess, Access.verifyUser],
-    ProjectController.bidForProject
+    ProjectController.applyForProject
   );
 
 router.route("/projects/bids/:projectId").get(ProjectController.getProjectBids);

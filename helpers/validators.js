@@ -331,9 +331,16 @@ const projectBidRequestValidation = () => {
     check("userId", "userId is required").isUUID(),
     check("projectId", "projectId is required").isUUID(),
     check("deliveryTimeLine", "deliveryTimeLine is required").isNumeric(),
-    check("areYouInterested", "areYouInterested is required").isBoolean(),
     check("projectCost", "projectCost is required").isNumeric(),
     check("reasonOfInterest", "reasonOfInterest is required").notEmpty(),
+  ];
+};
+
+const projectApplyRequestValidation = () => {
+  return [
+    check("userId", "userId is required").isUUID(),
+    check("projectId", "projectId is required").isUUID(),
+    check("areYouInterested", "areYouInterested is required").isBoolean(),
   ];
 };
 
@@ -393,6 +400,7 @@ module.exports = {
   KYCApprovalValidation,
   projectAssignmentRequestValidation,
   projectBidRequestValidation,
+  projectApplyRequestValidation,
   projectProgressValidation,
   projectInstallmentValidation,
   paymentInstallmentValidation,

@@ -416,6 +416,7 @@ exports.updateOrder = async (req, res, next) => {
         status,
         ...req.body,
       };
+      console.log(status)
       await Order.update(data, { where: { id: orderId }, transaction: t });
 
       const user = await User.findOne({

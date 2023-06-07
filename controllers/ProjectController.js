@@ -2850,13 +2850,30 @@ exports.bidForProject = async (req, res, next) => {
       const projectBid = await ProjectBidding.findOne({
         where: { userId, projectId },
       });
-      if (projectBid !== null) {
+      if (projectBid == null) {
         return res.status(400).send({
           success: false,
-          message: "You cannot bid for a project twice!",
+          message: "Go and apply to bid first!",
         });
       }
-      const bid = await ProjectBidding.create(data, { transaction: t });
+
+           if (req.files.length > 0) {
+        for (let i = 0; i < req.files.length; i++) {
+          const url = `${process.env.APP_URL}/${req.files[i].path}`;
+          const name = req.files[i].fieldname;
+          data[name] = url;
+        }
+      }
+      const bid = await ProjectBidding.update(
+        data,
+        {
+          where: {
+            userId: userId,
+            projectId: projectId,
+          },
+        },
+        {transaction: t}
+      );
 
       // Get client details
       const userData = await ServiceFormProjects.findOne({
@@ -2901,6 +2918,96 @@ exports.bidForProject = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         message: "Project Bade successfully",
+        data: bid,
+      });
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.applyForProject = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { userId, projectId } = req.body;
+      const { name, email, fname, id } = req._credentials;
+      const data = req.body;
+      const project = await Project.findByPk(data.projectId);
+      if (!project) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Project",
+        });
+      }
+      const where = {
+        userId,
+        projectId,
+      };
+      await ServiceProvider.update(
+        { status: "accepted" },
+        { where, transaction: t }
+      );
+
+      const projectBid = await ProjectBidding.findOne({
+        where: { userId, projectId },
+      });
+      if (projectBid !== null) {
+        return res.status(400).send({
+          success: false,
+          message: "You cannot bid for a project twice!",
+        });
+      }
+      console.log(projectBid)
+      const bid = await ProjectBidding.create(data, {
+        transaction: t,
+        areYouInterested: 1,
+      });
+
+      // Get client details
+      const userData = await ServiceFormProjects.findOne({
+        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        where: { projectID: project.id },
+      });
+
+      let client = {};
+      if (userData.length !== null) {
+        const userId = userData.userID;
+        const user = await User.findOne({
+          where: { id: userId },
+          attributes: { exclude: ["password"] },
+        });
+        client = user === null ? {} : user;
+      }
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // Service partner mailer on project bid
+      await ServicePartnerMailerForProjectBid(
+        { email, first_name: fname },
+        project
+      );
+
+      // Admin mailer on service partner's project bid
+      await AdminProjectBidUpdateMailer(
+        client,
+        { first_name: fname, name, email, id },
+        admins,
+        "bade for",
+        project
+      );
+
+      return res.status(200).send({
+        success: true,
+        message: "Project Application Successful",
         data: bid,
       });
     } catch (error) {
@@ -2983,7 +3090,7 @@ exports.getIndividualProjectBid = async (req, res, next) => {
  */
 exports.createProjectInstallment = async (req, res, next) => {
   try {
-    let { title, amount, type, project_slug } = req.body;
+    let { title, amount, type, project_slug, dueDate } = req.body;
 
     if (type === undefined) {
       type = "cost";
@@ -3015,6 +3122,7 @@ exports.createProjectInstallment = async (req, res, next) => {
       type,
       project_id: _response.id,
       paid: false,
+      dueDate
     });
 
     return res.status(201).json({

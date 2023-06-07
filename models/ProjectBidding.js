@@ -9,38 +9,46 @@ const ProjectBidding = sequelise.define(
       type: Sequelize.UUID,
       defaultValue: Sequelize.UUIDV4,
       unique: true,
-      primaryKey: true
+      primaryKey: true,
     },
     userId: {
       allowNull: true,
-      type: Sequelize.UUID
+      type: Sequelize.UUID,
     },
     projectId: {
       allowNull: true,
-      type: Sequelize.UUID
+      type: Sequelize.UUID,
     },
     projectCost: {
       type: Sequelize.FLOAT,
       defaultValue: 0.0,
-      allowNull: true
+      allowNull: true,
     },
     status: {
       type: Sequelize.STRING,
       defaultValue: "pending",
-      allowNull: true
+      allowNull: true,
     },
     deliveryTimeLine: {
       type: Sequelize.INTEGER,
-      allowNull: true
+      allowNull: true,
     },
     areYouInterested: {
       type: Sequelize.BOOLEAN,
-      allowNull: true
+      allowNull: true,
+    },
+    description: {
+      type: Sequelize.TEXT,
+      allowNull: true,
+    },
+    image: {
+      type: Sequelize.TEXT,
+      allowNull: true,
     },
     reasonOfInterest: {
       type: Sequelize.STRING,
-      allowNull: true
-    }
+      allowNull: true,
+    },
   },
   { paranoid: true }
 );
