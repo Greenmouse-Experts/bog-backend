@@ -2831,6 +2831,7 @@ exports.bidForProject = async (req, res, next) => {
       const { userId, projectId } = req.body;
       const { name, email, fname, id } = req._credentials;
       const data = req.body;
+      console.log(data)
       const project = await Project.findByPk(data.projectId);
       if (!project) {
         return res.status(404).send({
@@ -2847,8 +2848,20 @@ exports.bidForProject = async (req, res, next) => {
         { where, transaction: t }
       );
 
+
+        const servicePartner = await ServicePartner.findOne({
+          where: { userId },
+        });
+        console.log(servicePartner);
+        if (servicePartner == null) {
+          return res.status(400).send({
+            success: false,
+            message: "You are not a service partner",
+          });
+        }
+
       const projectBid = await ProjectBidding.findOne({
-        where: { userId, projectId },
+        where: { userId: servicePartner.id, projectId },
       });
       if (projectBid == null) {
         return res.status(400).send({
@@ -2857,6 +2870,8 @@ exports.bidForProject = async (req, res, next) => {
         });
       }
 
+
+
            if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
           const url = `${process.env.APP_URL}/${req.files[i].path}`;
@@ -2864,11 +2879,14 @@ exports.bidForProject = async (req, res, next) => {
           data[name] = url;
         }
       }
+
+      data.userId = servicePartner.id
+      console.log(data.userId)
       const bid = await ProjectBidding.update(
         data,
         {
           where: {
-            userId: userId,
+            userId: servicePartner.id,
             projectId: projectId,
           },
         },
@@ -2945,6 +2963,15 @@ exports.applyForProject = async (req, res, next) => {
         userId,
         projectId,
       };
+
+      const  servicePartner = await ServicePartner.findOne({where: {userId}});
+      console.log(servicePartner)
+         if (servicePartner == null) {
+        return res.status(400).send({
+          success: false,
+          message: "You are not a service partner",
+        });
+      }
       await ServiceProvider.update(
         { status: "accepted" },
         { where, transaction: t }
@@ -2956,13 +2983,15 @@ exports.applyForProject = async (req, res, next) => {
       if (projectBid !== null) {
         return res.status(400).send({
           success: false,
-          message: "You cannot bid for a project twice!",
+          message: "You cannot apply to bid for a project twice!",
         });
       }
       console.log(projectBid)
-      const bid = await ProjectBidding.create(data, {
+      const bid = await ProjectBidding.create({
         transaction: t,
         areYouInterested: 1,
+        projectId,
+        userId: servicePartner.id
       });
 
       // Get client details
@@ -3026,32 +3055,56 @@ exports.getProjectBids = async (req, res, next) => {
     const bids = JSON.parse(
       JSON.stringify(await ProjectBidding.findAll({ where: { projectId } }))
     );
-    const data = await Promise.all(
-      bids.map(async (bid) => {
+    // const data = await Promise.all(
+    //   bids.map(async (bid) => {
+
+    //     console.log(bid.userId)
+    //     const user = await userService.getUserFromProfile(
+    //       "professional",
+    //       bid.userId
+    //     );
+    //     console.log(user)
+    //     bid.userDetails = user;
+    //     const completedProjects = await Project.count({
+    //       where: { serviceProviderId: bid.userId, status: "completed" },
+    //     });
+
+    //     const ongoingProjects = await Project.count({
+    //       where: { serviceProviderId: bid.userId, status: "ongoing" },
+    //     });
+    //     bid.completedProjects = completedProjects;
+    //     bid.ongoingProjects = ongoingProjects;
+    //     return bid;
+    //   })
+    // );
+
+    for(let i = 0; i < bids.length; i++){
+        console.log(bids[i].userId);
         const user = await userService.getUserFromProfile(
           "professional",
-          bid.userId
+          bids[i].userId
         );
-        bid.userDetails = user;
+        bids[i].userDetails = user;
         const completedProjects = await Project.count({
-          where: { serviceProviderId: bid.userId, status: "completed" },
+          where: { serviceProviderId: bids[i].userId, status: "completed" },
         });
+
         const ongoingProjects = await Project.count({
-          where: { serviceProviderId: bid.userId, status: "ongoing" },
+          where: { serviceProviderId: bids[i].userId, status: "ongoing" },
         });
-        bid.completedProjects = completedProjects;
-        bid.ongoingProjects = ongoingProjects;
-        return bid;
-      })
-    );
+        bids[i].completedProjects = completedProjects;
+        bids[i].ongoingProjects = ongoingProjects;
+
+    }
     return res.status(200).send({
       success: true,
       data: {
         project,
-        bids: data,
+        bids: bids,
       },
     });
   } catch (error) {
+    console.log(error)
     return next(error);
   }
 };
