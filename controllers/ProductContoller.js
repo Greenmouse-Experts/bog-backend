@@ -24,6 +24,7 @@ const {
   ServicePartnerMailerForProjectPayout,
   AdminProjectPayoutMailer,
 } = require("../helpers/mailer/samples");
+const Notifications = require("../models/Notification");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
@@ -753,6 +754,7 @@ exports.approveProduct = async (req, res, next) => {
       const userId = product.creatorId;
       const notifyType = "user";
       const { io } = req.app;
+      console.log('hello')
       await Notification.createNotification({
         type: notifyType,
         message: mesg,

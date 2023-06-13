@@ -2978,7 +2978,7 @@ exports.applyForProject = async (req, res, next) => {
       );
 
       const projectBid = await ProjectBidding.findOne({
-        where: { userId, projectId },
+        where: { userId: servicePartner.id, projectId },
       });
       if (projectBid !== null) {
         return res.status(400).send({

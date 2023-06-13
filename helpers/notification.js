@@ -6,12 +6,17 @@ const Notification = require("../models/Notification");
 
 exports.createNotification = async ({ userId, type, message }) => {
   try {
+
+      console.log("hello");
+
     const request = {
       userId,
       type,
       message
     };
     await Notification.create(request);
+      console.log("hello");
+
     console.log("Notification sent");
     return true;
   } catch (error) {

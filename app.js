@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
 const express = require("express");
+const sequelize = require("./config/database/connection");
+
 
 const app = express();
 const cors = require("cors");
@@ -198,6 +200,8 @@ app.use((err, req, res, next) => {
 app.use((req, res) => {
   return res.status(404).send({ success: false, message: "Route not found" });
 });
+
+sequelize.sync();
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`server started on port ${PORT}`);
