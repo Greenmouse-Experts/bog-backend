@@ -137,6 +137,15 @@ router
 router
   .route("/all/admin")
   .get([Auth, Access.verifyAccess], UserController.getAllAdmin);
+router
+  .route("/all/projectAdmin")
+  .get([Auth, Access.verifyAccess], UserController.getAllAdmin);
+router
+  .route("/all/producAadmin")
+  .get([Auth, Access.verifyAccess], UserController.getAllAdmin);
+router
+  .route("/all/generalAdmin")
+  .get([Auth, Access.verifyAccess], UserController.getAllAdmin);
 
 router
   .route("/admin/:adminId")

@@ -2900,7 +2900,7 @@ exports.bidForProject = async (req, res, next) => {
       });
 
       let client = {};
-      if (userData.length !== null) {
+      if (userData !== null) {
         const userId = userData.userID;
         const user = await User.findOne({
           where: { id: userId },
@@ -3001,7 +3001,7 @@ exports.applyForProject = async (req, res, next) => {
       });
 
       let client = {};
-      if (userData.length !== null) {
+      if (userData !== null) {
         const userId = userData.userID;
         const user = await User.findOne({
           where: { id: userId },

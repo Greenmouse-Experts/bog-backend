@@ -1479,6 +1479,91 @@ exports.getAllAdmin = async (req, res) => {
   }
 };
 
+
+exports.getAllProjectAdmin = async (req, res) => {
+  try {
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User Found",
+      });
+    }
+
+    const where = {
+      userType: "admin",
+      level: 5,
+    };
+    const users = await User.findAll({ where, order: [["createdAt", "DESC"]] });
+
+    return res.status(200).send({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+exports.getAllProductAdmin = async (req, res) => {
+  try {
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User Found",
+      });
+    }
+
+    const where = {
+      userType: "admin",
+      level: 4,
+    };
+    const users = await User.findAll({ where, order: [["createdAt", "DESC"]] });
+
+    return res.status(200).send({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+exports.getAllGeneralAdmin = async (req, res) => {
+  try {
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User Found",
+      });
+    }
+
+    const where = {
+      userType: "admin",
+      level: 6,
+    };
+    const users = await User.findAll({ where, order: [["createdAt", "DESC"]] });
+
+    return res.status(200).send({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
 exports.findAdmin = async (req, res) => {
   try {
     const user = await UserService.getUserDetails({ id: req.user.id });

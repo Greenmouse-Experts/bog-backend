@@ -22,24 +22,24 @@ exports.TermiiMailProvider = (data) => {
 };
 
 exports.Mailer = async (template, data) => {
-//   let transporter = nodemailer.createTransport({
-//     host: process.env.EMAIL_HOST,
-//     port: process.env.EMAIL_PORT,
-//     secure: process.env.EMAIL_SECURE, // true for 465, false for other ports
-//     auth: {
-//       user: process.env.EMAIL_USERNAME,
-//       pass: process.env.EMAIL_PASSWORD,
-//     },
-//   });
   let transporter = nodemailer.createTransport({
-    host: process.env.MAILER_HOST,
-    port: process.env.MAILER_PORT,
-    secure: process.env.MAILER_SECURE, // true for 465, false for other ports
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: process.env.EMAIL_SECURE, // true for 465, false for other ports
     auth: {
-      user: process.env.MAILER_USER,
-      pass: process.env.MAILER_PASS,
+      user: process.env.EMAIL_USERNAME,
+      pass: process.env.EMAIL_PASSWORD,
     },
   });
+//   let transporter = nodemailer.createTransport({
+//     host: process.env.MAILER_HOST,
+//     port: process.env.MAILER_PORT,
+//     secure: process.env.MAILER_SECURE, // true for 465, false for other ports
+//     auth: {
+//       user: process.env.MAILER_USER,
+//       pass: process.env.MAILER_PASS,
+//     },
+//   });
 
   const receivers = typeof data.email === "string" ? data.email : data.email.toString()
 
