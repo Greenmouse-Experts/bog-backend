@@ -52,6 +52,7 @@ exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const { email, userType, name, captcha } = req.body;
+
       if (!req.body.platform && userType !== "admin") {
         const validateCaptcha = await UserService.validateCaptcha(captcha);
         if (!validateCaptcha) {
@@ -174,6 +175,7 @@ exports.registerUser = async (req, res, next) => {
         message: "User Created Successfully",
       });
     } catch (error) {
+      console.log(error)
       t.rollback();
       return next(error);
     }

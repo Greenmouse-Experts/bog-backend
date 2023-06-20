@@ -2,6 +2,7 @@
 require("dotenv").config();
 const express = require("express");
 const sequelize = require("./config/database/connection");
+const EmailService = require("./service/emailService");
 
 
 const app = express();
@@ -12,8 +13,8 @@ const { Server } = require("socket.io");
 const path = require("path");
 const bodyParser = require("body-parser");
 const cron = require("node-cron");
-const session = require('express-session')
-const cookieParser = require('cookie-parser')
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
 
 const server = http.createServer(app);
 require("./config/database/connection");
@@ -22,14 +23,20 @@ const Notification = require("./helpers/notification");
 
 const cloudinary = require("./helpers/cloudinaryMediaProvider");
 
-const logger = require('./helpers/ms-team/logger/logger')
-const msTeamsService = require('./helpers/ms-team/ms-team-service')
+const logger = require("./helpers/ms-team/logger/logger");
+const msTeamsService = require("./helpers/ms-team/ms-team-service");
 
 const Routes = require("./routes");
 const Subscription = require("./models/Subscription");
 const ServicePartner = require("./models/ServicePartner");
 const ProductPartner = require("./models/ProductPartner");
 const ProductEarning = require("./models/ProductEarnings");
+const {
+  sendMessage,
+  getUserChatMessagesApi,
+  deleteMessage,
+  markMessageRead,
+} = require("./controllers/ChatController");
 // set up public folder
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "uploads")));
@@ -41,7 +48,6 @@ app.use(express.static(path.join(__dirname, "uploads")));
 //   name: "mycookiesession",
 //   cookie: { secure: false }
 // }))
-
 
 // Static Files
 // dashboard
@@ -57,17 +63,17 @@ app.use(cors());
 app.use(express.json());
 app.use(
   express.urlencoded({
-    extended: true
+    extended: true,
   })
 );
 
-app.use(cookieParser())
+app.use(cookieParser());
 
 const io = new Server(server, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST", "PATCH", "DELETE"]
-  }
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+  },
 });
 
 app.io = io;
@@ -86,52 +92,100 @@ app.post("/upload", async (req, res, next) => {
     return res.status(400).json({
       status: false,
       message: "Problem occured!",
-      error
+      error,
     });
   }
 });
 
-io.on("connection", async socket => {
-  console.log(socket);
+io.on("connection", async (socket) => {
+  console.log(socket.handshake);
   io.emit("getNotifications", await Notification.fetchAdminNotification());
   io.emit(
     "getUserNotifications",
     await Notification.fetchUserNotificationApi(socket.handshake.query)
   );
-  socket.on("notification_read", async data => {
+  socket.on("notification_read", async (data) => {
     const { id } = data;
     socket.emit("markAsRead", await Notification.updateNotification(id));
   });
+
+  socket.on("send_message", async (data) => {
+    // io.in(room).emit("receive_message", data); // Send to all users in room, including sender
+    console.log('send message')
+    sendMessage(data, socket) // Save message in db
+          .then( async (response) => {
+
+                 io.emit(
+            "getNotifications",
+            await Notification.fetchAdminNotification()
+          );
+
+          io.emit(
+            "getUserNotifications",
+            await Notification.fetchUserNotificationApi2(data.senderId)
+          );
+          })
+          .catch((err) => {console.log(err)});
+
+
+ 
+  });
+
+  socket.on("getUserChatMessage", (data) => {
+    io.emit("getUserChatMessages", (data) => {
+      getUserChatMessagesApi(data);
+    });
+  });
+
+    socket.on("readConversationMessages", (data) => {
+      markMessageRead(data)
+      
+      io.emit("getUserChatMessages", (data) => {
+        getUserChatMessagesApi(data);
+      });
+    });
+
+  socket.on("deleteMessage", (data) => {
+    const { messageId } = data;
+    deleteMessage(messageId);
+    io.emit("getUserChatMessages", (data) => {
+      getUserChatMessagesApi(data);
+    });
+  });
 });
+
+          
+  
+
 
 // scheduler for subscription
 cron.schedule("* 6 * * *", () => {
   Subscription.findAll({
-    where: { status: 1 }
+    where: { status: 1 },
   })
-    .then(async activeSubscriptions => {
+    .then(async (activeSubscriptions) => {
       // console.log(activeSubscriptions);
       await Promise.all(
-        activeSubscriptions.map(async sub => {
+        activeSubscriptions.map(async (sub) => {
           if (sub.expiredAt < moment()) {
             await Subscription.update({ status: 0 }, { where: { id: sub.id } });
             let user = await ServicePartner.findOne({
-              where: { id: sub.userId }
+              where: { id: sub.userId },
             });
             const updateData = {
               hasActiveSubscription: false,
-              planId: null
+              planId: null,
             };
             if (user) {
               await ServicePartner.update(updateData, {
-                where: { id: user.id }
+                where: { id: user.id },
               });
             } else {
               user = await ProductPartner.findOne({
-                where: { id: sub.userId }
+                where: { id: sub.userId },
               });
               await ProductPartner.update(updateData, {
-                where: { id: user.id }
+                where: { id: user.id },
               });
             }
           }
@@ -139,7 +193,7 @@ cron.schedule("* 6 * * *", () => {
       );
       console.log(`No Subscription updated`);
     })
-    .catch(error => {
+    .catch((error) => {
       return null;
     });
   // }
@@ -167,7 +221,6 @@ app.use((err, req, res, next) => {
       .send({ success: false, message: error.message });
   }
 });
-
 
 // const teamCreationPayload = {
 //   authorization: '',

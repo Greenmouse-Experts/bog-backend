@@ -7,7 +7,7 @@ const Notification = require("../models/Notification");
 exports.createNotification = async ({ userId, type, message }) => {
   try {
 
-      console.log("hello");
+
 
     const request = {
       userId,
@@ -15,7 +15,7 @@ exports.createNotification = async ({ userId, type, message }) => {
       message
     };
     await Notification.create(request);
-      console.log("hello");
+  
 
     console.log("Notification sent");
     return true;
@@ -42,6 +42,8 @@ exports.fetchUserNotification = async ({ userId }) => {
 };
 exports.fetchUserNotificationApi = async notifyParam => {
   try {
+
+    console.log(notifyParam)
     const { userId } = notifyParam;
     const notifications = await Notification.findAll({
       where: {
@@ -90,6 +92,25 @@ exports.deleteNotifications = async id => {
   try {
     await Notification.destroy({ where: { id } });
     return true;
+  } catch (error) {
+    return error;
+  }
+};
+
+
+
+exports.fetchUserNotificationApi2 = async (senderId) => {
+  try {
+    const notifications = await Notification.findAll({
+      where: {
+        userId: senderId,
+        type: "user",
+        [Op.or]: [{ status: "pending" }, { status: "unread" }],
+      },
+      order: [["createdAt", "DESC"]],
+      limit: 5,
+    });
+    return notifications;
   } catch (error) {
     return error;
   }

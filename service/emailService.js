@@ -11,6 +11,16 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+
+  transporter
+    .verify()
+    .then(() => console.log("Connected to email server"))
+    .catch(() =>
+      console.log(
+        "Unable to connect to email server. Make sure you have configured the SMTP options in .env"
+      )
+    );
+
 exports.sendMail = async (email, message, subject, files = []) => {
   try {
     // send mail with defined transport object
