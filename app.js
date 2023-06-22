@@ -70,7 +70,7 @@ app.use(cookieParser());
 
 const io = new Server(server, {
   cors: {
-    origin: "192.142.128.146",
+    origin: "*",
     methods: ["GET", "POST", "PATCH", "DELETE"],
   },
 });
