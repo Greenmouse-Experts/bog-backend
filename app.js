@@ -72,16 +72,8 @@ const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST", "PATCH", "DELETE"],
-    path: "/",
-    serveClient: false,
-    // below are engine.IO options
-    pingInterval: 10000,
-    pingTimeout: 5000,
-    cookie: true,
   },
 });
-
-
 
 app.io = io;
 
