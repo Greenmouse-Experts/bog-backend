@@ -131,7 +131,7 @@ io.on("connection", async (socket) => {
  
   });
 
-  socket.on("getUserChatMessage", (data) => {
+  socket.on("getUserChatMessages", (data) => {
     io.emit("getUserChatMessages", (data) => {
       getUserChatMessagesApi(data);
     });
