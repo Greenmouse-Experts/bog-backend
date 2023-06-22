@@ -139,13 +139,13 @@ router
   .get([Auth, Access.verifyAccess], UserController.getAllAdmin);
 router
   .route("/all/projectAdmin")
-  .get([Auth, Access.verifyAccess], UserController.getAllAdmin);
+  .get([Auth, Access.verifyAccess], UserController.getAllProjectAdmin);
 router
   .route("/all/producAadmin")
-  .get([Auth, Access.verifyAccess], UserController.getAllAdmin);
+  .get([Auth, Access.verifyAccess], UserController.getAllProductAdmin);
 router
   .route("/all/generalAdmin")
-  .get([Auth, Access.verifyAccess], UserController.getAllAdmin);
+  .get([Auth, Access.verifyAccess], UserController.getAllGeneralAdmin);
 
 router
   .route("/admin/:adminId")

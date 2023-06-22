@@ -67,9 +67,10 @@ const {
 
 exports.getUserChatMessagesApi = async (data) => {
   try {
+    console.log('f')
+
     const { senderId, recieverId } = data;
 
-    console.log(data);
     const participantsId = [senderId, recieverId];
 
     const convoId = await checkExistingConversation(participantsId);
@@ -92,6 +93,7 @@ console.log(messages.length)
 
     return messages;
   } catch (error) {
+    console.log(error)
     return error;
   }
 };

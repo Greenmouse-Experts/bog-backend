@@ -4,7 +4,6 @@ const express = require("express");
 const sequelize = require("./config/database/connection");
 const EmailService = require("./service/emailService");
 
-
 const app = express();
 const cors = require("cors");
 const morgan = require("morgan");
@@ -111,39 +110,41 @@ io.on("connection", async (socket) => {
 
   socket.on("send_message", async (data) => {
     // io.in(room).emit("receive_message", data); // Send to all users in room, including sender
-    console.log('send message')
+    console.log("send message");
     sendMessage(data, socket) // Save message in db
-          .then( async (response) => {
+      .then(async (response) => {
+        io.emit(
+          "getNotifications",
+          await Notification.fetchAdminNotification()
+        );
 
-                 io.emit(
-            "getNotifications",
-            await Notification.fetchAdminNotification()
-          );
-
-          io.emit(
-            "getUserNotifications",
-            await Notification.fetchUserNotificationApi2(data.senderId)
-          );
-          })
-          .catch((err) => {console.log(err)});
-
-
- 
+        io.emit(
+          "getUserNotifications",
+          await Notification.fetchUserNotificationApi2(data.senderId)
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   });
 
-  socket.on("getUserChatMessages", (data) => {
+  socket.on("getUserChatMessages", async (data) => {
+    
+    console.log(data)
+    io.emit("getUserChatMessages", async (data) => {
+    console.log(data);
+      
+      await getUserChatMessagesApi(data);
+    });
+  });
+
+  socket.on("readConversationMessages", (data) => {
+    markMessageRead(data);
+
     io.emit("getUserChatMessages", (data) => {
       getUserChatMessagesApi(data);
     });
   });
-
-    socket.on("readConversationMessages", (data) => {
-      markMessageRead(data)
-      
-      io.emit("getUserChatMessages", (data) => {
-        getUserChatMessagesApi(data);
-      });
-    });
 
   socket.on("deleteMessage", (data) => {
     const { messageId } = data;
@@ -153,10 +154,6 @@ io.on("connection", async (socket) => {
     });
   });
 });
-
-          
-  
-
 
 // scheduler for subscription
 cron.schedule("* 6 * * *", () => {
