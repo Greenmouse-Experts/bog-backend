@@ -141,7 +141,7 @@ router
   .route("/all/projectAdmin")
   .get([Auth, Access.verifyAccess], UserController.getAllProjectAdmin);
 router
-  .route("/all/producAadmin")
+  .route("/all/productAdmin")
   .get([Auth, Access.verifyAccess], UserController.getAllProductAdmin);
 router
   .route("/all/generalAdmin")

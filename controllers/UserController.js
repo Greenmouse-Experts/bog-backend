@@ -1548,7 +1548,7 @@ exports.getAllGeneralAdmin = async (req, res) => {
 
     const where = {
       userType: "admin",
-      level: 6,
+      level: 1,
     };
     const users = await User.findAll({ where, order: [["createdAt", "DESC"]] });
 
