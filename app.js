@@ -97,7 +97,7 @@ app.post("/upload", async (req, res, next) => {
 });
 
 io.on("connection", async (socket) => {
-  console.log(socket.handshake);
+  console.log(socket.Id);
   io.emit("getNotifications", await Notification.fetchAdminNotification());
   io.emit(
     "getUserNotifications",

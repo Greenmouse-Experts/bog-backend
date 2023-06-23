@@ -67,7 +67,7 @@ const {
 
 exports.getUserChatMessagesApi = async (data) => {
   try {
-    console.log('f')
+    console.log("f");
 
     const { senderId, recieverId } = data;
 
@@ -89,11 +89,11 @@ exports.getUserChatMessagesApi = async (data) => {
       )
     );
 
-console.log(messages.length)
+    console.log(messages.length);
 
     return messages;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return error;
   }
 };
@@ -120,14 +120,12 @@ const getUserChatMessagesApi = async (data) => {
       )
     );
 
-     let count =
-         await ChatMessages.count({
-           where,
-           order: [["createdAt", "DESC"]],
-         })
-       
-console.log(count)
-    console.log(messages);
+    let count = await ChatMessages.count({
+      where,
+      order: [["createdAt", "DESC"]],
+    });
+
+    console.log(count, "messages in conversation");
 
     return messages;
   } catch (error) {
@@ -138,10 +136,19 @@ console.log(count)
 exports.sendMessage = async (data, socket) => {
   sequelize.transaction(async (t) => {
     try {
-      console.log(data, socket);
+      console.log(data);
       const { senderId, recieverId } = data;
       const participantsId = [senderId, recieverId];
+      console.log(participantsId);
 
+      if (senderId == null || senderId == "undefined") {
+        console.log("senderId must exist");
+        return "senderId must exist";
+      }
+      if (recieverId == null || recieverId == "undefined") {
+        console.log("recieverId must exist");
+        return "recieverId must exist";
+      }
       if (senderId == recieverId) {
         console.log("cannot message self");
         return "cannot message self";
@@ -171,18 +178,14 @@ exports.sendMessage = async (data, socket) => {
           return false;
         }
 
-          const chatControlCheck = await chatControl(
-            data, conversationType
-          );
-          if(chatControlCheck !== true){
-
-            return false;
-            
-          }
+        const chatControlCheck = await chatControl(data, conversationType);
+        if (chatControlCheck !== true) {
+          return false;
+        }
         const conversationCheck = await checkExistingConversation(
           participantsId
         );
-
+let saveMessage
         if (conversationCheck == false) {
           //create new conversations with participants
 
@@ -195,7 +198,7 @@ exports.sendMessage = async (data, socket) => {
           });
 
           data.conversationId = conversation.id;
-          const saveMessage = await ChatMessages.create(data, {
+          saveMessage = await ChatMessages.create(data, {
             transaction: t,
           });
         } else {
@@ -203,7 +206,7 @@ exports.sendMessage = async (data, socket) => {
 
           data.conversationId = conversationCheck;
 
-          const saveMessage = await ChatMessages.create(data, {
+           saveMessage = await ChatMessages.create(data, {
             transaction: t,
           });
         }
@@ -216,13 +219,18 @@ exports.sendMessage = async (data, socket) => {
           type: notifyType,
           message: mesg,
         });
-       
 
-       setTimeout(async () => {
-       socket.emit("getChatMessagesApi", await getUserChatMessagesApi(data))
+        // setTimeout(async () => {
+        //   socket.emit("getChatMessagesApi", await getUserChatMessagesApi(data));
+        // }, 500);
 
-       }, 500);
-     
+         setTimeout(async () => {
+           socket.emit(
+             "sentMessage",
+             saveMessage
+           );
+         }, 200);
+
         return "message sent";
       } else {
         return "Both sender and reciever must be valid users";
@@ -238,7 +246,7 @@ exports.sendMessage = async (data, socket) => {
 exports.markMessageRead = async (data) => {
   sequelize.transaction(async (t) => {
     try {
-      const { senderId, recieverId, conversationId} = data
+      const { senderId, recieverId, conversationId } = data;
       const message = await ChatMessages.findAll({
         where: { conversationId, recieverId: senderId },
       });
