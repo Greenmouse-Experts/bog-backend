@@ -84,6 +84,7 @@ app.use(
 app.use(cookieParser());
 
 const io = new Server(server, {
+  allowEIO3: true, // false by default
   cors: {
     origin: "*",
     methods: ["GET", "POST", "PATCH", "DELETE"],
@@ -154,7 +155,6 @@ io.on("connection", async (socket) => {
 
   socket.on("getUserConversations", async (userId) => {
     io.emit("getUserConversations", await getUserConversations(userId));
-   
   });
 
   socket.on("readConversationMessages", (data) => {
