@@ -133,6 +133,91 @@ const getUserChatMessagesApi = async (data) => {
   }
 };
 
+const getUserConversations = async (userId) => {
+  try {
+   
+
+    console.log(userId);
+
+
+    const where = {
+        participantsId: {
+          [Op.like]: `%${userId}%`,
+        },
+      }
+
+    let conversations = JSON.parse(
+      JSON.stringify(
+        await ChatConversations.findAll({
+          where,
+          order: [["createdAt", "DESC"]],
+          include: [
+            {
+              model: ChatMessages,
+              attributes: {
+                exclude: ["updatedAt"],
+              },
+              order: [["createdAt", "DESC"]],
+            },
+          ],
+        })
+      )
+    );
+
+    let count = await ChatConversations.count({
+      where,
+      order: [["createdAt", "DESC"]],
+    });
+
+    console.log(count, "Conversations had by this user");
+
+    return conversations;
+  } catch (error) {
+    return error;
+  }
+};
+
+exports.getUserConversations = async (userId) => {
+  try {
+    console.log(userId);
+
+    const where = {
+      participantsId: {
+        [Op.like]: `%${userId}%`,
+      },
+    };
+
+    let conversations = JSON.parse(
+      JSON.stringify(
+        await ChatConversations.findAll({
+          where,
+          order: [["createdAt", "DESC"]],
+          include: [
+            {
+              model: ChatMessages,
+              attributes: {
+                exclude: ["updatedAt"],
+              },
+              order: [["createdAt", "DESC"]],
+            },
+          ],
+        })
+      )
+    );
+
+    let count = await ChatConversations.count({
+      where,
+      order: [["createdAt", "DESC"]],
+    });
+
+    console.log(count, "Conversations had by this user");
+
+    return conversations;
+  } catch (error) {
+    return error;
+  }
+};
+
 exports.sendMessage = async (data, socket) => {
   sequelize.transaction(async (t) => {
     try {
@@ -230,6 +315,10 @@ let saveMessage
              saveMessage
            );
          }, 200);
+
+          setTimeout(async () => {
+            socket.emit("getUserConversations", getUserConversations(recieverId));
+          }, 200);
 
         return "message sent";
       } else {

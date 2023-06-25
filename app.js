@@ -35,10 +35,25 @@ const {
   getUserChatMessagesApi,
   deleteMessage,
   markMessageRead,
+  getUserConversations,
 } = require("./controllers/ChatController");
 // set up public folder
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "uploads")));
+
+//log file
+
+var fs = require("fs");
+
+var util = require("util");
+var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
+var log_stdout = process.stdout;
+
+console.log = function(d) {
+  //
+  log_file.write(util.format(d) + "\n");
+  log_stdout.write(util.format(d) + "\n");
+};
 
 // app.use(session({
 //   secret: 'keyboard cat',
@@ -97,7 +112,7 @@ app.post("/upload", async (req, res, next) => {
 });
 
 io.on("connection", async (socket) => {
-  console.log(socket.Id);
+  console.log(socket.id);
   io.emit("getNotifications", await Notification.fetchAdminNotification());
   io.emit(
     "getUserNotifications",
@@ -129,13 +144,17 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("getUserChatMessages", async (data) => {
-    
-    console.log(data)
-    io.emit("getUserChatMessages", async (data) => {
     console.log(data);
-      
+    io.emit("getUserChatMessages", async (data) => {
+      console.log(data);
+
       await getUserChatMessagesApi(data);
     });
+  });
+
+  socket.on("getUserConversations", async (userId) => {
+    io.emit("getUserConversations", await getUserConversations(userId));
+   
   });
 
   socket.on("readConversationMessages", (data) => {
@@ -151,6 +170,12 @@ io.on("connection", async (socket) => {
     deleteMessage(messageId);
     io.emit("getUserChatMessages", (data) => {
       getUserChatMessagesApi(data);
+    });
+  });
+
+  io.on("connection", (socket) => {
+    socket.on("disconnect", (reason) => {
+      // ...
     });
   });
 });
