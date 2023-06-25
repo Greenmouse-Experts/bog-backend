@@ -89,7 +89,7 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST", "PATCH", "DELETE"],
   },
-  transports: ['websocket']
+  transports: ['websocket', 'polling']
 });
 
 app.io = io;
