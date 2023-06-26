@@ -22,7 +22,7 @@ exports.createInvoice = async (orderData, user) => {
       description: items.product.name.substring(0, 27),
       quantity: items.quantity,
       price: parseInt(items.product.price),
-      "tax-rate": items.taxrate || 0,
+      "tax-rate": items.taxrate || 0,  
     };
   });
 
