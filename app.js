@@ -89,7 +89,8 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST", "PATCH", "DELETE"],
   },
-  transports: ['websocket', 'polling']
+  transports: ["websocket", "polling"],
+  upgrade: true
 });
 
 app.io = io;
