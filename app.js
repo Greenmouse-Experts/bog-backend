@@ -43,17 +43,17 @@ app.use(express.static(path.join(__dirname, "uploads")));
 
 // //log file
 
-var fs = require("fs");
+// var fs = require("fs");
 
-var util = require("util");
-var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
-var log_stdout = process.stdout;
+// var util = require("util");
+// var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
+// var log_stdout = process.stdout;
 
-console.log = function(d) {
-  //
-  log_file.write(util.format(d) + "\n");
-  log_stdout.write(util.format(d) + "\n");
-};
+// console.log = function(d) {
+//   //
+//   log_file.write(util.format(d) + "\n");
+//   log_stdout.write(util.format(d) + "\n");
+// };
 
 // app.use(session({
 //   secret: 'keyboard cat',
@@ -277,7 +277,7 @@ app.use((req, res) => {
   return res.status(404).send({ success: false, message: "Route not found" });
 });
 
-// sequelize.sync();
+sequelize.sync();
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`server started on port ${PORT}`);
