@@ -41,19 +41,19 @@ const {
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "uploads")));
 
-//log file
+// //log file
 
-var fs = require("fs");
+// var fs = require("fs");
 
-var util = require("util");
-var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
-var log_stdout = process.stdout;
+// var util = require("util");
+// var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
+// var log_stdout = process.stdout;
 
-console.log = function(d) {
-  //
-  log_file.write(util.format(d) + "\n");
-  log_stdout.write(util.format(d) + "\n");
-};
+// console.log = function(d) {
+//   //
+//   log_file.write(util.format(d) + "\n");
+//   log_stdout.write(util.format(d) + "\n");
+// };
 
 // app.use(session({
 //   secret: 'keyboard cat',
@@ -90,7 +90,6 @@ const io = new Server(server, {
     methods: ["GET", "POST", "PATCH", "DELETE"],
   },
   transports: ["websocket", "polling"],
-  upgrade: true
 });
 
 app.io = io;
