@@ -321,7 +321,7 @@ let saveMessage
 console.log("sentMessage");
 
           setTimeout(async () => {
-           socket.emit("getUserConversations", await getUserConversations(recieverId));
+           socket.emit("getUserConversations", getUserConversations(recieverId));
           }, 200);
 
         return "message sent";
