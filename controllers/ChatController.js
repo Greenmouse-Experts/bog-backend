@@ -145,6 +145,7 @@ const getUserConversations = async (userId) => {
           [Op.like]: `%${userId}%`,
         },
       }
+    console.log(userId);
 
     let conversations = JSON.parse(
       JSON.stringify(
@@ -157,7 +158,6 @@ const getUserConversations = async (userId) => {
               attributes: {
                 exclude: ["updatedAt"],
               },
-              order: [["createdAt", "DESC"]],
             },
           ],
         })
@@ -170,6 +170,7 @@ const getUserConversations = async (userId) => {
     });
 
     console.log(count, "Conversations had by this user");
+    console.log(conversations);
 
     return conversations;
   } catch (error) {
@@ -320,7 +321,7 @@ let saveMessage
 console.log("sentMessage");
 
           setTimeout(async () => {
-           socket.emit("getUserConversations", getUserConversations(recieverId));
+           socket.emit("getUserConversations", await getUserConversations(recieverId));
           }, 200);
 
         return "message sent";
