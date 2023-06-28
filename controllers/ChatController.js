@@ -308,7 +308,7 @@ let saveMessage
         // setTimeout(async () => {
         //   socket.emit("getChatMessagesApi", await getUserChatMessagesApi(data));
         // }, 500);
-
+console.log("sentMessage")
          setTimeout(async () => {
            socket.emit(
              "sentMessage",
