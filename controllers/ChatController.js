@@ -186,6 +186,7 @@ exports.getUserConversations = async (userId) => {
         [Op.like]: `%${userId}%`,
       },
     };
+    console.log(userId);
 
     let conversations = JSON.parse(
       JSON.stringify(
@@ -204,6 +205,8 @@ exports.getUserConversations = async (userId) => {
       )
     );
     console.log(conversations);
+    console.log(userId);
+
 
     let count = await ChatConversations.count({
       where,
