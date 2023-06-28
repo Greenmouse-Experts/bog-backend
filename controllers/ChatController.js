@@ -317,7 +317,7 @@ console.log("sentMessage")
          }, 200);
 
           setTimeout(async () => {
-            socket.emit("getUserConversations", getUserConversations(recieverId));
+            socket.emit("getUserConversations", await getUserConversations(recieverId));
           }, 200);
 
         return "message sent";
