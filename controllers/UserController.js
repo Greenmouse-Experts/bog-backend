@@ -656,6 +656,9 @@ exports.loginUser = async (req, res, next) => {
   sequelize.transaction(async t => {
   try {
 
+
+    
+
     const { email, password } = req.body;
     const user = JSON.parse(
       JSON.stringify(await UserService.findUser({ email }))
