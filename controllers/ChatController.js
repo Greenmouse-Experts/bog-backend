@@ -308,16 +308,16 @@ let saveMessage
         // setTimeout(async () => {
         //   socket.emit("getChatMessagesApi", await getUserChatMessagesApi(data));
         // }, 500);
-console.log("sentMessage")
          setTimeout(async () => {
            socket.emit(
              "sentMessage",
              saveMessage
            );
          }, 200);
+console.log("sentMessage");
 
           setTimeout(async () => {
-            socket.emit("getUserConversations", await getUserConversations(recieverId));
+           socket.emit("getUserConversations", getUserConversations(recieverId));
           }, 200);
 
         return "message sent";
