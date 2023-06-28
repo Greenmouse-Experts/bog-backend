@@ -198,12 +198,12 @@ exports.getUserConversations = async (userId) => {
               attributes: {
                 exclude: ["updatedAt"],
               },
-              order: [["createdAt", "DESC"]],
             },
           ],
         })
       )
     );
+    console.log(conversations);
 
     let count = await ChatConversations.count({
       where,
