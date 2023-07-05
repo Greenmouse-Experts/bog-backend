@@ -19,22 +19,33 @@ exports.checkExistingConversation = async (participantsId) => {
       let array1 = participantsId;
       let array2 = conversations[i].participantsId;
       if (array1.length === array2.length) {
-        // const isEqual = (a, b) =>
-        //   JSON.stringify(a.sort()) === JSON.stringify(b.sort());
-        //   if (isEqual(array1, array2) == true) {
-        //   }
-
-        //   console.log("ggg");
-
-        for (let c = 0; c < array1.length; c++) {
-          if (array2.includes(array1[c])) {
-            return conversations[i].id;
+        const isEqual = (a, b) =>
+          JSON.stringify(a.sort()) === JSON.stringify(b.sort());
+          if (isEqual(array1, array2) == true) {
+            console.log("convo exists")
+            return conversations[i].id
+          }else{
+            console.log('doesnt exist')
           }
-        }
+
+
+
+        //  console.log("ggg");
+        //  console.log(i);
+
+        // for (let c = 0; c < array1.length; c++) {
+        //   if (array2.includes(array1[c])) {
+        //     console.log("convo exist")
+        //     return conversations[i].id;
+        //   }
+        // }
       }
-      return false;
+      console.log("convo doesnt exist")
+      
     }
   }
+      console.log("convo doesnt exist");
+
   return false;
 };
 

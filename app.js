@@ -36,6 +36,7 @@ const {
   deleteMessage,
   markMessageRead,
   getUserConversations,
+  test,
 } = require("./controllers/ChatController");
 // set up public folder
 app.use(express.static(path.join(__dirname, "public")));
@@ -112,9 +113,9 @@ app.post("/upload", async (req, res, next) => {
     });
   }
 });
-
+let onlineUsers = [];
 io.on("connection", async (socket) => {
-  console.log(socket.id);
+  console.log("New Connection", socket.id);
   io.emit("getNotifications", await Notification.fetchAdminNotification());
   io.emit(
     "getUserNotifications",
@@ -125,24 +126,54 @@ io.on("connection", async (socket) => {
     socket.emit("markAsRead", await Notification.updateNotification(id));
   });
 
+  // Add new user connection to online users and send to client
+  socket.on("addNewUser", (userId) => {
+    if (!onlineUsers.some((user) => user.userId === userId)) {
+      onlineUsers.push({
+        userId,
+        socketId: socket.id,
+      });
+    } else if (onlineUsers.some((user) => user.userId !== userId)) {
+      onlineUsers = onlineUsers.filter((user) => user.userId !== userId);
+      console.log("Removed Prev Connection by User");
+      onlineUsers.push({
+        userId,
+        socketId: socket.id,
+      });
+    }
+
+    console.log("New Connection by User", socket.id, onlineUsers);
+
+    io.emit("getOnlineUsers", onlineUsers);
+  });
+
+  //send message
   socket.on("send_message", async (data) => {
     // io.in(room).emit("receive_message", data); // Send to all users in room, including sender
-    console.log("send message");
-    sendMessage(data, socket) // Save message in db
-      .then(async (response) => {
-        io.emit(
-          "getNotifications",
-          await Notification.fetchAdminNotification()
-        );
 
-        io.emit(
-          "getUserNotifications",
-          await Notification.fetchUserNotificationApi2(data.senderId)
-        );
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    // console.log("send message", data);
+
+    // // Save message in db
+    await sendMessage(data, socket, onlineUsers);
+
+    // //check if reciever online
+    // let user = onlineUsers.find((user) => user.userId === data.recieverId);
+    // //if reciever is online emit to his socket the new message
+    // if (user) {
+    //   socket.user = user
+    //   console.log(socket.user);
+
+    //   await getUserConversations(data.recieverId, socket, user);
+    // }
+    // io.emit(
+    //   "getNotifications",
+    //   await Notification.fetchAdminNotification()
+    // );
+
+    // io.emit(
+    //   "getUserNotifications",
+    //   await Notification.fetchUserNotificationApi2(data.senderId)
+    // );
   });
 
   socket.on("getUserChatMessages", async (data) => {
@@ -154,7 +185,8 @@ io.on("connection", async (socket) => {
     });
   });
 
-  socket.on("getUserConversations", async (userId) => {
+  socket.on("getUserConversations", async (data) => {
+    let { userId } = data;
     io.emit("getUserConversations", await getUserConversations(userId));
   });
 
@@ -174,10 +206,11 @@ io.on("connection", async (socket) => {
     });
   });
 
-  io.on("connection", (socket) => {
-    socket.on("disconnect", (reason) => {
-      // ...
-    });
+  socket.on("disconnect", () => {
+    onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
+
+    console.log("Online Users", onlineUsers);
+    io.emit("getOnlineUsers", onlineUsers);
   });
 });
 
@@ -269,12 +302,10 @@ app.use((err, req, res, next) => {
 //   }
 // }
 
-
-
 // new Index()
 //   .invoke()
 
-// Not found route 
+// Not found route
 app.use((req, res) => {
   return res.status(404).send({ success: false, message: "Route not found" });
 });
