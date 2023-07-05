@@ -43,7 +43,7 @@ exports.fetchUserNotification = async ({ userId }) => {
 exports.fetchUserNotificationApi = async notifyParam => {
   try {
 
-    console.log(notifyParam)
+    
     const { userId } = notifyParam;
     const notifications = await Notification.findAll({
       where: {

@@ -33,6 +33,7 @@ const {
   checkMessageType,
   chatControl,
 } = require("../service/chatService");
+const { error } = require("winston");
 
 // exports.getUserChatMessages = async (req, res, next) => {
 //   try {
@@ -133,52 +134,54 @@ const getUserChatMessagesApi = async (data) => {
   }
 };
 
-const getUserConversations = async (userId) => {
+const getUserConversations = async (userId, socket) => {
   try {
-   
-
-    console.log(userId);
-
+    // console.log(userId);
 
     const where = {
-        participantsId: {
-          [Op.like]: `%${userId}%`,
-        },
-      }
-    console.log(userId);
+      participantsId: {
+        [Op.like]: `%${userId}%`,
+      },
+    };
 
-    let conversations = JSON.parse(
-      JSON.stringify(
-        await ChatConversations.findAll({
-          where,
+    let conversations = await ChatConversations.findAll({
+      where: where,
+      order: [["updatedAt", "DESC"]],
+      include: [
+        {
+          model: ChatMessages,
+          as: "chatMessages",
           order: [["createdAt", "DESC"]],
-          include: [
-            {
-              model: ChatMessages,
-              attributes: {
-                exclude: ["updatedAt"],
-              },
-            },
-          ],
-        })
-      )
-    );
-
-    let count = await ChatConversations.count({
-      where,
-      order: [["createdAt", "DESC"]],
+          attributes: {
+            exclude: ["createdAt", "deletedAt"],
+          },
+        },
+      ],
+    }).then(async (conversations) => {
+      conversations = JSON.parse(JSON.stringify(conversations));
+      // console.log("getUserConversations", conversations);
+      socket.emit("getUserConversations", conversations);
     });
 
+    // console.log("hello");
+
+    const count = await ChatConversations.count({
+      where: where,
+    });
+
+    // setTimeout(async () => {
+    //   socket.emit("getUserConversations", conversations);
+    // }, 300);
     console.log(count, "Conversations had by this user");
-    console.log(conversations);
 
     return conversations;
   } catch (error) {
+    console.log(error);
     return error;
   }
 };
 
-exports.getUserConversations = async (userId) => {
+exports.getUserConversations = async (userId, socket) => {
   try {
     console.log(userId);
 
@@ -187,42 +190,141 @@ exports.getUserConversations = async (userId) => {
         [Op.like]: `%${userId}%`,
       },
     };
-    console.log(userId);
 
-    let conversations = JSON.parse(
+    const conversations = JSON.parse(
       JSON.stringify(
         await ChatConversations.findAll({
-          where,
-          order: [["createdAt", "DESC"]],
+          where: where,
           include: [
             {
               model: ChatMessages,
+              as: "chatMessages",
+              order: [["createdAt", "DESC"]],
               attributes: {
-                exclude: ["updatedAt"],
+                exclude: ["createdAt", "deletedAt"],
               },
             },
+          ],
+          order: [
+            [{ model: ChatMessages, as: "chatMessages" }, "createdAt", "DESC"],
           ],
         })
       )
     );
-    console.log(conversations);
-    console.log(userId);
 
+    console.log("hello");
 
-    let count = await ChatConversations.count({
-      where,
-      order: [["createdAt", "DESC"]],
+    const count = await ChatConversations.count({
+      where: where,
     });
 
+    setTimeout(async () => {
+      socket.emit("getUserConversations", conversations);
+    }, 300);
     console.log(count, "Conversations had by this user");
 
     return conversations;
   } catch (error) {
+    console.log(error);
     return error;
   }
 };
 
-exports.sendMessage = async (data, socket) => {
+exports.getUserConversationsNew = async (userId, socket, user) => {
+  try {
+    console.log(userId, user);
+
+    const where = {
+      participantsId: {
+        [Op.like]: `%${userId}%`,
+      },
+    };
+
+    const conversations = JSON.parse(
+      JSON.stringify(
+        await ChatConversations.findAll({
+          where: where,
+          include: [
+            {
+              model: ChatMessages,
+              as: "chatMessages",
+              order: [["createdAt", "DESC"]],
+              attributes: {
+                exclude: ["createdAt", "deletedAt"],
+              },
+            },
+          ],
+          order: [
+            [{ model: ChatMessages, as: "chatMessages" }, "createdAt", "DESC"],
+          ],
+        })
+      )
+    );
+
+    console.log("hello");
+
+    const count = await ChatConversations.count({
+      where: where,
+    });
+
+    console.log(conversations);
+
+    setTimeout(async () => {
+      // socket.emit("getUserConversations", conversations);
+      socket.to(user.socketId).emit("getUserConversations", conversations);
+    }, 300);
+
+    return conversations;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+// exports.getUserConversations = async (userId) => {
+//   try {
+//     console.log(userId);
+
+//     const where = {
+//       participantsId: {
+//         [Op.like]: `%${userId}%`,
+//       },
+//     };
+//     console.log(userId);
+
+//     let conversations = JSON.parse(
+//       JSON.stringify(
+//         await ChatConversations.findAll({
+//           where,
+//           order: [["createdAt", "DESC"]],
+//           include: [
+//             {
+//               model: ChatMessages,
+//               attributes: {
+//                 exclude: ["updatedAt"],
+//               },
+//             },
+//           ],
+//         })
+//       )
+//     );
+//     console.log(conversations);
+//     console.log(userId);
+
+//     let count = await ChatConversations.count({
+//       where,
+//       order: [["createdAt", "DESC"]],
+//     });
+
+//     console.log(count, "Conversations had by this user");
+
+//     return conversations;
+//   } catch (error) {
+//     return error;
+//   }
+// };
+
+exports.sendMessage = async (data, socket, onlineUsers) => {
   sequelize.transaction(async (t) => {
     try {
       console.log(data);
@@ -274,7 +376,7 @@ exports.sendMessage = async (data, socket) => {
         const conversationCheck = await checkExistingConversation(
           participantsId
         );
-let saveMessage
+        let saveMessage;
         if (conversationCheck == false) {
           //create new conversations with participants
 
@@ -282,11 +384,13 @@ let saveMessage
             participantsId: participantsId,
             conversationType: conversationType.messageType,
           };
-          const conversation = await ChatConversations.create(convo, {
+          const conversationcreate = await ChatConversations.create(convo, {
             transaction: t,
           });
+          // console.log(conversationcreate)
 
-          data.conversationId = conversation.id;
+          data.conversationId = conversationcreate.id;
+          data.conversationType = conversationcreate.conversationtype;
           saveMessage = await ChatMessages.create(data, {
             transaction: t,
           });
@@ -295,10 +399,24 @@ let saveMessage
 
           data.conversationId = conversationCheck;
 
-           saveMessage = await ChatMessages.create(data, {
+          saveMessage = await ChatMessages.create(data, {
             transaction: t,
           });
         }
+        // console.log(data)
+        let id = data.conversationId;
+        const where = {
+          id,
+        };
+        const up = await ChatConversations.update(
+          {
+            conversationtype: data.conversationtype,
+          },
+          {
+            where,
+            transaction: t,
+          }
+        );
 
         const mesg = `A ${senderAccountType} ${senderId} just sent you a message`;
         const userId = recieverId;
@@ -312,19 +430,28 @@ let saveMessage
         // setTimeout(async () => {
         //   socket.emit("getChatMessagesApi", await getUserChatMessagesApi(data));
         // }, 500);
-         setTimeout(async () => {
-           socket.emit(
-             "sentMessage",
-             saveMessage
-           );
-         }, 200);
-console.log("sentMessage");
+        setTimeout(() => {
+          socket.emit("sentMessage", saveMessage);
+        }, 100);
+        console.log("sentMessage");
 
-          setTimeout(async () => {
-           socket.emit("getUserConversations", getUserConversations(recieverId));
-          }, 200);
+        // getUserConversations(recieverId, socket);
 
-        return "message sent";
+        //check if reciever online
+        let user = onlineUsers.find((user) => user.userId === data.recieverId);
+        //if reciever is online emit to his socket the new message
+        if (user) {
+          socket.user = user;
+          console.log(socket.user);
+
+                 setTimeout(async() => {
+          await this.getUserConversationsNew(data.recieverId, socket, user);
+
+                 }, 100);
+        }
+
+        // console.log("message sent")
+        return saveMessage;
       } else {
         return "Both sender and reciever must be valid users";
       }
@@ -373,3 +500,20 @@ exports.deleteMessage = async (messageId) => {
     }
   });
 };
+
+// exports.test = async () => {
+//   sequelize.transaction(async (t) => {
+//     new Promise(function(resolve, reject) {
+//       try {
+//         const newt = {
+//           mike: "fff",
+//         };
+//         resolve(newt);
+//       } catch (error) {
+//         console.log(error);
+//         t.rollback();
+//         reject(error);
+//       }
+//     });
+//   });
+// };
