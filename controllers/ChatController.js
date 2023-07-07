@@ -448,6 +448,13 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
           await this.getUserConversationsNew(data.recieverId, socket, user);
 
                  }, 100);
+                   setTimeout(async () => {
+                     await this.getUserConversationsNew(
+                       data.senderId,
+                       socket,
+                       user
+                     );
+                   }, 100);
         }
 
         // console.log("message sent")
