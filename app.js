@@ -154,6 +154,7 @@ io.on("connection", async (socket) => {
     // console.log("send message", data);
 
     // // Save message in db
+    
     await sendMessage(data, socket, onlineUsers);
 
     // //check if reciever online
