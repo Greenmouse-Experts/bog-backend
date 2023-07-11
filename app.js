@@ -44,7 +44,7 @@ app.use(express.static(path.join(__dirname, "uploads")));
 
 // //log file
 
-// var fs = require("fs");
+var fs = require("fs");
 
 // var util = require("util");
 // var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
@@ -113,7 +113,7 @@ app.post("/upload", async (req, res, next) => {
     });
   }
 });
-
+let onlineUsers = [];
 io.on("connection", async (socket) => {
   console.log("New Connection", socket.id);
   io.emit("getNotifications", await Notification.fetchAdminNotification());
@@ -126,6 +126,28 @@ io.on("connection", async (socket) => {
     socket.emit("markAsRead", await Notification.updateNotification(id));
   });
 
+  // Add new user connection to online users and send to client
+  socket.on("addNewUser", (userId) => {
+    if (!onlineUsers.some((user) => user.userId === userId)) {
+      onlineUsers.push({
+        userId,
+        socketId: socket.id,
+      });
+    } else if (onlineUsers.some((user) => user.userId !== userId)) {
+      onlineUsers = onlineUsers.filter((user) => user.userId !== userId);
+      console.log("Removed Prev Connection by User");
+      onlineUsers.push({
+        userId,
+        socketId: socket.id,
+      });
+    }
+
+    console.log("New Connection by User", socket.id, onlineUsers);
+
+    io.emit("getOnlineUsers", onlineUsers);
+  });
+
+  //send message
   socket.on("send_message", async (data) => {
     // io.in(room).emit("receive_message", data); // Send to all users in room, including sender
 
@@ -164,7 +186,8 @@ io.on("connection", async (socket) => {
     });
   });
 
-  socket.on("getUserConversations", async (userId) => {
+  socket.on("getUserConversations", async (data) => {
+    let { userId } = data;
     io.emit("getUserConversations", await getUserConversations(userId));
   });
 
@@ -184,10 +207,11 @@ io.on("connection", async (socket) => {
     });
   });
 
-  io.on("connection", (socket) => {
-    socket.on("disconnect", (reason) => {
-      // ...
-    });
+  socket.on("disconnect", () => {
+    onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
+
+    console.log("Online Users", onlineUsers);
+    io.emit("getOnlineUsers", onlineUsers);
   });
 });
 
