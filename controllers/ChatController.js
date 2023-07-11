@@ -285,12 +285,10 @@ exports.getUserConversations = async (userId, socket) => {
     return conversations;
   } catch (error) {
     console.log(error);
-    console.log(error);
     return error;
   }
 };
 
-exports.getUserConversationsNew = async (userId, socket, user) => {
 exports.getUserConversationsNew = async (userId, socket, user) => {
   try {
     console.log(userId, user);
@@ -393,55 +391,10 @@ exports.getUserConversationsNew = async (userId, socket, user) => {
     return conversations;
   } catch (error) {
     console.log(error);
-    console.log(error);
     return error;
   }
 };
 
-// exports.getUserConversations = async (userId) => {
-//   try {
-//     console.log(userId);
-
-//     const where = {
-//       participantsId: {
-//         [Op.like]: `%${userId}%`,
-//       },
-//     };
-//     console.log(userId);
-
-//     let conversations = JSON.parse(
-//       JSON.stringify(
-//         await ChatConversations.findAll({
-//           where,
-//           order: [["createdAt", "DESC"]],
-//           include: [
-//             {
-//               model: ChatMessages,
-//               attributes: {
-//                 exclude: ["updatedAt"],
-//               },
-//             },
-//           ],
-//         })
-//       )
-//     );
-//     console.log(conversations);
-//     console.log(userId);
-
-//     let count = await ChatConversations.count({
-//       where,
-//       order: [["createdAt", "DESC"]],
-//     });
-
-//     console.log(count, "Conversations had by this user");
-
-//     return conversations;
-//   } catch (error) {
-//     return error;
-//   }
-// };
-
-exports.sendMessage = async (data, socket, onlineUsers) => {
 // exports.getUserConversations = async (userId) => {
 //   try {
 //     console.log(userId);
@@ -546,7 +499,6 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
 //           participantsId
 //         );
 //         let saveMessage;
-//         let saveMessage;
 //         if (conversationCheck == false) {
 //           //create new conversations with participants
 
@@ -556,14 +508,10 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
 //             conversationType: conversationType.messageType,
 //           };
 //           const conversationcreate = await ChatConversations.create(convo, {
-//           const conversationcreate = await ChatConversations.create(convo, {
 //             transaction: t,
 //           });
 //           // console.log(conversationcreate)
-//           // console.log(conversationcreate)
 
-//           data.conversationId = conversationcreate.id;
-//           data.conversationType = conversationcreate.conversationtype;
 //           data.conversationId = conversationcreate.id;
 //           data.conversationType = conversationcreate.conversationtype;
 //           saveMessage = await ChatMessages.create(data, {
@@ -575,24 +523,9 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
 //           data.conversationId = conversationCheck;
 
 //           saveMessage = await ChatMessages.create(data, {
-//           saveMessage = await ChatMessages.create(data, {
 //             transaction: t,
 //           });
 //         }
-//         // console.log(data)
-//         let id = data.conversationId;
-//         const where = {
-//           id,
-//         };
-//         const up = await ChatConversations.update(
-//           {
-//             conversationtype: data.conversationtype,
-//           },
-//           {
-//             where,
-//             transaction: t,
-//           }
-//         );
 //         // console.log(data)
 //         let id = data.conversationId;
 //         const where = {
