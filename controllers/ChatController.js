@@ -285,10 +285,12 @@ exports.getUserConversations = async (userId, socket) => {
     return conversations;
   } catch (error) {
     console.log(error);
+    console.log(error);
     return error;
   }
 };
 
+exports.getUserConversationsNew = async (userId, socket, user) => {
 exports.getUserConversationsNew = async (userId, socket, user) => {
   try {
     console.log(userId, user);
@@ -391,6 +393,7 @@ exports.getUserConversationsNew = async (userId, socket, user) => {
     return conversations;
   } catch (error) {
     console.log(error);
+    console.log(error);
     return error;
   }
 };
@@ -439,197 +442,261 @@ exports.getUserConversationsNew = async (userId, socket, user) => {
 // };
 
 exports.sendMessage = async (data, socket, onlineUsers) => {
-  sequelize.transaction(async (t) => {
-    try {
-      console.log(data);
-      const { senderId, recieverId } = data;
-      const participantsId = [senderId, recieverId];
-      console.log(participantsId);
+// exports.getUserConversations = async (userId) => {
+//   try {
+//     console.log(userId);
 
-      if (senderId == null || senderId == "undefined") {
-        console.log("senderId must exist");
-        return "senderId must exist";
-      }
-      if (recieverId == null || recieverId == "undefined") {
-        console.log("recieverId must exist");
-        return "recieverId must exist";
-      }
-      if (senderId == recieverId) {
-        console.log("cannot message self");
-        return "cannot message self";
-      }
+//     const where = {
+//       participantsId: {
+//         [Op.like]: `%${userId}%`,
+//       },
+//     };
+//     console.log(userId);
 
-      let senderAccountType;
-      let recieverAccountType;
+//     let conversations = JSON.parse(
+//       JSON.stringify(
+//         await ChatConversations.findAll({
+//           where,
+//           order: [["createdAt", "DESC"]],
+//           include: [
+//             {
+//               model: ChatMessages,
+//               attributes: {
+//                 exclude: ["updatedAt"],
+//               },
+//             },
+//           ],
+//         })
+//       )
+//     );
+//     console.log(conversations);
+//     console.log(userId);
 
-      //for sender
-      const senderdetails = await getUserDetails({ id: senderId });
-      const recieverdetails = await getUserDetails({ id: recieverId });
-      if (senderdetails !== null && recieverdetails !== null) {
-        //for reciever
-        // const recieverdetails =  getUserDetails({ id: recieverId });
+//     let count = await ChatConversations.count({
+//       where,
+//       order: [["createdAt", "DESC"]],
+//     });
 
-        //to get who is the user amongt chat participants
-        let conversationUserId;
-        if (senderdetails == "admin") {
-          senderAccountType = "admin";
-          recieverAccountType = "user";
+//     console.log(count, "Conversations had by this user");
 
-          //assign who is user
-          conversationUserId = recieverId;
-        } else {
-          senderAccountType = "user";
-          recieverAccountType = "admin";
+//     return conversations;
+//   } catch (error) {
+//     return error;
+//   }
+// };
 
-          //assign who is user
-          conversationUserId = senderId;
-        }
-        //check who is admin and check message type from admin type
-        const conversationType = await checkMessageType(participantsId);
-        if (conversationType == false) {
-          console.log("someone must be an admin");
-          return false;
-        }
+// exports.sendMessage = async (data, socket, onlineUsers) => {
+//   sequelize.transaction(async (t) => {
+//     try {
+//       console.log(data);
+//       const { senderId, recieverId } = data;
+//       const participantsId = [senderId, recieverId];
+//       console.log(participantsId);
 
-        const chatControlCheck = await chatControl(data, conversationType);
-        if (chatControlCheck !== true) {
-          return false;
-        }
-        const conversationCheck = await checkExistingConversation(
-          participantsId
-        );
-        let saveMessage;
-        if (conversationCheck == false) {
-          //create new conversations with participants
+//       if (senderId == null || senderId == "undefined") {
+//         console.log("senderId must exist");
+//         return "senderId must exist";
+//       }
+//       if (recieverId == null || recieverId == "undefined") {
+//         console.log("recieverId must exist");
+//         return "recieverId must exist";
+//       }
+//       if (senderId == recieverId) {
+//         console.log("cannot message self");
+//         return "cannot message self";
+//       }
 
-          const convo = {
-            userId: conversationUserId,
-            participantsId: participantsId,
-            conversationType: conversationType.messageType,
-          };
-          const conversationcreate = await ChatConversations.create(convo, {
-            transaction: t,
-          });
-          // console.log(conversationcreate)
+//       let senderAccountType;
+//       let recieverAccountType;
 
-          data.conversationId = conversationcreate.id;
-          data.conversationType = conversationcreate.conversationtype;
-          saveMessage = await ChatMessages.create(data, {
-            transaction: t,
-          });
-        } else {
-          //In case conversation already exists
+//       //for sender
+//       const senderdetails = await getUserDetails({ id: senderId });
+//       const recieverdetails = await getUserDetails({ id: recieverId });
+//       if (senderdetails !== null && recieverdetails !== null) {
+//         //for reciever
+//         // const recieverdetails =  getUserDetails({ id: recieverId });
 
-          data.conversationId = conversationCheck;
+//         //to get who is the user amongt chat participants
+//         let conversationUserId;
+//         if (senderdetails == "admin") {
+//           senderAccountType = "admin";
+//           recieverAccountType = "user";
 
-          saveMessage = await ChatMessages.create(data, {
-            transaction: t,
-          });
-        }
-        // console.log(data)
-        let id = data.conversationId;
-        const where = {
-          id,
-        };
-        const up = await ChatConversations.update(
-          {
-            conversationtype: data.conversationtype,
-          },
-          {
-            where,
-            transaction: t,
-          }
-        );
+//           //assign who is user
+//           conversationUserId = recieverId;
+//         } else {
+//           senderAccountType = "user";
+//           recieverAccountType = "admin";
 
-        let conversation = await ChatConversations.findOne({
-          where: { id: data.conversationId },
-        });
+//           //assign who is user
+//           conversationUserId = senderId;
+//         }
+//         //check who is admin and check message type from admin type
+//         const conversationType = await checkMessageType(participantsId);
+//         if (conversationType == false) {
+//           console.log("someone must be an admin");
+//           return false;
+//         }
 
-        // setTimeout(async () => {
-        //   socket.emit("getChatMessagesApi", await getUserChatMessagesApi(data));
-        // }, 500);
-        setTimeout(() => {
-          socket.emit("sentMessage", saveMessage);
-        }, 100);
-        console.log("sentMessage");
+//         const chatControlCheck = await chatControl(data, conversationType);
+//         if (chatControlCheck !== true) {
+//           return false;
+//         }
+//         const conversationCheck = await checkExistingConversation(
+//           participantsId
+//         );
+//         let saveMessage;
+//         let saveMessage;
+//         if (conversationCheck == false) {
+//           //create new conversations with participants
 
-        //for loop : for all partcipants in chat, check if online, if yes emit get conversation to their socket Ids
-        console.log(conversation.participantsId);
-        console.log(onlineUsers);
-        for (let i = 0; i < conversation.participantsId.length; i++) {
-          let onlineuser = onlineUsers.find(
-            (user) => user.userId === conversation.participantsId[i]
-          );
-          //if participant is online emit to his socket the new message
-          if (onlineuser) {
-            console.log(conversation.participantsId[i] + "is online");
+//           const convo = {
+//             userId: conversationUserId,
+//             participantsId: participantsId,
+//             conversationType: conversationType.messageType,
+//           };
+//           const conversationcreate = await ChatConversations.create(convo, {
+//           const conversationcreate = await ChatConversations.create(convo, {
+//             transaction: t,
+//           });
+//           // console.log(conversationcreate)
+//           // console.log(conversationcreate)
 
-            setTimeout(async () => {
-              await this.getUserConversationsNew(
-                conversation.participantsId[i],
-                socket,
-                onlineuser
-              );
-            }, 100);
-          }
-        }
+//           data.conversationId = conversationcreate.id;
+//           data.conversationType = conversationcreate.conversationtype;
+//           data.conversationId = conversationcreate.id;
+//           data.conversationType = conversationcreate.conversationtype;
+//           saveMessage = await ChatMessages.create(data, {
+//             transaction: t,
+//           });
+//         } else {
+//           //In case conversation already exists
 
-        //to know wether to send the notification to user or admins
-        const notifysender = await findUserById(senderId);
+//           data.conversationId = conversationCheck;
 
-        if (notifysender.userType == "admin") {
-          const mesg = `A ${senderAccountType} ${senderId} just sent you a message`;
-          const userId = recieverId;
-          const notifyType = "user";
-          await Notification.createNotification({
-            userId,
-            type: notifyType,
-            message: mesg,
-          });
+//           saveMessage = await ChatMessages.create(data, {
+//           saveMessage = await ChatMessages.create(data, {
+//             transaction: t,
+//           });
+//         }
+//         // console.log(data)
+//         let id = data.conversationId;
+//         const where = {
+//           id,
+//         };
+//         const up = await ChatConversations.update(
+//           {
+//             conversationtype: data.conversationtype,
+//           },
+//           {
+//             where,
+//             transaction: t,
+//           }
+//         );
+//         // console.log(data)
+//         let id = data.conversationId;
+//         const where = {
+//           id,
+//         };
+//         const up = await ChatConversations.update(
+//           {
+//             conversationtype: data.conversationtype,
+//           },
+//           {
+//             where,
+//             transaction: t,
+//           }
+//         );
 
-          //To all admin
-          const mesgAdmin = `A ${data.conversationType} admin just sent a message to a user `;
-          const userIdAdmin = senderId;
-          const notifyTypeAdmin = "admin";
-          // const { io } = req.app;
-          await Notification.createNotification({
-            userId: userIdAdmin,
-            type: notifyTypeAdmin,
-            message: mesgAdmin,
-          });
-        } else {
-          //if sender is a user
-          //To all admin
-          const mesgAdmin2 = `A ${data.conversationType} user just sent a message `;
-          const userIdAdmin2 = senderId;
-          const notifyTypeAdmin2 = "admin";
-          // const { io } = req.app;
-          await Notification.createNotification({
-            userId: userIdAdmin2,
-            type: notifyTypeAdmin2,
-            message: mesgAdmin2,
-          });
-        }
+//         let conversation = await ChatConversations.findOne({
+//           where: { id: data.conversationId },
+//         });
 
-        setTimeout(async () => {
-          socket.emit(
-            "getNotifications",
-            await Notification.fetchAdminNotification()
-          );
-        }, 200);
+//         // setTimeout(async () => {
+//         //   socket.emit("getChatMessagesApi", await getUserChatMessagesApi(data));
+//         // }, 500);
+//         setTimeout(() => {
+//           socket.emit("sentMessage", saveMessage);
+//         }, 100);
+//         console.log("sentMessage");
 
-        // console.log("message sent")
-        return saveMessage;
-      } else {
-        return "Both sender and reciever must be valid users";
-      }
-    } catch (error) {
-      console.log(error);
-      t.rollback();
-      return error;
-    }
-  });
-};
+//         //for loop : for all partcipants in chat, check if online, if yes emit get conversation to their socket Ids
+//         console.log(conversation.participantsId);
+//         console.log(onlineUsers);
+//         for (let i = 0; i < conversation.participantsId.length; i++) {
+//           let onlineuser = onlineUsers.find(
+//             (user) => user.userId === conversation.participantsId[i]
+//           );
+//           //if participant is online emit to his socket the new message
+//           if (onlineuser) {
+//             console.log(conversation.participantsId[i] + "is online");
+
+//             setTimeout(async () => {
+//               await this.getUserConversationsNew(
+//                 conversation.participantsId[i],
+//                 socket,
+//                 onlineuser
+//               );
+//             }, 100);
+//           }
+//         }
+
+//         //to know wether to send the notification to user or admins
+//         const notifysender = await findUserById(senderId);
+
+//         if (notifysender.userType == "admin") {
+//           const mesg = `A ${senderAccountType} ${senderId} just sent you a message`;
+//           const userId = recieverId;
+//           const notifyType = "user";
+//           await Notification.createNotification({
+//             userId,
+//             type: notifyType,
+//             message: mesg,
+//           });
+
+//           //To all admin
+//           const mesgAdmin = `A ${data.conversationType} admin just sent a message to a user `;
+//           const userIdAdmin = senderId;
+//           const notifyTypeAdmin = "admin";
+//           // const { io } = req.app;
+//           await Notification.createNotification({
+//             userId: userIdAdmin,
+//             type: notifyTypeAdmin,
+//             message: mesgAdmin,
+//           });
+//         } else {
+//           //if sender is a user
+//           //To all admin
+//           const mesgAdmin2 = `A ${data.conversationType} user just sent a message `;
+//           const userIdAdmin2 = senderId;
+//           const notifyTypeAdmin2 = "admin";
+//           // const { io } = req.app;
+//           await Notification.createNotification({
+//             userId: userIdAdmin2,
+//             type: notifyTypeAdmin2,
+//             message: mesgAdmin2,
+//           });
+//         }
+
+//         setTimeout(async () => {
+//           socket.emit(
+//             "getNotifications",
+//             await Notification.fetchAdminNotification()
+//           );
+//         }, 200);
+
+//         // console.log("message sent")
+//         return saveMessage;
+//       } else {
+//         return "Both sender and reciever must be valid users";
+//       }
+//     } catch (error) {
+//       console.log(error);
+//       t.rollback();
+//       return error;
+//     }
+//   });
+// };
 
 exports.markMessageRead = async (data) => {
   sequelize.transaction(async (t) => {
