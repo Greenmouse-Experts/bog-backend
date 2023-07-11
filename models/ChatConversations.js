@@ -14,6 +14,10 @@ const ChatConversations = sequelise.define(
       unique: true,
       primaryKey: true,
     },
+    userId: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
     participantsId: {
       allowNull: false,
       type: Sequelize.TEXT,

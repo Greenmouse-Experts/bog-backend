@@ -30,6 +30,15 @@ exports.adminLevels = [
   { level: 6, type: "general admin" },
 ];
 
+exports.adminLevelCheck = [
+  { level: 1, type: "general" },
+  { level: 2, type: "article" },
+  { level: 3, type: "finance" },
+  { level: 4, type: "product" },
+  { level: 5, type: "project" },
+  { level: 6, type: "general" },
+];
+
 exports.adminPrivileges = [
   {
     type: "general admin",
@@ -45,7 +54,10 @@ exports.adminPrivileges = [
     ],
   },
   { type: "article admin", privileges: ["BLOG", "PROFILE"] },
-  { type: "finance admin", privileges: ["TRANSACTION", "PROFILE", "PROJECT", "PRODUCT"] },
+  {
+    type: "finance admin",
+    privileges: ["TRANSACTION", "PROFILE", "PROJECT", "PRODUCT"],
+  },
   {
     type: "product admin",
     privileges: ["PRODUCT", "ADDRESS", "ORDER", "NOTIFICATION", "PROFILE"],
@@ -90,7 +102,7 @@ exports.ticket_issues = [
   {
     name: "Sales",
     slug: "sales",
-    desc: "For Product & Service issues"
+    desc: "For Product & Service issues",
   },
   {
     name: "Technical",
