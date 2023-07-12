@@ -311,7 +311,7 @@ app.use((req, res) => {
   return res.status(404).send({ success: false, message: "Route not found" });
 });
 
-sequelize.sync();
+// sequelize.sync();
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`server started on port ${PORT}`);

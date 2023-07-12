@@ -26,6 +26,8 @@ const {
 } = require("../helpers/mailer/samples");
 const Notifications = require("../models/Notification");
 
+const cloudinary = require("../helpers/cloudinaryMediaProvider");
+
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
   const { io } = req.app;
@@ -290,6 +292,7 @@ exports.deleteCategory = async (req, res, next) => {
 };
 
 exports.createProduct = async (req, res, next) => {
+
   sequelize.transaction(async (t) => {
     try {
       const { categoryId, name, price, quantity, unit, description } = req.body;
@@ -305,6 +308,8 @@ exports.createProduct = async (req, res, next) => {
         status: req.body.status,
       };
 
+      // console.log(request)
+      // const images = await cloudinary.upload(req);
       const photos = [];
       for (let i = 0; i < req.files.length; i++) {
         // const result = await cloudinary.uploader.upload(req.files[i].path);
@@ -352,6 +357,159 @@ exports.createProduct = async (req, res, next) => {
   });
 };
 
+exports.createProductV2 = async (req, res, next) => {
+
+  sequelize.transaction(async (t) => {
+    try {
+      const { categoryId, name, price, quantity, unit, description } = req.body;
+      const creatorId = req.user.id;
+      const request = {
+        categoryId,
+        name,
+        price,
+        quantity,
+        unit,
+        description,
+        creatorId,
+        status: req.body.status,
+      };
+      console.log(request)
+
+      const images = await cloudinary.upload(req);
+      const photos = [];
+      // for (let i = 0; i < req.files.length; i++) {
+      for (let i = 0; i < images.length; i++) {
+        // const result = await cloudinary.uploader.upload(req.files[i].path);
+        // const docPath = result.secure_url;
+        
+        photos.push({
+          creatorId,
+          url: images[i],
+        });
+      }
+      if (photos.length > 0) {
+        request.image = photos[0].url;
+        request.product_image = photos;
+      }
+      const product = await Product.create(request, {
+        transaction: t,
+        include: [
+          {
+            model: ProductImage,
+            as: "product_image",
+          },
+        ],
+      });
+
+      const mesg = `A new Product was created`;
+      const notifyType = "admin";
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg,
+      });
+      io.emit("getNotifications", await Notification.fetchAdminNotification());
+
+      return res.status(200).send({
+        success: true,
+        message: "Product created successfully",
+        data: product,
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.updateProductV2 = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { productId } = req.params;
+      const request = req.body;
+      const creatorId = req.user.id;
+      const product = await Product.findByPk(productId, {
+        attributes: ["id"],
+      });
+      console.log(request)
+      if (!product) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Product",
+        });
+      }
+
+      if(typeof images !== 'undefined'){
+        const images = await cloudinary.upload(req);
+      // const photos = [];
+     
+
+      // console.log(images);
+      
+        if (images.length > 0) {
+          const photos = [];
+          for (let i = 0; i < images.length; i++) {
+            // const result = await cloudinary.uploader.upload(req.files[i].path);
+            // const docPath = result.secure_url;
+            // const url = `${process.env.APP_URL}/${req.files[i].path}`;
+            photos.push({
+              url: images[i],
+              creatorId,
+              productId
+            });
+          }
+          const images = await ProductImage.findAll({
+            where: { productId },
+            attributes: ["id"],
+          });
+          // if (images.length > 0) {
+          //   const Ids = images.map((img) => img.id);
+          //   await ProductImage.destroy({ where: { id: Ids }, transaction: t });
+          // }
+          await ProductImage.bulkCreate(photos, { transaction: t });
+          request.image = photos[0].image;
+        }
+      }
+
+      await Product.update(request, {
+        where: { id: productId },
+        // transaction: t
+      });
+
+      const result = await Product.findOne({
+        where: { id: productId },
+        include: [
+          {
+            model: User,
+            as: "creator",
+            attributes: ["id", "name", "email", "phone", "photo"],
+          },
+          {
+            model: Category,
+            as: "category",
+            attributes: ["id", "name", "description"],
+          },
+          {
+            model: ProductImage,
+            as: "product_image",
+            attributes: ["id", "name", "image", "url"],
+          },
+        ],
+      });
+
+      return res.status(200).send({
+        success: true,
+        message: "Product updated successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.log(error)
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
 exports.updateProduct = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -386,10 +544,10 @@ exports.updateProduct = async (req, res, next) => {
           where: { productId },
           attributes: ["id"],
         });
-        if (images.length > 0) {
-          const Ids = images.map((img) => img.id);
-          await ProductImage.destroy({ where: { id: Ids }, transaction: t });
-        }
+        // if (images.length > 0) {
+        //   const Ids = images.map((img) => img.id);
+        //   await ProductImage.destroy({ where: { id: Ids }, transaction: t });
+        // }
         await ProductImage.bulkCreate(photos, { transaction: t });
         request.image = photos[0].image;
       }
@@ -431,6 +589,34 @@ exports.updateProduct = async (req, res, next) => {
     }
   });
 };
+
+exports.deleteProductImage = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { productimgId } = req.params;
+      
+      const productImg = await ProductImage.findByPk(productimgId, {
+        attributes: ["id"],
+      });
+      if (!productImg) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Product Image",
+        });
+      }
+
+      await ProductImage.destroy({where: {id: productimgId}});
+
+      return res.status(200).send({
+        success: true,
+        message: "Product image deleted successfully",
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+}
 
 exports.getAllProducts = async (req, res, next) => {
   try {

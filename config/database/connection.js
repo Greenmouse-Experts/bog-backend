@@ -10,14 +10,14 @@ const sequelize = new Sequelize(
     host: config.host,
     port: config.port,
     dialect: 'mysql',
-    timezone: '+01:00',
-    raw: true,
-    pool: {
-      max: 15,
-      min: 0,
-      acquire: 30000,
-      idle: 10000
-    }
+    // timezone: '+01:00',
+    // raw: true,
+    // pool: {
+    //   max: 1,
+    //   min: 0,
+    //   acquire: 30000,
+    //   idle: 10000
+    // }
   }
 );
 

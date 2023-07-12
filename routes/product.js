@@ -51,6 +51,8 @@ router
   .delete([Auth, Access.verifyAccess], ProductController.deleteProduct)
   .get(ProductController.getSingleProducts);
 
+router.route("/product/image/:productimgId").delete([Auth, Access.verifyAccess], ProductController.deleteProductImage)
+
 router
   .route("/product/add-to-shop/:productId")
   .patch([Auth, Access.verifyAccess], ProductController.addProductToShop);
