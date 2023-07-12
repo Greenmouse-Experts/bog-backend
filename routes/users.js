@@ -119,6 +119,13 @@ router
   .patch(Auth, upload.any(), UserController.updateUserProfile);
 
 router
+  .route("/user/delete-account/:id")
+  .delete(
+    Auth, 
+    UserController.deleteUser
+  );
+
+router
   .route("/all/users")
   .get([Auth, Access.verifyAccess], UserController.getAllUsers);
 

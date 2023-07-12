@@ -706,13 +706,14 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
           const recieverdetails = await getUserDetails({
             id: recieverId,
           });
-
+// console.log(senderdetails)
+// console.log(recieverdetails);
           if (senderdetails == null || recieverdetails == null) {
             console.log("Both sender and user must be valid users");
             return "Both sender and reciever must be valid users";
           }
           if (
-            senderdetails.userType !== "admin" ||
+            senderdetails.userType !== "admin" &&
             recieverdetails.userType !== "admin"
           ) {
             console.log("One must be an admin");
@@ -837,12 +838,12 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
             saveMessage = await ChatMessages.create(data, {
               transaction: t,
             });
-
+console.log(data, data.conversationId);
             let id = data.conversationId;
             const where = {
-              id,
+              id: data.conversationId
             };
-            let up = await ChatConversations.update(
+             let up =  await ChatConversations.update(
               {
                 conversationtype: data.conversationtype,
               },
@@ -852,9 +853,13 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
               }
             );
 
+console.log(up);
+console.log(data);
+
             conversation = await ChatConversations.findOne({
               where: { id: data.conversationId },
             });
+            console.log("exists", conversation)
           }
 
           setTimeout(() => {
