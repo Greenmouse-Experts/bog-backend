@@ -860,12 +860,14 @@ console.log(data, data.conversationId);
               },
               {
                 where,
-                transaction: t,
+                // transaction: t,
               }
             );
 
 console.log(up);
 console.log(data);
+
+
 
             conversation =  await ChatConversations.findOne({
               where: { id: data.conversationId },
