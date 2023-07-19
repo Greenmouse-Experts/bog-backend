@@ -687,7 +687,7 @@ exports.deleteMessage = async (messageId) => {
 // };
 
 exports.sendMessage = async (data, socket, onlineUsers) => {
-  sequelize.transaction(async (t) => {
+  // sequelize.transaction(async (t) => {
     try {
           console.log(data);
           const { senderId, recieverId } = data;
@@ -722,7 +722,7 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
           let saveMessage;
           let conversationUserId;
           let conversation;
-          if (senderdetails == "admin") {
+          if (senderdetails.userType == "admin") {
             senderAccountType = "admin";
             recieverAccountType = "user";
 
@@ -737,7 +737,7 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
           }
           if (data.conversationId) {
             console.log("conversation Id exists");
-            conversation = ChatConversations.findOne({
+            conversation = await ChatConversations.findOne({
               where: { id: data.conversationId },
             });
             if (conversation == null) {
@@ -751,12 +751,13 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
               console.log("sender is admin");
 
               //then check is user is correct
+              console.log(conversation)
               if (conversation.userId !== recieverId) {
                 console.log("Wrong recieverId");
                 return "Wrong recieverId";
               }
               let adminLevel = adminLevelCheck.find(
-                (admin) => admin.level === conversation.conversationtype
+                (admin) => admin.type === conversation.conversationtype
               );
 
               if (!adminLevel) {
@@ -764,10 +765,36 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
                 return "Type of admin cant join this conversation";
               }
 
+              //  console.log(conversationType);
+               // check if admin exist in participant id if no add it
+               const elementExists = conversation.participantsId.includes(
+                 senderId
+               );
+               let newparticipantsId = []
+               if (!elementExists) {
+                for(let d = 0; d<conversation.participantsId.length; d++){
+                 newparticipantsId.push(conversation.participantsId[d]);
+
+                }
+                 newparticipantsId.push(senderId);
+                 console.log("new partcipant Id" + newparticipantsId);
+               
+               console.log(conversation.participantsId);
+               let up = await ChatConversations.update(
+                 {
+                   conversationtype: data.conversationtype,
+                   participantsId: newparticipantsId,
+                 },
+                 {
+                   where: {id: data.conversationId},
+                   // transaction: t,
+                 }
+               );
+                }
               //  data.userId = conversation.userId;
 
               saveMessage = await ChatMessages.create(data, {
-                transaction: t,
+                // transaction: t,
               });
             } else {
               //user is the sender
@@ -779,7 +806,7 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
 
               //  data.userId = conversation.userId;
               saveMessage = await ChatMessages.create(data, {
-                transaction: t,
+                // transaction: t,
               });
               let conversationType = await checkMessageType(participantsId);
               if (conversationType == false) {
@@ -787,24 +814,7 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
                 return false;
               }
 
-              // check if admin exist in participant id if no add it
-              const elementExists = conversation.participantsId.includes(
-                conversationType.admin
-              );
-              if (!elementExists) {
-                conversation.participantsId.push(conversationType.admin);
-                console.log("new partcipant Id" + conversation.participantsId);
-              }
-              let up = await ChatConversations.update(
-                {
-                  conversationtype: data.conversationtype,
-                  participantsId: conversation.participantsId,
-                },
-                {
-                  where,
-                  transaction: t,
-                }
-              );
+             
             }
           } else {
             //if convoId doesnt exist
@@ -818,6 +828,7 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
               return false;
             }
 
+            console.log(conversationType)
             const chatControlCheck = await chatControl(data, conversationType);
             if (chatControlCheck !== true) {
               return false;
@@ -826,17 +837,17 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
             const convo = {
               userId: conversationUserId,
               participantsId: participantsId,
-              conversationType: conversationType.messageType,
+              conversationtype: conversationType.messageType,
             };
             const newConversation = await ChatConversations.create(convo, {
-              transaction: t,
+              // transaction: t,
             });
             console.log(newConversation);
 
             data.conversationId = newConversation.id;
             data.conversationType = newConversation.conversationtype;
             saveMessage = await ChatMessages.create(data, {
-              transaction: t,
+              // transaction: t,
             });
 console.log(data, data.conversationId);
             let id = data.conversationId;
@@ -856,7 +867,7 @@ console.log(data, data.conversationId);
 console.log(up);
 console.log(data);
 
-            conversation = await ChatConversations.findOne({
+            conversation =  await ChatConversations.findOne({
               where: { id: data.conversationId },
             });
             console.log("exists", conversation)
@@ -935,8 +946,8 @@ console.log(data);
           return saveMessage;
         } catch (error) {
       console.log(error);
-      t.rollback();
+      // t.rollback();
       return error;
     }
-  });
+  // });
 };

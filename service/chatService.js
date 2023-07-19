@@ -62,12 +62,15 @@ exports.checkMessageType = async (participantsId) => {
             case 1:
             case 6:
               final.messageType = "general";
+              console.log(final)
               return final;
             case 4:
               final.messageType = "product";
+              console.log(final);
               return final;
             case 5:
               final.messageType = "project";
+              console.log(final);
               return final;
             default:
               return res.status(404).send({

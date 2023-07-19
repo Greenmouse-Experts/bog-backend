@@ -15,8 +15,10 @@ const transporter = nodemailer.createTransport({
   transporter
     .verify()
     .then(() => console.log("Connected to email server"))
-    .catch(() =>
+    .catch((error) =>
       console.log(
+        transporter.options,
+        error,
         "Unable to connect to email server. Make sure you have configured the SMTP options in .env"
       )
     );
