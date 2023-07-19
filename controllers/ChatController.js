@@ -808,11 +808,11 @@ exports.sendMessage = async (data, socket, onlineUsers) => {
               saveMessage = await ChatMessages.create(data, {
                 // transaction: t,
               });
-              let conversationType = await checkMessageType(participantsId);
-              if (conversationType == false) {
-                console.log("someone must be an admin");
-                return false;
-              }
+              // let conversationType = await checkMessageType(conversation.participantsId);
+              // if (conversationType == false) {
+              //   console.log("someone must be an admin");
+              //   return false;
+              // }
 
              
             }
