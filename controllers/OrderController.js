@@ -363,16 +363,28 @@ exports.createOrder = async (req, res, next) => {
         });
       }
 
+          const mesgUser = `You just made an order of  product - ${prodData.name}`;
+          const notifyTypeU = "user";
+          const { io } = req.app;
+          
+          await Notification.createNotification({
+            type: notifyTypeU,
+            message: mesgUser,
+            userId: user.id,
+          });
+          io.emit(
+            "getNotifications",
+            await Notification.fetchUserNotificationApi()
+          );
       const mesg = `A new order was made by ${
         user.name ? user.name : `${user.fname} ${user.lname}`
       }`;
       const notifyType = "admin";
-      const { io } = req.app;
       await Notification.createNotification({
         type: notifyType,
         message: mesg,
       });
-      io.emit("getNotifications", await Notification.fetchAdminNotification());
+      io.emit("getNotifications", await Notification.fetchAdminNotification({userId}));
 
   
       // save the details of the transaction

@@ -314,7 +314,7 @@ exports.createProduct = async (req, res, next) => {
       for (let i = 0; i < req.files.length; i++) {
         // const result = await cloudinary.uploader.upload(req.files[i].path);
         // const docPath = result.secure_url;
-        const url = `${process.env.APP_URL}/${req.files[i].path}`;
+        const url = `${process.env.APP_URL}${process.env.PORT}/${req.files[i].path}`;
         photos.push({
           name: req.files[i].originalname,
           image: req.files[i].path,
