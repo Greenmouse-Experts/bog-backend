@@ -83,7 +83,7 @@ exports.createInvoice = async (orderData, user) => {
   const preparedInvoiceTemplate = invoice(invoiceData);
   const data = {
     customize: {
-      template: btoa(preparedInvoiceTemplate),
+      template: Buffer.from(preparedInvoiceTemplate).toString('base64'),
       // template: fs.readFileSync("./index.html", "base64"),
     },
     // information: {
