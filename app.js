@@ -47,15 +47,15 @@ app.use(express.static(path.join(__dirname, "uploads")));
 
 var fs = require("fs");
 
-// var util = require("util");
-// var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
-// var log_stdout = process.stdout;
+var util = require("util");
+var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
+var log_stdout = process.stdout;
 
-// console.log = function(d) {
-//   //
-//   log_file.write(util.format(d) + "\n");
-//   log_stdout.write(util.format(d) + "\n");
-// };
+console.log = function(d) {
+  //
+  log_file.write(util.format(d) + "\n");
+  log_stdout.write(util.format(d) + "\n");
+};
 
 // app.use(session({
 //   secret: 'keyboard cat',
@@ -73,15 +73,25 @@ app.use(morgan("combined"));
 
 app.use(cors());
 // body parse
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(bodyParser.json({ limit: "100mb" }));
+app.use(bodyParser.urlencoded({ extended: true, limit: "100mb" }));
+// app.use(bodyParser.json({ limit: "20mb", extended: true }));
+// app.use(bodyParser.urlencoded({ limit: "20mb", extended: true, parameterLimit: 50000 }));
 // app.use(bodyParser.raw({}));
-app.use(express.json());
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
+// app.use(express.json());
+// app.use(
+//   express.urlencoded({
+//     extended: true,
+//   })
+// );
+
+
+//to cancel error 413
+// app.use(express.json({ limit: "20mb", extended: true }));
+// app.use(
+//   express.urlencoded({ limit: "20mb", extended: true, parameterLimit: 50000 })
+// );
 
 app.use(cookieParser());
 

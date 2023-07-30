@@ -14,7 +14,7 @@ exports.createInvoice = async (orderData, user) => {
   if (!order_items && order_items.length < 1) {
     return false;
   }
-  // console.log(orderData);
+  // console.log(orderData.order_items[0].shippingAddress);
 
   const myProduct = order_items.map((items) => {
     console.log(items.product);
@@ -22,14 +22,15 @@ exports.createInvoice = async (orderData, user) => {
       description: items.product.name.substring(0, 27),
       quantity: items.quantity,
       price: parseInt(items.product.price),
-      "tax-rate": items.taxrate || 0,  
+      "tax-rate": items.taxrate || 0,
     };
   });
 
   let _subtotal = 0;
-  let insurancecharge = 0
-  if (orderData.insuranceFee == true){
-    insurancecharge = orderData.order_items[0].shippingAddress.deliveryaddress.insurancecharge
+  let insurancecharge = 0;
+  if (orderData.insuranceFee == true) {
+    insurancecharge =
+      orderData.order_items[0].shippingAddress.deliveryaddress.insurancecharge;
   }
   const _products = orderData.order_items.map((orderItem) => {
     // const productDetails = await Product.findOne({where: {id: }})
@@ -38,11 +39,11 @@ exports.createInvoice = async (orderData, user) => {
       description: orderItem.product.name,
       quantity: orderItem.quantity,
       price: orderItem.product.price.toLocaleString(),
-      row_total: (orderItem.product.price * orderItem.quantity).toLocaleString(),
+      row_total: (
+        orderItem.product.price * orderItem.quantity
+      ).toLocaleString(),
     };
   });
-
- 
 
   const invoiceData = {
     logo:
@@ -70,13 +71,15 @@ exports.createInvoice = async (orderData, user) => {
     products: _products,
     subtotal: _subtotal.toLocaleString(),
     delivery_fee: orderData.deliveryFee.toLocaleString(),
-    insurancecharge: insurancecharge.toLocaleString(),
+    insurancecharge: insurancecharge,
     total: (
-      parseInt(_subtotal) + parseInt(orderData.deliveryFee) + parseInt(insurancecharge)
+      parseInt(_subtotal) +
+      parseInt(orderData.deliveryFee) +
+      parseInt(insurancecharge)
     ).toLocaleString(),
   };
 
-  console.log("Invoice Generator")
+  console.log("Invoice Generator");
   const preparedInvoiceTemplate = invoice(invoiceData);
   const data = {
     customize: {
@@ -123,8 +126,9 @@ exports.createInvoice = async (orderData, user) => {
   const result = await easyinvoice.createInvoice(data);
   // The response will contain a base64 encoded PDF file
   // console.log('PDF base64 string: ', result.pdf);
-  fs.writeFileSync(`uploads/${orderSlug}.pdf`, result.pdf, "base64");
+  await fs.writeFileSync(`uploads/${orderSlug}.pdf`, result.pdf, "base64");
   // easyinvoice.download('myInvoice.pdf', result.pdf);
+  
 
   return true;
 };

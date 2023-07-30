@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.sendMail = async (email, message, subject, files = []) => {
-  console.log(files);
+  // console.log(files);
   try {
     // send mail with defined transport object
     const mailOptions = {

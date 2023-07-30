@@ -363,7 +363,7 @@ exports.createOrder = async (req, res, next) => {
         });
       }
 
-          const mesgUser = `You just made an order of  product - ${prodData.name}`;
+          const mesgUser = `You just made an order of  product `;
           const notifyTypeU = "user";
           const { io } = req.app;
           
