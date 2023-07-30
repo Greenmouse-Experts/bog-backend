@@ -122,18 +122,15 @@ exports.createInvoice = async (orderData, user) => {
     //   total: 8500,
     // },
   };
+  console.log('Create your invoice! Easy!')
+  const result = await easyinvoice.createInvoice(data);
   console.log("Create your invoice! Easy!");
-  try {
-    const result = await easyinvoice.createInvoice(data);
-    console.log("Create your invoice! Easy!");
 
-    // The response will contain a base64 encoded PDF file
-    // console.log('PDF base64 string: ', result.pdf);
-    fs.writeFileSync(`uploads/${orderSlug}.pdf`, result.pdf, "base64");
-    // easyinvoice.download('myInvoice.pdf', result.pdf);
-    return true;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
+  // The response will contain a base64 encoded PDF file
+  // console.log('PDF base64 string: ', result.pdf);
+ fs.writeFileSync(`uploads/${orderSlug}.pdf`, result.pdf, "base64");
+  // easyinvoice.download('myInvoice.pdf', result.pdf);
+  
+
+  return true;
 };
