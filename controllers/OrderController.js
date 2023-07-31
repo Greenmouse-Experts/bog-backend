@@ -349,6 +349,7 @@ exports.createOrder = async (req, res, next) => {
         const message = helpers.invoiceMessage(user.name);
         sendMail(user.email, message, "BOG Invoice", files);
 
+
         // Get active product admins
         const product_admins = await User.findAll({
           where: { userType: "admin", level: 4, isActive: 1, isSuspended: 0 },

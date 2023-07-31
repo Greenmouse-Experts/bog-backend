@@ -14,7 +14,7 @@ exports.createInvoice = async (orderData, user) => {
   if (!order_items && order_items.length < 1) {
     return false;
   }
-  // console.log(orderData.order_items[0].shippingAddress);
+  console.log(orderData.contact);
 
   const myProduct = order_items.map((items) => {
     console.log(items.product);
@@ -57,7 +57,7 @@ exports.createInvoice = async (orderData, user) => {
     sender_custom_2: "",
     sender_custom_3: "",
     client: {
-      address_to: orderData.contact.home_address,
+      address_to: orderData.contact.deliveryaddress.home_address,
       city_to: "",
       country_to: orderData.contact.country,
       client_custom_1: "",
@@ -67,7 +67,7 @@ exports.createInvoice = async (orderData, user) => {
     ref: orderSlug,
     date_ordered: moment(new Date()).format("MMMM Do YYYY, h:mm:ss a"),
     delivery_address: orderData.contact.address,
-    delivery_time: orderData.contact.delivery_time,
+    delivery_time: orderData.contact.deliveryaddress.delivery_time,
     products: _products,
     subtotal: _subtotal.toLocaleString(),
     delivery_fee: orderData.deliveryFee.toLocaleString(),
@@ -83,7 +83,7 @@ exports.createInvoice = async (orderData, user) => {
   const preparedInvoiceTemplate = invoice(invoiceData);
   const data = {
     customize: {
-      template: Buffer.from(preparedInvoiceTemplate).toString('base64'),
+      template: Buffer.from(preparedInvoiceTemplate).toString("base64"),
       // template: fs.readFileSync("./index.html", "base64"),
     },
     // information: {
@@ -122,21 +122,21 @@ exports.createInvoice = async (orderData, user) => {
     //   total: 8500,
     // },
   };
-  console.log('Create your invoice! Easy!')
-//   const result = await easyinvoice.createInvoice(data);
-//   console.log("Create your invoice! Easy!");
+  console.log("Create your invoice! Easy!");
+  const result = await easyinvoice.createInvoice(data);
+  //   console.log("Create your invoice! Easy!");
 
-//   // The response will contain a base64 encoded PDF file
-//   // console.log('PDF base64 string: ', result.pdf);
-//  fs.writeFileSync(`uploads/${orderSlug}.pdf`, result.pdf, "base64");
+  //   // The response will contain a base64 encoded PDF file
+  //   // console.log('PDF base64 string: ', result.pdf);
+  fs.writeFileSync(`uploads/${orderSlug}.pdf`, result.pdf, "base64");
   // easyinvoice.download('myInvoice.pdf', result.pdf);
-  
-   easyinvoice.createInvoice(data, async function(result) {
-     // The response will contain a base64 encoded PDF file
-     console.log("PDF base64 string: ", result.pdf);
 
-     // Now this result can be used to save, download or render your invoice
-     // Please review the documentation below on how to do this
-   });
+  //   await easyinvoice.createInvoice(data, async function(result) {
+  //      // The response will contain a base64 encoded PDF file
+  //      console.log("PDF base64 string: ", result.pdf);
+
+  //      // Now this result can be used to save, download or render your invoice
+  //      // Please review the documentation below on how to do this
+  //   });
   return true;
-};
+};;
