@@ -64,6 +64,7 @@
     "sequelize": "^6.25.0",
     "sequelize-cli": "^6.5.1",
     "socket.io": "^4.7.0",
+    "pdfjs-dist": "^3.9.179",
     "store2": "^2.14.2",
     "supervisor": "^0.12.0",
     "winston": "^3.8.2",
@@ -85,5 +86,5 @@
   },
   "peerDependencies": {
     "pdfjs-dist": "^3.9.179"
-}
+  }
 }
