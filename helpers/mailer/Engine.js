@@ -25,10 +25,10 @@ exports.Mailer = async (template, data) => {
   let transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
-    secure: process.env.EMAIL_SECURE, // true for 465, false for other ports
+    secure: process.env.EMAIL_SECURE || false, // true for 465, false for other ports
     auth: {
-      user: process.env.EMAIL_USERNAME,
-      pass: process.env.EMAIL_PASSWORD,
+      user: process.env.EMAIL_USERNAME, // generated ethereal user
+      pass: process.env.EMAIL_PASSWORD, // generated ethereal password
     },
   });
 //   let transporter = nodemailer.createTransport({
@@ -45,11 +45,11 @@ exports.Mailer = async (template, data) => {
 
   // send mail with defined transport object
   let info = await transporter.sendMail({
-    from: `${process.env.APP_NAME} <${process.env.MAILER_USER}>`, // sender address
+    from: `${process.env.APP_NAME} <${process.env.EMAIL_FROM}>`, // sender address
     to: receivers, // list of receivers
     subject: data.subject, // Subject line
     html: template, // html body
-    attachments: data.files !== undefined ? data.files : ''
+    attachments: data.files !== undefined ? data.files : "",
   });
 
   return info;
