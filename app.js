@@ -48,7 +48,6 @@ app.use(express.static(path.join(__dirname, "uploads")));
 // //log file
 
 var fs = require("fs");
-
 var util = require("util");
 var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
 var log_stdout = process.stdout;
@@ -56,7 +55,7 @@ var log_stdout = process.stdout;
 console.log = function(d) {
   //
   log_file.write(util.format(d) + "\n");
-  log_stdout.write(util.format(d) g+ "\n");
+  log_stdout.write(util.format(d) + "\n");
 };
 
 // app.use(session({
@@ -214,18 +213,20 @@ io.on("connection", async (socket) => {
     }
   });
 
-   socket.on("getConversationMessages", async (userId, conversationId) => {
-     // let { userId } = data;
+   socket.on("getConversationMessages", async (data) => {
+     let { userId, conversationId} = data;
+     console.log('hello')
+    console.log(userId)
      let user = onlineUsers.find((user) => user.userId === userId);
      //if reciever is online emit to his socket the new message
      if (user) {
+      // console.log('h')
        socket.user = user;
-       console.log(socket.user);
+      //  console.log(socket.user);
 
-       io.emit(
-         "getUserConversations",
+       
          await getConversationMessages(conversationId, socket, user)
-       );
+       
      }
    });
 

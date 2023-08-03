@@ -440,11 +440,12 @@ if(conversations == null || conversations.length < 1){
     count = await ChatMessages.count({
       where: {conversationId},
     });
-
+console.log(user.socketId)
+console.log(count, conversations);
     setTimeout(async () => {
       // socket.emit("getUserConversations", conversations);
       socket.to(user.socketId).emit("getConversationMessages", conversations);
-    }, 300);
+    }, 100);
 
     return conversations;
   } catch (error) {
