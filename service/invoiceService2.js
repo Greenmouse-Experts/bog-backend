@@ -14,7 +14,8 @@ exports.createInvoice = async (orderData, user) => {
   if (!order_items && order_items.length < 1) {
     return false;
   }
-  console.log(orderData.contact);
+  console.log(orderData);
+  console.log(orderData.order_items[0].shippingAddress);
 
   const myProduct = order_items.map((items) => {
     console.log(items.product);
@@ -28,9 +29,19 @@ exports.createInvoice = async (orderData, user) => {
 
   let _subtotal = 0;
   let insurancecharge = 0;
-  if (orderData.insuranceFee == true) {
+  if (
+    orderData.insuranceFee == true &&
+    orderData.order_items[0].shippingAddress.deliveryaddress !== "No address"
+  ) {
     insurancecharge =
       orderData.order_items[0].shippingAddress.deliveryaddress.insurancecharge;
+  }
+  let deliveryTime = "Not stated";
+  if (
+    orderData.order_items[0].shippingAddress.deliveryaddress !== "No address"
+  ) {
+    deliveryTime =
+      orderData.order_items[0].shippingAddress.deliveryaddress.delivery_time;
   }
   const _products = orderData.order_items.map((orderItem) => {
     // const productDetails = await Product.findOne({where: {id: }})
@@ -57,7 +68,14 @@ exports.createInvoice = async (orderData, user) => {
     sender_custom_2: "",
     sender_custom_3: "",
     client: {
-      address_to: orderData.contact.deliveryaddress.home_address,
+      address_to:
+        orderData.order_items[0].shippingAddress.address +
+        ", " +
+        orderData.order_items[0].shippingAddress.city +
+        ", " +
+        orderData.order_items[0].shippingAddress.state +
+        ", " +
+        orderData.order_items[0].shippingAddress.country,
       city_to: "",
       country_to: orderData.contact.country,
       client_custom_1: "",
@@ -66,8 +84,11 @@ exports.createInvoice = async (orderData, user) => {
     },
     ref: orderSlug,
     date_ordered: moment(new Date()).format("MMMM Do YYYY, h:mm:ss a"),
-    delivery_address: orderData.contact.address,
-    delivery_time: orderData.contact.deliveryaddress.delivery_time,
+    delivery_address:
+      orderData.order_items[0].shippingAddress.address +
+      ", " +
+      orderData.order_items[0].shippingAddress.city,
+    delivery_time: deliveryTime,
     products: _products,
     subtotal: _subtotal.toLocaleString(),
     delivery_fee: orderData.deliveryFee.toLocaleString(),
@@ -139,4 +160,4 @@ exports.createInvoice = async (orderData, user) => {
   //      // Please review the documentation below on how to do this
   //   });
   return true;
-};;
+};

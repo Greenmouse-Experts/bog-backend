@@ -187,7 +187,6 @@ exports.createOrder = async (req, res, next) => {
    let deliveryaddress = await Addresses.findOne({
      where: { id: deliveryaddressId },
    });
-
    if (deliveryaddress == null){
 
     deliveryaddress = "No address"

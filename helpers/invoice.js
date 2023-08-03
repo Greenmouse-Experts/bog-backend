@@ -199,7 +199,7 @@ exports.invoice = (data) => {
     <tr>
         <td>
             <b>Reference:</b> ${data.ref}<br/>
-            <b>Delivery Address:</b> ${data.delivery_address}, ${data.city_from}, ${data.country_from}<br/>
+            <b>Delivery Address:</b> ${data.delivery_address}<br/>
             <b>Home Address:</b> ${data.client.address_to}<br/>
             <b>Delivery Time:</b> ${data.delivery_time}<br/>
             <b>Date Ordered:</b> ${data.date_ordered}<br/>
