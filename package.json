@@ -57,7 +57,6 @@
     "passport": "^0.6.0",
     "passport-facebook": "^3.0.0",
     "passport-facebook-token": "^4.0.0",
-    "pdfjs-dist": "^3.4.120",
     "randomstring": "^1.2.2",
     "redis": "^4.6.5",
     "request": "^2.88.2",
@@ -83,5 +82,8 @@
     "nodemon": "^2.0.16",
     "nyc": "^14.0.0",
     "prettier": "^1.19.1"
+  },
+  "peerDependencies": {
+    "pdfjs-dist": "^3.4.120"
   }
 }
