@@ -47,17 +47,17 @@ app.use(express.static(path.join(__dirname, "uploads")));
 
 // //log file
 
-var fs = require("fs");
+// var fs = require("fs");
 
-var util = require("util");
-var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
-var log_stdout = process.stdout;
+// var util = require("util");
+// var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
+// var log_stdout = process.stdout;
 
-console.log = function(d) {
-  //
-  log_file.write(util.format(d) + "\n");
-  log_stdout.write(util.format(d) + "\n");
-};
+// console.log = function(d) {
+//   //
+//   log_file.write(util.format(d) + "\n");
+//   log_stdout.write(util.format(d) g+ "\n");
+// };
 
 // app.use(session({
 //   secret: 'keyboard cat',
@@ -214,7 +214,7 @@ io.on("connection", async (socket) => {
     }
   });
 
-   socket.on("getConversationMessage", async (userId, conversationId) => {
+   socket.on("getConversationMessages", async (userId, conversationId) => {
      // let { userId } = data;
      let user = onlineUsers.find((user) => user.userId === userId);
      //if reciever is online emit to his socket the new message
