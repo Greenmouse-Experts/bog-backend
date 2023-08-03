@@ -69,7 +69,6 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "easyinvoice": "^3.0.23",
     "eslint": "^6.1.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-airbnb-base": "^14.0.0",
