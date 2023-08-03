@@ -77,6 +77,19 @@ exports.notifyAdmin = async ({ userId, message, req }) => {
   io.emit("getNotifications", await Notification.fetchAdminNotification());
 };
 
+
+exports.notifyUser = async ({ userId, message, req }) => {
+  const notifyType = "user";
+  const { io } = req.app;
+  await Notification.createNotification({
+    type: notifyType,
+    message,
+    userId,
+  });
+  io.emit("getNotifications", await Notification.fetchUserNotification({userId}));
+};
+
+
 // Projects
 exports.getProjectRequest = async (req, res, next) => {
   try {
@@ -1927,6 +1940,13 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
               };
               await this.notifyAdmin(reqData);
 
+               const reqData2 = {
+                 req,
+                 userId: user.id,
+                 message: `Admin has made a payout of NGN ${amount} to service partner ${profile.company_name} [${project.projectSlug}]`,
+               };
+               await this.notifyUser(reqData2);
+
               // Get active project admins
               const project_admins = await User.findAll({
                 where: {
@@ -1971,7 +1991,7 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
           }
         } else if (userLevel == 1 && pendingTransaction.financialadmin == false
         ) {
-          console.log('yippe')
+          // console.log('yippe')
            await TransactionPending.update(
             { superadmin: true },
             { where: { id} }

@@ -38,6 +38,8 @@ const {
   getUserConversations,
   test,
   getUserConversationsNew,
+  getConversationMessage,
+  getConversationMessages,
 } = require("./controllers/ChatController");
 // set up public folder
 app.use(express.static(path.join(__dirname, "public")));
@@ -211,6 +213,21 @@ io.on("connection", async (socket) => {
     );
     }
   });
+
+   socket.on("getConversationMessage", async (userId, conversationId) => {
+     // let { userId } = data;
+     let user = onlineUsers.find((user) => user.userId === userId);
+     //if reciever is online emit to his socket the new message
+     if (user) {
+       socket.user = user;
+       console.log(socket.user);
+
+       io.emit(
+         "getUserConversations",
+         await getConversationMessages(conversationId, socket, user)
+       );
+     }
+   });
 
   socket.on("readConversationMessages", (data) => {
     markMessageRead(data);
