@@ -1105,7 +1105,6 @@ module.exports = {
   AdminProjectInstallmentPaymentMailer: async (
     user,
     admins,
-    note,
     image,
     _project
   ) => {
