@@ -57,7 +57,7 @@
     "passport": "^0.6.0",
     "passport-facebook": "^3.0.0",
     "passport-facebook-token": "^4.0.0",
-    "pdfjs-dist": "^2.3.200",
+    "pdfjs-dist": "^3.4.120",
     "randomstring": "^1.2.2",
     "redis": "^4.6.5",
     "request": "^2.88.2",
