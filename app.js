@@ -40,6 +40,7 @@ const {
   getUserConversationsNew,
   getConversationMessage,
   getConversationMessages,
+  markMessagesRead,
 } = require("./controllers/ChatController");
 // set up public folder
 app.use(express.static(path.join(__dirname, "public")));
@@ -86,7 +87,6 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "100mb" }));
 //     extended: true,
 //   })
 // );
-
 
 //to cancel error 413
 // app.use(express.json({ limit: "20mb", extended: true }));
@@ -166,7 +166,7 @@ io.on("connection", async (socket) => {
     // console.log("send message", data);
 
     // // Save message in db
-    
+
     await sendMessage(data, socket, onlineUsers);
 
     // //check if reciever online
@@ -203,47 +203,59 @@ io.on("connection", async (socket) => {
     let user = onlineUsers.find((user) => user.userId === userId);
     //if reciever is online emit to his socket the new message
     if (user) {
-      socket.user = user
+      socket.user = user;
       console.log(socket.user);
 
-    io.emit(
-      "getUserConversations",
-      await getUserConversationsNew(userId, socket, user)
-    );
+      io.emit(
+        "getUserConversations",
+        await getUserConversationsNew(userId, socket, user)
+      );
     }
   });
 
-   socket.on("getConversationMessages", async (data) => {
-     let { userId, conversationId} = data;
-     console.log('hello')
-    console.log(userId)
-     let user = onlineUsers.find((user) => user.userId === userId);
-     //if reciever is online emit to his socket the new message
-     if (user) {
+  socket.on("getConversationMessages", async (data) => {
+    let { userId, conversationId } = data;
+    console.log("hello");
+    console.log(userId);
+    let user = onlineUsers.find((user) => user.userId === userId);
+    //if reciever is online emit to his socket the new message
+    if (user) {
       // console.log('h')
-       socket.user = user;
+      socket.user = user;
       //  console.log(socket.user);
 
-       
-         await getConversationMessages(conversationId, socket, user)
-       
-     }
-   });
-
-  socket.on("readConversationMessages", (data) => {
-    markMessageRead(data);
-
-    io.emit("getUserChatMessages", (data) => {
-      getUserChatMessagesApi(data);
-    });
+      await getConversationMessages(conversationId, socket, user);
+    }
   });
 
-  socket.on("deleteMessage", (data) => {
-    const { messageId } = data;
+  socket.on("readConversationMessages", async (data) => {
+    const {userId, conversationId} = data
+    markMessagesRead(conversationId);
+
+      let user = onlineUsers.find((user) => user.userId === userId);
+    //if reciever is online emit to his socket the new message
+    if (user) {
+      // console.log('h')
+      socket.user = user;
+      //  console.log(socket.user);
+
+      await getConversationMessages(conversationId, socket, user);
+    }
+  });
+
+  socket.on("deleteMessage", async (data) => {
+    const { messageId, userId, conversationId } = data;
     deleteMessage(messageId);
-    io.emit("getUserChatMessages", (data) => {
-      getUserChatMessagesApi(data);
-    });
+
+    let user = onlineUsers.find((user) => user.userId === userId);
+    //if reciever is online emit to his socket the new message
+    if (user) {
+      // console.log('h')
+      socket.user = user;
+      //  console.log(socket.user);
+
+      await getConversationMessages(conversationId, socket, user);
+    }
   });
 
   socket.on("disconnect", () => {

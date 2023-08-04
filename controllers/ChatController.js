@@ -690,19 +690,19 @@ console.log(count, conversations);
 //   });
 // };
 
-exports.markMessageRead = async (data) => {
+exports.markMessagesRead = async (conversationId) => {
   sequelize.transaction(async (t) => {
     try {
-      const { senderId, recieverId, conversationId } = data;
+
       const message = await ChatMessages.findAll({
-        where: { conversationId, recieverId: senderId },
+        where: { conversationId },
       });
 
       await ChatMessages.update(
         { read: true },
-        { where: { conversationId, recieverId: senderId }, transaction: t }
+        { where: { conversationId }, transaction: t }
       );
-      return "Message Deleted";
+      return true;
     } catch (error) {
       console.log(error);
       t.rollback();
@@ -719,7 +719,7 @@ exports.deleteMessage = async (messageId) => {
       });
 
       await ChatMessages.destroy({ where: { id: messageId }, transaction: t });
-      return "Message Deleted";
+      return true;
     } catch (error) {
       console.log(error);
       t.rollback();
