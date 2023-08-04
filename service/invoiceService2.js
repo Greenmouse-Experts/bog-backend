@@ -17,8 +17,6 @@ exports.createInvoice = async (orderData, user) => {
   console.log(orderData);
   console.log(orderData.order_items[0].shippingAddress);
 
-
-  
   const myProduct = order_items.map((items) => {
     console.log(items.product);
     return {

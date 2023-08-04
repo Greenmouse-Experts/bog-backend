@@ -299,7 +299,6 @@ exports.createOrder = async (req, res, next) => {
       );
 
       orderData.order_items = orders;
-      orderData.user = user;
       orderData.contact = contact;
       orderData.productEarnings = productEarnings;
       const order = await Order.create(orderData, {
