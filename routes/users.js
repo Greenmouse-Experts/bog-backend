@@ -154,6 +154,10 @@ router
   .route("/all/generalAdmin")
   .get([Auth, Access.verifyAccess], UserController.getAllGeneralAdmin);
 
+  router
+    .route("/all/chatAdmins")
+    .get([Auth, Access.verifyAccess], UserController.getChatAdmins);
+
 router
   .route("/admin/:adminId")
   .get([Auth, Access.verifyAccess], UserController.findAdmin);

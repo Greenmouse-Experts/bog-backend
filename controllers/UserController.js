@@ -1566,6 +1566,55 @@ exports.getAllGeneralAdmin = async (req, res) => {
   }
 };
 
+exports.getChatAdmins = async (req, res) => {
+  try {
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "No User Found",
+      });
+    }
+
+     const generalAdmins = await User.findAll({  where: {
+      userType: "admin",
+      level: 1
+    }, order: [["createdAt", "DESC"]] });
+
+      const productAdmins = await User.findAll({  where: {
+      userType: "admin",
+      level: 1
+    }, order: [["createdAt", "DESC"]] });
+
+      const projectAdmins = await User.findAll({  where: {
+      userType: "admin",
+      level: 1
+    }, order: [["createdAt", "DESC"]] });
+
+      const financialadmins = await User.findAll({  where: {
+      userType: "admin",
+      level: 1
+    }, order: [["createdAt", "DESC"]] });
+    
+   
+let admin= {
+  generalAdmin: generalAdmins[0],
+  projectAdmin: projectAdmins[0],
+  productAdmin: productAdmins[0],
+  financiallAdmin: financialadmins[0]
+}
+    return res.status(200).send({
+      success: true,
+      admin,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
 exports.findAdmin = async (req, res) => {
   try {
     const user = await UserService.getUserDetails({ id: req.user.id });

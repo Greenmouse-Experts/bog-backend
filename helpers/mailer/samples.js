@@ -1105,7 +1105,7 @@ module.exports = {
   AdminProjectInstallmentPaymentMailer: async (
     user,
     admins,
-    image,
+    pr_installment,
     _project
   ) => {
     const { name, userType, id } = user;
@@ -1124,8 +1124,8 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">Project ${name} (${userType}) with the ID #${id} paid the ${title} of NGN ${amount.toLocaleString()} for the project with the ID of ${
-      _project.slug
+                  <p style="font-size: 1.4em;">Project ${name} (${userType}) with the ID #${id} paid the ${_project.title} of NGN ${pr_installment.amount.toLocaleString()} for the project with the ID of ${
+      _project.projectSlug
     }.</p>
                   <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
               `;
