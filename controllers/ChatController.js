@@ -433,15 +433,15 @@ exports.getConversationMessages = async (conversationId, socket, user) => {
         })
       )
     );
-if(conversations == null || conversations.length < 1){
-  console.log('no chats with conversationId')
-  return false
-}
+    if (conversations == null || conversations.length < 1) {
+      console.log("no chats with conversationId");
+      return false;
+    }
     count = await ChatMessages.count({
-      where: {conversationId},
+      where: { conversationId },
     });
-console.log(user.socketId)
-console.log(count, conversations);
+    console.log(user.socketId);
+    console.log(count);
     setTimeout(async () => {
       // socket.emit("getUserConversations", conversations);
       socket.to(user.socketId).emit("getConversationMessages", conversations);
@@ -690,40 +690,120 @@ console.log(count, conversations);
 //   });
 // };
 
-exports.markMessagesRead = async (conversationId) => {
+exports.markMessagesRead = async (data) => {
   sequelize.transaction(async (t) => {
     try {
+      const { userId, conversationId } = data;
 
-      const message = await ChatMessages.findAll({
-        where: { conversationId },
+      const where = {
+        id: conversationId,
+        participantsId: {
+          [Op.like]: `%${userId}%`,
+        },
+      };
+
+      let conversations = await ChatConversations.findOne({
+        where: where,
+        order: [["updatedAt", "DESC"]],
+        include: [
+          {
+            model: ChatMessages,
+            as: "chatMessages",
+            order: [["createdAt", "DESC"]],
+            attributes: {
+              exclude: ["deletedAt"],
+            },
+          },
+        ],
       });
+
+      if (conversations == null) {
+        return false;
+      }
 
       await ChatMessages.update(
         { read: true },
-        { where: { conversationId }, transaction: t }
+        {
+          where: {
+            conversationId,
+            senderId: {
+              [Op.not]: userId,
+            },
+          },
+          transaction: t,
+        }
       );
+
+      if (data.socket) {
+        setTimeout(async () => {
+          await this.getConversationMessages(
+            conversationId,
+            data.socket,
+            data.socket.user
+          );
+        }, 100);
+      }
       return true;
     } catch (error) {
       console.log(error);
       t.rollback();
-      return next(error);
+      return error;
     }
   });
 };
 
-exports.deleteMessage = async (messageId) => {
+exports.deleteMessage = async (data) => {
   sequelize.transaction(async (t) => {
     try {
+      const { messageId, userId, conversationId } = data;
+
+      const where = {
+        id: conversationId,
+        participantsId: {
+          [Op.like]: `%${userId}%`,
+        },
+      };
+
+      let conversations = await ChatConversations.findOne({
+        where: where,
+        order: [["updatedAt", "DESC"]],
+        include: [
+          {
+            model: ChatMessages,
+            as: "chatMessages",
+            order: [["createdAt", "DESC"]],
+            attributes: {
+              exclude: ["deletedAt"],
+            },
+          },
+        ],
+      });
+
+      if (conversations == null) {
+        console.log("Message doesnt exist");
+        return false;
+      }
       const message = await ChatMessages.findOne({
         where: { id: messageId },
       });
 
       await ChatMessages.destroy({ where: { id: messageId }, transaction: t });
+
+      if (data.socket) {
+        setTimeout(async () => {
+          await this.getConversationMessages(
+            conversationId,
+            data.socket,
+            data.socket.user
+          );
+        }, 100);
+      }
+
       return true;
     } catch (error) {
       console.log(error);
       t.rollback();
-      return next(error);
+      return error;
     }
   });
 };

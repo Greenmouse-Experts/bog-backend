@@ -198,18 +198,16 @@ io.on("connection", async (socket) => {
     });
   });
 
-  socket.on("getUserConversations", async (userId) => {
-    // let { userId } = data;
+  socket.on("getUserConversations", async (data) => {
+    let { userId } = data;
     let user = onlineUsers.find((user) => user.userId === userId);
+    console.log(data);
     //if reciever is online emit to his socket the new message
     if (user) {
       socket.user = user;
       console.log(socket.user);
 
-      io.emit(
-        "getUserConversations",
-        await getUserConversationsNew(userId, socket, user)
-      );
+      await getUserConversationsNew(userId, socket, user);
     }
   });
 
@@ -229,32 +227,32 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("readConversationMessages", async (data) => {
-    const {userId, conversationId} = data
-    markMessagesRead(conversationId);
+    const { userId, conversationId } = data;
 
-      let user = onlineUsers.find((user) => user.userId === userId);
+    let user = onlineUsers.find((user) => user.userId === userId);
     //if reciever is online emit to his socket the new message
     if (user) {
-      // console.log('h')
       socket.user = user;
-      //  console.log(socket.user);
 
-      await getConversationMessages(conversationId, socket, user);
+      data.socket = socket;
+      markMessagesRead(data);
+    } else {
+      markMessagesRead(data);
     }
   });
 
   socket.on("deleteMessage", async (data) => {
     const { messageId, userId, conversationId } = data;
-    deleteMessage(messageId);
 
     let user = onlineUsers.find((user) => user.userId === userId);
     //if reciever is online emit to his socket the new message
     if (user) {
-      // console.log('h')
       socket.user = user;
-      //  console.log(socket.user);
 
-      await getConversationMessages(conversationId, socket, user);
+      data.socket = socket;
+      deleteMessage(data);
+    } else {
+      deleteMessage(messageId);
     }
   });
 
