@@ -56,6 +56,39 @@ exports.createInvoice = async (orderData, user) => {
     };
   });
 
+  let homeaddress = "Not stated by user"
+  if(    orderData.order_items[0].shippingAddress.address !== null &&
+        orderData.order_items[0].shippingAddress.city !== null &&
+        orderData.order_items[0].shippingAddress.state !== null &&
+        orderData.order_items[0].shippingAddress.country !== null){
+          homeaddress =
+            orderData.order_items[0].shippingAddress.address +
+            ", " +
+            orderData.order_items[0].shippingAddress.city +
+            ", " +
+            orderData.order_items[0].shippingAddress.state +
+            ", " +
+            orderData.order_items[0].shippingAddress.country;
+  }
+
+  let landmarkAddress = "Not stated by user";
+    if (
+      orderData.order_items[0].shippingAddress.deliveryaddress.title !==
+        null &&
+      orderData.order_items[0].shippingAddress.deliveryaddress.address !== null &&
+      orderData.order_items[0].shippingAddress.deliveryaddress.state !== null &&
+      orderData.order_items[0].shippingAddress.deliveryaddress.country !== null
+    ) {
+      landmarkAddress =
+        orderData.order_items[0].shippingAddress.deliveryaddress.title +
+        ", " +
+        orderData.order_items[0].shippingAddress.deliveryaddress.address +
+        ", " +
+        orderData.order_items[0].shippingAddress.deliveryaddress.state +
+        ", " +
+        orderData.order_items[0].shippingAddress.deliveryaddress.country;
+    }
+
   const invoiceData = {
     logo:
       "https://res.cloudinary.com/greenmouse-tech/image/upload/v1669563824/BOG/logo_1_1_ubgtnr.png",
@@ -68,14 +101,7 @@ exports.createInvoice = async (orderData, user) => {
     sender_custom_2: "",
     sender_custom_3: "",
     client: {
-      address_to:
-        orderData.order_items[0].shippingAddress.address +
-        ", " +
-        orderData.order_items[0].shippingAddress.city +
-        ", " +
-        orderData.order_items[0].shippingAddress.state +
-        ", " +
-        orderData.order_items[0].shippingAddress.country,
+      address_to: homeaddress,
       city_to: "",
       country_to: orderData.contact.country,
       client_custom_1: "",
@@ -93,6 +119,7 @@ exports.createInvoice = async (orderData, user) => {
     subtotal: _subtotal.toLocaleString(),
     delivery_fee: orderData.deliveryFee.toLocaleString(),
     insurancecharge: insurancecharge,
+    landmarkAddress: landmarkAddress,
     total: (
       parseInt(_subtotal) +
       parseInt(orderData.deliveryFee) +

@@ -201,6 +201,7 @@ exports.invoice = (data) => {
             <b>Reference:</b> ${data.ref}<br/>
             <b>Delivery Address:</b> ${data.delivery_address}<br/>
             <b>Home Address:</b> ${data.client.address_to}<br/>
+            <b>Landmark Address:</b> ${data.landmarkAddress}<br/>
             <b>Delivery Time:</b> ${data.delivery_time}<br/>
             <b>Date Ordered:</b> ${data.date_ordered}<br/>
             ${data.client.client_custom_1}<br/>

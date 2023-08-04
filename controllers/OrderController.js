@@ -168,7 +168,7 @@ exports.createOrder = async (req, res, next) => {
       const userId = req.user.id;
       const ownerId = req.user.id;
       const user = await User.findByPk(userId, {
-        attributes: ["id", "email", "name", "fname", "lname", "userType"],
+        attributes: ["id", "email", "name", "fname", "lname", "userType", "phone", "address", "state", "city", "street"],
       });
       let {
         shippingAddress,
@@ -299,6 +299,7 @@ exports.createOrder = async (req, res, next) => {
       );
 
       orderData.order_items = orders;
+      orderData.user = user;
       orderData.contact = contact;
       orderData.productEarnings = productEarnings;
       const order = await Order.create(orderData, {
