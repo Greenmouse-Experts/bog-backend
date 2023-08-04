@@ -68,7 +68,8 @@
     "store2": "^2.14.2",
     "supervisor": "^0.12.0",
     "winston": "^3.8.2",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "pdfjs-dist": "^3.4.120"
   },
   "devDependencies": {
     "eslint": "^6.1.0",
@@ -82,7 +83,8 @@
     "eslint-plugin-react-hooks": "^1.7.0",
     "nodemon": "^2.0.16",
     "nyc": "^14.0.0",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "pdfjs-dist": "^3.4.120"
   },
   "peerDependencies": {
     "pdfjs-dist": "^3.4.120"
