@@ -1,0 +1,42 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/greehxeo/bog.greenmouseproperties.com"
+PassengerBaseURI "/"
+PassengerNodejs "/home/greehxeo/nodevenv/bog.greenmouseproperties.com/14/bin/node"
+PassengerAppType node
+PassengerStartupFile app.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION BEGIN
+<IfModule Litespeed>
+SetEnv ADMIN_EMAIL greenmouseapp@gmail.com
+SetEnv APP_URL https://bog.greenmouseproperties.com
+SetEnv CLOUD_API_KEY 387967922976455
+SetEnv CLOUD_NAME appbog
+SetEnv CLOUD_SECRET aSFUqA2bOvg5hT8uestMA4XwiGY
+SetEnv DEVELOPMENT_DB_NAME greehxeo_bog_db
+SetEnv DEVELOPMENT_HOSTNAME localhost
+SetEnv DEVELOPMENT_PASSWORD KrAnHT5AAeEDJLY
+SetEnv DEVELOPMENT_USERNAME greehxeo_bog_user
+SetEnv DIALECT mysql
+SetEnv EMAIL_FROM buildonthego2023@gmail.com
+SetEnv EMAIL_HOST smtp.sendgrid.net
+SetEnv EMAIL_PASSWORD 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
+SetEnv EMAIL_PORT 465
+SetEnv EMAIL_SECURE true
+SetEnv EMAIL_USERNAME apikey
+SetEnv GOOGLE_CAPTCHA_KEY 6Lc_Hi8nAAAAALDf5IhMYO4eyaC4YHxWs3ZEtPvP
+SetEnv GOOGLE_CAPTCHA_SECRET 6Lc_Hi8nAAAAALbJxLrcKJZi8DW7BLqTONzDtr6z
+SetEnv JWT_SECRET qwertypogThaer090862uiop1234567890zxcvbnm<>?!@+$%^&*()asdfgjjklfop
+SetEnv MAILER_HOST greenmouseproperties.com
+SetEnv MAILER_PASS 2)wZodylnYHi
+SetEnv MAILER_PORT 465
+SetEnv MAILER_SECURE true
+SetEnv MAILER_USER no-reply@greenmouseproperties.com
+SetEnv NODE_ENV development
+SetEnv PAYSTACK_BASEURL https://api.paystack.co
+SetEnv PAYSTACK_SECRET sk_test_fde1e5319c69aa49534344c95485a8f1cef333ac
+SetEnv PORT 5055
+SetEnv ZOOM_API_KEY dye1qYLdSDiiGLxjLetXkg
+SetEnv ZOOM_API_SECRET D5u05lLAJQqfV9Akl8uZfszbZoOoHvMEKu6L
+SetEnv SITE_URL https://buildonthego.com
+</IfModule>
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END
