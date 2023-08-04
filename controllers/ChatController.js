@@ -387,7 +387,7 @@ exports.getUserConversationsNew = async (userId, socket, user) => {
       // socket.emit("getUserConversations", conversations);
       socket.to(user.socketId).emit("getUserConversations", conversations);
     }, 300);
-
+console.log("this is the last count", count)
     return conversations;
   } catch (error) {
     console.log(error);
