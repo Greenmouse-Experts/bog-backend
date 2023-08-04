@@ -32,7 +32,15 @@ const Notification = require("../helpers/notification");
 const { adminLevels, adminPrivileges } = require("../helpers/utility");
 const ServiceProvider = require("../models/ServiceProvider");
 
-const { ClientForgotPasswordMobileMailer, ClientForgotPasswordMailer, AdminSuspendUserMailerForUser, AdminSuspendUserMailerForAdmin, clientWelcomeMessage, servicePartnerWelcomeMessage, productPartnerWelcomeMessage } = require("../helpers/mailer/samples");
+const {
+  ClientForgotPasswordMobileMailer,
+  ClientForgotPasswordMailer,
+  AdminSuspendUserMailerForUser,
+  AdminSuspendUserMailerForAdmin,
+  clientWelcomeMessage,
+  servicePartnerWelcomeMessage,
+  productPartnerWelcomeMessage,
+} = require("../helpers/mailer/samples");
 
 const axios = require("axios");
 
@@ -45,8 +53,6 @@ const axios = require("axios");
 // const client = createClient();
 
 // client.on('error', err => console.log('Redis Client Error', err));
-
-
 
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -175,7 +181,7 @@ exports.registerUser = async (req, res, next) => {
         message: "User Created Successfully",
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -289,7 +295,6 @@ exports.appleSign = async (req, res, next) => {
     const { id, email, name } = req.apple_details;
 
     try {
-
       const user = await User.findOne({ where: { email } });
 
       /**
@@ -396,8 +401,6 @@ exports.googleSign = async (req, res, next) => {
     const { id, email, verified_email, name } = req.google_details;
 
     try {
-      
-
       const user = await User.findOne({ where: { email } });
 
       /**
@@ -653,102 +656,102 @@ exports.registerAdmin = async (req, res, next) => {
 };
 
 exports.loginUser = async (req, res, next) => {
-  sequelize.transaction(async t => {
-  try {
+  sequelize.transaction(async (t) => {
+    try {
+      const { email, password } = req.body;
+      const user = JSON.parse(
+        JSON.stringify(await UserService.findUser({ email }))
+      );
 
-
-    
-
-    const { email, password } = req.body;
-    const user = JSON.parse(
-      JSON.stringify(await UserService.findUser({ email }))
-    );
-
-    if (!user) {
-      return res.status(400).send({
-        success: false,
-        message: "Invalid Email Address!",
-      });
-    }
-    if (user.userType === "admin") {
-      return res.status(400).send({
-        success: false,
-        message: "This account is not available",
-      });
-    }
-    if (!user.isActive) {
-      return res.status(400).send({
-        success: false,
-        message: "Please Verify account",
-      });
-    }
-    if (user.isSuspended) {
-      return res.status(400).send({
-        success: false,
-        message:
-          "Your account has been suspended. Reach out to the admin for further information",
-      });
-    }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(404).send({
-        success: false,
-        message: "Incorrect Password!",
-      });
-    }
-
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: 36000,
-    });
-    let profile;
-    const data = {
-      ...user,
-    };
-    const userId = user.id;
-    if (req.body.userType && req.body.userType !== "") {
-      const { userType } = req.body;
-      profile = await UserService.getUserTypeProfile(userType, userId);
-      if (profile) {
-        data.profile = profile;
-        data.userType = userType;
+      if (!user) {
+        return res.status(400).send({
+          success: false,
+          message: "Invalid Email Address!",
+        });
       }
-    } else {
-      profile = await UserService.getUserTypeProfile(user.userType, userId);
-      if (profile) {
-        data.profile = profile;
-        data.userType = user.userType;
+      if (user.userType === "admin") {
+        return res.status(400).send({
+          success: false,
+          message: "This account is not available",
+        });
       }
-    }
+      if (!user.isActive) {
+        return res.status(400).send({
+          success: false,
+          message: "Please Verify account",
+        });
+      }
+      if (user.isSuspended) {
+        return res.status(400).send({
+          success: false,
+          message:
+            "Your account has been suspended. Reach out to the admin for further information",
+        });
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(404).send({
+          success: false,
+          message: "Incorrect Password!",
+        });
+      }
 
-    if(user.last_login === null){
-      if(user.userType.includes("client")){ // for corporate and private clients
-        await clientWelcomeMessage(user)
+      const payload = {
+        user: {
+          id: user.id,
+        },
+      };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: 36000,
+      });
+      let profile;
+      const data = {
+        ...user,
+      };
+      const userId = user.id;
+      if (req.body.userType && req.body.userType !== "") {
+        const { userType } = req.body;
+        profile = await UserService.getUserTypeProfile(userType, userId);
+        if (profile) {
+          data.profile = profile;
+          data.userType = userType;
+        }
+      } else {
+        profile = await UserService.getUserTypeProfile(user.userType, userId);
+        if (profile) {
+          data.profile = profile;
+          data.userType = user.userType;
+        }
       }
-      else if(user.userType === "professional"){ // for service partners
-        await servicePartnerWelcomeMessage(user)
-      }
-      else if (user.userType === "vendor") { // for product partners
-        await productPartnerWelcomeMessage(user)
-      }
-      await User.update({last_login: new Date()}, {where: {id: user.id}})
-    }
 
-    return res.status(201).send({
-      success: true,
-      message: "User Logged In Sucessfully",
-      token,
-      user: data,
-    });
-  } catch (error) {
-    console.log(error);
-    t.rollback();
-    return next(error);
-  }
+      if (user.last_login === null) {
+        if (user.userType.includes("client")) {
+          // for corporate and private clients
+          await clientWelcomeMessage(user);
+        } else if (user.userType === "professional") {
+          // for service partners
+          await servicePartnerWelcomeMessage(user);
+        } else if (user.userType === "vendor") {
+          // for product partners
+          await productPartnerWelcomeMessage(user);
+        }
+        await User.update(
+          { last_login: new Date() },
+          { where: { id: user.id } }
+        );
+      }
+
+      return res.status(201).send({
+        success: true,
+        message: "User Logged In Sucessfully",
+        token,
+        user: data,
+      });
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
   });
 };
 
@@ -1073,8 +1076,8 @@ exports.verifyUser = async (req, res, next) => {
     try {
       const { email, token } = req.body;
 
-      const user = await UserService.findUser({ email, token});
-  
+      const user = await UserService.findUser({ email, token });
+
       if (!user) {
         return res.status(404).send({
           success: false,
@@ -1104,8 +1107,8 @@ exports.verifyUserEmail = async (req, res, next) => {
     try {
       const { email, token } = req.query;
 
-      const user = await UserService.findUser({ email, token});
-  
+      const user = await UserService.findUser({ email, token });
+
       if (!user) {
         return res.status(404).send({
           success: false,
@@ -1273,15 +1276,20 @@ exports.forgotPassword = async (req, res, next) => {
         });
       }
 
-      let token = '';
+      let token = "";
       if (req.body.platform === "mobile") {
         token = helpers.generateMobileToken();
-        await ClientForgotPasswordMobileMailer({email, first_name: user.fname}, token);
+        await ClientForgotPasswordMobileMailer(
+          { email, first_name: user.fname },
+          token
+        );
         // message = helpers.resetPasswordMobileMessage(token);
-      }
-      else{
+      } else {
         token = helpers.generateWebToken();
-        await ClientForgotPasswordMailer({email, first_name: user.fname}, token);
+        await ClientForgotPasswordMailer(
+          { email, first_name: user.fname },
+          token
+        );
         // let message = helpers.resetPasswordMessage(email, token);
       }
       // await EmailService.sendMail(email, message, "Reset Password");
@@ -1482,7 +1490,6 @@ exports.getAllAdmin = async (req, res) => {
   }
 };
 
-
 exports.getAllProjectAdmin = async (req, res) => {
   try {
     const user = await UserService.getUserDetails({ id: req.user.id });
@@ -1550,7 +1557,7 @@ exports.getAllGeneralAdmin = async (req, res) => {
     }
 
     const where = {
-      userType: "admin"
+      userType: "admin",
     };
     const users = await User.findAll({ where, order: [["createdAt", "DESC"]] });
 
@@ -1576,33 +1583,53 @@ exports.getChatAdmins = async (req, res) => {
       });
     }
 
-     const generalAdmins = await User.findAll({  where: {
-      userType: "admin",
-      level: 1
-    }, order: [["createdAt", "DESC"]] });
+    const superAdmins = await User.findAll({
+      where: {
+        userType: "admin",
+        level: 1,
+      },
+      order: [["createdAt", "DESC"]],
+    });
 
-      const productAdmins = await User.findAll({  where: {
-      userType: "admin",
-      level: 1
-    }, order: [["createdAt", "DESC"]] });
+    const productAdmins = await User.findAll({
+      where: {
+        userType: "admin",
+        level: 4,
+      },
+      order: [["createdAt", "DESC"]],
+    });
 
-      const projectAdmins = await User.findAll({  where: {
-      userType: "admin",
-      level: 1
-    }, order: [["createdAt", "DESC"]] });
+    const projectAdmins = await User.findAll({
+      where: {
+        userType: "admin",
+        level: 5,
+      },
+      order: [["createdAt", "DESC"]],
+    });
 
-      const financialadmins = await User.findAll({  where: {
-      userType: "admin",
-      level: 1
-    }, order: [["createdAt", "DESC"]] });
-    
-   
-let admin= {
-  generalAdmin: generalAdmins[0],
-  projectAdmin: projectAdmins[0],
-  productAdmin: productAdmins[0],
-  financiallAdmin: financialadmins[0]
-}
+    const financialadmins = await User.findAll({
+      where: {
+        userType: "admin",
+        level: 3,
+      },
+      order: [["createdAt", "DESC"]],
+    });
+
+    const generaladmins = await User.findAll({
+      where: {
+        userType: "admin",
+        level: 6,
+      },
+      order: [["createdAt", "DESC"]],
+    });
+
+    let admin = {
+      superAdmins: superAdmins[0],
+      projectAdmin: projectAdmins[0],
+      productAdmin: productAdmins[0],
+      financialAdmin: financialadmins[0],
+      generaladmins: generaladmins[0],
+    };
     return res.status(200).send({
       success: true,
       admin,
@@ -1802,20 +1829,26 @@ exports.suspendUser = async (req, res) => {
 
     const update = {
       isSuspended: true,
-      reason_for_suspension: reason
+      reason_for_suspension: reason,
     };
-    
-    const userdetails = await User.findOne({where: {id: userId}});
 
-    const super_admins = JSON.parse(JSON.stringify(await User.findAll({
-      where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
-    })));
+    const userdetails = await User.findOne({ where: { id: userId } });
+
+    const super_admins = JSON.parse(
+      JSON.stringify(
+        await User.findAll({
+          where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        })
+      )
+    );
 
     await User.update(update, { where: { id: userId } });
 
-
     // Mailer methods
-    await AdminSuspendUserMailerForUser({first_name: userdetails.first_name, email: userdetails.email}, reason);
+    await AdminSuspendUserMailerForUser(
+      { first_name: userdetails.first_name, email: userdetails.email },
+      reason
+    );
     await AdminSuspendUserMailerForAdmin(userdetails, super_admins, reason);
 
     return res.status(200).send({
@@ -1823,7 +1856,7 @@ exports.suspendUser = async (req, res) => {
       message: "User suspended",
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).send({
       success: false,
       message: "Server Error",
@@ -1920,4 +1953,3 @@ exports.unsuspendUser = async (req, res) => {
     });
   }
 };
-
