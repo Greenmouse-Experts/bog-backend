@@ -270,6 +270,7 @@ exports.createOrder = async (req, res, next) => {
           const mesg = `A user just bought ${product.quantity} of your product - ${prodData.name}`;
           const notifyType = "user";
           const { io } = req.app;
+          console.log("notification for prod creator")
           await Notification.createNotification({
             type: notifyType,
             message: mesg,
@@ -277,7 +278,7 @@ exports.createOrder = async (req, res, next) => {
           });
           io.emit(
             "getNotifications",
-            await Notification.fetchUserNotificationApi()
+            await Notification.fetchUserNotificationApi(prodData.creatorId)
           );
 
           return {
