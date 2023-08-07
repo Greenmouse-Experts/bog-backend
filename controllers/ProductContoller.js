@@ -549,7 +549,7 @@ exports.updateProduct = async (req, res, next) => {
         //   await ProductImage.destroy({ where: { id: Ids }, transaction: t });
         // }
         await ProductImage.bulkCreate(photos, { transaction: t });
-        request.image = photos[0].image;
+        request.image = photos[0].url;
       }
 
       await Product.update(request, {
