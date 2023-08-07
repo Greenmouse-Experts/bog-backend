@@ -334,7 +334,15 @@ exports.createOrder = async (req, res, next) => {
           qty: productEarnings[i].qty,
         });
       }
-
+   let deliveryTime = "Not stated";
+               if (
+                 orderData.order_items[0].shippingAddress.deliveryaddress !==
+                 "No address"
+               ) {
+                 deliveryTime =
+                   orderData.order_items[0].shippingAddress.deliveryaddress
+                     .delivery_time;
+               }
       orderData.slug = orderSlug;
       await helpTransaction.saveTxn(orderData, "Products");
       orderData.orderSlug = slug;
@@ -346,15 +354,7 @@ exports.createOrder = async (req, res, next) => {
             filename: `${slug}.pdf`,
           },
         ];
-               let deliveryTime = "Not stated";
-               if (
-                 orderData.order_items[0].shippingAddress.deliveryaddress !==
-                 "No address"
-               ) {
-                 deliveryTime =
-                   orderData.order_items[0].shippingAddress.deliveryaddress
-                     .delivery_time;
-               }
+            
         const message = helpers.invoiceMessage(user.name, deliveryTime);
         sendMail(user.email, message, "BOG Invoice", files);
 
