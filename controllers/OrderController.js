@@ -33,17 +33,16 @@ const ProductEarning = require("../models/ProductEarnings");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
-
-    const {userType} = req.query;
+    const { userType } = req.query;
     const where = {
       userId: req.user.id,
     };
-    
+
     if (req.query.status) {
       where.status = req.query.status;
     }
     if (userType) {
-      where.userType = userType
+      where.userType = userType;
     }
 
     const orders = await Order.findAll({
@@ -168,7 +167,19 @@ exports.createOrder = async (req, res, next) => {
       const userId = req.user.id;
       const ownerId = req.user.id;
       const user = await User.findByPk(userId, {
-        attributes: ["id", "email", "name", "fname", "lname", "userType", "phone", "address", "state", "city", "street"],
+        attributes: [
+          "id",
+          "email",
+          "name",
+          "fname",
+          "lname",
+          "userType",
+          "phone",
+          "address",
+          "state",
+          "city",
+          "street",
+        ],
       });
       let {
         shippingAddress,
@@ -179,24 +190,23 @@ exports.createOrder = async (req, res, next) => {
         totalAmount,
         userType,
         deliveryaddressId,
-        insuranceFee
+        insuranceFee,
       } = req.body;
 
       // const profile = await UserService.getUserTypeProfile(user.userType, userId);
       // const { id } = profile;
-   let deliveryaddress = await Addresses.findOne({
-     where: { id: deliveryaddressId },
-   });
-   if (deliveryaddress == null){
+      let deliveryaddress = await Addresses.findOne({
+        where: { id: deliveryaddressId },
+      });
+      if (deliveryaddress == null) {
+        deliveryaddress = "No address";
+      }
 
-    deliveryaddress = "No address"
-   }
-
-      if (userType == null || userType == 'undefined') {
+      if (userType == null || userType == "undefined") {
         userType = user.userType;
       }
-   shippingAddress.deliveryaddress = deliveryaddress
-   
+      shippingAddress.deliveryaddress = deliveryaddress;
+
       const slug = Math.floor(190000000 + Math.random() * 990000000);
       const orderSlug = `BOG/ORD/${slug}`;
       const orderData = {
@@ -206,7 +216,7 @@ exports.createOrder = async (req, res, next) => {
         deliveryFee,
         discount,
         totalAmount,
-        insuranceFee
+        insuranceFee,
       };
       const paymentData = {
         userId,
@@ -216,10 +226,6 @@ exports.createOrder = async (req, res, next) => {
       };
 
       // console.log(req.body);
-
-
- 
-
 
       await Payment.create(paymentData, { transaction: t });
       const contact = {
@@ -258,7 +264,7 @@ exports.createOrder = async (req, res, next) => {
             amount,
             qty: product.quantity,
           };
-          productEarnings.push(p)
+          productEarnings.push(p);
 
           // Notify product partner
           const mesg = `A user just bought ${product.quantity} of your product - ${prodData.name}`;
@@ -317,15 +323,12 @@ exports.createOrder = async (req, res, next) => {
           {
             model: ContactDetails,
             as: "contact",
-          }
+          },
         ],
         transaction: t,
       });
-  
 
-
-      for(let i = 0; i < productEarnings.length; i++){
-
+      for (let i = 0; i < productEarnings.length; i++) {
         const prode = ProductEarning.create({
           orderId: order.id,
           orderItemId: order.order_items[i].id,
@@ -334,19 +337,23 @@ exports.createOrder = async (req, res, next) => {
           qty: productEarnings[i].qty,
         });
       }
-   let deliveryTime = "Not stated";
-               if (
-                 orderData.order_items[0].shippingAddress.deliveryaddress !==
-                 "No address"
-               ) {
-                 deliveryTime =
-                   orderData.order_items[0].shippingAddress.deliveryaddress
-                     .delivery_time;
-               }
+      let deliveryTime = "Not stated";
+      if (
+        orderData.order_items[0].shippingAddress.deliveryaddress !==
+        "No address"
+      ) {
+        deliveryTime =
+          orderData.order_items[0].shippingAddress.deliveryaddress
+            .delivery_time;
+      }
       orderData.slug = orderSlug;
       await helpTransaction.saveTxn(orderData, "Products");
       orderData.orderSlug = slug;
-      const invoice = await invoiceService.createInvoice(orderData, deliveryTime, user);
+      const invoice = await invoiceService.createInvoice(
+        orderData,
+        deliveryTime,
+        user
+      );
       if (invoice) {
         const files = [
           {
@@ -354,10 +361,9 @@ exports.createOrder = async (req, res, next) => {
             filename: `${slug}.pdf`,
           },
         ];
-            
+
         const message = helpers.invoiceMessage(user.name, deliveryTime);
         sendMail(user.email, message, "BOG Invoice", files);
-
 
         // Get active product admins
         const product_admins = await User.findAll({
@@ -368,25 +374,24 @@ exports.createOrder = async (req, res, next) => {
         });
         const _admins = [...product_admins, ...super_admins];
 
-   
         await AdminNewOrderMailer(user, _admins, orders, files, {
           ref: orderSlug,
         });
       }
 
-          const mesgUser = `You just made an order of  product `;
-          const notifyTypeU = "user";
-          const { io } = req.app;
-          
-          await Notification.createNotification({
-            type: notifyTypeU,
-            message: mesgUser,
-            userId: user.id,
-          });
-          io.emit(
-            "getNotifications",
-            await Notification.fetchUserNotificationApi()
-          );
+      const mesgUser = `You just made an order of  product `;
+      const notifyTypeU = "user";
+      const { io } = req.app;
+
+      await Notification.createNotification({
+        type: notifyTypeU,
+        message: mesgUser,
+        userId: user.id,
+      });
+      io.emit(
+        "getNotifications",
+        await Notification.fetchUserNotificationApi()
+      );
       const mesg = `A new order was made by ${
         user.name ? user.name : `${user.fname} ${user.lname}`
       }`;
@@ -395,9 +400,11 @@ exports.createOrder = async (req, res, next) => {
         type: notifyType,
         message: mesg,
       });
-      io.emit("getNotifications", await Notification.fetchAdminNotification({userId}));
+      io.emit(
+        "getNotifications",
+        await Notification.fetchAdminNotification({ userId })
+      );
 
-  
       // save the details of the transaction
       return res.status(200).send({
         success: true,
@@ -439,7 +446,7 @@ exports.updateOrder = async (req, res, next) => {
         status,
         ...req.body,
       };
-      console.log(status)
+      console.log(status);
       await Order.update(data, { where: { id: orderId }, transaction: t });
 
       const user = await User.findOne({
