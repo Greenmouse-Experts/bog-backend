@@ -14,7 +14,7 @@ exports.createInvoice = async (orderData, user) => {
   if (!order_items && order_items.length < 1) {
     return false;
   }
-  console.log(orderData);
+  console.log(orderData.user.address);
   console.log(orderData.order_items[0].shippingAddress);
 
   const myProduct = order_items.map((items) => {
@@ -56,16 +56,13 @@ exports.createInvoice = async (orderData, user) => {
     };
   });
 
+
   let homeaddress = "Not stated by user"
-  if(     orderData.user.address !== null &&
-    orderData.user.street !== null &&
-    orderData.user.city !== null &&
-    orderData.user.state !== null
+  if(     orderData.user.address !== null 
   ) {
     homeaddress =
       orderData.user.address + ", " + orderData.user.street  + ", " + orderData.user.city + ", " + orderData.user.state
   }
-  
 
   let landmarkAddress = "Not stated by user";
     if (
@@ -107,13 +104,7 @@ exports.createInvoice = async (orderData, user) => {
     ref: orderSlug,
     date_ordered: moment(new Date()).format("MMMM Do YYYY, h:mm:ss a"),
     delivery_address:
-      orderData.order_items[0].shippingAddress.address +
-      ", " +
-      orderData.order_items[0].shippingAddress.city +
-      ", " +
-      orderData.order_items[0].shippingAddress.state +
-      ", " +
-      orderData.order_items[0].shippingAddress.country,
+      orderData.order_items[0].shippingAddress.home_address,
     delivery_time: deliveryTime,
     products: _products,
     subtotal: _subtotal.toLocaleString(),
