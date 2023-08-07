@@ -62,11 +62,8 @@ exports.createInvoice = async (orderData, user) => {
     orderData.user.city !== null &&
     orderData.user.state !== null
   ) {
-    homeAddress =
-      (((orderData.user.address !== null + ", " + orderData.user.street) !==
-        null + ", " + orderData.user.city) !==
-        null + ", " + orderData.user.state) !==
-      null;
+    homeaddress =
+      orderData.user.address + ", " + orderData.user.street  + ", " + orderData.user.city + ", " + orderData.user.state
   }
   
 
@@ -110,8 +107,6 @@ exports.createInvoice = async (orderData, user) => {
     ref: orderSlug,
     date_ordered: moment(new Date()).format("MMMM Do YYYY, h:mm:ss a"),
     delivery_address:
-      orderData.order_items[0].shippingAddress.postal_code +
-      ", " +
       orderData.order_items[0].shippingAddress.address +
       ", " +
       orderData.order_items[0].shippingAddress.city +
