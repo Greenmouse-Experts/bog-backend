@@ -57,19 +57,18 @@ exports.createInvoice = async (orderData, user) => {
   });
 
   let homeaddress = "Not stated by user"
-  if(    orderData.order_items[0].shippingAddress.address !== null &&
-        orderData.order_items[0].shippingAddress.city !== null &&
-        orderData.order_items[0].shippingAddress.state !== null &&
-        orderData.order_items[0].shippingAddress.country !== null){
-          homeaddress =
-            orderData.order_items[0].shippingAddress.address +
-            ", " +
-            orderData.order_items[0].shippingAddress.city +
-            ", " +
-            orderData.order_items[0].shippingAddress.state +
-            ", " +
-            orderData.order_items[0].shippingAddress.country;
+  if(     orderData.user.address !== null &&
+    orderData.user.street !== null &&
+    orderData.user.city !== null &&
+    orderData.user.state !== null
+  ) {
+    homeAddress =
+      (((orderData.user.address !== null + ", " + orderData.user.street) !==
+        null + ", " + orderData.user.city) !==
+        null + ", " + orderData.user.state) !==
+      null;
   }
+  
 
   let landmarkAddress = "Not stated by user";
     if (
@@ -111,9 +110,15 @@ exports.createInvoice = async (orderData, user) => {
     ref: orderSlug,
     date_ordered: moment(new Date()).format("MMMM Do YYYY, h:mm:ss a"),
     delivery_address:
+      orderData.order_items[0].shippingAddress.postal_code +
+      ", " +
       orderData.order_items[0].shippingAddress.address +
       ", " +
-      orderData.order_items[0].shippingAddress.city,
+      orderData.order_items[0].shippingAddress.city +
+      ", " +
+      orderData.order_items[0].shippingAddress.state +
+      ", " +
+      orderData.order_items[0].shippingAddress.country,
     delivery_time: deliveryTime,
     products: _products,
     subtotal: _subtotal.toLocaleString(),
