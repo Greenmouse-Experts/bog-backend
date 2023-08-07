@@ -338,7 +338,7 @@ exports.createOrder = async (req, res, next) => {
       orderData.slug = orderSlug;
       await helpTransaction.saveTxn(orderData, "Products");
       orderData.orderSlug = slug;
-      const invoice = await invoiceService.createInvoice(orderData, user);
+      const invoice = await invoiceService.createInvoice(orderData, deliveryTime, user);
       if (invoice) {
         const files = [
           {
@@ -346,7 +346,16 @@ exports.createOrder = async (req, res, next) => {
             filename: `${slug}.pdf`,
           },
         ];
-        const message = helpers.invoiceMessage(user.name);
+               let deliveryTime = "Not stated";
+               if (
+                 orderData.order_items[0].shippingAddress.deliveryaddress !==
+                 "No address"
+               ) {
+                 deliveryTime =
+                   orderData.order_items[0].shippingAddress.deliveryaddress
+                     .delivery_time;
+               }
+        const message = helpers.invoiceMessage(user.name, deliveryTime);
         sendMail(user.email, message, "BOG Invoice", files);
 
 
@@ -359,6 +368,7 @@ exports.createOrder = async (req, res, next) => {
         });
         const _admins = [...product_admins, ...super_admins];
 
+   
         await AdminNewOrderMailer(user, _admins, orders, files, {
           ref: orderSlug,
         });
