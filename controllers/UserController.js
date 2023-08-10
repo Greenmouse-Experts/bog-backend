@@ -1125,6 +1125,8 @@ exports.verifyUserEmail = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         message: "Account Activated Successfully",
+        name: user.name,
+        email: user.email
       });
     } catch (error) {
       transaction.rollback();
