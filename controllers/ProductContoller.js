@@ -540,16 +540,23 @@ exports.updateProduct = async (req, res, next) => {
             url,
           });
         }
+
+
+
         const images = await ProductImage.findAll({
           where: { productId },
           attributes: ["id"],
         });
+
+             await ProductImage.destroy({
+               where: { productId },
+             });
         // if (images.length > 0) {
         //   const Ids = images.map((img) => img.id);
         //   await ProductImage.destroy({ where: { id: Ids }, transaction: t });
         // }
         await ProductImage.bulkCreate(photos, { transaction: t });
-        request.image = photos[0].image;
+        request.image = photos[0].url;
       }
 
       await Product.update(request, {
@@ -1334,6 +1341,13 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
               };
               await this.notifyAdmin(reqData);
 
+                const reqData2 = {
+                  req,
+                  userId: product.creatorId,
+                  message: `Admin has made a payout of NGN ${amount} to you for [${product.description}]`,
+                };
+                await this.notifyAdmin(reqData2);
+
               //update fin admin approve to true when transfer complete
               await TransactionPending.update(
                 { financialadmin: true },
@@ -1416,7 +1430,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
         ) {
                return res.status(404).send({
                  success: false,
-                 message: "Super Admin alreaady Approved",
+                 message: "Super Admin already Approved",
                });
         }
       }

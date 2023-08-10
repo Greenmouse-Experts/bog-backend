@@ -14,7 +14,7 @@ exports.createInvoice = async (orderData, user) => {
   if (!order_items && order_items.length < 1) {
     return false;
   }
-  console.log(orderData);
+  console.log(orderData.user);
   console.log(orderData.order_items[0].shippingAddress);
 
   const myProduct = order_items.map((items) => {
@@ -56,38 +56,43 @@ exports.createInvoice = async (orderData, user) => {
     };
   });
 
-  let homeaddress = "Not stated by user"
-  if(    orderData.order_items[0].shippingAddress.address !== null &&
-        orderData.order_items[0].shippingAddress.city !== null &&
-        orderData.order_items[0].shippingAddress.state !== null &&
-        orderData.order_items[0].shippingAddress.country !== null){
-          homeaddress =
-            orderData.order_items[0].shippingAddress.address +
-            ", " +
-            orderData.order_items[0].shippingAddress.city +
-            ", " +
-            orderData.order_items[0].shippingAddress.state +
-            ", " +
-            orderData.order_items[0].shippingAddress.country;
+  let homeaddress = "empty";
+  let add = "empty";
+
+  if (orderData.user.address !== null) {
+    add = orderData.user.address;
+  }
+  let str = "empty";
+  if (orderData.user.street !== null) {
+    str = orderData.user.street;
+  }
+  let cty = "empty";
+  if (orderData.user.city !== null) {
+    cty = orderData.user.city;
+  }
+  let sta = "empty";
+  if (orderData.user.state !== null) {
+    sta = orderData.user.state;
   }
 
+  homeaddress = add + ", " + str + ", " + cty + ", " + sta;
+
   let landmarkAddress = "Not stated by user";
-    if (
-      orderData.order_items[0].shippingAddress.deliveryaddress.title !==
-        null &&
-      orderData.order_items[0].shippingAddress.deliveryaddress.address !== null &&
-      orderData.order_items[0].shippingAddress.deliveryaddress.state !== null &&
-      orderData.order_items[0].shippingAddress.deliveryaddress.country !== null
-    ) {
-      landmarkAddress =
-        orderData.order_items[0].shippingAddress.deliveryaddress.title +
-        ", " +
-        orderData.order_items[0].shippingAddress.deliveryaddress.address +
-        ", " +
-        orderData.order_items[0].shippingAddress.deliveryaddress.state +
-        ", " +
-        orderData.order_items[0].shippingAddress.deliveryaddress.country;
-    }
+  if (
+    orderData.order_items[0].shippingAddress.deliveryaddress.title !== null &&
+    orderData.order_items[0].shippingAddress.deliveryaddress.address !== null &&
+    orderData.order_items[0].shippingAddress.deliveryaddress.state !== null &&
+    orderData.order_items[0].shippingAddress.deliveryaddress.country !== null
+  ) {
+    landmarkAddress =
+      orderData.order_items[0].shippingAddress.deliveryaddress.title +
+      ", " +
+      orderData.order_items[0].shippingAddress.deliveryaddress.address +
+      ", " +
+      orderData.order_items[0].shippingAddress.deliveryaddress.state +
+      ", " +
+      orderData.order_items[0].shippingAddress.deliveryaddress.country;
+  }
 
   const invoiceData = {
     logo:
@@ -110,10 +115,7 @@ exports.createInvoice = async (orderData, user) => {
     },
     ref: orderSlug,
     date_ordered: moment(new Date()).format("MMMM Do YYYY, h:mm:ss a"),
-    delivery_address:
-      orderData.order_items[0].shippingAddress.address +
-      ", " +
-      orderData.order_items[0].shippingAddress.city,
+    delivery_address: orderData.order_items[0].shippingAddress.home_address,
     delivery_time: deliveryTime,
     products: _products,
     subtotal: _subtotal.toLocaleString(),
