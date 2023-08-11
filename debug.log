@@ -1,0 +1,8 @@
+server started on port 3001
+Connection to database establised
+{
+  host: 'dace.info',
+  port: '465',
+  secure: 'true',
+  auth: { user: 'applicationsupport@dace.info', pass: 'Yhomi@Ce18$' }
+}
