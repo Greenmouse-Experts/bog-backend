@@ -662,6 +662,7 @@ exports.loginUser = async (req, res, next) => {
       const user = JSON.parse(
         JSON.stringify(await UserService.findUser({ email }))
       );
+      console.log(user)
 
       if (!user) {
         return res.status(400).send({
@@ -741,11 +742,11 @@ exports.loginUser = async (req, res, next) => {
         );
       }
 
-      const mesg = `Welcome back to your dashboard. You login was successful!`;
+      const mesg = `Welcome back to your dashboard. Your login was successful!`;
       const notifyType = user.userType === 'admin' ? 'admin' : 'user';
       const { io } = req.app;
       await Notification.createNotification({
-        userId,
+        userId: profile.id,
         type: notifyType,
         message: mesg,
       });

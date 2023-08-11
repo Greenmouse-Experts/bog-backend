@@ -9,6 +9,7 @@ const Product = require("../models/Product");
 const Payment = require("../models/Payment");
 const OrderItem = require("../models/OrderItem");
 // services
+const UserService = require("../service/UserService");
 const invoiceService = require("../service/invoiceService2");
 const { sendMail } = require("../service/attachmentEmailService");
 const helpers = require("../helpers/message");
@@ -225,7 +226,7 @@ exports.createOrder = async (req, res, next) => {
         payment_category: "Order",
       };
 
-      // console.log(req.body);
+      const profile = await UserService.getUserTypeProfile(userType, userId);
 
       await Payment.create(paymentData, { transaction: t });
       const contact = {
@@ -366,14 +367,14 @@ exports.createOrder = async (req, res, next) => {
         });
       }
 
-      const mesgUser = `You just made an order of  product `;
+      const mesgUser = `You just ordered for ${orders.length} item${orders.length > 1 ? 's' : '' } [${orderSlug}]`;
       const notifyTypeU = "user";
       const { io } = req.app;
 
       await Notification.createNotification({
         type: notifyTypeU,
         message: mesgUser,
-        userId: user.id,
+        userId: profile.id,
       });
       io.emit(
         "getNotifications",
