@@ -952,7 +952,7 @@ exports.approveProduct = async (req, res, next) => {
       console.log(profile)
       const data = {
         status,
-        approval_reason: reason || undefined
+        approval_reason: status === 'disapproved' ? reason || undefined : null
       };
       if (status === "approved") {
         data.showInShop = true;
