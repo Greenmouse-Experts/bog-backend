@@ -6,184 +6,137 @@ Connection to database establised
   secure: 'true',
   auth: { user: 'applicationsupport@dace.info', pass: 'Yhomi@Ce18$' }
 }
-Notification sent
 {
-  orderSlug: 627580485,
-  userId: '60ee41e9-07d8-4ef9-b813-c8ebc03f7f72',
-  userType: 'private_client',
-  deliveryFee: 500,
-  discount: 0,
-  totalAmount: 7000,
-  insuranceFee: true,
-  order_items: [
-    {
-      status: 'paid',
-      trackingId: 'TRD-374859598',
-      userId: '60ee41e9-07d8-4ef9-b813-c8ebc03f7f72',
-      ownerId: '60ee41e9-07d8-4ef9-b813-c8ebc03f7f72',
-      productOwner: '81588e5b-7869-43e2-b44f-46b27413f21e',
-      amount: 1800,
-      shippingAddress: [Object],
-      paymentInfo: [Object],
-      quantity: 1,
-      productEarnings: [Array],
-      product: [Object]
-    }
-  ],
-  user: users {
-    dataValues: {
-      id: '60ee41e9-07d8-4ef9-b813-c8ebc03f7f72',
-      email: 'greenmouseapp+client@gmail.com',
-      name: 'QA Private',
-      fname: 'QA',
-      lname: 'Private',
-      userType: 'private_client',
-      phone: '09087876765',
-      address: null,
-      state: null,
-      city: null,
-      street: null
-    },
-    _previousDataValues: {
-      id: '60ee41e9-07d8-4ef9-b813-c8ebc03f7f72',
-      email: 'greenmouseapp+client@gmail.com',
-      name: 'QA Private',
-      fname: 'QA',
-      lname: 'Private',
-      userType: 'private_client',
-      phone: '09087876765',
-      address: null,
-      state: null,
-      city: null,
-      street: null
-    },
-    uniqno: 1,
-    _changed: Set(0) {},
-    _options: {
-      isNewRecord: false,
-      _schema: null,
-      _schemaDelimiter: '',
-      raw: true,
-      attributes: [Array]
-    },
-    isNewRecord: false
-  },
-  contact: {
-    city: 'Berger',
-    state: 'Select a state',
-    country: 'Nigeria',
-    postal_code: '100213',
-    address: '10A, Comfort close, Ojodu Berger',
-    contact_name: 'Yhomi Ace',
-    contact_phone: '08101938842',
-    contact_email: 'test3@gmail.com',
-    deliveryaddress: addresses {
-      dataValues: [Object],
-      _previousDataValues: [Object],
-      uniqno: 1,
-      _changed: Set(0) {},
-      _options: [Object],
-      isNewRecord: false
-    },
-    userId: '60ee41e9-07d8-4ef9-b813-c8ebc03f7f72'
-  },
-  productEarnings: [
-    {
-      productOwnerId: '81588e5b-7869-43e2-b44f-46b27413f21e',
-      amount: 1800,
-      qty: 1
-    }
-  ],
-  slug: 'BOG/ORD/627580485'
+  id: '81588e5b-7869-43e2-b44f-46b27413f21e',
+  name: 'QA Product Green',
+  email: 'greenmousedev+pro@gmail.com',
+  password: '$2a$10$w6nCunCG5wyOYDATFEXwwuarp.DaIcezuK7MWEV6viML0lIzM30PC',
+  phone: '2349078767643',
+  isActive: true,
+  token: null,
+  userType: 'vendor',
+  address: '2 metal box road',
+  state: 'Lagos',
+  city: 'Ikeja',
+  street: null,
+  level: 1,
+  photo: 'https://bog.greenmouseproperties.com/uploads/ueLx38amanQA.jpeg',
+  fname: 'QA Dan',
+  lname: 'Product',
+  referralId: 'dnE6hlMzBAiU',
+  aboutUs: 'facebook',
+  isSuspended: false,
+  kycScore: '{"generalInfo":7,"orgInfo":9,"taxDetails":3,"workExperience":12,"SupplyCat":2,"financialData":6,"uploadDocument":5}',
+  kycTotal: '{"generalInfo":7,"orgInfo":9,"taxDetails":3,"workExperience":12,"SupplyCat":1,"financialData":6,"uploadDocument":16}',
+  app: null,
+  facebook_id: null,
+  google_id: null,
+  apple_id: null,
+  login_trials: null,
+  reason_for_suspension: null,
+  last_login: '2023-06-12',
+  createdAt: '2023-06-12T15:45:10.000Z',
+  updatedAt: '2023-07-19T11:48:10.000Z',
+  deletedAt: null
 }
-{
-  city: 'Berger',
-  state: 'Select a state',
-  country: 'Nigeria',
-  postal_code: '100213',
-  address: '10A, Comfort close, Ojodu Berger',
-  contact_name: 'Yhomi Ace',
-  contact_phone: '08101938842',
-  contact_email: 'test3@gmail.com',
-  deliveryaddress: addresses {
-    dataValues: {
-      id: 'f752441e-7ad3-42b9-9eca-47519eee3496',
-      title: 'Agbara, Lagos',
-      address: 'Opic Estate',
-      state: 'Lagos',
-      country: 'Nigeria',
-      longitude: null,
-      latitude: null,
-      zipcode: '+234',
-      charge: 4000,
-      delivery_type: null,
-      delivery_time: '5 days',
-      status: true,
-      insurancecharge: '1000',
-      createdAt: 2023-04-19T15:36:38.000Z,
-      updatedAt: 2023-06-07T20:00:46.000Z,
-      deletedAt: null
-    },
-    _previousDataValues: {
-      id: 'f752441e-7ad3-42b9-9eca-47519eee3496',
-      title: 'Agbara, Lagos',
-      address: 'Opic Estate',
-      state: 'Lagos',
-      country: 'Nigeria',
-      longitude: null,
-      latitude: null,
-      zipcode: '+234',
-      charge: 4000,
-      delivery_type: null,
-      delivery_time: '5 days',
-      status: true,
-      insurancecharge: '1000',
-      createdAt: 2023-04-19T15:36:38.000Z,
-      updatedAt: 2023-06-07T20:00:46.000Z,
-      deletedAt: null
-    },
-    uniqno: 1,
-    _changed: Set(0) {},
-    _options: {
-      isNewRecord: false,
-      _schema: null,
-      _schemaDelimiter: '',
-      raw: true,
-      attributes: [Array]
-    },
-    isNewRecord: false
-  }
-}
-{
-  id: '1be5df70-7b11-438e-9180-2f93fa86a307',
-  name: 'Rugby Cement',
-  price: '1800',
-  unit: 'Bags',
-  image: 'https://bog.greenmouseproperties.com/uploads/8gTAF0Oc4.jpeg',
-  description: 'Cement for your building or construction'
-}
-Invoice Generator
-Create your invoice! Easy!
 Notification sent
+Product id
+81588e5b-7869-43e2-b44f-46b27413f21e
+Log profile data
+{
+  id: 'e77bcb7b-5c6d-4eae-be2c-0a04fa9070fa',
+  userId: '81588e5b-7869-43e2-b44f-46b27413f21e',
+  userType: 'vendor',
+  isVerified: true,
+  company_address: null,
+  company_state: null,
+  company_city: null,
+  company_street: null,
+  company_name: 'Greenmouse',
+  cac_number: null,
+  tin: null,
+  years_of_experience: null,
+  certificate_of_operation: null,
+  professional_certificate: null,
+  kycPoint: 90,
+  planId: '129f109b-0f28-49d6-8f59-dbf02c1dca33',
+  expiredAt: '2024-06-19T12:23:28.000Z',
+  hasActiveSubscription: true
+}
+hello
 Notification sent
-Error: getaddrinfo ENOTFOUND dace.info
-    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (dns.js:79:26) {
-  errno: -3008,
-  code: 'EDNS',
-  syscall: 'getaddrinfo',
-  hostname: 'dace.info',
-  command: 'CONN'
+Product id
+81588e5b-7869-43e2-b44f-46b27413f21e
+Log profile data
+{
+  id: 'e77bcb7b-5c6d-4eae-be2c-0a04fa9070fa',
+  userId: '81588e5b-7869-43e2-b44f-46b27413f21e',
+  userType: 'vendor',
+  isVerified: true,
+  company_address: null,
+  company_state: null,
+  company_city: null,
+  company_street: null,
+  company_name: 'Greenmouse',
+  cac_number: null,
+  tin: null,
+  years_of_experience: null,
+  certificate_of_operation: null,
+  professional_certificate: null,
+  kycPoint: 90,
+  planId: '129f109b-0f28-49d6-8f59-dbf02c1dca33',
+  expiredAt: '2024-06-19T12:23:28.000Z',
+  hasActiveSubscription: true
 }
-CustomError: No Image provided!.
-    at /Users/admin/Documents/node-apps/BOG_Backend_final/helpers/cloudinaryMediaProvider.js:26:32
-    at zalgoSafe (/Users/admin/Documents/node-apps/BOG_Backend_final/node_modules/dezalgo/dezalgo.js:20:10)
-    at f (/Users/admin/Documents/node-apps/BOG_Backend_final/node_modules/once/once.js:25:25)
-    at IncomingForm.<anonymous> (/Users/admin/Documents/node-apps/BOG_Backend_final/node_modules/formidable/src/Formidable.js:183:9)
-    at IncomingForm.emit (events.js:400:28)
-    at IncomingForm._maybeEnd (/Users/admin/Documents/node-apps/BOG_Backend_final/node_modules/formidable/src/Formidable.js:612:10)
-    at DummyParser._flush (/Users/admin/Documents/node-apps/BOG_Backend_final/node_modules/formidable/src/parsers/Dummy.js:16:23)
-    at DummyParser.prefinish (internal/streams/transform.js:147:10)
-    at DummyParser.emit (events.js:400:28)
-    at prefinish (internal/streams/writable.js:630:14) {
-  status: 400
+hello
+Notification sent
+Product id
+81588e5b-7869-43e2-b44f-46b27413f21e
+Log profile data
+{
+  id: 'e77bcb7b-5c6d-4eae-be2c-0a04fa9070fa',
+  userId: '81588e5b-7869-43e2-b44f-46b27413f21e',
+  userType: 'vendor',
+  isVerified: true,
+  company_address: null,
+  company_state: null,
+  company_city: null,
+  company_street: null,
+  company_name: 'Greenmouse',
+  cac_number: null,
+  tin: null,
+  years_of_experience: null,
+  certificate_of_operation: null,
+  professional_certificate: null,
+  kycPoint: 90,
+  planId: '129f109b-0f28-49d6-8f59-dbf02c1dca33',
+  expiredAt: '2024-06-19T12:23:28.000Z',
+  hasActiveSubscription: true
 }
+hello
+Notification sent
+Product id
+81588e5b-7869-43e2-b44f-46b27413f21e
+Log profile data
+{
+  id: 'e77bcb7b-5c6d-4eae-be2c-0a04fa9070fa',
+  userId: '81588e5b-7869-43e2-b44f-46b27413f21e',
+  userType: 'vendor',
+  isVerified: true,
+  company_address: null,
+  company_state: null,
+  company_city: null,
+  company_street: null,
+  company_name: 'Greenmouse',
+  cac_number: null,
+  tin: null,
+  years_of_experience: null,
+  certificate_of_operation: null,
+  professional_certificate: null,
+  kycPoint: 90,
+  planId: '129f109b-0f28-49d6-8f59-dbf02c1dca33',
+  expiredAt: '2024-06-19T12:23:28.000Z',
+  hasActiveSubscription: true
+}
+hello
+Notification sent

@@ -59,6 +59,10 @@ const Product = sequelise.define(
       type: Sequelize.ENUM,
       values: ["draft", "pending", "in_review", "approved", "disapproved"],
       defaultValue: "pending"
+    },
+    approval_reason: {
+      allowNull: true,
+      type: Sequelize.STRING
     }
   },
   { paranoid: true }

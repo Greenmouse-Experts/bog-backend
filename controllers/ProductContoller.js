@@ -28,6 +28,10 @@ const Notifications = require("../models/Notification");
 
 const cloudinary = require("../helpers/cloudinaryMediaProvider");
 
+// services
+const UserService = require("../service/UserService");
+
+
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
   const { io } = req.app;
@@ -925,26 +929,40 @@ exports.getProductsForAdmin = async (req, res, next) => {
 exports.approveProduct = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { productId, status } = req.body;
+      const { productId, status, reason } = req.body;
 
       const product = await Product.findOne({
         where: { id: productId },
       });
+
+      
       if (!product) {
         return res.status(404).send({
           success: false,
           message: "Invalid Product",
         });
       }
+
+      console.log("Product id")
+      console.log(product.creatorId);
+
+      const profile = await UserService.getUserTypeProfile('product_partner', product.creatorId);
+
+      console.log("Log profile data");
+      console.log(profile)
       const data = {
         status,
+        approval_reason: reason || undefined
       };
       if (status === "approved") {
         data.showInShop = true;
       }
       await Product.update(data, { where: { id: productId }, transaction: t });
-      const mesg = `Your product ${product.name} has been reviewed and approved`;
-      const userId = product.creatorId;
+
+      const reason_details = reason && status === 'disapproved' ? ` due to ${reason}` : '';
+      
+      const mesg = `Your product ${product.name} has been reviewed and ${status}${reason_details}.`;
+      const userId = profile.id;
       const notifyType = "user";
       const { io } = req.app;
       console.log('hello')

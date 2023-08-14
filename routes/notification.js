@@ -15,7 +15,7 @@ router
 
 router
   .route("/notifications/user/:userId")
-  .get(Auth, NotificationController.getAllAUserNotifications);
+  .get([Auth, Access.verifyAccess], NotificationController.getAllAUserNotifications);
 
 router
   .route("/notifications/mark-read/:notificationId")

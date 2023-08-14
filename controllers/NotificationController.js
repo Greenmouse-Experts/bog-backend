@@ -5,6 +5,9 @@ const Notification = require("../models/Notification");
 const NotificationService = require("../helpers/notification");
 const sequelize = require("../config/database/connection");
 
+// Service methods
+const UserService = require("../service/UserService");
+
 exports.getAllAdminNotifications = async (req, res, next) => {
   try {
     const { level, role } = req._credentials;
@@ -40,6 +43,25 @@ exports.getAllAdminNotifications = async (req, res, next) => {
 
 exports.getAllAUserNotifications = async (req, res, next) => {
   try {
+    const {userType, id} = req._credentials;
+    
+    // Retrieve profile details
+    const profile = await UserService.getUserTypeProfile(userType, id);
+    if (!profile) {
+      return res.status(400).json({
+        success: false,
+        message: "Profile does not exist!",
+        data: []
+      });
+    }
+
+    if (profile.id !== req.params.userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access"
+      });
+    }
+
     const notifications = await Notification.findAll({
       where: {
         type: "user",
