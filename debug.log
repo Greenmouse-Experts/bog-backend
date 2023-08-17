@@ -6,12 +6,3 @@ Connection to database establised
   secure: 'true',
   auth: { user: 'applicationsupport@dace.info', pass: 'Yhomi@Ce18$' }
 }
-Notification sent
-Error: getaddrinfo ENOTFOUND dace.info
-    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (dns.js:79:26) {
-  errno: -3008,
-  code: 'EDNS',
-  syscall: 'getaddrinfo',
-  hostname: 'dace.info',
-  command: 'CONN'
-}

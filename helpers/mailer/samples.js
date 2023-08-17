@@ -1967,9 +1967,7 @@ module.exports = {
 
     const link = `${process.env.SITE_URL}/login`;
 
-    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
-      process.env.APP_NAME
-    }, ${!first_name ? "user" : first_name}</b></p>`;
+    params.body = `<p style="font-size:1.7em;"><b>Hello ${!first_name ? "user" : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">This is to inform you that your product <b>${product.name}</b> has been reviewed and ${product.status}${product.approval_reason !== null ? ` due to ${product.approval_reason}` : ''}.</p><br/>
                   <p style="font-size: 1.4em;">You can view this by logging to your <a href="${link}">dashboard</a>.</p>
