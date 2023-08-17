@@ -1801,19 +1801,19 @@ exports.transferToServicePartner = async (req, res, next) => {
             });
             const admins = [...project_admins, ...super_admins];
 
-            // // Client mailer
-            // await ServicePartnerMailerForProjectPayout(
-            //   { email: _service_partner.email, first_name: _service_partner.fname },
-            //   amount,
-            //   project
-            // );
-            // // Admins mailer
-            // await AdminProjectPayoutMailer(
-            //   {company_name: profile.company_name},
-            //   admins,
-            //   amount,
-            //   project
-            // );
+            // service partner mailer
+            await ServicePartnerMailerForProjectPayout(
+              { email: _service_partner.email, first_name: _service_partner.fname },
+              amount,
+              project
+            );
+            // Admins mailer
+            await AdminProjectPayoutMailer(
+              {company_name: profile.company_name},
+              admins,
+              amount,
+              project
+            );
 
             return res.status(200).send({
               success: true,

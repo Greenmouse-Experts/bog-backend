@@ -271,10 +271,11 @@ exports.createOrder = async (req, res, next) => {
           const mesg = `A user just bought ${product.quantity} of your product - ${prodData.name}`;
           const notifyType = "user";
           const { io } = req.app;
+          const partner_profile = await UserService.getUserTypeProfile("product_partner", prodData.creatorId);
           await Notification.createNotification({
             type: notifyType,
             message: mesg,
-            userId: prodData.creatorId,
+            userId: partner_profile.id,
           });
           io.emit(
             "getNotifications",
@@ -367,6 +368,7 @@ exports.createOrder = async (req, res, next) => {
         });
       }
 
+      // Notify buyer (client)
       const mesgUser = `You just ordered for ${orders.length} item${orders.length > 1 ? 's' : '' } [${orderSlug}]`;
       const notifyTypeU = "user";
       const { io } = req.app;
@@ -380,6 +382,8 @@ exports.createOrder = async (req, res, next) => {
         "getNotifications",
         await Notification.fetchUserNotificationApi()
       );
+
+      // Notify admin
       const mesg = `A new order was made by ${
         user.name ? user.name : `${user.fname} ${user.lname}`
       }`;
