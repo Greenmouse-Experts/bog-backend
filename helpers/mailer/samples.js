@@ -1950,6 +1950,54 @@ module.exports = {
       });
   },
 
+
+  /**
+   * Mailer to product partners on their product approval or disapproval
+   * @param {*} partner 
+   * @param {*} product 
+   */
+  PartnerProductApprovalMessage: async (partner, product) => {
+    const { first_name, email } = partner;
+
+    
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}/login`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
+      process.env.APP_NAME
+    }, ${!first_name ? "user" : first_name}</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">This is to inform you that your product <b>${product.name}</b> has been reviewed and ${product.status}${product.approval_reason !== null ? ` due to ${product.approval_reason}` : ''}.</p><br/>
+                  <p style="font-size: 1.4em;">You can view this by logging to your <a href="${link}">dashboard</a>.</p>
+                  <p style="font-size: 1.4em;">Regards, <br/></p>
+                  <p style="font-size: 1.4em;">${process.env.APP_NAME} team.</p>
+              `;
+
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Your product has been reviewed and ${product.status}`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        console.log(err)
+        return Promise.reject(err);
+      });
+  },
+
   /**
    * Mailer of complaint to iuser
    * @param {{first_name:string, email:string}} user
@@ -2004,47 +2052,49 @@ module.exports = {
    * @param {{first_name:string, email:string}} user
    * @param {{issue_type, issue_no, title, description, status}} issue
    */
-  complaintMessageToUser: async (user, issue) => {
-    const { first_name, email } = user;
-    const { issue_type, issue_no, title, description, status } = issue;
+  // complaintMessageToUser: async (user, issue) => {
+  //   const { first_name, email } = user;
+  //   const { issue_type, issue_no, title, description, status } = issue;
 
-    // setup mail credentials
-    let params = {};
-    params.logo = Logo;
-    params.header_color = "white";
+  //   // setup mail credentials
+  //   let params = {};
+  //   params.logo = Logo;
+  //   params.header_color = "white";
 
-    const link = `${process.env.SITE_URL}/dashboard/complaints`;
+  //   const link = `${process.env.SITE_URL}/dashboard/complaints`;
 
-    params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
-      process.env.APP_NAME
-    }, ${!first_name ? "user" : first_name}</b></p>`;
-    params.body += `
-                  <p style="font-size: 1.4em;">This is to inform you that you just made a complaint for the ticket issue ${issue_type} has been sent.</p><br/>
-                  <p style="font-size: 1.4em;">Status: ${status}</p>
-                  <p style="font-size: 1.4em;">Issue No: ${issue_no}</p><br/>
-                  <p style="font-size: 1.4em;">Title: ${title}</p>
-                  <p style="font-size: 1.4em;">Description:</p>
-                  <p style="font-size: 1.2em;">${description}</p>
-                  <p style="font-size: 1.4em;">For more info, click <a href="${link}">here</a>.</p>
-              `;
+  //   params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
+  //     process.env.APP_NAME
+  //   }, ${!first_name ? "user" : first_name}</b></p>`;
+  //   params.body += `
+  //                 <p style="font-size: 1.4em;">This is to inform you that you just made a complaint for the ticket issue ${issue_type} has been sent.</p><br/>
+  //                 <p style="font-size: 1.4em;">Status: ${status}</p>
+  //                 <p style="font-size: 1.4em;">Issue No: ${issue_no}</p><br/>
+  //                 <p style="font-size: 1.4em;">Title: ${title}</p>
+  //                 <p style="font-size: 1.4em;">Description:</p>
+  //                 <p style="font-size: 1.2em;">${description}</p>
+  //                 <p style="font-size: 1.4em;">For more info, click <a href="${link}">here</a>.</p>
+  //             `;
 
-    params.footer = "";
-    params.date = new Date().getFullYear();
+  //   params.footer = "";
+  //   params.date = new Date().getFullYear();
 
-    let params2 = {
-      email,
-      subject: `Complaints on ${issue_type} [${issue_no}]`,
-    };
+  //   let params2 = {
+  //     email,
+  //     subject: `Complaints on ${issue_type} [${issue_no}]`,
+  //   };
 
-    const template = mailer_template(params);
+  //   const template = mailer_template(params);
 
-    // Send Mail
-    Mailer(template, params2)
-      .then((response) => {
-        return Promise.resolve("Successful!");
-      })
-      .catch((err) => {
-        return Promise.reject(err);
-      });
-  },
+  //   // Send Mail
+  //   Mailer(template, params2)
+  //     .then((response) => {
+  //       return Promise.resolve("Successful!");
+  //     })
+  //     .catch((err) => {
+  //       return Promise.reject(err);
+  //     });
+  // },
+
+
 };

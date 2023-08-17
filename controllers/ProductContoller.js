@@ -23,6 +23,7 @@ const { Service } = require("../helpers/flutterwave");
 const {
   ServicePartnerMailerForProjectPayout,
   AdminProjectPayoutMailer,
+  PartnerProductApprovalMessage
 } = require("../helpers/mailer/samples");
 const Notifications = require("../models/Notification");
 
@@ -935,7 +936,6 @@ exports.approveProduct = async (req, res, next) => {
         where: { id: productId },
       });
 
-      
       if (!product) {
         return res.status(404).send({
           success: false,
@@ -943,13 +943,9 @@ exports.approveProduct = async (req, res, next) => {
         });
       }
 
-      console.log("Product id")
-      console.log(product.creatorId);
-
       const profile = await UserService.getUserTypeProfile('product_partner', product.creatorId);
+      const partner_details = await UserService.findUser({id: product.creatorId});
 
-      console.log("Log profile data");
-      console.log(profile)
       const data = {
         status,
         approval_reason: status === 'disapproved' ? reason || undefined : null
@@ -965,7 +961,7 @@ exports.approveProduct = async (req, res, next) => {
       const userId = profile.id;
       const notifyType = "user";
       const { io } = req.app;
-      console.log('hello')
+   
       await Notification.createNotification({
         type: notifyType,
         message: mesg,
@@ -976,6 +972,9 @@ exports.approveProduct = async (req, res, next) => {
         await Notification.fetchUserNotificationApi({ userId })
       );
 
+      // Send mails to product partners
+      await PartnerProductApprovalMessage(partner_details, product);
+      
       return res.status(200).send({
         success: true,
         message: `Product ${status} successfully `,

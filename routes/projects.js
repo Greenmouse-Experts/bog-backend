@@ -50,8 +50,12 @@ router
     ProjectController.updateProjectProgress
   );
 
-router.route("/projects/update/:projectId")
-    .put([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.updateProjectDetails);
+router
+  .route("/projects/update/:projectId")
+  .put(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    ProjectController.updateProjectDetails
+  );
 
 // Get assigned projects v2
 // router
@@ -60,18 +64,22 @@ router.route("/projects/update/:projectId")
 
 router.route("/projects/all").get(Auth, ProjectController.getAllProjectRequest);
 
-
 router
   .route("/projects/v2/all")
   .get([Auth, Access.verifyAccess], ProjectController.getAllProjectRequestV2);
 
 // View all project v2 ?y=${year} default is present year
-router.route("/projects/analyze")
-  .get([Auth, Access.verifyAccess], ProjectController.analyzeProjects)
+router
+  .route("/projects/analyze")
+  .get([Auth, Access.verifyAccess], ProjectController.analyzeProjects);
 
 // View all project v2 ?y=${year} default is present year
-router.route("/projects/service-partner-analyze")
-  .get([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.analyzeServicePartnerProjects)
+router
+  .route("/projects/service-partner-analyze")
+  .get(
+    [Auth, Access.verifyAccess, Access.verifyUser],
+    ProjectController.analyzeServicePartnerProjects
+  );
 
 router
   .route("/projects/view-project/:projectId")
@@ -156,20 +164,28 @@ router
   .route("/projects/request-for-approval/:projectId")
   .patch(Auth, ProjectController.requestProjectApproval);
 
-
 router
   .route("/projects/approve-project/:projectId")
-  .patch([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.approveProjectRequest);
+  .patch(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    ProjectController.approveProjectRequest
+  );
 
-// 1 // list competent providers 
+// 1 // list competent providers
 router
   .route("/projects/list-providers/:projectId")
-  .put([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.listCapableServiceProviders)
+  .put(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    ProjectController.listCapableServiceProviders
+  );
 
 // 2 // dispatch to selected providers from the list
 router
   .route("/projects/v2/dispatch-project/:projectId")
-  .put([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.selectivelyDispatchProject)
+  .put(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    ProjectController.selectivelyDispatchProject
+  );
 
 router
   .route("/projects/dispatch-project/:projectId")
@@ -184,24 +200,42 @@ router
     ProjectController.assignProject
   );
 
-router.route("/projects/installments/create")
-  .post([Auth, Access.verifyAccess, Access.verifyAdmin], projectInstallmentValidation(), validate, ProjectController.createProjectInstallment)
+router
+  .route("/projects/installments/create")
+  .post(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    projectInstallmentValidation(),
+    validate,
+    ProjectController.createProjectInstallment
+  );
 
 // Get project installments ?type=${cost | installment}
-router.route("/projects/installments/:project_id/view") 
-  .get([Auth, Access.verifyAccess], ProjectController.viewProjectInstallment)
+router
+  .route("/projects/installments/:project_id/view")
+  .get([Auth, Access.verifyAccess], ProjectController.viewProjectInstallment);
 
 // Pay project installment
-router.route("/projects/installments/:projectId/payment")
-  .post([Auth, Access.verifyAccess, Access.verifyUser], paymentInstallmentValidation(), validate, ProjectController.payProjectInstallment);
+router
+  .route("/projects/installments/:projectId/payment")
+  .post(
+    [Auth, Access.verifyAccess, Access.verifyUser],
+    paymentInstallmentValidation(),
+    validate,
+    ProjectController.payProjectInstallment
+  );
 
 // Transfer to service partners
-router.route("/projects/transfer/:projectId")
-  .post([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.transferToServicePartner);
+router
+  .route("/projects/transfer/:projectId")
+  .post(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    ProjectController.transferToServicePartner
+  );
 
 router
   .route("/projects/pendingTransfers")
-  .get([Auth, Access.verifyAccess, Access.verifyAdmin],
+  .get(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
     ProjectController.getPendingTransfers
   );
 
@@ -213,12 +247,19 @@ router
   );
 
 // Add Project notification
-router.route("/projects/notification/create")
-  .post([Auth, Access.verifyAccess], projectNotificationValidation(), validate, ProjectController.createProjectNotification)
+router
+  .route("/projects/notification/create")
+  .post(
+    [Auth, Access.verifyAccess],
+    projectNotificationValidation(),
+    validate,
+    ProjectController.createProjectNotification
+  );
 
 // View project notifications
-router.route("/projects/notification/:projectId/view")
-  .get([Auth, Access.verifyAccess], ProjectController.viewProjectNotifications)
+router
+  .route("/projects/notification/:projectId/view")
+  .get([Auth, Access.verifyAccess], ProjectController.viewProjectNotifications);
 
 router
   .route("/projects/bid-project")

@@ -77,7 +77,6 @@ exports.notifyAdmin = async ({ userId, message, req }) => {
   io.emit("getNotifications", await Notification.fetchAdminNotification());
 };
 
-
 exports.notifyUser = async ({ userId, message, req }) => {
   const notifyType = "user";
   const { io } = req.app;
@@ -86,9 +85,11 @@ exports.notifyUser = async ({ userId, message, req }) => {
     message,
     userId,
   });
-  io.emit("getNotifications", await Notification.fetchUserNotification({userId}));
+  io.emit(
+    "getNotifications",
+    await Notification.fetchUserNotification({ userId })
+  );
 };
-
 
 // Projects
 exports.getProjectRequest = async (req, res, next) => {
@@ -503,6 +504,13 @@ exports.updateProjectProgress = async (req, res, next) => {
       });
     }
 
+    if (percent > 100) {
+      return res.status(400).send({
+        status: false,
+        message: "Invalid percentage value!",
+      });
+    }
+
     await Project.update(
       { service_partner_progress: percent },
       { where: { id: projectId } }
@@ -559,6 +567,13 @@ exports.updateProjectDetails = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: "Project not found!",
+      });
+    }
+
+    if (progress > 100) {
+      return res.status(400).send({
+        status: false,
+        message: "Invalid percentage value!",
       });
     }
 
@@ -1803,13 +1818,16 @@ exports.transferToServicePartner = async (req, res, next) => {
 
             // service partner mailer
             await ServicePartnerMailerForProjectPayout(
-              { email: _service_partner.email, first_name: _service_partner.fname },
+              {
+                email: _service_partner.email,
+                first_name: _service_partner.fname,
+              },
               amount,
               project
             );
             // Admins mailer
             await AdminProjectPayoutMailer(
-              {company_name: profile.company_name},
+              { company_name: profile.company_name },
               admins,
               amount,
               project
@@ -1854,8 +1872,8 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
         });
       }
       const userLevel = user.level;
-      const transaction = pendingTransaction.transaction
-      const transfer = pendingTransaction.transfer
+      const transaction = pendingTransaction.transaction;
+      const transfer = pendingTransaction.transfer;
 
       const {
         TransactionId,
@@ -1870,13 +1888,11 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
 
       if (userLevel == 1 || userLevel == 3) {
         if (userLevel == 3 && pendingTransaction.superadmin == false) {
-          
           return res.status(404).send({
             success: false,
             message: "Cant approve transfer until super admin approves it",
           });
         } else if (userLevel == 3 && pendingTransaction.superadmin == true) {
-
           const service_partner_details = await ServicePartner.findOne({
             where: { id: project.serviceProviderId },
           });
@@ -1925,10 +1941,10 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
               };
 
               const response = await Transaction.create(trxData, { t });
-                            await TransactionPending.update(
-                              { financialadmin: true },
-                              { where: { id } }
-                            );
+              await TransactionPending.update(
+                { financialadmin: true },
+                { where: { id } }
+              );
 
               const user = await User.findByPk(userId, {
                 attributes: ["name", "email", "id", "userType"],
@@ -1940,12 +1956,12 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
               };
               await this.notifyAdmin(reqData);
 
-               const reqData2 = {
-                 req,
-                 userId: user.id,
-                 message: `Admin has made a payout of NGN ${amount} to service partner ${profile.company_name} [${project.projectSlug}]`,
-               };
-               await this.notifyUser(reqData2);
+              const reqData2 = {
+                req,
+                userId: user.id,
+                message: `Admin has made a payout of NGN ${amount} to service partner ${profile.company_name} [${project.projectSlug}]`,
+              };
+              await this.notifyUser(reqData2);
 
               // Get active project admins
               const project_admins = await User.findAll({
@@ -1989,19 +2005,21 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
               });
             }
           }
-        } else if (userLevel == 1 && pendingTransaction.financialadmin == false
+        } else if (
+          userLevel == 1 &&
+          pendingTransaction.financialadmin == false
         ) {
           // console.log('yippe')
-           await TransactionPending.update(
+          await TransactionPending.update(
             { superadmin: true },
-            { where: { id} }
+            { where: { id } }
           );
 
-          
-              return res.status(200).send({
-                success: true,
-                message: "Approved, Transfer would be done once finance admin approves!",
-              });
+          return res.status(200).send({
+            success: true,
+            message:
+              "Approved, Transfer would be done once finance admin approves!",
+          });
         }
       }
     } catch (error) {
@@ -2029,7 +2047,7 @@ exports.getPendingTransfers = async (req, res, next) => {
         });
       }
       for (let i = 0; i < pendingTransaction.length; i++) {
-        console.log(pendingTransaction[i])
+        console.log(pendingTransaction[i]);
         // let transfer = JSON.parse(pendingTransaction[i].transfer);
         // let transaction = JSON.parse(pendingTransaction[i].transaction);
         // delete pendingTransaction[i].transfer;
@@ -2851,7 +2869,7 @@ exports.bidForProject = async (req, res, next) => {
       const { userId, projectId } = req.body;
       const { name, email, fname, id } = req._credentials;
       const data = req.body;
-      console.log(data)
+      console.log(data);
       const project = await Project.findByPk(data.projectId);
       if (!project) {
         return res.status(404).send({
@@ -2868,17 +2886,16 @@ exports.bidForProject = async (req, res, next) => {
         { where, transaction: t }
       );
 
-
-        const servicePartner = await ServicePartner.findOne({
-          where: { userId },
+      const servicePartner = await ServicePartner.findOne({
+        where: { userId },
+      });
+      console.log(servicePartner);
+      if (servicePartner == null) {
+        return res.status(400).send({
+          success: false,
+          message: "You are not a service partner",
         });
-        console.log(servicePartner);
-        if (servicePartner == null) {
-          return res.status(400).send({
-            success: false,
-            message: "You are not a service partner",
-          });
-        }
+      }
 
       const projectBid = await ProjectBidding.findOne({
         where: { userId: servicePartner.id, projectId },
@@ -2890,9 +2907,7 @@ exports.bidForProject = async (req, res, next) => {
         });
       }
 
-
-
-           if (req.files.length > 0) {
+      if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
           const url = `${process.env.APP_URL}/${req.files[i].path}`;
           const name = req.files[i].fieldname;
@@ -2900,8 +2915,8 @@ exports.bidForProject = async (req, res, next) => {
         }
       }
 
-      data.userId = servicePartner.id
-      console.log(data.userId)
+      data.userId = servicePartner.id;
+      console.log(data.userId);
       const bid = await ProjectBidding.update(
         data,
         {
@@ -2910,7 +2925,7 @@ exports.bidForProject = async (req, res, next) => {
             projectId: projectId,
           },
         },
-        {transaction: t}
+        { transaction: t }
       );
 
       // Get client details
@@ -2984,9 +2999,11 @@ exports.applyForProject = async (req, res, next) => {
         projectId,
       };
 
-      const  servicePartner = await ServicePartner.findOne({where: {userId}});
-      console.log(servicePartner)
-         if (servicePartner == null) {
+      const servicePartner = await ServicePartner.findOne({
+        where: { userId },
+      });
+      console.log(servicePartner);
+      if (servicePartner == null) {
         return res.status(400).send({
           success: false,
           message: "You are not a service partner",
@@ -3006,12 +3023,12 @@ exports.applyForProject = async (req, res, next) => {
           message: "You cannot apply to bid for a project twice!",
         });
       }
-      console.log(projectBid)
+      console.log(projectBid);
       const bid = await ProjectBidding.create({
         transaction: t,
         areYouInterested: 1,
         projectId,
-        userId: servicePartner.id
+        userId: servicePartner.id,
       });
 
       // Get client details
@@ -3098,23 +3115,22 @@ exports.getProjectBids = async (req, res, next) => {
     //   })
     // );
 
-    for(let i = 0; i < bids.length; i++){
-        console.log(bids[i].userId);
-        const user = await userService.getUserFromProfile(
-          "professional",
-          bids[i].userId
-        );
-        bids[i].userDetails = user;
-        const completedProjects = await Project.count({
-          where: { serviceProviderId: bids[i].userId, status: "completed" },
-        });
+    for (let i = 0; i < bids.length; i++) {
+      console.log(bids[i].userId);
+      const user = await userService.getUserFromProfile(
+        "professional",
+        bids[i].userId
+      );
+      bids[i].userDetails = user;
+      const completedProjects = await Project.count({
+        where: { serviceProviderId: bids[i].userId, status: "completed" },
+      });
 
-        const ongoingProjects = await Project.count({
-          where: { serviceProviderId: bids[i].userId, status: "ongoing" },
-        });
-        bids[i].completedProjects = completedProjects;
-        bids[i].ongoingProjects = ongoingProjects;
-
+      const ongoingProjects = await Project.count({
+        where: { serviceProviderId: bids[i].userId, status: "ongoing" },
+      });
+      bids[i].completedProjects = completedProjects;
+      bids[i].ongoingProjects = ongoingProjects;
     }
     return res.status(200).send({
       success: true,
@@ -3124,7 +3140,7 @@ exports.getProjectBids = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return next(error);
   }
 };
@@ -3172,6 +3188,7 @@ exports.createProjectInstallment = async (req, res, next) => {
     const _response = await Project.findOne({
       where: { projectSlug: project_slug },
     });
+
     if (_response === null) {
       return res.status(404).json({
         success: false,
@@ -3189,13 +3206,47 @@ exports.createProjectInstallment = async (req, res, next) => {
       });
     }
 
+
+    if(type === 'installment'){
+      
+      // installment total amount
+      let installments = await ProjectInstallments.findAll({
+        attributes: [[Sequelize.fn('sum', Sequelize.col('amount')), 'totalAmount']],
+        where: { project_id: _response.id, type: "installment" },
+        raw: true
+      });
+
+      let installment_sum = installments[0].totalAmount + amount;
+      if (installment_sum > _response.totalCost) {
+        return res.status(400).json({
+          success: false,
+          message: `Your total installment breakdown amount exceeds the total cost of the project!`
+        })
+      }
+    }else if (type === 'cost') {
+      
+      // cost total amount
+      let cost = await ProjectInstallments.findAll({
+        attributes: [[Sequelize.fn('sum', Sequelize.col('amount')), 'totalAmount']],
+        where: { project_id: _response.id, type: "cost" },
+        raw: true
+      });
+      let cost_sum = cost[0].totalAmount + amount;
+      if (cost_sum > _response.totalCost) {
+        return res.status(400).json({
+          success: false,
+          message: `Your total cost summary breakdown amount exceeds the total cost of the project!`
+        })
+      }
+    }
+
     const _r2 = await ProjectInstallments.create({
       title,
       amount,
       type,
       project_id: _response.id,
       paid: false,
-      dueDate
+      dueDate,
     });
 
     return res.status(201).json({
