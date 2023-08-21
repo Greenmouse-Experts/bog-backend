@@ -313,7 +313,7 @@ module.exports = {
       params.logo = Logo;
       params.header_color = "white";
 
-      const link = `${process.env.SITE_URL}/dashboard/projectfile?projectId=${_project.id}`;
+      const link = `${process.env.SITE_URL}/login?redir_url=/dashboard/projectfile?projectId=${_project.id}`;
 
       params.body = `<p style="font-size:1.7em;"><b>Hi, Service partner ${partner.fname}</b></p>`;
       params.body += `

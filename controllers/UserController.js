@@ -742,15 +742,15 @@ exports.loginUser = async (req, res, next) => {
         );
       }
 
-      const mesg = `Welcome back to your dashboard. Your login was successful!`;
-      const notifyType = user.userType === 'admin' ? 'admin' : 'user';
-      const { io } = req.app;
-      await Notification.createNotification({
-        userId: profile.id,
-        type: notifyType,
-        message: mesg,
-      });
-      io.emit("getNotifications", await Notification.fetchAdminNotification());
+      // const mesg = `Welcome back to your dashboard. Your login was successful!`;
+      // const notifyType = user.userType === 'admin' ? 'admin' : 'user';
+      // const { io } = req.app;
+      // await Notification.createNotification({
+      //   userId: profile.id,
+      //   type: notifyType,
+      //   message: mesg,
+      // });
+      // io.emit("getNotifications", await Notification.fetchAdminNotification());
 
       return res.status(201).send({
         success: true,
