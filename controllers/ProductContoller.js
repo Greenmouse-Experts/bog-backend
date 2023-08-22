@@ -23,7 +23,7 @@ const { Service } = require("../helpers/flutterwave");
 const {
   ServicePartnerMailerForProjectPayout,
   AdminProjectPayoutMailer,
-  PartnerProductApprovalMessage
+  PartnerProductApprovalMessage,
 } = require("../helpers/mailer/samples");
 const Notifications = require("../models/Notification");
 
@@ -31,7 +31,6 @@ const cloudinary = require("../helpers/cloudinaryMediaProvider");
 
 // services
 const UserService = require("../service/UserService");
-
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
@@ -297,7 +296,6 @@ exports.deleteCategory = async (req, res, next) => {
 };
 
 exports.createProduct = async (req, res, next) => {
-
   sequelize.transaction(async (t) => {
     try {
       const { categoryId, name, price, quantity, unit, description } = req.body;
@@ -363,7 +361,6 @@ exports.createProduct = async (req, res, next) => {
 };
 
 exports.createProductV2 = async (req, res, next) => {
-
   sequelize.transaction(async (t) => {
     try {
       const { categoryId, name, price, quantity, unit, description } = req.body;
@@ -378,7 +375,7 @@ exports.createProductV2 = async (req, res, next) => {
         creatorId,
         status: req.body.status,
       };
-      console.log(request)
+      console.log(request);
 
       const images = await cloudinary.upload(req);
       const photos = [];
@@ -386,7 +383,7 @@ exports.createProductV2 = async (req, res, next) => {
       for (let i = 0; i < images.length; i++) {
         // const result = await cloudinary.uploader.upload(req.files[i].path);
         // const docPath = result.secure_url;
-        
+
         photos.push({
           creatorId,
           url: images[i],
@@ -436,7 +433,7 @@ exports.updateProductV2 = async (req, res, next) => {
       const product = await Product.findByPk(productId, {
         attributes: ["id"],
       });
-      console.log(request)
+      console.log(request);
       if (!product) {
         return res.status(404).send({
           success: false,
@@ -444,13 +441,12 @@ exports.updateProductV2 = async (req, res, next) => {
         });
       }
 
-      if(typeof images !== 'undefined'){
+      if (typeof images !== "undefined") {
         const images = await cloudinary.upload(req);
-      // const photos = [];
-     
+        // const photos = [];
 
-      // console.log(images);
-      
+        // console.log(images);
+
         if (images.length > 0) {
           const photos = [];
           for (let i = 0; i < images.length; i++) {
@@ -460,7 +456,7 @@ exports.updateProductV2 = async (req, res, next) => {
             photos.push({
               url: images[i],
               creatorId,
-              productId
+              productId,
             });
           }
           const images = await ProductImage.findAll({
@@ -508,7 +504,7 @@ exports.updateProductV2 = async (req, res, next) => {
         data: result,
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -546,16 +542,14 @@ exports.updateProduct = async (req, res, next) => {
           });
         }
 
-
-
         const images = await ProductImage.findAll({
           where: { productId },
           attributes: ["id"],
         });
 
-             await ProductImage.destroy({
-               where: { productId },
-             });
+        await ProductImage.destroy({
+          where: { productId },
+        });
         // if (images.length > 0) {
         //   const Ids = images.map((img) => img.id);
         //   await ProductImage.destroy({ where: { id: Ids }, transaction: t });
@@ -606,7 +600,7 @@ exports.deleteProductImage = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const { productimgId } = req.params;
-      
+
       const productImg = await ProductImage.findByPk(productimgId, {
         attributes: ["id"],
       });
@@ -617,7 +611,7 @@ exports.deleteProductImage = async (req, res, next) => {
         });
       }
 
-      await ProductImage.destroy({where: {id: productimgId}});
+      await ProductImage.destroy({ where: { id: productimgId } });
 
       return res.status(200).send({
         success: true,
@@ -628,7 +622,7 @@ exports.deleteProductImage = async (req, res, next) => {
       return next(error);
     }
   });
-}
+};
 
 exports.getAllProducts = async (req, res, next) => {
   try {
@@ -943,25 +937,34 @@ exports.approveProduct = async (req, res, next) => {
         });
       }
 
-      const profile = await UserService.getUserTypeProfile('product_partner', product.creatorId);
-      const partner_details = await UserService.findUser({id: product.creatorId});
+      const profile = await UserService.getUserTypeProfile(
+        "product_partner",
+        product.creatorId
+      );
+      const partner_details = await UserService.findUser({
+        id: product.creatorId,
+      });
 
       const data = {
         status,
-        approval_reason: status === 'disapproved' ? reason || undefined : null
+        approval_reason: status === "disapproved" ? reason || undefined : null,
       };
       if (status === "approved") {
         data.showInShop = true;
       }
       await Product.update(data, { where: { id: productId }, transaction: t });
 
-      const reason_details = reason && status === 'disapproved' ? ` due to ${reason}` : '';
-      
-      const mesg = `Your product ${product.name} has been reviewed and ${status}${reason_details}.`;
+      const reason_details =
+        reason && status === "disapproved" ? ` due to ${reason}` : "";
+
+      const mesg =
+        status === "in_review"
+          ? `Your product ${product.name} is under review`
+          : `Your product ${product.name} has been reviewed and ${status}${reason_details}.`;
       const userId = profile.id;
       const notifyType = "user";
       const { io } = req.app;
-   
+
       await Notification.createNotification({
         type: notifyType,
         message: mesg,
@@ -974,7 +977,7 @@ exports.approveProduct = async (req, res, next) => {
 
       // Send mails to product partners
       await PartnerProductApprovalMessage(partner_details, product);
-      
+
       return res.status(200).send({
         success: true,
         message: `Product ${status} successfully `,
@@ -1144,7 +1147,7 @@ exports.transferToProductPartner = async (req, res, next) => {
               description: narration,
               product,
             };
-            console.log(orderCompletionCheck.id)
+            console.log(orderCompletionCheck.id);
 
             const trxData = {
               TransactionId: TransactionId,
@@ -1358,12 +1361,12 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
               };
               await this.notifyAdmin(reqData);
 
-                const reqData2 = {
-                  req,
-                  userId: product.creatorId,
-                  message: `Admin has made a payout of NGN ${amount} to you for [${product.description}]`,
-                };
-                await this.notifyAdmin(reqData2);
+              const reqData2 = {
+                req,
+                userId: product.creatorId,
+                message: `Admin has made a payout of NGN ${amount} to you for [${product.description}]`,
+              };
+              await this.notifyAdmin(reqData2);
 
               //update fin admin approve to true when transfer complete
               await TransactionPending.update(
@@ -1441,14 +1444,11 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
             message:
               "Approved, Transfer would be done once finance admin approves!",
           });
-        } else if (
-          userLevel == 1 &&
-          pendingTransaction.superadmin == true
-        ) {
-               return res.status(404).send({
-                 success: false,
-                 message: "Super Admin already Approved",
-               });
+        } else if (userLevel == 1 && pendingTransaction.superadmin == true) {
+          return res.status(404).send({
+            success: false,
+            message: "Super Admin already Approved",
+          });
         }
       }
     } catch (error) {

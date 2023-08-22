@@ -1124,7 +1124,9 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">Project ${name} (${userType}) with the ID #${id} paid the ${_project.title} of NGN ${pr_installment.amount.toLocaleString()} for the project with the ID of ${
+                  <p style="font-size: 1.4em;">Project ${name} (${userType}) with the ID #${id} paid the ${
+      _project.title
+    } of NGN ${pr_installment.amount.toLocaleString()} for the project with the ID of ${
       _project.projectSlug
     }.</p>
                   <p style="font-size: 1.4em;">To view project details, you have to click the button below!</p>
@@ -1950,16 +1952,14 @@ module.exports = {
       });
   },
 
-
   /**
    * Mailer to product partners on their product approval or disapproval
-   * @param {*} partner 
-   * @param {*} product 
+   * @param {*} partner
+   * @param {*} product
    */
   PartnerProductApprovalMessage: async (partner, product) => {
     const { first_name, email } = partner;
 
-    
     // setup mail credentials
     let params = {};
     params.logo = Logo;
@@ -1967,9 +1967,21 @@ module.exports = {
 
     const link = `${process.env.SITE_URL}/login`;
 
-    params.body = `<p style="font-size:1.7em;"><b>Hello ${!first_name ? "user" : first_name}</b></p>`;
+    params.body = `<p style="font-size:1.7em;"><b>Hello ${
+      !first_name ? "user" : first_name
+    }</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">This is to inform you that your product <b>${product.name}</b> has been reviewed and ${product.status}${product.approval_reason !== null ? ` due to ${product.approval_reason}` : ''}.</p><br/>
+                  <p style="font-size: 1.4em;">This is to inform you that your product <b>${
+                    product.name
+                  }</b> ${
+      product.status === "in_review"
+        ? "is under review"
+        : ` has been reviewed and ${product.status}`
+    }${
+      product.approval_reason !== null
+        ? ` due to ${product.approval_reason}`
+        : ""
+    }.</p><br/>
                   <p style="font-size: 1.4em;">You can view this by logging to your <a href="${link}">dashboard</a>.</p>
                   <p style="font-size: 1.4em;">Regards, <br/></p>
                   <p style="font-size: 1.4em;">${process.env.APP_NAME} team.</p>
@@ -1980,7 +1992,11 @@ module.exports = {
 
     let params2 = {
       email,
-      subject: `Your product has been reviewed and ${product.status}`,
+      subject: `Your product ${
+        product.status === "in_review"
+          ? "is under review"
+          : ` has been reviewed and ${product.status}`
+      }`,
     };
 
     const template = mailer_template(params);
@@ -1991,7 +2007,7 @@ module.exports = {
         return Promise.resolve("Successful!");
       })
       .catch((err) => {
-        console.log(err)
+        console.log(err);
         return Promise.reject(err);
       });
   },
@@ -2093,6 +2109,4 @@ module.exports = {
   //       return Promise.reject(err);
   //     });
   // },
-
-
 };
