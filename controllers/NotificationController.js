@@ -43,7 +43,8 @@ exports.getAllAdminNotifications = async (req, res, next) => {
 
 exports.getAllAUserNotifications = async (req, res, next) => {
   try {
-    const {userType, id} = req._credentials;
+    const {id} = req._credentials;
+    const {userType} = req.query;
     
     // Retrieve profile details
     const profile = await UserService.getUserTypeProfile(userType, id);
