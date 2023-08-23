@@ -2,6 +2,8 @@
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
 const { Op } = require("sequelize");
+const sanitizer = require("string-sanitizer");
+
 const sequelize = require("../config/database/connection");
 const ServicesFormBuilder = require("../models/ServicesFormBuilder");
 const ServiceType = require("../models/ServiceType");
@@ -257,7 +259,7 @@ exports.createServiceForm = async (req, res, next) => {
       
       let formParams = {
         ...element,
-        serviceName, serviceTypeID: serviceType,
+        serviceName: sanitizer.sanitize(serviceName), serviceTypeID: serviceType,
         inputType: element.type
       };
 
@@ -265,9 +267,9 @@ exports.createServiceForm = async (req, res, next) => {
         for (let index2 = 0; index2 < element.values.length; index2++) {
           const element2 = element.values[index2];
           
-          formParams.subLabel = element2.label;
-          formParams.value = element2.value;
-          formParams.selected = element2.selected;
+          formParams.subLabel = sanitizer.sanitize(element2.label);
+          formParams.value = sanitizer.sanitize(element2.value);
+          formParams.selected = sanitizer.sanitize(element2.selected);
   
           const response = await ServicesFormBuilder.create({
             ...formParams,
