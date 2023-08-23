@@ -31,6 +31,7 @@ const email_data = {
     EMAIL_SECURE: true
 }
 
+
 exports.Mailer = async (template, data) => {
   let transporter = nodemailer.createTransport({
     host: email_data.EMAIL_HOST,
