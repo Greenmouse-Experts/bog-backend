@@ -1,6 +1,6 @@
 const request = require('request');
 const nodemailer = require('nodemailer');
-require('dotenv').config()
+// require('dotenv').config()
 
 exports.Logo = 'https://res.cloudinary.com/greenmouse-tech/image/upload/v1669563824/BOG/logo_1_1_ubgtnr.png';
 
@@ -22,6 +22,7 @@ exports.TermiiMailProvider = (data) => {
 };
 
 const email_data = {
+    APP_NAME: "BOG",
     EMAIL_PASSWORD: "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",
     EMAIL_USERNAME: "apikey",
     EMAIL_HOST: "smtp.sendgrid.net",
@@ -32,21 +33,21 @@ const email_data = {
 
 exports.Mailer = async (template, data) => {
   let transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: process.env.EMAIL_SECURE || false, // true for 465, false for other ports
+    host: email_data.EMAIL_HOST,
+    port: email_data.EMAIL_PORT,
+    secure: email_data.EMAIL_SECURE || false, // true for 465, false for other ports
     auth: {
-      user: process.env.EMAIL_USERNAME, // generated ethereal user
-      pass: process.env.EMAIL_PASSWORD, // generated ethereal password
+      user: email_data.EMAIL_USERNAME, // generated ethereal user
+      pass: email_data.EMAIL_PASSWORD, // generated ethereal password
     },
   });
 //   let transporter = nodemailer.createTransport({
-//     host: process.env.MAILER_HOST,
-//     port: process.env.MAILER_PORT,
-//     secure: process.env.MAILER_SECURE, // true for 465, false for other ports
+//     host: email_data.MAILER_HOST,
+//     port: email_data.MAILER_PORT,
+//     secure: email_data.MAILER_SECURE, // true for 465, false for other ports
 //     auth: {
-//       user: process.env.MAILER_USER,
-//       pass: process.env.MAILER_PASS,
+//       user: email_data.MAILER_USER,
+//       pass: email_data.MAILER_PASS,
 //     },
 //   });
 
@@ -54,7 +55,7 @@ exports.Mailer = async (template, data) => {
 
   // send mail with defined transport object
   let info = await transporter.sendMail({
-    from: `${process.env.APP_NAME} <${process.env.EMAIL_FROM}>`, // sender address
+    from: `${email_data.APP_NAME} <${email_data.EMAIL_FROM}>`, // sender address
     to: receivers, // list of receivers
     subject: data.subject, // Subject line
     html: template, // html body
@@ -599,7 +600,7 @@ exports.mailer_template = (params) => {
                                                             <p>Copyright &copy; ${
                                                               params.date
                                                             } ${
-    process.env.APP_NAME
+    email_data.APP_NAME
   } All rights reserved. </p>
                                                         </div>
                                                     </div>
