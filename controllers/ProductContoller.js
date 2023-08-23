@@ -957,10 +957,13 @@ exports.approveProduct = async (req, res, next) => {
       const reason_details =
         reason && status === "disapproved" ? ` due to ${reason}` : "";
 
+        
       const mesg =
         status === "in_review"
           ? `Your product ${product.name} is under review`
           : `Your product ${product.name} has been reviewed and ${status}${reason_details}.`;
+
+       
       const userId = profile.id;
       const notifyType = "user";
       const { io } = req.app;
@@ -976,7 +979,7 @@ exports.approveProduct = async (req, res, next) => {
       );
 
       // Send mails to product partners
-      await PartnerProductApprovalMessage(partner_details, product);
+      await PartnerProductApprovalMessage(partner_details, product, status, reason_details);
 
       return res.status(200).send({
         success: true,

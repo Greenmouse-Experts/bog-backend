@@ -1957,7 +1957,7 @@ module.exports = {
    * @param {*} partner
    * @param {*} product
    */
-  PartnerProductApprovalMessage: async (partner, product) => {
+  PartnerProductApprovalMessage: async (partner, product, status, reason_details) => {
     const { first_name, email } = partner;
 
     // setup mail credentials
@@ -1974,14 +1974,10 @@ module.exports = {
                   <p style="font-size: 1.4em;">This is to inform you that your product <b>${
                     product.name
                   }</b> ${
-      product.status === "in_review"
+      status === "in_review"
         ? "is under review"
-        : ` has been reviewed and ${product.status}`
-    }${
-      product.approval_reason !== null
-        ? ` due to ${product.approval_reason}`
-        : ""
-    }.</p><br/>
+        : ` has been reviewed and ${status}`
+    }${reason_details}.</p><br/>
                   <p style="font-size: 1.4em;">You can view this by logging to your <a href="${link}">dashboard</a>.</p>
                   <p style="font-size: 1.4em;">Regards, <br/></p>
                   <p style="font-size: 1.4em;">${process.env.APP_NAME} team.</p>
@@ -1993,9 +1989,9 @@ module.exports = {
     let params2 = {
       email,
       subject: `Your product ${
-        product.status === "in_review"
+        status === "in_review"
           ? "is under review"
-          : ` has been reviewed and ${product.status}`
+          : ` has been reviewed and ${status}`
       }`,
     };
 
