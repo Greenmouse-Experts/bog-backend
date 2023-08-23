@@ -3,6 +3,7 @@
 require("dotenv").config();
 const { Op } = require("sequelize");
 const sanitizer = require("string-sanitizer");
+const {stripHtml} = require("string-strip-html")
 
 const sequelize = require("../config/database/connection");
 const ServicesFormBuilder = require("../models/ServicesFormBuilder");
@@ -261,7 +262,7 @@ exports.createServiceForm = async (req, res, next) => {
 
       let formParams = {
         ...element,
-        serviceName: sanitizer.sanitize(serviceName),
+        serviceName: stripHtml(serviceName),
         serviceTypeID: serviceType,
         inputType: element.type,
       };
@@ -270,9 +271,9 @@ exports.createServiceForm = async (req, res, next) => {
         for (let index2 = 0; index2 < element.values.length; index2++) {
           const element2 = element.values[index2];
 
-          formParams.subLabel = sanitizer.sanitize(element2.label);
-          formParams.value = sanitizer.sanitize(element2.value);
-          formParams.selected = sanitizer.sanitize(element2.selected);
+          formParams.subLabel = stripHtml(element2.label);
+          formParams.value = stripHtml(element2.value);
+          formParams.selected = stripHtml(element2.selected);
 
           const response = await ServicesFormBuilder.create({
             ...formParams,
