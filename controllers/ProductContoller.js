@@ -983,7 +983,7 @@ exports.approveProduct = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: `Product ${status} successfully `,
+        message: `Product ${status} successfully erjernejrn`,
       });
     } catch (error) {
       t.rollback();
