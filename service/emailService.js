@@ -1,27 +1,36 @@
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 
+const email_data = {
+  APP_NAME: "BOG",
+  EMAIL_PASSWORD: "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",
+  EMAIL_USERNAME: "apikey",
+  EMAIL_HOST: "smtp.sendgrid.net",
+  EMAIL_PORT: 465,
+  EMAIL_FROM: "buildonthego2023@gmail.com",
+  EMAIL_SECURE: true
+}
+
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: process.env.EMAIL_SECURE || false, // true for 465, false for other ports
+  host: email_data.EMAIL_HOST,
+  port: email_data.EMAIL_PORT,
+  secure: email_data.EMAIL_SECURE || false, // true for 465, false for other ports
   auth: {
-    user: process.env.EMAIL_USERNAME, // generated ethereal user
-    pass: process.env.EMAIL_PASSWORD // generated ethereal password
-  }
+    user: email_data.EMAIL_USERNAME, // generated ethereal user
+    pass: email_data.EMAIL_PASSWORD, // generated ethereal password
+  },
 });
 
-
-  transporter
-    .verify()
-    .then(() => console.log("Connected to email server"))
-    .catch((error) =>
-      console.log(
-        transporter.options,
-        error,
-        "Unable to connect to email server. Make sure you have configured the SMTP options in .env"
-      )
-    );
+transporter
+  .verify()
+  .then(() => console.log("Connected to email server"))
+  .catch((error) =>
+    console.log(
+      transporter.options,
+      error,
+      "Unable to connect to email server. Make sure you have configured the SMTP options in .env"
+    )
+  );
 
 exports.sendMail = async (email, message, subject, files = []) => {
   try {
@@ -32,7 +41,7 @@ exports.sendMail = async (email, message, subject, files = []) => {
       subject, // Subject line
       text: "BOG LTD", // plain text body
       html: message, // html body
-      attachments: files
+      attachments: files,
     };
     transporter.sendMail(mailOptions, async (err, info) => {
       if (err) {
