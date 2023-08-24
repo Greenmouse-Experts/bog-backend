@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "installation": "npm install --force",
     "start": "node app.js",
     "dev": "supervisor app.js",
     "serve": "nodemon app.js",
