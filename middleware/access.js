@@ -67,6 +67,7 @@ exports.verifyAccess = async (req, res, next) => {
         const _path = _adminPrivileges.privileges.filter((_privilege) => _privilege && path.includes(_privilege.toLowerCase())
         );
 
+        console.log(_path)
         
         if (_path.length === 0) {
           return res.status(403).send({

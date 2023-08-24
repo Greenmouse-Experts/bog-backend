@@ -14,7 +14,7 @@ exports.getAllAdminNotifications = async (req, res, next) => {
 
     let notifications = await Notification.findAll({
       where: {
-        type: "admin"
+        type: "admin",
       },
       order: [["createdAt", "DESC"]]
     });
@@ -26,6 +26,7 @@ exports.getAllAdminNotifications = async (req, res, next) => {
         const _privilegedMsg = role.privileges.filter(_priv =>
           _notification.message.toLowerCase().includes(_priv.toLowerCase())
         );
+        
         if (_privilegedMsg.length > 0) {
           return _notification;
         }

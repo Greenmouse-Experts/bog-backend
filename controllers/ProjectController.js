@@ -1956,6 +1956,10 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
               };
               await this.notifyAdmin(reqData);
 
+              // const profile_for_fadmin = await getUserTypeProfile(
+              //   "service_partner",
+              //   service_partner_details.userId
+              // );
               const reqData2 = {
                 req,
                 userId: user.id,
