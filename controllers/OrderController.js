@@ -271,7 +271,10 @@ exports.createOrder = async (req, res, next) => {
           const mesg = `A user just bought ${product.quantity} of your product - ${prodData.name}`;
           const notifyType = "user";
           const { io } = req.app;
-          const partner_profile = await UserService.getUserTypeProfile("product_partner", prodData.creatorId);
+          const partner_profile = await UserService.getUserTypeProfile(
+            "product_partner",
+            prodData.creatorId
+          );
           await Notification.createNotification({
             type: notifyType,
             message: mesg,
@@ -369,7 +372,9 @@ exports.createOrder = async (req, res, next) => {
       }
 
       // Notify buyer (client)
-      const mesgUser = `You just ordered for ${orders.length} item${orders.length > 1 ? 's' : '' } [${orderSlug}]`;
+      const mesgUser = `You just ordered for ${orders.length} item${
+        orders.length > 1 ? "s" : ""
+      } [${orderSlug}]`;
       const notifyTypeU = "user";
       const { io } = req.app;
 
@@ -434,17 +439,30 @@ exports.updateOrder = async (req, res, next) => {
         });
       }
 
+      const user_details = await UserService.findUser({ id: order.userId });
+      if (!user_details) {
+        return res.status(404).send({
+          success: false,
+          message: "User account not found!",
+        });
+      }
+
+      const profile = await UserService.getUserTypeProfile(
+        user_details.userType,
+        user_details.id
+      );
+      if (!profile) {
+        return res.status(404).send({
+          success: false,
+          message: "User profile not found!",
+        });
+      }
+
       const data = {
         status,
         ...req.body,
       };
-      console.log(status);
       await Order.update(data, { where: { id: orderId }, transaction: t });
-
-      const user = await User.findOne({
-        where: { id: order.userId },
-        attributes: { exclude: ["password"] },
-      });
 
       // Get active project admins
       const project_admins = await User.findAll({
@@ -455,13 +473,44 @@ exports.updateOrder = async (req, res, next) => {
       });
       const admins = [...project_admins, ...super_admins];
 
+      // Notify buyer (client)
+      const mesgUser = `Your order [${order.orderSlug}] has been ${
+        status === "pending" ? "updated to pending" : status
+      }`;
+      const notifyTypeU = "user";
+      const { io } = req.app;
+
+      await Notification.createNotification({
+        type: notifyTypeU,
+        message: mesgUser,
+        userId: profile.id,
+      });
+      io.emit(
+        "getNotifications",
+        await Notification.fetchUserNotificationApi()
+      );
+
+      // Notify admin
+      const mesg = `${user_details.userType} ${user_details.name}'s order [${
+        order.orderSlug
+      }] has been ${status === "pending" ? "updated to pending" : status}`;
+      const notifyType = "admin";
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg,
+      });
+      io.emit(
+        "getNotifications",
+        await Notification.fetchAdminNotification({ userId: user_details.id })
+      );
+
       // mailer for clients
-      await ClientUpdateOrderMailer(user, status, {
+      await ClientUpdateOrderMailer(user_details, status, {
         id: order.id,
         ref: order.orderSlug,
       });
       // mailer for admins
-      await AdminUpdateOrderMailer(user, admins, status, {
+      await AdminUpdateOrderMailer(user_details, admins, status, {
         id: order.id,
         ref: order.orderSlug,
       });
@@ -523,11 +572,21 @@ exports.cancelOrder = async (req, res, next) => {
       });
       const admins = [...project_admins, ...super_admins];
 
-      // mailer for clients
-      await ClientUpdateOrderMailer(user, status, {
-        id: order.id,
-        ref: order.orderSlug,
+      // Notify admin
+      const mesg = `${user.userType} ${user.name} has cancelled a ${order.status} order [${
+        order.orderSlug
+      }]`;
+      const notifyType = "admin";
+      await Notification.createNotification({
+        type: notifyType,
+        message: mesg,
       });
+      const { io } = req.app;
+      io.emit(
+        "getNotifications",
+        await Notification.fetchAdminNotification({ userId: user.id })
+      );
+
       // mailer for admins
       await AdminUpdateOrderMailer(user, admins, status, {
         id: order.id,

@@ -2550,6 +2550,8 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
   if (serviceTypes === null) {
     return Promise.reject({ message: "Service Type does not exist!" });
   }
+
+  console.log(score);
   const wherePartner = {
     serviceTypeId: serviceTypes.id,
     kycPoint: {
@@ -2596,6 +2598,7 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
     }
     return null;
   });
+  
 
   const qualifiedPartners = filteredServicePartners.filter(
     (pat) => pat !== null

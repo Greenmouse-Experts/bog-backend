@@ -1443,14 +1443,14 @@ module.exports = {
 
     let link = "";
     if (status === "completed") {
-      link = `${process.env.SITE_URL}/dashboard/order-detail/${trx.id}?f=1`;
+      link = `${process.env.SITE_URL}/login?redir_url=/dashboard/order-detail/${trx.id}?f=1`;
     } else {
-      link = `${process.env.SITE_URL}/dashboard/order-detail/${trx.id}`;
+      link = `${process.env.SITE_URL}/login?redir_url=/dashboard/order-detail/${trx.id}`;
     }
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, ${user.name}</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">We are glad to inform you that your order has been ${
+                  <p style="font-size: 1.4em;">This is to inform you that your order has been ${
                     status === "pending" ? "updated to pending" : status
                   }</p><br/>
               `;
@@ -1463,7 +1463,12 @@ module.exports = {
                     </p>
                 `;
     } else {
-      params.body += `<br/><p style="font-size: 1.4em;">For more info, you have to click the button below!</p>`;
+      if (status === "cancelled") {
+        params.body += `<br/>
+      <p style="font-size: 1.4em;"><b>PS:</b> Your money will be refunded in 7 working days' time.</p>`;
+      }
+      params.body += `<p style="font-size: 1.4em;">For more info, you have to click the button below!</p>
+      `;
       params.body += `
                     <p style="margin-top:30px; font-size: 1em;">
                         <a href="${link}" target="_BLANK" title="click to view your order" style="padding:20px;color:white;font-size:1.2em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Order</a>
@@ -1476,7 +1481,11 @@ module.exports = {
     let params2 = {
       email: user.email,
       subject: `Your Order [${trx.ref}] ${
-        status === "completed" ? status : ""
+        status === "completed"
+          ? status
+          : status === "cancelled"
+          ? "has been cancelled"
+          : ""
       }`,
     };
 
@@ -1957,7 +1966,12 @@ module.exports = {
    * @param {*} partner
    * @param {*} product
    */
-  PartnerProductApprovalMessage: async (partner, product, status, reason_details) => {
+  PartnerProductApprovalMessage: async (
+    partner,
+    product,
+    status,
+    reason_details
+  ) => {
     const { first_name, email } = partner;
 
     // setup mail credentials

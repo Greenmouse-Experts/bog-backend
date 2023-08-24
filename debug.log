@@ -1,4 +1,6 @@
 server started on port 3001
 Connection to database establised
 Connected to email server
-[ 'NOTIFICATION' ]
+{ message: 'Service Type does not exist!' }
+89
+10
