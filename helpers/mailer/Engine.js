@@ -26,7 +26,7 @@ const email_data = {
     EMAIL_PASSWORD: "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",
     EMAIL_USERNAME: "apikey",
     EMAIL_HOST: "smtp.sendgrid.net",
-    EMAIL_PORT: '',
+    EMAIL_PORT: '465',
     EMAIL_FROM: "buildonthego2023@gmail.com",
     EMAIL_SECURE: true
 }
