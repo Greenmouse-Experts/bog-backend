@@ -37,7 +37,7 @@ const Service = {
         const res = await axios.post(url, data, {
           headers: config.flw_header,
         });
-        // console.log(res.data);
+        console.log(res.data);
         return res.data;
       } catch (error) {
         console.log(error.response.data);

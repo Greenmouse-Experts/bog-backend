@@ -1857,6 +1857,8 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
       const pendingTransaction = await TransactionPending.findOne({
         where: { id },
       });
+      console.log("pending transaction")
+      console.log(pendingTransaction)
       if (!pendingTransaction || pendingTransaction == null) {
         return res.status(404).send({
           success: false,
@@ -2552,6 +2554,7 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
   }
 
   console.log(score);
+  console.log(serviceTypes)
   const wherePartner = {
     serviceTypeId: serviceTypes.id,
     kycPoint: {
@@ -2569,7 +2572,8 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
       })
     )
   );
-  // console.log({ servicePartners });
+  console.log('display service providers')
+  console.log({ servicePartners });
   if (servicePartners.length === 0) {
     return {
       message: "Not enough service providers",
