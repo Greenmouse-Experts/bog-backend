@@ -528,7 +528,7 @@ exports.updateOrder = async (req, res, next) => {
 };
 
 exports.cancelOrder = async (req, res, next) => {
-  sequelize.transaction(async (t) => {
+  // sequelize.transaction(async (t) => {
     try {
       const { id } = req._credentials;
       const { orderId } = req.params;
@@ -556,7 +556,8 @@ exports.cancelOrder = async (req, res, next) => {
       const data = {
         status,
       };
-      await Order.update(data, { where: { id: orderId }, transaction: t });
+      await Order.update(data, { where: { id: orderId } });
+      // await Order.update(data, { where: { id: orderId }, transaction: t });
 
       const user = await User.findOne({
         where: { id: order.userId },
@@ -599,10 +600,10 @@ exports.cancelOrder = async (req, res, next) => {
       });
     } catch (error) {
       console.log(error);
-      t.rollback();
+      // t.rollback();
       return next(error);
     }
-  });
+  // });
 };
 
 exports.requestRefund = async (req, res, next) => {

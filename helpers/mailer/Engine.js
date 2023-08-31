@@ -1,36 +1,57 @@
-const request = require('request');
-const nodemailer = require('nodemailer');
+const request = require("request");
+const nodemailer = require("nodemailer");
+
+// SMTPTransport
 // require('dotenv').config()
 
-exports.Logo = 'https://res.cloudinary.com/greenmouse-tech/image/upload/v1669563824/BOG/logo_1_1_ubgtnr.png';
+exports.Logo =
+  "https://res.cloudinary.com/greenmouse-tech/image/upload/v1669563824/BOG/logo_1_1_ubgtnr.png";
 
 exports.TermiiMailProvider = (data) => {
   // console.log(process.env.TERMII_API_KEY)
   const options = {
-    method: 'POST',
+    method: "POST",
     url: process.env.TERMII_API_ENDPOINT,
     headers: {
-      'Content-Type': ['application/json', 'application/json'],
+      "Content-Type": ["application/json", "application/json"],
     },
     body: JSON.stringify(data),
   };
 
-  request(options, function (error, response) {
+  request(options, function(error, response) {
     if (error) throw new Error(error);
     console.log(response.body);
   });
 };
 
 const email_data = {
-    APP_NAME: "BOG",
-    EMAIL_PASSWORD: "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",
-    EMAIL_USERNAME: "apikey",
-    EMAIL_HOST: "smtp.sendgrid.net",
-    EMAIL_PORT: '465',
-    EMAIL_FROM: "buildonthego2023@gmail.com",
-    EMAIL_SECURE: true
-}
-
+  APP_NAME: "BOG",
+  EMAIL_PASSWORD: "Ca2Y5tf1;D^v",
+  EMAIL_USERNAME: "no-reply@buildonthego.com",
+  EMAIL_HOST: "mail.buildonthego.com",
+  EMAIL_PORT: 25,
+  EMAIL_FROM: "no-reply@buildonthego.com",
+  EMAIL_SECURE: false,
+//   EMAIL_PASSWORD: "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",
+//   EMAIL_USERNAME: "apikey",
+//   EMAIL_HOST: "smtp.sendgrid.net",
+//   EMAIL_PORT: 587,
+//   EMAIL_FROM: "buildonthego2023@gmail.com",
+//   EMAIL_SECURE: false
+//   APP_NAME: "BOG",
+//   EMAIL_PASSWORD: "Ca2Y5tf1;D^v",
+//   EMAIL_USERNAME: "no-reply@buildonthego.com",
+//   EMAIL_HOST: "mail.buildonthego.com",
+//   EMAIL_PORT: 587,
+//   EMAIL_FROM: "no-reply@buildonthego.com",
+//   EMAIL_SECURE: true,
+  // EMAIL_PASSWORD: "-PUwv?h}YPcZ",
+  // EMAIL_USERNAME: "no-reply@buildonthego.com",
+  // EMAIL_HOST: "buildonthego.com",
+  // EMAIL_PORT: 465,
+  // EMAIL_FROM: "no-reply@buildonthego.com",
+  // EMAIL_SECURE: true
+};
 
 exports.Mailer = async (template, data) => {
   let transporter = nodemailer.createTransport({
@@ -41,18 +62,22 @@ exports.Mailer = async (template, data) => {
       user: email_data.EMAIL_USERNAME, // generated ethereal user
       pass: email_data.EMAIL_PASSWORD, // generated ethereal password
     },
+    tls: {
+        rejectUnauthorized: false
+    }
   });
-//   let transporter = nodemailer.createTransport({
-//     host: email_data.MAILER_HOST,
-//     port: email_data.MAILER_PORT,
-//     secure: email_data.MAILER_SECURE, // true for 465, false for other ports
-//     auth: {
-//       user: email_data.MAILER_USER,
-//       pass: email_data.MAILER_PASS,
-//     },
-//   });
+  //   let transporter = nodemailer.createTransport({
+  //     host: email_data.MAILER_HOST,
+  //     port: email_data.MAILER_PORT,
+  //     secure: email_data.MAILER_SECURE, // true for 465, false for other ports
+  //     auth: {
+  //       user: email_data.MAILER_USER,
+  //       pass: email_data.MAILER_PASS,
+  //     },
+  //   });
 
-  const receivers = typeof data.email === "string" ? data.email : data.email.toString()
+  const receivers =
+    typeof data.email === "string" ? data.email : data.email.toString();
 
   // send mail with defined transport object
   let info = await transporter.sendMail({
