@@ -1,21 +1,20 @@
 const nodemailer = require("nodemailer");
 
 const email_data = {
-  APP_NAME: "BOG",
-  EMAIL_PASSWORD: "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",
-  EMAIL_USERNAME: "apikey",
-  EMAIL_HOST: "smtp.sendgrid.net",
-  EMAIL_PORT: 465,
-  EMAIL_FROM: "buildonthego2023@gmail.com",
-  EMAIL_SECURE: true
-
   // APP_NAME: "BOG",
-  // EMAIL_PASSWORD: "Ca2Y5tf1;D^v",
-  // EMAIL_USERNAME: "no-reply@buildonthego.com",
-  // EMAIL_HOST: "mail.buildonthego.com",
-  // EMAIL_PORT: 25,
-  // EMAIL_FROM: "no-reply@buildonthego.com",
-  // EMAIL_SECURE: false,
+  // EMAIL_PASSWORD: "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",
+  // EMAIL_USERNAME: "apikey",
+  // EMAIL_HOST: "smtp.sendgrid.net",
+  // EMAIL_PORT: 465,
+  // EMAIL_FROM: "buildonthego2023@gmail.com",
+  // EMAIL_SECURE: true
+  APP_NAME: "BOG",
+  EMAIL_PASSWORD: "+TwO[kj;ct-G",
+  EMAIL_USERNAME: "no-reply@buildonthego.com",
+  EMAIL_HOST: "mail.buildonthego.com",
+  EMAIL_PORT: 587,
+  EMAIL_FROM: "no-reply@buildonthego.com",
+  EMAIL_SECURE: false,
   // EMAIL_PASSWORD: "Ca2Y5tf1;D^v",
   // EMAIL_USERNAME: "no-reply@buildonthego.com",
   // EMAIL_HOST: "mail.buildonthego.com",
@@ -38,7 +37,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // let mailOptions = {
-//   from: `BOG <${email_data.EMAIL_USERNAME}>`,
+//   from: '"xxx" <xxx@gmail.com>',
 //   to: 'greenmouseapp@gmail.com',
 //   subject: 'Teste Templete ✔',
 //   html: '<h1>Test here</h1>'
