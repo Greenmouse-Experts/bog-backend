@@ -67,6 +67,7 @@ router.route("/user/switch-account").post(Auth, UserController.switchAccount);
 
 router.route("/user/get-accounts").get(Auth, UserController.getAccounts);
 
+router.route("/user/delete").delete(Auth, UserController.deleteAccount)
 router
   .route("/admin/login")
   .post(loginValidation(), validate, UserController.loginAdmin);

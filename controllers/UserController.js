@@ -856,6 +856,25 @@ exports.getAccounts = async (req, res, next) => {
   });
 };
 
+exports.deleteAccount = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const userId = req.user.id;
+
+      await User.destroy({where: {id: userId}});
+
+      return res.status(200).send({
+        success: true,
+        message: "User account deleted successfully!",
+      });
+    } catch (error) {
+      console.log(error)
+      t.rollback();
+      return next(error);
+    }
+  });
+}
+
 exports.contactAdmin = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
