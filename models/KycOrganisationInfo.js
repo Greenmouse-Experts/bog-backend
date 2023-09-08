@@ -58,6 +58,10 @@ const KycOrganisationInfo = sequelise.define(
     others_operations: {
       type: Sequelize.STRING,
       allowNull: true
+    },
+    years_of_experience: {
+      type: Sequelize.NUMBER,
+      allowNull: true
     }
   },
   { paranoid: true }
