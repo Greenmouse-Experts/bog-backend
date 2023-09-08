@@ -860,7 +860,8 @@ exports.deleteAccount = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
-
+      
+      // Delete user 
       await User.destroy({where: {id: userId}});
 
       return res.status(200).send({

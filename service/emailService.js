@@ -9,7 +9,7 @@ const email_data = {
   // EMAIL_FROM: "buildonthego2023@gmail.com",
   // EMAIL_SECURE: true
   APP_NAME: "BOG",
-  EMAIL_PASSWORD: "+TwO[kj;ct-G",
+  EMAIL_PASSWORD: "VK!x_6%vo___",
   EMAIL_USERNAME: "no-reply@buildonthego.com",
   EMAIL_HOST: "mail.buildonthego.com",
   EMAIL_PORT: 587,

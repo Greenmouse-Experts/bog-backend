@@ -26,7 +26,7 @@ exports.TermiiMailProvider = (data) => {
 
 const email_data = {
   APP_NAME: "BOG",
-  EMAIL_PASSWORD: "+TwO[kj;ct-G",
+  EMAIL_PASSWORD: "VK!x_6%vo___",
   EMAIL_USERNAME: "no-reply@buildonthego.com",
   EMAIL_HOST: "mail.buildonthego.com",
   EMAIL_PORT: 587,
