@@ -662,7 +662,6 @@ exports.loginUser = async (req, res, next) => {
       const user = JSON.parse(
         JSON.stringify(await UserService.findUser({ email }))
       );
-      console.log(user)
 
       if (!user) {
         return res.status(400).send({
@@ -766,6 +765,48 @@ exports.loginUser = async (req, res, next) => {
   });
 };
 
+const avg_rating = (details) => {
+  const {
+    years_of_experience_rating,
+    certification_of_personnel_rating,
+    no_of_staff_rating,
+    complexity_of_projects_completed_rating,
+    cost_of_projects_completed_rating,
+    quality_delivery_performance_rating,
+    timely_delivery_peformance_rating,
+  } = details;
+
+  const total = Object.keys(details).length;
+  let rating = 0;
+  if (years_of_experience_rating) {
+    rating += years_of_experience_rating || 0;
+  }
+  if (certification_of_personnel_rating) {
+    rating += certification_of_personnel_rating || 0;
+  }
+  if (no_of_staff_rating) {
+    rating += no_of_staff_rating || 0;
+  }
+  if (complexity_of_projects_completed_rating) {
+    rating += complexity_of_projects_completed_rating || 0;
+  }
+  if (cost_of_projects_completed_rating) {
+    rating += cost_of_projects_completed_rating || 0;
+  }
+  if (quality_delivery_performance_rating) {
+    rating += quality_delivery_performance_rating || 0;
+  }
+  if (timely_delivery_peformance_rating) {
+    rating += timely_delivery_peformance_rating || 0;
+  }
+
+  console.log(rating);
+  console.log(Object.keys(details).length);
+  console.log(Object.keys(details));
+
+  return (rating / total).toFixed(1);
+};
+
 exports.switchAccount = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -860,21 +901,21 @@ exports.deleteAccount = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
-      
-      // Delete user 
-      await User.destroy({where: {id: userId}});
+
+      // Delete user
+      await User.destroy({ where: { id: userId } });
 
       return res.status(200).send({
         success: true,
         message: "User account deleted successfully!",
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       t.rollback();
       return next(error);
     }
   });
-}
+};
 
 exports.contactAdmin = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -1070,6 +1111,9 @@ exports.getLoggedInUser = async (req, res) => {
         user: null,
       });
     }
+
+    const {years_of_experience_rating, certification_of_personnel_rating, no_of_staff_rating, complexity_of_projects_completed_rating, cost_of_projects_completed_rating, quality_delivery_performance_rating, timely_delivery_peformance_rating} = user;
+
     let profile;
     const data = {
       ...user,
@@ -1090,9 +1134,22 @@ exports.getLoggedInUser = async (req, res) => {
       }
     }
 
+    const rating =
+      user.userType === "professional"
+        ? avg_rating({
+            years_of_experience_rating,
+            certification_of_personnel_rating,
+            no_of_staff_rating,
+            complexity_of_projects_completed_rating,
+            cost_of_projects_completed_rating,
+            quality_delivery_performance_rating,
+            timely_delivery_peformance_rating,
+          })
+        : undefined;
+
     return res.status(200).send({
       success: true,
-      user: data,
+      user: { ...data, rating },
     });
   } catch (error) {
     return res.status(500).send({
@@ -1774,6 +1831,11 @@ exports.findSingleUser = async (req, res) => {
       );
     }
 
+    const {years_of_experience_rating, certification_of_personnel_rating, no_of_staff_rating, complexity_of_projects_completed_rating, cost_of_projects_completed_rating, quality_delivery_performance_rating, timely_delivery_peformance_rating} = userData;
+
+    const rating =
+      userData.userType === "professional" ? avg_rating({years_of_experience_rating, certification_of_personnel_rating, no_of_staff_rating, complexity_of_projects_completed_rating, cost_of_projects_completed_rating, quality_delivery_performance_rating, timely_delivery_peformance_rating}) : undefined;
+
     return res.status(200).send({
       success: true,
       data: {
@@ -1781,6 +1843,7 @@ exports.findSingleUser = async (req, res) => {
         accounts,
         ongoingProjects,
         completedProjects,
+        rating,
       },
     });
   } catch (error) {
