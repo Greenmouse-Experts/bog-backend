@@ -132,7 +132,35 @@ const User = sequelise.define(
     last_login: {
       type: Sequelize.DATE,
       allowNull: true
-    }
+    },
+    years_of_experience_rating: {
+      type: Sequelize.NUMBER,
+      allowNull: true
+    },
+    certification_of_personnel_rating: {
+      type: Sequelize.NUMBER,
+      allowNull: true
+    },
+    no_of_staff_rating: {
+      type: Sequelize.NUMBER,
+      allowNull: true
+    },
+    complexity_of_projects_completed_rating: {
+      type: Sequelize.NUMBER,
+      allowNull: true
+    },
+    cost_of_projects_completed_rating: {
+      type: Sequelize.NUMBER,
+      allowNull: true
+    },
+    quality_delivery_performance_rating: {
+      type: Sequelize.NUMBER,
+      allowNull: true
+    },
+    timely_delivery_peformance_rating: {
+      type: Sequelize.NUMBER,
+      allowNull: true
+    },
   },
   { paranoid: true }
 );

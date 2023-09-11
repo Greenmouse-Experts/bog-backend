@@ -59,8 +59,16 @@ const KycOrganisationInfo = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true
     },
-    years_of_experience: {
-      type: Sequelize.NUMBER,
+    no_of_staff: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    cost_of_projects_completed: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    complexity_of_projects_completed: {
+      type: Sequelize.STRING,
       allowNull: true
     }
   },

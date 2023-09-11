@@ -1,6 +1,17 @@
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
 
+
+const job_roles = [
+  'quantity_surveyor',
+  'structural_engineer',
+  'architects',
+  'mechanical_engineer',
+  'electrical_engineer',
+  'surveyor',
+  'civil_engineer'
+]
+
 const KycGeneralInfo = sequelise.define(
   "kyc_general_informations",
   {
@@ -44,9 +55,22 @@ const KycGeneralInfo = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true
     },
+    role: {
+      type: Sequelize.ENUM,
+      values: job_roles,
+      allowNull: true
+    },
     operational_address: {
       allowNull: true,
       type: Sequelize.STRING
+    },
+    years_of_experience: {
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    certification_of_personnel:{
+      type: Sequelize.STRING,
+      allowNull: true
     }
   },
   { paranoid: true }
