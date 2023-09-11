@@ -271,7 +271,7 @@ exports.createServiceForm = async (req, res, next) => {
         for (let index2 = 0; index2 < element.values.length; index2++) {
           const element2 = element.values[index2];
 
-          formParams.subLabel = striptags(element2.subLabel);
+          formParams.subLabel = striptags(element2.label);
           formParams.value = striptags(element2.value);
           formParams.selected = striptags(element2.selected);
 
