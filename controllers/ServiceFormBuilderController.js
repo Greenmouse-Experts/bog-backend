@@ -273,7 +273,7 @@ exports.createServiceForm = async (req, res, next) => {
 
           formParams.subLabel = striptags(element2.label);
           formParams.value = striptags(element2.value);
-          formParams.selected = striptags(element2.selected);
+          formParams.selected = element2.selected;
 
           const response = await ServicesFormBuilder.create({
             ...formParams,
@@ -293,6 +293,7 @@ exports.createServiceForm = async (req, res, next) => {
       message: "Form created!",
     });
   } catch (error) {
+    console.log(error)
     return next(error);
   }
 };
