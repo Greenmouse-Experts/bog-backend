@@ -2,3 +2,164 @@ server started on port 3001
 Connection to database establised
 Connected to email server
 Notification sent
+{
+  orderSlug: 643805785,
+  userId: 'cb9b5f4f-15a3-43d7-ad92-f22018187845',
+  userType: 'professional',
+  deliveryFee: 500,
+  discount: 0,
+  totalAmount: 7000,
+  insuranceFee: true,
+  order_items: [
+    {
+      status: 'paid',
+      trackingId: 'TRD-422067601',
+      userId: 'cb9b5f4f-15a3-43d7-ad92-f22018187845',
+      ownerId: 'cb9b5f4f-15a3-43d7-ad92-f22018187845',
+      productOwner: '334555599599332',
+      amount: 100000,
+      shippingAddress: [Object],
+      paymentInfo: [Object],
+      quantity: 1,
+      productEarnings: [Array],
+      product: [Object]
+    }
+  ],
+  user: users {
+    dataValues: {
+      id: 'cb9b5f4f-15a3-43d7-ad92-f22018187845',
+      email: 'greenmousedev+service21@gmail.com',
+      name: 'QA Service 2 Green',
+      fname: 'QA Service 2',
+      lname: 'Green',
+      userType: 'professional',
+      phone: '2349087876765',
+      address: '2 metalbox rd',
+      state: 'Lagos',
+      city: 'Ikeja',
+      street: null
+    },
+    _previousDataValues: {
+      id: 'cb9b5f4f-15a3-43d7-ad92-f22018187845',
+      email: 'greenmousedev+service21@gmail.com',
+      name: 'QA Service 2 Green',
+      fname: 'QA Service 2',
+      lname: 'Green',
+      userType: 'professional',
+      phone: '2349087876765',
+      address: '2 metalbox rd',
+      state: 'Lagos',
+      city: 'Ikeja',
+      street: null
+    },
+    uniqno: 1,
+    _changed: Set(0) {},
+    _options: {
+      isNewRecord: false,
+      _schema: null,
+      _schemaDelimiter: '',
+      raw: true,
+      attributes: [Array]
+    },
+    isNewRecord: false
+  },
+  contact: {
+    city: 'Berger',
+    state: 'Select a state',
+    country: 'Nigeria',
+    postal_code: '100213',
+    address: '10A, Comfort close, Ojodu Berger',
+    contact_name: 'Yhomi Ace',
+    contact_phone: '08101938842',
+    contact_email: 'test3@gmail.com',
+    deliveryaddress: addresses {
+      dataValues: [Object],
+      _previousDataValues: [Object],
+      uniqno: 1,
+      _changed: Set(0) {},
+      _options: [Object],
+      isNewRecord: false
+    },
+    userId: 'cb9b5f4f-15a3-43d7-ad92-f22018187845'
+  },
+  productEarnings: [ { productOwnerId: '334555599599332', amount: 100000, qty: 1 } ],
+  slug: 'BOG/ORD/643805785'
+}
+{
+  city: 'Berger',
+  state: 'Select a state',
+  country: 'Nigeria',
+  postal_code: '100213',
+  address: '10A, Comfort close, Ojodu Berger',
+  contact_name: 'Yhomi Ace',
+  contact_phone: '08101938842',
+  contact_email: 'test3@gmail.com',
+  deliveryaddress: addresses {
+    dataValues: {
+      id: 'f752441e-7ad3-42b9-9eca-47519eee3496',
+      title: 'Agbara, Lagos',
+      address: 'Opic Estate',
+      state: 'Lagos',
+      country: 'Nigeria',
+      longitude: null,
+      latitude: null,
+      zipcode: '+234',
+      charge: 4000,
+      delivery_type: null,
+      delivery_time: '5 days',
+      status: true,
+      insurancecharge: '1000',
+      createdAt: 2023-04-19T15:36:38.000Z,
+      updatedAt: 2023-06-07T20:00:46.000Z,
+      deletedAt: null
+    },
+    _previousDataValues: {
+      id: 'f752441e-7ad3-42b9-9eca-47519eee3496',
+      title: 'Agbara, Lagos',
+      address: 'Opic Estate',
+      state: 'Lagos',
+      country: 'Nigeria',
+      longitude: null,
+      latitude: null,
+      zipcode: '+234',
+      charge: 4000,
+      delivery_type: null,
+      delivery_time: '5 days',
+      status: true,
+      insurancecharge: '1000',
+      createdAt: 2023-04-19T15:36:38.000Z,
+      updatedAt: 2023-06-07T20:00:46.000Z,
+      deletedAt: null
+    },
+    uniqno: 1,
+    _changed: Set(0) {},
+    _options: {
+      isNewRecord: false,
+      _schema: null,
+      _schemaDelimiter: '',
+      raw: true,
+      attributes: [Array]
+    },
+    isNewRecord: false
+  }
+}
+{
+  id: '291e1cb0-dd47-4142-9073-a0d97704f74c',
+  name: 'Unique product test',
+  price: '100000',
+  unit: 'bags',
+  image: null,
+  description: 'Consequat mollit commodo laboris amet est occaecat velit velit proident enim nulla eu. Deserunt consectetur cillum irure magna cillum elit mollit nulla. Ullamco commodo irure est aliquip qui anim qui occaecat magna'
+}
+Invoice Generator
+Create your invoice! Easy!
+Notification sent
+Notification sent
+[Error: 4465903104:error:1408F10B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:332:
+] {
+  library: 'SSL routines',
+  function: 'ssl3_get_record',
+  reason: 'wrong version number',
+  code: 'ESOCKET',
+  command: 'CONN'
+}

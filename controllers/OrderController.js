@@ -267,9 +267,11 @@ exports.createOrder = async (req, res, next) => {
           };
           productEarnings.push(p);
 
+          const userDetails = await UserService.findUserById(prodData.creatorId);
+
           // Notify product partner
           const mesg = `A user just bought ${product.quantity} of your product - ${prodData.name}`;
-          const notifyType = "user";
+          const notifyType = userDetails.userType === "vendor" ? "user" : "admin";
           const { io } = req.app;
           const partner_profile = await UserService.getUserTypeProfile(
             "product_partner",
@@ -278,7 +280,7 @@ exports.createOrder = async (req, res, next) => {
           await Notification.createNotification({
             type: notifyType,
             message: mesg,
-            userId: partner_profile.id,
+            userId: userDetails.userType === "vendor" ? partner_profile.id : undefined,
           });
           io.emit(
             "getNotifications",
