@@ -3,7 +3,7 @@ Connection to database establised
 Connected to email server
 Notification sent
 {
-  orderSlug: 643805785,
+  orderSlug: 839734671,
   userId: 'cb9b5f4f-15a3-43d7-ad92-f22018187845',
   userType: 'professional',
   deliveryFee: 500,
@@ -13,7 +13,7 @@ Notification sent
   order_items: [
     {
       status: 'paid',
-      trackingId: 'TRD-422067601',
+      trackingId: 'TRD-428737912',
       userId: 'cb9b5f4f-15a3-43d7-ad92-f22018187845',
       ownerId: 'cb9b5f4f-15a3-43d7-ad92-f22018187845',
       productOwner: '334555599599332',
@@ -83,7 +83,7 @@ Notification sent
     userId: 'cb9b5f4f-15a3-43d7-ad92-f22018187845'
   },
   productEarnings: [ { productOwnerId: '334555599599332', amount: 100000, qty: 1 } ],
-  slug: 'BOG/ORD/643805785'
+  slug: 'BOG/ORD/839734671'
 }
 {
   city: 'Berger',
@@ -155,11 +155,24 @@ Invoice Generator
 Create your invoice! Easy!
 Notification sent
 Notification sent
-[Error: 4465903104:error:1408F10B:SSL routines:ssl3_get_record:wrong version number:../deps/openssl/openssl/ssl/record/ssl3_record.c:332:
-] {
-  library: 'SSL routines',
-  function: 'ssl3_get_record',
-  reason: 'wrong version number',
-  code: 'ESOCKET',
-  command: 'CONN'
+{
+  accepted: [ 'greenmousedev+service21@gmail.com' ],
+  rejected: [],
+  ehlo: [
+    'SIZE 52428800',
+    '8BITMIME',
+    'PIPELINING',
+    'PIPECONNECT',
+    'AUTH PLAIN LOGIN',
+    'HELP'
+  ],
+  envelopeTime: 944,
+  messageTime: 5633,
+  messageSize: 220575,
+  response: '250 OK id=1qg2JS-00016z-0g',
+  envelope: {
+    from: 'no-reply@buildonthego.com',
+    to: [ 'greenmousedev+service21@gmail.com' ]
+  },
+  messageId: '<e91c926a-adbc-0c4b-5d4f-ce2bae08c3d6@buildonthego.com>'
 }
