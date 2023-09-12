@@ -1,35 +1,4 @@
 server started on port 3001
 Connection to database establised
-16
-7
-[
-  'years_of_experience_rating',
-  'certification_of_personnel_rating',
-  'no_of_staff_rating',
-  'complexity_of_projects_completed_rating',
-  'cost_of_projects_completed_rating',
-  'quality_delivery_performance_rating',
-  'timely_delivery_peformance_rating'
-]
-16
-7
-[
-  'years_of_experience_rating',
-  'certification_of_personnel_rating',
-  'no_of_staff_rating',
-  'complexity_of_projects_completed_rating',
-  'cost_of_projects_completed_rating',
-  'quality_delivery_performance_rating',
-  'timely_delivery_peformance_rating'
-]
-16
-7
-[
-  'years_of_experience_rating',
-  'certification_of_personnel_rating',
-  'no_of_staff_rating',
-  'complexity_of_projects_completed_rating',
-  'cost_of_projects_completed_rating',
-  'quality_delivery_performance_rating',
-  'timely_delivery_peformance_rating'
-]
+Connected to email server
+Notification sent

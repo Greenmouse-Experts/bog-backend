@@ -925,6 +925,7 @@ exports.approveProduct = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const { productId, status, reason } = req.body;
+      const { userType } = req._credentials;
 
       const product = await Product.findOne({
         where: { id: productId },
@@ -937,10 +938,14 @@ exports.approveProduct = async (req, res, next) => {
         });
       }
 
-      const profile = await UserService.getUserTypeProfile(
-        "product_partner",
-        product.creatorId
-      );
+      let profile;
+      if (userType === "vendor") {
+        profile = await UserService.getUserTypeProfile(
+          "product_partner",
+          product.creatorId
+        );
+      }
+
       const partner_details = await UserService.findUser({
         id: product.creatorId,
       });
@@ -957,15 +962,13 @@ exports.approveProduct = async (req, res, next) => {
       const reason_details =
         reason && status === "disapproved" ? ` due to ${reason}` : "";
 
-        
       const mesg =
         status === "in_review"
           ? `Your product ${product.name} is under review`
           : `Your product ${product.name} has been reviewed and ${status}${reason_details}.`;
 
-       
-      const userId = profile.id;
-      const notifyType = "user";
+      const userId = userType === "vendor" ? profile.id : undefined;
+      const notifyType = userType === "vendor" ? "user" : "admin";
       const { io } = req.app;
 
       await Notification.createNotification({
@@ -973,20 +976,32 @@ exports.approveProduct = async (req, res, next) => {
         message: mesg,
         userId,
       });
-      io.emit(
-        "getNotifications",
-        await Notification.fetchUserNotificationApi({ userId })
-      );
+      if (userType === "vendor") {
+        io.emit(
+          "getNotifications",
+          await Notification.fetchUserNotificationApi({ userId })
+        );
+      } else {
+        io.emit(
+          "getNotifications",
+          await Notification.fetchAdminNotification()
+        );
+      }
 
       // Send mails to product partners
-      await PartnerProductApprovalMessage(partner_details, product, status, reason_details);
+      await PartnerProductApprovalMessage(
+        partner_details,
+        product,
+        status,
+        reason_details
+      );
 
       return res.status(200).send({
         success: true,
         message: `Product ${status} successfully`,
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       t.rollback();
       return next(error);
     }
