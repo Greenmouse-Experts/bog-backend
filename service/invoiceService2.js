@@ -64,8 +64,8 @@ exports.createInvoice = async (orderData, user) => {
           homeaddress =
             orderData.order_items[0].shippingAddress.address +
             ", " +
-            orderData.order_items[0].shippingAddress.city +
-            ", " +
+            // orderData.order_items[0].shippingAddress.city +
+            // "" +
             orderData.order_items[0].shippingAddress.state +
             ", " +
             orderData.order_items[0].shippingAddress.country;
@@ -111,9 +111,9 @@ exports.createInvoice = async (orderData, user) => {
     ref: orderSlug,
     date_ordered: moment(new Date()).format("MMMM Do YYYY, h:mm:ss a"),
     delivery_address:
-      orderData.order_items[0].shippingAddress.address +
-      ", " +
-      orderData.order_items[0].shippingAddress.city,
+      orderData.order_items[0].shippingAddress.address,
+      // ", " +
+      // orderData.order_items[0].shippingAddress.city,
     delivery_time: deliveryTime,
     products: _products,
     subtotal: _subtotal.toLocaleString(),

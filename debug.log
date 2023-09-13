@@ -3,7 +3,7 @@ Connection to database establised
 Connected to email server
 Notification sent
 {
-  orderSlug: 839734671,
+  orderSlug: 297220189,
   userId: 'cb9b5f4f-15a3-43d7-ad92-f22018187845',
   userType: 'professional',
   deliveryFee: 500,
@@ -13,7 +13,7 @@ Notification sent
   order_items: [
     {
       status: 'paid',
-      trackingId: 'TRD-428737912',
+      trackingId: 'TRD-984604333',
       userId: 'cb9b5f4f-15a3-43d7-ad92-f22018187845',
       ownerId: 'cb9b5f4f-15a3-43d7-ad92-f22018187845',
       productOwner: '334555599599332',
@@ -68,7 +68,7 @@ Notification sent
     state: 'Select a state',
     country: 'Nigeria',
     postal_code: '100213',
-    address: '10A, Comfort close, Ojodu Berger',
+    address: 'Comfort close',
     contact_name: 'Yhomi Ace',
     contact_phone: '08101938842',
     contact_email: 'test3@gmail.com',
@@ -83,14 +83,14 @@ Notification sent
     userId: 'cb9b5f4f-15a3-43d7-ad92-f22018187845'
   },
   productEarnings: [ { productOwnerId: '334555599599332', amount: 100000, qty: 1 } ],
-  slug: 'BOG/ORD/839734671'
+  slug: 'BOG/ORD/297220189'
 }
 {
   city: 'Berger',
   state: 'Select a state',
   country: 'Nigeria',
   postal_code: '100213',
-  address: '10A, Comfort close, Ojodu Berger',
+  address: 'Comfort close',
   contact_name: 'Yhomi Ace',
   contact_phone: '08101938842',
   contact_email: 'test3@gmail.com',
@@ -166,13 +166,13 @@ Notification sent
     'AUTH PLAIN LOGIN',
     'HELP'
   ],
-  envelopeTime: 944,
-  messageTime: 5633,
-  messageSize: 220575,
-  response: '250 OK id=1qg2JS-00016z-0g',
+  envelopeTime: 1138,
+  messageTime: 2452,
+  messageSize: 202147,
+  response: '250 OK id=1qgQDv-0003sK-1X',
   envelope: {
     from: 'no-reply@buildonthego.com',
     to: [ 'greenmousedev+service21@gmail.com' ]
   },
-  messageId: '<e91c926a-adbc-0c4b-5d4f-ce2bae08c3d6@buildonthego.com>'
+  messageId: '<a21c638f-ce9d-1fd6-3ad1-97bdbb96717c@buildonthego.com>'
 }
