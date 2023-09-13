@@ -21,6 +21,50 @@ const {
   USERTYPE,
   kyc_criteria_for_rating_service_partners,
 } = require("../helpers/utility");
+const ServicePartner = require("../models/ServicePartner");
+
+
+const avg_rating = (details) => {
+  const {
+    years_of_experience_rating,
+    certification_of_personnel_rating,
+    no_of_staff_rating,
+    complexity_of_projects_completed_rating,
+    cost_of_projects_completed_rating,
+    quality_delivery_performance_rating,
+    timely_delivery_peformance_rating,
+  } = details;
+
+  const total = Object.keys(details).length;
+  let rating = 0;
+  if (years_of_experience_rating) {
+    rating += years_of_experience_rating || 0;
+  }
+  if (certification_of_personnel_rating) {
+    rating += certification_of_personnel_rating || 0;
+  }
+  if (no_of_staff_rating) {
+    rating += no_of_staff_rating || 0;
+  }
+  if (complexity_of_projects_completed_rating) {
+    rating += complexity_of_projects_completed_rating || 0;
+  }
+  if (cost_of_projects_completed_rating) {
+    rating += cost_of_projects_completed_rating || 0;
+  }
+  if (quality_delivery_performance_rating) {
+    rating += quality_delivery_performance_rating || 0;
+  }
+  if (timely_delivery_peformance_rating) {
+    rating += timely_delivery_peformance_rating || 0;
+  }
+
+  console.log(rating);
+  console.log(Object.keys(details).length);
+  console.log(Object.keys(details));
+
+  return (rating / total).toFixed(1);
+};
 
 /**
  *
@@ -108,15 +152,33 @@ const rateServicePartner = async (user, role, data) => {
         no_of_staff_rating,
         cost_of_projects_completed_rating,
         complexity_of_projects_completed_rating,
-        id: userId
+        id: userId,
       };
+
       await UserService.updateUser(updateData, t);
 
+      // Get user details
+      const user_details = await UserService.findUserById(userId);
+
+      // Update service partner
+      await updateServicePartnerRating(user_details, userId);
+      
     } catch (error) {
+      console.log(error);
       t.rollback();
-      return next(error);
     }
   });
+};
+
+const updateServicePartnerRating = async (rating_details, userId) => {
+  try {
+   
+    const rating = avg_rating(rating_details);
+    await ServicePartner.update({rating}, {where: {userId}})
+
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 // supply Categories controllers
@@ -314,7 +376,13 @@ exports.ReadKycGeneralInfo = async (req, res, next) => {
 exports.createKycOrganisationInfo = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { userType, role, no_of_staff, cost_of_projects_completed, complexity_of_projects_completed} = req.body;
+      const {
+        userType,
+        role,
+        no_of_staff,
+        cost_of_projects_completed,
+        complexity_of_projects_completed,
+      } = req.body;
       const userId = req.user.id;
 
       if (userType === USERTYPE.SERVICE_PARTNER) {
@@ -322,7 +390,7 @@ exports.createKycOrganisationInfo = async (req, res, next) => {
         rateServicePartner({ userId }, role, {
           no_of_staff,
           cost_of_projects_completed,
-          complexity_of_projects_completed
+          complexity_of_projects_completed,
         });
       }
 

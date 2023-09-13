@@ -176,7 +176,7 @@ router
   .route("/projects/list-providers/:projectId")
   .put(
     [Auth, Access.verifyAccess, Access.verifyAdmin],
-    ProjectController.listCapableServiceProviders
+    ProjectController.listCapableServiceProvidersByRating
   );
 
 // 2 // dispatch to selected providers from the list

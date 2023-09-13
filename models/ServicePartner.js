@@ -93,6 +93,10 @@ const ServicePartner = sequelise.define(
     hasActiveSubscription: {
       type: Sequelize.BOOLEAN,
       defaultValue: false
+    },
+    rating: {
+      type: Sequelize.DOUBLE,
+      allowNull: true
     }
   },
   { paranoid: true }

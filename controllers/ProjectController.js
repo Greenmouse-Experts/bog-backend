@@ -2217,7 +2217,7 @@ exports.approveProjectRequest = async (req, res, next) => {
   });
 };
 
-// List Capable Service Providers
+// List Capable Service Providers - based on score
 exports.listCapableServiceProviders = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -2233,6 +2233,35 @@ exports.listCapableServiceProviders = async (req, res, next) => {
       }
 
       const providers = await this.getQualifiedProvidersOnly(project, score, t);
+
+      return res.send({
+        success: true,
+        data: providers,
+      });
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+// List Capable Service Providers - based on rating
+exports.listCapableServiceProvidersByRating = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { projectId } = req.params;
+      const { rating } = req.body;
+
+      const project = await Project.findByPk(projectId);
+      if (!project) {
+        return res.status(404).send({
+          success: false,
+          message: "Invalid Project",
+        });
+      }
+
+      const providers = await this.getQualifiedProvidersOnlyByRating(project, rating, t);
 
       return res.send({
         success: true,
@@ -2572,6 +2601,92 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
       })
     )
   );
+  console.log('display service providers')
+  console.log({ servicePartners });
+  if (servicePartners.length === 0) {
+    return {
+      message: "Not enough service providers",
+      providerData: [],
+    };
+  }
+
+  // remove service partners with ongoing projects
+  const where = {
+    status: "ongoing",
+    approvalStatus: "approved",
+    serviceProviderId: {
+      [Op.ne]: null,
+    },
+  };
+  const ongoingProjects = await Project.findAll({
+    where,
+    attributes: ["serviceProviderId"],
+  });
+
+  const partnersWithProjects = ongoingProjects.map((p) => p.serviceProviderId);
+  // console.log(partnersWithProjects)
+  const filteredServicePartners = servicePartners.filter((partner) => {
+    if (!partnersWithProjects.includes(partner.id)) {
+      return partner;
+    }
+    return null;
+  });
+  
+
+  const qualifiedPartners = filteredServicePartners.filter(
+    (pat) => pat !== null
+  );
+
+  let providers = [...qualifiedPartners];
+
+  return {
+    message: "Competent Service Providers",
+    providerData: providers,
+  };
+};
+
+/**
+ * Get qualified providers only by rating
+ * @param {*} project
+ * @param {*} rating
+ * @param {*} transaction
+ * @returns
+ */
+exports.getQualifiedProvidersOnlyByRating = async (project, rating, transaction) => {
+  // check project type
+  const { projectTypes, title } = project;
+  // console.log(project)
+  // get service types for project types
+  const serviceTypes = await ServiceType.findOne({
+    where: { slug: projectTypes, title },
+  });
+  // query all service partners with service type id
+  // kyc point greater than the passed score
+  // user is verified
+  // user has active subscription
+
+  if (serviceTypes === null) {
+    return Promise.reject({ message: "Service Type does not exist!" });
+  }
+
+  const wherePartner = {
+    serviceTypeId: serviceTypes.id,
+    hasActiveSubscription: true,
+    rating: {
+      [Op.gte]: rating
+    },
+    isVerified: true,
+  };
+  const servicePartners = JSON.parse(
+    JSON.stringify(
+      await ServicePartner.findAll({
+        include: [{ model: User, as: "service_user"}],
+        where: wherePartner,
+        order: [[Sequelize.literal("RAND()")]],
+      })
+    )
+  );
+
   console.log('display service providers')
   console.log({ servicePartners });
   if (servicePartners.length === 0) {

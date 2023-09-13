@@ -14,6 +14,8 @@ exports.createInvoice = async (orderData, user) => {
   if (!order_items && order_items.length < 1) {
     return false;
   }
+  console.log("user details");
+  console.log(user);
   console.log(orderData);
   console.log(orderData.order_items[0].shippingAddress);
 
@@ -56,38 +58,31 @@ exports.createInvoice = async (orderData, user) => {
     };
   });
 
-  let homeaddress = "Not stated by user"
-  if(    orderData.order_items[0].shippingAddress.address !== null &&
-        orderData.order_items[0].shippingAddress.city !== null &&
-        orderData.order_items[0].shippingAddress.state !== null &&
-        orderData.order_items[0].shippingAddress.country !== null){
-          homeaddress =
-            orderData.order_items[0].shippingAddress.address +
-            ", " +
-            // orderData.order_items[0].shippingAddress.city +
-            // "" +
-            orderData.order_items[0].shippingAddress.state +
-            ", " +
-            orderData.order_items[0].shippingAddress.country;
-  }
+  // let homeaddress = "Not stated by user"
+  // if(    orderData.order_items[0].shippingAddress.address !== null &&
+  //       orderData.order_items[0].shippingAddress.city !== null &&
+  //       orderData.order_items[0].shippingAddress.state !== null &&
+  //       orderData.order_items[0].shippingAddress.country !== null){
+  let homeaddress = `${user.address}, ${user.city}, ${user.state}`;
+
+  // }
 
   let landmarkAddress = "Not stated by user";
-    if (
-      orderData.order_items[0].shippingAddress.deliveryaddress.title !==
-        null &&
-      orderData.order_items[0].shippingAddress.deliveryaddress.address !== null &&
-      orderData.order_items[0].shippingAddress.deliveryaddress.state !== null &&
-      orderData.order_items[0].shippingAddress.deliveryaddress.country !== null
-    ) {
-      landmarkAddress =
-        orderData.order_items[0].shippingAddress.deliveryaddress.title +
-        ", " +
-        orderData.order_items[0].shippingAddress.deliveryaddress.address +
-        ", " +
-        orderData.order_items[0].shippingAddress.deliveryaddress.state +
-        ", " +
-        orderData.order_items[0].shippingAddress.deliveryaddress.country;
-    }
+  if (
+    orderData.order_items[0].shippingAddress.deliveryaddress.title !== null &&
+    orderData.order_items[0].shippingAddress.deliveryaddress.address !== null &&
+    orderData.order_items[0].shippingAddress.deliveryaddress.state !== null &&
+    orderData.order_items[0].shippingAddress.deliveryaddress.country !== null
+  ) {
+    landmarkAddress =
+      orderData.order_items[0].shippingAddress.deliveryaddress.title +
+      ", " +
+      orderData.order_items[0].shippingAddress.deliveryaddress.address +
+      ", " +
+      orderData.order_items[0].shippingAddress.deliveryaddress.state +
+      ", " +
+      orderData.order_items[0].shippingAddress.deliveryaddress.country;
+  }
 
   const invoiceData = {
     logo:
@@ -110,10 +105,9 @@ exports.createInvoice = async (orderData, user) => {
     },
     ref: orderSlug,
     date_ordered: moment(new Date()).format("MMMM Do YYYY, h:mm:ss a"),
-    delivery_address:
-      orderData.order_items[0].shippingAddress.address,
-      // ", " +
-      // orderData.order_items[0].shippingAddress.city,
+    delivery_address: orderData.order_items[0].shippingAddress.address,
+    // ", " +
+    // orderData.order_items[0].shippingAddress.city,
     delivery_time: deliveryTime,
     products: _products,
     subtotal: _subtotal.toLocaleString(),
