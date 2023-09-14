@@ -201,6 +201,13 @@ router
   );
 
 router
+  .route("/projects/acknowledge-completion/:projectId")
+  .patch(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    ProjectController.acknowledgeCompletion
+  );
+
+router
   .route("/projects/installments/create")
   .post(
     [Auth, Access.verifyAccess, Access.verifyAdmin],

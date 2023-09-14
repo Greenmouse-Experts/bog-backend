@@ -365,23 +365,23 @@ const complexity_of_projects_completed = {
 
 const timely_delivery_performance = [ // in percentage
   {
-    experience: {min: 16, max: '*'},
+    experience: 'Over 15% of time',
     rating: 1
   },
   {
-    experience: {min: 10, max: 15},
+    experience: '10-15% of time',
     rating: 2
   },
   {
-    experience: {min: 5, max: 9},
+    experience: '5-10% of time',
     rating: 3
   },
   {
-    experience: {min: 0.1, max: 4},
+    experience: 'Less than 5% of time',
     rating: 4
   },
   {
-    experience: {max: 0}, // on or before time
+    experience: 'On/Before time', // on or before time
     rating: 5
   },
 ]
@@ -475,3 +475,48 @@ exports.kyc_criteria_for_rating_service_partners = [
     }
   },
 ];
+
+
+exports.avg_rating = (details) => {
+  const {
+    years_of_experience_rating,
+    certification_of_personnel_rating,
+    no_of_staff_rating,
+    complexity_of_projects_completed_rating,
+    cost_of_projects_completed_rating,
+    quality_delivery_performance_rating,
+    timely_delivery_peformance_rating,
+  } = details;
+
+  const total = Object.keys(details).length;
+  let rating = 0;
+  if (years_of_experience_rating) {
+    rating += years_of_experience_rating || 0;
+  }
+  if (certification_of_personnel_rating) {
+    rating += certification_of_personnel_rating || 0;
+  }
+  if (no_of_staff_rating) {
+    rating += no_of_staff_rating || 0;
+  }
+  if (complexity_of_projects_completed_rating) {
+    rating += complexity_of_projects_completed_rating || 0;
+  }
+  if (cost_of_projects_completed_rating) {
+    rating += cost_of_projects_completed_rating || 0;
+  }
+  if (quality_delivery_performance_rating) {
+    rating += quality_delivery_performance_rating || 0;
+  }
+  if (timely_delivery_peformance_rating) {
+    rating += timely_delivery_peformance_rating || 0;
+  }
+
+  // console.log(rating);
+  // console.log(Object.keys(details).length);
+  // console.log(Object.keys(details));
+
+  return (rating / total).toFixed(1);
+};
+
+exports.PERCENT_100 = 100;

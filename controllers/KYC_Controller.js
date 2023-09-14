@@ -20,51 +20,10 @@ const UserService = require("../service/UserService");
 const {
   USERTYPE,
   kyc_criteria_for_rating_service_partners,
+  avg_rating,
 } = require("../helpers/utility");
 const ServicePartner = require("../models/ServicePartner");
-
-
-const avg_rating = (details) => {
-  const {
-    years_of_experience_rating,
-    certification_of_personnel_rating,
-    no_of_staff_rating,
-    complexity_of_projects_completed_rating,
-    cost_of_projects_completed_rating,
-    quality_delivery_performance_rating,
-    timely_delivery_peformance_rating,
-  } = details;
-
-  const total = Object.keys(details).length;
-  let rating = 0;
-  if (years_of_experience_rating) {
-    rating += years_of_experience_rating || 0;
-  }
-  if (certification_of_personnel_rating) {
-    rating += certification_of_personnel_rating || 0;
-  }
-  if (no_of_staff_rating) {
-    rating += no_of_staff_rating || 0;
-  }
-  if (complexity_of_projects_completed_rating) {
-    rating += complexity_of_projects_completed_rating || 0;
-  }
-  if (cost_of_projects_completed_rating) {
-    rating += cost_of_projects_completed_rating || 0;
-  }
-  if (quality_delivery_performance_rating) {
-    rating += quality_delivery_performance_rating || 0;
-  }
-  if (timely_delivery_peformance_rating) {
-    rating += timely_delivery_peformance_rating || 0;
-  }
-
-  console.log(rating);
-  console.log(Object.keys(details).length);
-  console.log(Object.keys(details));
-
-  return (rating / total).toFixed(1);
-};
+const User = require("../models/User");
 
 /**
  *
@@ -152,17 +111,25 @@ const rateServicePartner = async (user, role, data) => {
         no_of_staff_rating,
         cost_of_projects_completed_rating,
         complexity_of_projects_completed_rating,
-        id: userId,
       };
 
-      await UserService.updateUser(updateData, t);
+      await User.update(updateData, {where: {id: userId}});
 
       // Get user details
       const user_details = await UserService.findUserById(userId);
 
+      const rating_details = {
+        years_of_experience_rating: user_details.years_of_experience_rating,
+        certification_of_personnel_rating: user_details.certification_of_personnel_rating,
+        no_of_staff_rating: user_details.no_of_staff_rating,
+        complexity_of_projects_completed_rating: user_details.complexity_of_projects_completed_rating,
+        cost_of_projects_completed_rating: user_details.cost_of_projects_completed_rating,
+        quality_delivery_performance_rating: user_details.quality_delivery_performance_rating,
+        timely_delivery_peformance_rating: user_details.timely_delivery_peformance_rating,
+      }
+
       // Update service partner
-      await updateServicePartnerRating(user_details, userId);
-      
+      await updateServicePartnerRating(rating_details, userId);
     } catch (error) {
       console.log(error);
       t.rollback();
@@ -174,8 +141,8 @@ const updateServicePartnerRating = async (rating_details, userId) => {
   try {
    
     const rating = avg_rating(rating_details);
-    await ServicePartner.update({rating}, {where: {userId}})
 
+    await ServicePartner.update({ rating }, { where: { userId } });
   } catch (error) {
     console.log(error);
   }
@@ -313,8 +280,9 @@ exports.createKycGeneralInfo = async (req, res, next) => {
 
       const userId = req.user.id;
       if (userType === USERTYPE.SERVICE_PARTNER) {
+        console.log('riwiewiejwiejiwjeiwjeijwijei')
         // Determine rating for service partner based
-        rateServicePartner({ userId }, role, {
+        await rateServicePartner({ userId }, role, {
           years_of_experience,
           certification_of_personnel,
         });

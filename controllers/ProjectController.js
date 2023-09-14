@@ -1857,8 +1857,8 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
       const pendingTransaction = await TransactionPending.findOne({
         where: { id },
       });
-      console.log("pending transaction")
-      console.log(pendingTransaction)
+      console.log("pending transaction");
+      console.log(pendingTransaction);
       if (!pendingTransaction || pendingTransaction == null) {
         return res.status(404).send({
           success: false,
@@ -2261,7 +2261,11 @@ exports.listCapableServiceProvidersByRating = async (req, res, next) => {
         });
       }
 
-      const providers = await this.getQualifiedProvidersOnlyByRating(project, rating, t);
+      const providers = await this.getQualifiedProvidersOnlyByRating(
+        project,
+        rating,
+        t
+      );
 
       return res.send({
         success: true,
@@ -2583,7 +2587,7 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
   }
 
   console.log(score);
-  console.log(serviceTypes)
+  console.log(serviceTypes);
   const wherePartner = {
     serviceTypeId: serviceTypes.id,
     kycPoint: {
@@ -2601,7 +2605,7 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
       })
     )
   );
-  console.log('display service providers')
+  console.log("display service providers");
   console.log({ servicePartners });
   if (servicePartners.length === 0) {
     return {
@@ -2631,7 +2635,6 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
     }
     return null;
   });
-  
 
   const qualifiedPartners = filteredServicePartners.filter(
     (pat) => pat !== null
@@ -2652,7 +2655,11 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
  * @param {*} transaction
  * @returns
  */
-exports.getQualifiedProvidersOnlyByRating = async (project, rating, transaction) => {
+exports.getQualifiedProvidersOnlyByRating = async (
+  project,
+  rating,
+  transaction
+) => {
   // check project type
   const { projectTypes, title } = project;
   // console.log(project)
@@ -2673,21 +2680,21 @@ exports.getQualifiedProvidersOnlyByRating = async (project, rating, transaction)
     serviceTypeId: serviceTypes.id,
     hasActiveSubscription: true,
     rating: {
-      [Op.gte]: rating
+      [Op.gte]: rating,
     },
     isVerified: true,
   };
   const servicePartners = JSON.parse(
     JSON.stringify(
       await ServicePartner.findAll({
-        include: [{ model: User, as: "service_user"}],
+        include: [{ model: User, as: "service_user" }],
         where: wherePartner,
         order: [[Sequelize.literal("RAND()")]],
       })
     )
   );
 
-  console.log('display service providers')
+  console.log("display service providers");
   console.log({ servicePartners });
   if (servicePartners.length === 0) {
     return {
@@ -2717,7 +2724,6 @@ exports.getQualifiedProvidersOnlyByRating = async (project, rating, transaction)
     }
     return null;
   });
-  
 
   const qualifiedPartners = filteredServicePartners.filter(
     (pat) => pat !== null
@@ -2988,6 +2994,153 @@ exports.assignProject = async (req, res, next) => {
   });
 };
 
+// Acknowledge service partner completion
+exports.acknowledgeCompletion = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { projectId } = req.params;
+      const { percentage_of_completion } = req.body; // in string
+
+      const project_details = await Project.findOne({
+        where: { id: projectId },
+      });
+
+      if (project_details === null) {
+        return res.status(404).json({
+          success: false,
+          message: "Project not found!",
+        });
+      }
+
+      // Get service partner details
+      const service_partner_details = await ServicePartner.findOne({
+        where: { id: project_details.serviceProviderId },
+      });
+      if (service_partner_details === null) {
+        return res.status(404).json({
+          success: false,
+          message: "Service provider not found!",
+        });
+      }
+
+      // Meta data for this concern is the same for all service type
+      const timely_delivery_performance =
+        utility.kyc_criteria_for_rating_service_partners[0].meta_data
+          .timely_delivery_performance;
+      const __delivery_performance = timely_delivery_performance.find(
+        (_delivery_performance) =>
+          _delivery_performance.experience === percentage_of_completion
+      );
+
+      if (__delivery_performance === undefined) {
+        return res.status(400).json({
+          success: false,
+          message: "Not recognized... Pls supply one the provided option value",
+        });
+      }
+
+      const project_performance_data = {
+        service_partner_delivery_performance: percentage_of_completion,
+        timely_delivery_rating: __delivery_performance.rating,
+        completion_acknowledged: true,
+      };
+
+      // Save project performance
+      await Project.update(project_performance_data, {
+        where: { id: projectId },
+      });
+
+      // Rate service partner
+      await avgRatingForTimelyDeliveryPerformance(
+        project_details.serviceProviderId,
+        service_partner_details.userId,
+        utility.PERCENT_100
+      );
+
+      return res.status(200).json({
+        success: true,
+        message:
+          "Service partner's completion has been acknowledged successfully.",
+      });
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+const avgRatingForTimelyDeliveryPerformance = async (
+  serviceProviderId,
+  userId,
+  progress
+) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const servicePartnerProject = JSON.parse(
+        JSON.stringify(
+          await Project.findAll({
+            attributes: [
+              [
+                Sequelize.fn("avg", Sequelize.col("timely_delivery_rating")),
+                "avg_rating",
+              ],
+            ],
+            where: {
+              serviceProviderId,
+              service_partner_progress: progress,
+              completion_acknowledged: true,
+            },
+          })
+        )
+      );
+
+      const rating = servicePartnerProject[0].avg_rating;
+      await updateServicePartnerRating(
+        { timely_delivery_peformance_rating: rating },
+        userId
+      );
+    } catch (error) {
+      console.log(error);
+      t.rollback();
+    }
+  });
+};
+
+const updateServicePartnerRating = async (rating_details, userId) => {
+  try {
+
+    await User.update(rating_details, {where: {id: userId}});
+
+    const user_details = await User.findOne({ where: { id: userId } });
+    const {
+      years_of_experience_rating,
+      certification_of_personnel_rating,
+      no_of_staff_rating,
+      complexity_of_projects_completed_rating,
+      cost_of_projects_completed_rating,
+      quality_delivery_performance_rating,
+      timely_delivery_peformance_rating
+    } = user_details;
+
+    rating_details = {
+      years_of_experience_rating,
+      certification_of_personnel_rating,
+      no_of_staff_rating,
+      complexity_of_projects_completed_rating,
+      cost_of_projects_completed_rating,
+      quality_delivery_performance_rating,
+      timely_delivery_peformance_rating
+    };
+    
+    const rating = utility.avg_rating(rating_details);
+
+    await ServicePartner.update({ rating }, { where: { userId } });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // Assign Project to Service Partner
 exports.bidForProject = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -3053,6 +3206,16 @@ exports.bidForProject = async (req, res, next) => {
         },
         { transaction: t }
       );
+
+      // Service partner dates for project
+      const dates_for_project = {
+        assigned_at: new Date(),
+        service_partner_completion_date: moment().add(
+          data.deliveryTimeLine,
+          "weeks"
+        ),
+      };
+      await Project.update(dates_for_project, { where: { id: projectId } });
 
       // Get client details
       const userData = await ServiceFormProjects.findOne({
@@ -3332,37 +3495,38 @@ exports.createProjectInstallment = async (req, res, next) => {
       });
     }
 
-
-    if(type === 'installment'){
-      
+    if (type === "installment") {
       // installment total amount
       let installments = await ProjectInstallments.findAll({
-        attributes: [[Sequelize.fn('sum', Sequelize.col('amount')), 'totalAmount']],
+        attributes: [
+          [Sequelize.fn("sum", Sequelize.col("amount")), "totalAmount"],
+        ],
         where: { project_id: _response.id, type: "installment" },
-        raw: true
+        raw: true,
       });
 
       let installment_sum = installments[0].totalAmount + amount;
       if (installment_sum > _response.totalCost) {
         return res.status(400).json({
           success: false,
-          message: `Your total installment breakdown amount exceeds the total cost of the project!`
-        })
+          message: `Your total installment breakdown amount exceeds the total cost of the project!`,
+        });
       }
-    }else if (type === 'cost') {
-      
+    } else if (type === "cost") {
       // cost total amount
       let cost = await ProjectInstallments.findAll({
-        attributes: [[Sequelize.fn('sum', Sequelize.col('amount')), 'totalAmount']],
+        attributes: [
+          [Sequelize.fn("sum", Sequelize.col("amount")), "totalAmount"],
+        ],
         where: { project_id: _response.id, type: "cost" },
-        raw: true
+        raw: true,
       });
       let cost_sum = cost[0].totalAmount + amount;
       if (cost_sum > _response.totalCost) {
         return res.status(400).json({
           success: false,
-          message: `Your total cost summary breakdown amount exceeds the total cost of the project!`
-        })
+          message: `Your total cost summary breakdown amount exceeds the total cost of the project!`,
+        });
       }
     }
 

@@ -87,7 +87,27 @@ const Project = sequelise.define(
     totalEndDate: {
       allowNull: true,
       type: Sequelize.DATE
-    }
+    },
+    assigned_at: {
+      allowNull: true,
+      type: Sequelize.DATE
+    },
+    service_partner_completion_date: {
+      allowNull: true,
+      type: Sequelize.DATE
+    },
+    completion_acknowledged: {
+      allowNull: true,
+      type: Sequelize.BOOLEAN
+    },
+    service_partner_delivery_performance: {
+      allowNull: true,
+      type: Sequelize.STRING
+    },
+    timely_delivery_rating: {
+      allowNull: true,
+      type: Sequelize.DOUBLE
+    },
   },
   { paranoid: true }
 );
