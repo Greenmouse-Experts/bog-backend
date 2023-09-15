@@ -511,8 +511,6 @@ exports.avg_rating = (details) => {
   if (timely_delivery_peformance_rating) {
     rating += timely_delivery_peformance_rating || 0;
   }
-
-  // console.log(rating);
   // console.log(Object.keys(details).length);
   // console.log(Object.keys(details));
 

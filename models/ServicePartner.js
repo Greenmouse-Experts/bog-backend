@@ -95,7 +95,7 @@ const ServicePartner = sequelise.define(
       defaultValue: false
     },
     rating: {
-      type: Sequelize.DOUBLE,
+      type: Sequelize.NUMBER,
       allowNull: true
     }
   },

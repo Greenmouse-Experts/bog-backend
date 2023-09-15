@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
 
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
+const Project = require('./Project');
 const User = require("./User")
 
 const ProjectReviews = sequelise.define(
@@ -54,12 +55,21 @@ const ProjectReviews = sequelise.define(
       type: Sequelize.STRING,
       allowNull: false
     },
+    serviceProviderId: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
   }
 );
 
 ProjectReviews.belongsTo(User, {
   foreignKey: "userId",
   as: "client"
+})
+
+ProjectReviews.belongsTo(Project, {
+  foreignKey: "projectId",
+  as: "project"
 })
 
 User.hasMany(ProjectReviews, {
