@@ -78,6 +78,7 @@ exports.registerUser = async (req, res, next) => {
         });
       }
       let user = await UserService.findUser({ email });
+      let user_exists = user;
 
       if (!user) {
         const userData = {
@@ -179,6 +180,7 @@ exports.registerUser = async (req, res, next) => {
       return res.status(201).send({
         success: true,
         message: "User Created Successfully",
+        exists: user_exists ? true : false
       });
     } catch (error) {
       console.log(error);
