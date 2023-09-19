@@ -220,9 +220,9 @@ exports.getCategory = async (req, res, next) => {
 exports.createCategory = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { name, description, unit } = req.body;
+      const { name, description, unit, max_qty, min_qty } = req.body;
       const [category, created] = await Category.findOrCreate({
-        where: { name, description, unit },
+        where: { name, description, unit, max_qty, min_qty },
         transaction: t,
       });
       return res.status(200).send({
@@ -240,7 +240,7 @@ exports.createCategory = async (req, res, next) => {
 exports.updateCategory = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { name, description, unit } = req.body;
+      const { name, description, unit, max_qty, min_qty } = req.body;
       const { categoryId } = req.params;
       const category = await Category.findOne({
         where: { id: categoryId },
@@ -256,6 +256,8 @@ exports.updateCategory = async (req, res, next) => {
           name,
           description,
           unit,
+          max_qty,
+          min_qty,
         },
         { where: { id: categoryId }, transaction: t }
       );

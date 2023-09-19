@@ -20,8 +20,10 @@ const {
   googleLoginValidation,
   facebookSignupValidation,
   googleSignValidation,
-  appleSignValidation
+  appleSignValidation,
+  tokenValidation
 } = require("../helpers/validators");
+const refreshAuth = require("../middleware/refreshAuth");
 
 
 // @route  api/signup
@@ -39,6 +41,10 @@ router
 router
   .route("/user/login")
   .post(loginValidation(), validate, UserController.loginUser);
+
+router
+  .route("/user/refresh-token")
+  .get(refreshAuth, UserController.refreshToken);
 
 /**
  * Facebook signin * signup

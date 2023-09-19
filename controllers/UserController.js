@@ -180,7 +180,7 @@ exports.registerUser = async (req, res, next) => {
       return res.status(201).send({
         success: true,
         message: "User Created Successfully",
-        exists: user_exists ? true : false
+        exists: user_exists ? true : false,
       });
     } catch (error) {
       console.log(error);
@@ -704,8 +704,12 @@ exports.loginUser = async (req, res, next) => {
         },
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: 36000,
+        expiresIn: process.env.JWT_SECRET_EXPIRATION,
       });
+      const refresh_token = jwt.sign(payload, process.env.JWT_SECRET_REFRESH, {
+        expiresIn: process.env.JWT_SECRET_REFRESH_EXPIRATION,
+      });
+
       let profile;
       const data = {
         ...user,
@@ -757,6 +761,7 @@ exports.loginUser = async (req, res, next) => {
         success: true,
         message: "User Logged In Sucessfully",
         token,
+        refresh_token,
         user: data,
       });
     } catch (error) {
@@ -765,6 +770,30 @@ exports.loginUser = async (req, res, next) => {
       return next(error);
     }
   });
+};
+
+exports.refreshToken = async (req, res, next) => {
+  try {
+    const payload = {
+      user: req.user
+    };
+  
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_SECRET_EXPIRATION,
+    });
+    const refresh_token = jwt.sign(payload, process.env.JWT_SECRET_REFRESH, {
+      expiresIn: process.env.JWT_SECRET_REFRESH_EXPIRATION,
+    });
+
+    return res.status(200).send({
+      success: true,
+      token,
+      refresh_token,
+    });
+  } catch (error) {
+    t.rollback();
+    return next(error);
+  }
 };
 
 const avg_rating = (details) => {
@@ -802,9 +831,9 @@ const avg_rating = (details) => {
     rating += timely_delivery_peformance_rating || 0;
   }
 
-  console.log(rating);
-  console.log(Object.keys(details).length);
-  console.log(Object.keys(details));
+  // console.log(rating);
+  // console.log(Object.keys(details).length);
+  // console.log(Object.keys(details));
 
   return (rating / total).toFixed(1);
 };
@@ -1076,7 +1105,10 @@ exports.loginAdmin = async (req, res, next) => {
         },
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: 3600,
+        expiresIn: process.env.JWT_SECRET_EXPIRATION,
+      });
+      const refresh_token = jwt.sign(payload, process.env.JWT_SECRET_REFRESH, {
+        expiresIn: process.env.JWT_SECRET_REFRESH_EXPIRATION,
       });
 
       const _adminLevel = adminLevels.find(
@@ -1092,6 +1124,7 @@ exports.loginAdmin = async (req, res, next) => {
         success: true,
         message: "Admin Logged In Sucessfully",
         token,
+        refresh_token,
         user: { ...user.toJSON(), role: _adminPrivilege },
       });
     } catch (error) {
@@ -1114,7 +1147,15 @@ exports.getLoggedInUser = async (req, res) => {
       });
     }
 
-    const {years_of_experience_rating, certification_of_personnel_rating, no_of_staff_rating, complexity_of_projects_completed_rating, cost_of_projects_completed_rating, quality_delivery_performance_rating, timely_delivery_peformance_rating} = user;
+    const {
+      years_of_experience_rating,
+      certification_of_personnel_rating,
+      no_of_staff_rating,
+      complexity_of_projects_completed_rating,
+      cost_of_projects_completed_rating,
+      quality_delivery_performance_rating,
+      timely_delivery_peformance_rating,
+    } = user;
 
     let profile;
     const data = {
@@ -1154,6 +1195,7 @@ exports.getLoggedInUser = async (req, res) => {
       user: { ...data, rating },
     });
   } catch (error) {
+    console.log(error)
     return res.status(500).send({
       success: false,
       message: "Server Error",
@@ -1833,10 +1875,28 @@ exports.findSingleUser = async (req, res) => {
       );
     }
 
-    const {years_of_experience_rating, certification_of_personnel_rating, no_of_staff_rating, complexity_of_projects_completed_rating, cost_of_projects_completed_rating, quality_delivery_performance_rating, timely_delivery_peformance_rating} = userData;
+    const {
+      years_of_experience_rating,
+      certification_of_personnel_rating,
+      no_of_staff_rating,
+      complexity_of_projects_completed_rating,
+      cost_of_projects_completed_rating,
+      quality_delivery_performance_rating,
+      timely_delivery_peformance_rating,
+    } = userData;
 
     const rating =
-      userData.userType === "professional" ? avg_rating({years_of_experience_rating, certification_of_personnel_rating, no_of_staff_rating, complexity_of_projects_completed_rating, cost_of_projects_completed_rating, quality_delivery_performance_rating, timely_delivery_peformance_rating}) : undefined;
+      userData.userType === "professional"
+        ? avg_rating({
+            years_of_experience_rating,
+            certification_of_personnel_rating,
+            no_of_staff_rating,
+            complexity_of_projects_completed_rating,
+            cost_of_projects_completed_rating,
+            quality_delivery_performance_rating,
+            timely_delivery_peformance_rating,
+          })
+        : undefined;
 
     return res.status(200).send({
       success: true,

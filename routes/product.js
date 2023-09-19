@@ -30,8 +30,8 @@ router
 
 router
   .route("/product/category/:categoryId")
-  .patch(ProductController.updateCategory)
-  .delete(ProductController.deleteCategory)
+  .patch([Auth, Access.verifyAccess, Access.verifyAdmin], ProductController.updateCategory)
+  .delete([Auth, Access.verifyAccess, Access.verifyAdmin], ProductController.deleteCategory)
   .get(ProductController.getCategory);
 
 router

@@ -31,6 +31,7 @@ const {
   AdminOrderRefundMailer,
 } = require("../helpers/mailer/samples");
 const ProductEarning = require("../models/ProductEarnings");
+const ProductCategory = require("../models/ProductCategory");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -193,6 +194,11 @@ exports.createOrder = async (req, res, next) => {
         deliveryaddressId,
         insuranceFee,
       } = req.body;
+      
+
+      // products.forEach(async pr => {
+        
+      // });
 
       // const profile = await UserService.getUserTypeProfile(user.userType, userId);
       // const { id } = profile;
@@ -237,6 +243,7 @@ exports.createOrder = async (req, res, next) => {
       const orders = await Promise.all(
         products.map(async (product) => {
           const prodData = await Product.findByPk(product.productId, {
+            include: [{model: ProductCategory, as: 'category'}],
             attributes: [
               "id",
               "name",
@@ -253,6 +260,11 @@ exports.createOrder = async (req, res, next) => {
               message: "Product not found!",
             });
           }
+
+        
+        if (!(product.quantity >= prodData.category.min_qty || product.quantity <= prodData.category.max_qty)) {
+          return res.status(400).send({success: false, message: "Product order is not within the specified range of purchase."})
+        }
 
           const amount = product.quantity * Number(prodData.price);
           const trackingId = `TRD-${Math.floor(

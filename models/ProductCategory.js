@@ -22,6 +22,14 @@ const ProductCategory = sequelise.define(
       allowNull: true,
       type: Sequelize.STRING,
     },
+    max_qty: {
+      allowNull: true,
+      type: Sequelize.NUMBER,
+    },
+    min_qty: {
+      allowNull: true,
+      type: Sequelize.NUMBER,
+    },
   },
   { paranoid: true }
 );

@@ -48,6 +48,12 @@ const loginValidation = () => {
   ];
 };
 
+const tokenValidation = () => {
+  return [
+    check("access_token", "Access token is required").isString(),
+  ];
+};
+
 const facebookLoginValidation = () => {
   return [
     check("facebook_id", "Facebook ID is required!").notEmpty(),
@@ -369,6 +375,7 @@ module.exports = {
   validate,
   registerValidation,
   loginValidation,
+  tokenValidation,
   facebookLoginValidation,
   googleLoginValidation,
   facebookSignupValidation,
