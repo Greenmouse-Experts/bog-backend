@@ -258,6 +258,8 @@ exports.createOrder = async (req, res, next) => {
               "unit",
               "image",
               "description",
+              "min_qty",
+              "max_qty"
             ],
             include: [{ model: ProductCategory, as: "category" }],
           });
@@ -267,6 +269,13 @@ exports.createOrder = async (req, res, next) => {
             return res.status(404).send({
               success: false,
               message: "Product not found!",
+            });
+          }
+
+          if (!(product.quantity >= prodData.min_qty && product.quantity <= prodData.max_qty)) {
+            return res.status(422).send({
+              success: false,
+              message: "The quantity of item requested for cannot be processed.",
             });
           }
 

@@ -39,7 +39,11 @@ const KycGeneralInfo = sequelise.define(
       allowNull: true
     },
     contact_number: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING,
+      allowNull: true
+    },
+    contact_number_2: {
+      type: Sequelize.STRING,
       allowNull: true
     },
     reg_type: {
@@ -63,6 +67,10 @@ const KycGeneralInfo = sequelise.define(
     operational_address: {
       allowNull: true,
       type: Sequelize.STRING
+    },
+    operational_email_tel: {
+      allowNull: true,
+      type: Sequelize.TEXT
     },
     years_of_experience: {
       type: Sequelize.STRING,

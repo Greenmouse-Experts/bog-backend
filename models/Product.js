@@ -38,6 +38,14 @@ const Product = sequelise.define(
       allowNull: true,
       type: Sequelize.DECIMAL
     },
+    min_qty: {
+      allowNull: true,
+      type: Sequelize.INTEGER
+    },
+    max_qty: {
+      allowNull: true,
+      type: Sequelize.INTEGER
+    },
     weight: {
       allowNull: true,
       type: Sequelize.DOUBLE

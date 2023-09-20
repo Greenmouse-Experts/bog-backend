@@ -280,7 +280,7 @@ exports.createKycGeneralInfo = async (req, res, next) => {
 
       const userId = req.user.id;
       if (userType === USERTYPE.SERVICE_PARTNER) {
-        console.log('riwiewiejwiejiwjeiwjeijwijei')
+        
         // Determine rating for service partner based
         await rateServicePartner({ userId }, role, {
           years_of_experience,
@@ -315,6 +315,7 @@ exports.createKycGeneralInfo = async (req, res, next) => {
         data: myInfo,
       });
     } catch (error) {
+      console.log(error)
       t.rollback();
       return next(error);
     }

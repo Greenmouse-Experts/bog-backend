@@ -1105,7 +1105,7 @@ exports.loginAdmin = async (req, res, next) => {
         },
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_SECRET_EXPIRATION,
+        expiresIn: process.env.JWT_SECRET_EXPIRATION_ADMIN,
       });
       const refresh_token = jwt.sign(payload, process.env.JWT_SECRET_REFRESH, {
         expiresIn: process.env.JWT_SECRET_REFRESH_EXPIRATION,

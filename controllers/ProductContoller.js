@@ -300,19 +300,27 @@ exports.deleteCategory = async (req, res, next) => {
 exports.createProduct = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { categoryId, name, price, quantity, unit, description } = req.body;
+      const { categoryId, name, price, quantity, unit, description, min_qty, max_qty } = req.body;
       const creatorId = req.user.id;
       const request = {
         categoryId,
         name,
         price,
         quantity,
+        min_qty,
+        max_qty,
         unit,
         description,
         creatorId,
         status: req.body.status,
       };
 
+      if(Number(min_qty) > Number(max_qty)){
+        return res.status(422).json({
+          success: false,
+          message: "Minimum qty cannot be more than the entered maximum qty."
+        })
+      }
       // console.log(request)
       // const images = await cloudinary.upload(req);
       const photos = [];
