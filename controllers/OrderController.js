@@ -270,21 +270,6 @@ exports.createOrder = async (req, res, next) => {
             });
           }
 
-          if (
-            !(
-              product.quantity >= prodData.category.min_qty &&
-              product.quantity <= prodData.category.max_qty
-            )
-          ) {
-            return res
-              .status(400)
-              .send({
-                success: false,
-                message:
-                  "Product order is not within the specified range of purchase.",
-              });
-          }
-
           const amount = product.quantity * Number(prodData.price);
           const trackingId = `TRD-${Math.floor(
             190000000 + Math.random() * 990000000
