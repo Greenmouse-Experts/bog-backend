@@ -14,10 +14,10 @@ exports.createInvoice = async (orderData, user) => {
   if (!order_items && order_items.length < 1) {
     return false;
   }
-  console.log("user details");
-  console.log(user);
-  console.log(orderData);
-  console.log(orderData.order_items[0].shippingAddress);
+  // console.log("user details");
+  // console.log(user);
+  // console.log(orderData);
+  // console.log(orderData.order_items[0].shippingAddress);
 
   const myProduct = order_items.map((items) => {
     console.log(items.product);

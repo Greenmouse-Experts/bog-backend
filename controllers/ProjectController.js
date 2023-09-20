@@ -794,6 +794,13 @@ exports.requestForService = async (req, res, next) => {
 
       const { form, userType } = req.body;
 
+      if(!user.address && !user.city && !user.state){
+        return res.status(400).send({
+          success: false,
+          message: "Home address has not been added."
+        });
+      }
+
       let _project = null;
       const serviceRequestForm = [];
       let serviceNameRes = "";

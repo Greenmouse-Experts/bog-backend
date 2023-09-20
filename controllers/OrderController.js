@@ -194,10 +194,16 @@ exports.createOrder = async (req, res, next) => {
         deliveryaddressId,
         insuranceFee,
       } = req.body;
-      
+
+      if(!user.address && !user.city && !user.state){
+        return res.status(400).send({
+          success: false,
+          message: "Home address has not been added."
+        });
+      }
 
       // products.forEach(async pr => {
-        
+
       // });
 
       // const profile = await UserService.getUserTypeProfile(user.userType, userId);
@@ -242,8 +248,8 @@ exports.createOrder = async (req, res, next) => {
       let productEarnings = [];
       const orders = await Promise.all(
         products.map(async (product) => {
-          const prodData = await Product.findByPk(product.productId, {
-            include: [{model: ProductCategory, as: 'category'}],
+          const prodData = await Product.findOne({
+            where: { id: product.productId },
             attributes: [
               "id",
               "name",
@@ -253,7 +259,10 @@ exports.createOrder = async (req, res, next) => {
               "image",
               "description",
             ],
+            include: [{ model: ProductCategory, as: "category" }],
           });
+
+          // console.log(prodData);
           if (prodData === null) {
             return res.status(404).send({
               success: false,
@@ -261,10 +270,20 @@ exports.createOrder = async (req, res, next) => {
             });
           }
 
-        
-        if (!(product.quantity >= prodData.category.min_qty || product.quantity <= prodData.category.max_qty)) {
-          return res.status(400).send({success: false, message: "Product order is not within the specified range of purchase."})
-        }
+          if (
+            !(
+              product.quantity >= prodData.category.min_qty &&
+              product.quantity <= prodData.category.max_qty
+            )
+          ) {
+            return res
+              .status(400)
+              .send({
+                success: false,
+                message:
+                  "Product order is not within the specified range of purchase.",
+              });
+          }
 
           const amount = product.quantity * Number(prodData.price);
           const trackingId = `TRD-${Math.floor(
@@ -279,11 +298,14 @@ exports.createOrder = async (req, res, next) => {
           };
           productEarnings.push(p);
 
-          const userDetails = await UserService.findUserById(prodData.creatorId);
+          const userDetails = await UserService.findUserById(
+            prodData.creatorId
+          );
 
           // Notify product partner
           const mesg = `A user just bought ${product.quantity} of your product - ${prodData.name}`;
-          const notifyType = userDetails.userType === "vendor" ? "user" : "admin";
+          const notifyType =
+            userDetails.userType === "vendor" ? "user" : "admin";
           const { io } = req.app;
           const partner_profile = await UserService.getUserTypeProfile(
             "product_partner",
@@ -292,7 +314,10 @@ exports.createOrder = async (req, res, next) => {
           await Notification.createNotification({
             type: notifyType,
             message: mesg,
-            userId: userDetails.userType === "vendor" ? partner_profile.id : undefined,
+            userId:
+              userDetails.userType === "vendor"
+                ? partner_profile.id
+                : undefined,
           });
           io.emit(
             "getNotifications",
@@ -368,7 +393,16 @@ exports.createOrder = async (req, res, next) => {
             filename: `${slug}.pdf`,
           },
         ];
-        const message = helpers.invoiceMessage(user.name);
+        let deliveryTime = "Not stated";
+        if (
+          orderData.order_items[0].shippingAddress.deliveryaddress !==
+          "No address"
+        ) {
+          deliveryTime =
+            orderData.order_items[0].shippingAddress.deliveryaddress
+              .delivery_time;
+        }
+        const message = helpers.invoiceMessage(user.name, deliveryTime);
         sendMail(user.email, message, "BOG Invoice", files);
 
         // Get active product admins
@@ -543,80 +577,78 @@ exports.updateOrder = async (req, res, next) => {
 
 exports.cancelOrder = async (req, res, next) => {
   // sequelize.transaction(async (t) => {
-    try {
-      const { id } = req._credentials;
-      const { orderId } = req.params;
-      const status = "cancelled";
-      const order = await Order.findOne({ where: { id: orderId } });
-      if (!order) {
-        return res.status(404).json({
-          success: false,
-          message: "Invalid Order",
-        });
-      }
-
-      if (order.status === "cancelled") {
-        return res.status(200).json({
-          success: true,
-          message: "Order has already been cancelled!",
-        });
-      } else if (order.status !== "pending" || order.userId !== id) {
-        return res.status(401).json({
-          success: false,
-          message: "Order cannot be cancelled!",
-        });
-      }
-
-      const data = {
-        status,
-      };
-      await Order.update(data, { where: { id: orderId } });
-      // await Order.update(data, { where: { id: orderId }, transaction: t });
-
-      const user = await User.findOne({
-        where: { id: order.userId },
-        attributes: { exclude: ["password"] },
+  try {
+    const { id } = req._credentials;
+    const { orderId } = req.params;
+    const status = "cancelled";
+    const order = await Order.findOne({ where: { id: orderId } });
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid Order",
       });
-
-      // Get active project admins
-      const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
-      });
-      const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
-      });
-      const admins = [...project_admins, ...super_admins];
-
-      // Notify admin
-      const mesg = `${user.userType} ${user.name} has cancelled a ${order.status} order [${
-        order.orderSlug
-      }]`;
-      const notifyType = "admin";
-      await Notification.createNotification({
-        type: notifyType,
-        message: mesg,
-      });
-      const { io } = req.app;
-      io.emit(
-        "getNotifications",
-        await Notification.fetchAdminNotification({ userId: user.id })
-      );
-
-      // mailer for admins
-      await AdminUpdateOrderMailer(user, admins, status, {
-        id: order.id,
-        ref: order.orderSlug,
-      });
-
-      return res.status(200).send({
-        success: true,
-        message: `Order ${status}`,
-      });
-    } catch (error) {
-      console.log(error);
-      // t.rollback();
-      return next(error);
     }
+
+    if (order.status === "cancelled") {
+      return res.status(200).json({
+        success: true,
+        message: "Order has already been cancelled!",
+      });
+    } else if (order.status !== "pending" || order.userId !== id) {
+      return res.status(401).json({
+        success: false,
+        message: "Order cannot be cancelled!",
+      });
+    }
+
+    const data = {
+      status,
+    };
+    await Order.update(data, { where: { id: orderId } });
+    // await Order.update(data, { where: { id: orderId }, transaction: t });
+
+    const user = await User.findOne({
+      where: { id: order.userId },
+      attributes: { exclude: ["password"] },
+    });
+
+    // Get active project admins
+    const project_admins = await User.findAll({
+      where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+    });
+    const super_admins = await User.findAll({
+      where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+    });
+    const admins = [...project_admins, ...super_admins];
+
+    // Notify admin
+    const mesg = `${user.userType} ${user.name} has cancelled a ${order.status} order [${order.orderSlug}]`;
+    const notifyType = "admin";
+    await Notification.createNotification({
+      type: notifyType,
+      message: mesg,
+    });
+    const { io } = req.app;
+    io.emit(
+      "getNotifications",
+      await Notification.fetchAdminNotification({ userId: user.id })
+    );
+
+    // mailer for admins
+    await AdminUpdateOrderMailer(user, admins, status, {
+      id: order.id,
+      ref: order.orderSlug,
+    });
+
+    return res.status(200).send({
+      success: true,
+      message: `Order ${status}`,
+    });
+  } catch (error) {
+    console.log(error);
+    // t.rollback();
+    return next(error);
+  }
   // });
 };
 
