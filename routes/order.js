@@ -24,6 +24,18 @@ router
   .post(orderValidation(), validate, [Auth, Access.verifyAccess], OrderController.createOrder);
 
 router
+  .route("/orders/delivery/list")
+  .get([Auth, Access.verifyAccess], OrderController.getDeliveryAddresses);
+
+router
+  .route("/orders/delivery/remove/:deliveryId")
+  .delete([Auth, Access.verifyAccess], OrderController.removeDeliveryAddress);
+
+router
+  .route("/orders/delivery/update/:deliveryId")
+  .patch([Auth, Access.verifyAccess], OrderController.updateDeliveryAddress);
+
+router
   .route("/orders/update-order")
   .patch(updateOrderValidation(), validate, [Auth, Access.verifyAccess, Access.verifyAdmin], OrderController.updateOrder);
   

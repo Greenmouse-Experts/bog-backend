@@ -384,6 +384,29 @@ const timely_delivery_performance = [ // in percentage
     experience: 'On/Before time', // on or before time
     rating: 5
   },
+];
+
+const timely_delivery = [
+  {
+    experience: {min: 16, max: '*'},
+    rating: 1
+  },
+  {
+    experience: {min: 11, max: 15},
+    rating: 2
+  },
+  {
+    experience: {min: 6, max: 10},
+    rating: 3
+  },
+  {
+    experience: {min: 1, max: 5},
+    rating: 4
+  },
+  {
+    experience: {min: 0, max: 0}, // on or before time
+    rating: 5
+  },
 ]
 
 /**

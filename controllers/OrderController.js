@@ -32,6 +32,7 @@ const {
 } = require("../helpers/mailer/samples");
 const ProductEarning = require("../models/ProductEarnings");
 const ProductCategory = require("../models/ProductCategory");
+const DeliveryAddresses = require("../models/delivery_addresses");
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -195,19 +196,21 @@ exports.createOrder = async (req, res, next) => {
         insuranceFee,
       } = req.body;
 
-      if(!user.address && !user.city && !user.state){
+      if (!user.address && !user.city && !user.state) {
         return res.status(400).send({
           success: false,
-          message: "Home address has not been added."
+          message: "Home address has not been added.",
         });
       }
 
-      // products.forEach(async pr => {
+      const deliveryAddress = await DeliveryAddresses.findOne({
+        where: { ...shippingAddress, user_id: userId },
+      });
 
-      // });
+      if (!deliveryAddress) {
+        await DeliveryAddresses.create({ ...shippingAddress, user_id: userId });
+      }
 
-      // const profile = await UserService.getUserTypeProfile(user.userType, userId);
-      // const { id } = profile;
       let deliveryaddress = await Addresses.findOne({
         where: { id: deliveryaddressId },
       });
@@ -259,7 +262,7 @@ exports.createOrder = async (req, res, next) => {
               "image",
               "description",
               "min_qty",
-              "max_qty"
+              "max_qty",
             ],
             include: [{ model: ProductCategory, as: "category" }],
           });
@@ -272,10 +275,16 @@ exports.createOrder = async (req, res, next) => {
             });
           }
 
-          if (!(product.quantity >= prodData.min_qty && product.quantity <= prodData.max_qty)) {
+          if (
+            !(
+              product.quantity >= prodData.min_qty &&
+              product.quantity <= prodData.max_qty
+            )
+          ) {
             return res.status(422).send({
               success: false,
-              message: "The quantity of item requested for cannot be processed.",
+              message:
+                "The quantity of item requested for cannot be processed.",
             });
           }
 
@@ -458,6 +467,76 @@ exports.createOrder = async (req, res, next) => {
   });
 };
 
+exports.getDeliveryAddresses = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { id } = req._credentials;
+      const delivery_address = await DeliveryAddresses.findAll({
+        where: { user_id: id },
+      });
+
+      return res.status(200).send({
+        success: true,
+        data: delivery_address,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
+exports.removeDeliveryAddress = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { deliveryId } = req.params;
+
+      const d_address = await DeliveryAddresses.findOne({
+        where: { id: deliveryId },
+      });
+      if (!d_address) {
+        return res
+          .status(404)
+          .send({ success: false, message: "Delivery address not found." });
+      }
+
+      await DeliveryAddresses.destroy({ where: { id: deliveryId } });
+
+      return res
+        .status(200)
+        .send({ success: true, message: "Delivery address has been deleted." });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
+exports.updateDeliveryAddress = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { deliveryId } = req.params;
+
+      const d_address = await DeliveryAddresses.findOne({
+        where: { id: deliveryId },
+      });
+      if (!d_address) {
+        return res
+          .status(404)
+          .send({ success: false, message: "Delivery address not found." });
+      }
+
+      await DeliveryAddresses.update(req.body, { where: { id: deliveryId } });
+
+      return res
+        .status(200)
+        .send({
+          success: true,
+          message: "Delivery address has been updated successfully.",
+        });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
 // generate invoice on save
 
 exports.generateOrderInvoice = async (orders, res, next) => {
