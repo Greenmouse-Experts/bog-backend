@@ -13,6 +13,7 @@ const {
   BasicKYCRequirements,
   KYCApprovalValidation
 } = require("../helpers/validators");
+const { verifyAccess, verifyAdmin } = require("../middleware/access");
 
 const {
   createSupplyCategories,
@@ -32,7 +33,8 @@ const {
   ReadKycDocuments,
   deleteKycDocuments,
   approveKycVerification,
-  getUserKycDetails
+  getUserKycDetails,
+  approveDisapproveKycDocument
 } = KYC_Controller;
 
 router
@@ -95,6 +97,9 @@ router
 router
   .route("/kyc/admin-approval")
   .post(KYCApprovalValidation(), validate, Auth, approveKycVerification);
+
+router.route('/kyc/document/approval/:id/:userId')
+  .patch([Auth, verifyAccess, verifyAdmin], approveDisapproveKycDocument);
 
 router.route("/kyc/user-kyc/:userId").get(Auth, getUserKycDetails);
 

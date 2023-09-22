@@ -2072,6 +2072,53 @@ module.exports = {
   },
 
   /**
+   * Disapproval message for kyc document
+   * @param {*} user 
+   * @param {*} issue 
+   */
+  ProviderMailerForKycDocument: async (user, kyc_document, approved, reason) => {
+    const { first_name, email } = user;
+
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = "white";
+
+    const link = `${process.env.SITE_URL}?redir_url=/dashboard/kyc`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Dear ${!first_name ? "user" : first_name},</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">This is to inform you that your ${kyc_document} kyc document has been ${approved}.</p><br/>
+                  `
+                  if(approved === 'disapproved'){
+                    params.body += `<p style="font-size: 1.4em;">Reason: ${reason}</p>
+                    `;
+                  }
+                  params.body += `
+                  <p style="font-size: 1.4em;">For more info, click <a href="${link}">here</a>.</p>
+              `;
+
+    params.footer = "";
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Disapproval for your ${kyc_document} kyc document`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve("Successful!");
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
+
+  /**
    * Mailer of complaint to admin
    * @param {{first_name:string, email:string}} user
    * @param {{issue_type, issue_no, title, description, status}} issue

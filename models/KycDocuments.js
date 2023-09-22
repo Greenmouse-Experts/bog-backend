@@ -26,6 +26,14 @@ const KycDocuments = sequelise.define(
     file: {
       type: Sequelize.STRING,
       allowNull: true
+    },
+    approved: {
+      type: Sequelize.BOOLEAN,
+      allowNull: true
+    },
+    reason: {
+      type: Sequelize.STRING,
+      allowNull: true
     }
   },
   { paranoid: true }

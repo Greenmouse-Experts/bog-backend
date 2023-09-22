@@ -24,6 +24,7 @@ const {
 } = require("../helpers/utility");
 const ServicePartner = require("../models/ServicePartner");
 const User = require("../models/User");
+const { ProviderMailerForKycDocument } = require("../helpers/mailer/samples");
 
 /**
  *
@@ -633,6 +634,74 @@ exports.deleteKycDocuments = async (req, res, next) => {
     }
   });
 };
+
+exports.approveDisapproveKycDocument = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const {id, userId} = req.params;
+      const {approved, reason} = req.body;
+      
+      const kycDoc = await KycDocuments.findOne({where: {id}});
+      if(!kycDoc){
+        return res.status(404).send({success: false, message: "Kyc document not found."})
+      }
+
+      if (kycDoc.approved || kycDoc.approved === false) {
+        return res.status(404).send({success: false, message: "KYC document has already been vetted. You cannot approve or disapprove it again."})
+      }
+
+      const userDetails = await User.findOne({where: {id: userId}})
+      if(!userDetails){
+        return res.status(404).send({success: false, message: "Account not found."})
+      }
+
+      let {kycScore} = userDetails;
+      kycScore = JSON.parse(kycScore);
+      
+      if(!approved){
+        kycScore.uploadDocument = kycScore.uploadDocument - 1;
+        kycScore = JSON.stringify(kycScore);
+
+        // Update User Model
+        await User.update({kycScore}, {where: {id: userId}});
+      }
+
+      await KycDocuments.update({approved, reason}, {where: {id}});
+
+      let approval_status = approved ? 'approved' : 'disapproved';
+
+      // Mailer for providers
+      const kyc_document = kycDoc.name.split('_').join(' ');
+      if (!approved) {
+        await ProviderMailerForKycDocument(userDetails, kyc_document, approval_status, reason);
+      }
+      
+      // send notification to provider
+      const profile = await getUserTypeProfile(userDetails.userType, userId);
+      const message =
+        `Your ${kyc_document} KYC document has been ${approval_status}.${approved ? '' : ` Reason: ${reason}.`}`;
+
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: "user",
+        message: message,
+        userId: profile.id,
+      });
+      io.emit(
+        "getNotifications",
+        await Notification.fetchUserNotificationApi({ userId: profile.id })
+      );
+
+      return res.send({
+        success: true,
+        message: `KYC document has been ${approval_status} successfully.`
+      })
+
+    } catch (error) {
+      return next(error);
+    }
+  });
+}
 
 // Admin verifies user and give score based on kyc
 exports.approveKycVerification = async (req, res, next) => {
