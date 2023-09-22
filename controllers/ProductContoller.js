@@ -220,9 +220,9 @@ exports.getCategory = async (req, res, next) => {
 exports.createCategory = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { name, description, unit, max_qty, min_qty } = req.body;
+      const { name, description, unit } = req.body;
       const [category, created] = await Category.findOrCreate({
-        where: { name, description, unit, max_qty, min_qty },
+        where: { name, description, unit },
         transaction: t,
       });
       return res.status(200).send({
