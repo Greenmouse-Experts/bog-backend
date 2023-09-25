@@ -495,7 +495,6 @@ exports.updateProjectProgress = async (req, res, next) => {
       });
     }
 
-    // console.log(project.progress)
     // Forbid a service partner from reducing the project percentage
     if (project.service_partner_progress > percent) {
       return res.status(403).send({
@@ -511,10 +510,15 @@ exports.updateProjectProgress = async (req, res, next) => {
       });
     }
 
-    await Project.update(
-      { service_partner_progress: percent },
-      { where: { id: projectId } }
-    );
+    const project_data =
+      percent === 100
+        ? {
+            provider_submission_date: new Date(),
+            service_partner_progress: percent,
+          }
+        : { service_partner_progress: percent };
+
+    await Project.update(project_data, { where: { id: projectId } });
 
     // Get active project admins
     const project_admins = await User.findAll({
@@ -563,10 +567,21 @@ exports.updateProjectDetails = async (req, res, next) => {
 
     // Check project
     const _project = await Project.findOne({ where: { id: projectId } });
-    if (_project === null) {
+    if (!_project) {
       return res.status(404).json({
         success: false,
         message: "Project not found!",
+      });
+    }
+
+    // check project bid
+    const __project_bidding = await ProjectBidding.findOne({
+      where: { userId: _project.serviceProviderId, projectId },
+    });
+    if (!__project_bidding) {
+      return res.status(404).json({
+        success: false,
+        message: "Project Bidding not found!",
       });
     }
 
@@ -575,6 +590,28 @@ exports.updateProjectDetails = async (req, res, next) => {
         status: false,
         message: "Invalid percentage value!",
       });
+    }
+
+    // for service partner that finished on or before time
+    const finishing_time = utility.compute_elapsed_days(
+      _project.service_partner_completion_date,
+      _project.provider_submission_date
+    );
+    if (
+      finishing_time === 0 ||
+      !utility.date_compare(
+        _project.service_partner_completion_date,
+        _project.provider_submission_date
+      )
+    ) {
+      req.body.timely_delivery_rating = 5; // 5-star
+    } else {
+      const rating = utility.rating_by_timely_delivery(
+        _project.service_partner_completion_date,
+        _project.provider_submission_date,
+        __project_bidding.deliveryTimeLine
+      );
+      req.body.timely_delivery_rating = rating; // Computed rating
     }
 
     await Project.update(req.body, { where: { id: projectId } });
@@ -794,10 +831,10 @@ exports.requestForService = async (req, res, next) => {
 
       const { form, userType } = req.body;
 
-      if(!user.address && !user.city && !user.state){
+      if (!user.address && !user.city && !user.state) {
         return res.status(400).send({
           success: false,
-          message: "Home address has not been added."
+          message: "Home address has not been added.",
         });
       }
 
@@ -3116,8 +3153,7 @@ const avgRatingForTimelyDeliveryPerformance = async (
 
 const updateServicePartnerRating = async (rating_details, userId) => {
   try {
-
-    await User.update(rating_details, {where: {id: userId}});
+    await User.update(rating_details, { where: { id: userId } });
 
     const user_details = await User.findOne({ where: { id: userId } });
     const {
@@ -3127,7 +3163,7 @@ const updateServicePartnerRating = async (rating_details, userId) => {
       complexity_of_projects_completed_rating,
       cost_of_projects_completed_rating,
       quality_delivery_performance_rating,
-      timely_delivery_peformance_rating
+      timely_delivery_peformance_rating,
     } = user_details;
 
     rating_details = {
@@ -3137,9 +3173,9 @@ const updateServicePartnerRating = async (rating_details, userId) => {
       complexity_of_projects_completed_rating,
       cost_of_projects_completed_rating,
       quality_delivery_performance_rating,
-      timely_delivery_peformance_rating
+      timely_delivery_peformance_rating,
     };
-    
+
     const rating = utility.avg_rating(rating_details);
 
     await ServicePartner.update({ rating }, { where: { userId } });

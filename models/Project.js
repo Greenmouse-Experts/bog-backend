@@ -108,6 +108,10 @@ const Project = sequelise.define(
       allowNull: true,
       type: Sequelize.DOUBLE
     },
+    provider_submission_date: {
+      allowNull: true,
+      type: Sequelize.DATE
+    }
   },
   { paranoid: true }
 );

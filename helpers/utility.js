@@ -119,295 +119,355 @@ exports.ticket_issues = [
 ];
 
 const money = (value) => {
-  return parseInt(value.replace(/,/g, ''), 10);
-}
+  return parseInt(value.replace(/,/g, ""), 10);
+};
 
 exports.USERTYPE = {
-  SERVICE_PARTNER: 'professional'
-}
+  SERVICE_PARTNER: "professional",
+};
 
 /**
  * Criteria for rating service partners
  */
 
-
 const years_of_experience = [
   {
-    experience: '3-5',
+    experience: "3-5",
     rating: 1,
   },
   {
-    experience: '6-10',
+    experience: "6-10",
     rating: 2,
   },
   {
-    experience: '11-15',
+    experience: "11-15",
     rating: 3,
   },
   {
-    experience: '16-20',
+    experience: "16-20",
     rating: 4,
   },
   {
-    experience: 'Over 20',
+    experience: "Over 20",
     rating: 5,
   },
 ];
 
 const no_of_staff_members = [
   {
-    experience: '1-10',
+    experience: "1-10",
     rating: 1,
   },
   {
-    experience: '11-50',
+    experience: "11-50",
     rating: 2,
   },
   {
-    experience: '51-100',
+    experience: "51-100",
     rating: 3,
   },
   {
-    experience: '101-200',
+    experience: "101-200",
     rating: 4,
   },
   {
-    experience: 'Over 200',
+    experience: "Over 200",
     rating: 5,
   },
 ];
 
 const cost_of_projects_completed = [
   {
-    experience: 'Less than 50 million',
+    experience: "Less than 50 million",
     rating: 1,
   },
   {
-    experience: '51-100 million',
+    experience: "51-100 million",
     rating: 2,
   },
   {
-    experience: '101-200 million',
+    experience: "101-200 million",
     rating: 3,
   },
   {
-    experience: '201-500 million',
+    experience: "201-500 million",
     rating: 4,
   },
   {
-    experience: 'Over 500 million',
+    experience: "Over 500 million",
     rating: 5,
   },
-]
+];
 
 const certification_of_personnel = {
   quantity_surveyor: [
     {
-      experience: 'HND, MNIQS, RQS',
-      rating: 1
+      experience: "HND, MNIQS, RQS",
+      rating: 1,
     },
     {
-      experience: 'PGD, MNIQS, RQS',
-      rating: 2
+      experience: "PGD, MNIQS, RQS",
+      rating: 2,
     },
     {
-      experience: 'B.Sc, MNIQS, RQS',
-      rating: 3
+      experience: "B.Sc, MNIQS, RQS",
+      rating: 3,
     },
     {
-      experience: 'M.Sc, MNIQS, RQS',
-      rating: 4
+      experience: "M.Sc, MNIQS, RQS",
+      rating: 4,
     },
     {
-      experience: 'Ph.D, MNIQS, RQS',
-      rating: 5
+      experience: "Ph.D, MNIQS, RQS",
+      rating: 5,
     },
   ],
   structural_electrical_civil_engineer: [
     {
-      experience: 'HND, COREN',
-      rating: 1
+      experience: "HND, COREN",
+      rating: 1,
     },
     {
-      experience: 'PGD, COREN',
-      rating: 2
+      experience: "PGD, COREN",
+      rating: 2,
     },
     {
-      experience: 'B.Sc, COREN',
-      rating: 3
+      experience: "B.Sc, COREN",
+      rating: 3,
     },
     {
-      experience: 'M.Sc, COREN',
-      rating: 4
+      experience: "M.Sc, COREN",
+      rating: 4,
     },
     {
-      experience: 'Ph.D, COREN',
-      rating: 5
+      experience: "Ph.D, COREN",
+      rating: 5,
     },
   ],
   architect: [
     {
-      experience: 'HND, ATECH',
-      rating: 1
+      experience: "HND, ATECH",
+      rating: 1,
     },
     {
-      experience: 'PGD, ATECH',
-      rating: 2
+      experience: "PGD, ATECH",
+      rating: 2,
     },
     {
-      experience: 'B.Sc, G.M.NIA',
-      rating: 3
+      experience: "B.Sc, G.M.NIA",
+      rating: 3,
     },
     {
-      experience: 'M.Sc, A.M.NIA,/MNIA',
-      rating: 4
+      experience: "M.Sc, A.M.NIA,/MNIA",
+      rating: 4,
     },
     {
-      experience: 'Ph.D, MNIA',
-      rating: 5
-    }
+      experience: "Ph.D, MNIA",
+      rating: 5,
+    },
   ],
   mechanical_engineer: [
     {
-      experience: 'HND, PGD, B.Sc, M.Sc, Ph.D',
-      rating: 1
+      experience: "HND, PGD, B.Sc, M.Sc, Ph.D",
+      rating: 1,
     },
     {
-      experience: 'PGD, MNIMECHE',
-      rating: 2
+      experience: "PGD, MNIMECHE",
+      rating: 2,
     },
     {
-      experience: 'B.Sc, MNIMECHE',
-      rating: 3
+      experience: "B.Sc, MNIMECHE",
+      rating: 3,
     },
     {
-      experience: 'M.Sc, MNIMECHE',
-      rating: 4
+      experience: "M.Sc, MNIMECHE",
+      rating: 4,
     },
     {
-      experience: 'Ph.D, MNIMECHE',
-      rating: 5
+      experience: "Ph.D, MNIMECHE",
+      rating: 5,
     },
   ],
   surveyor: [
     {
-      experience: 'HND, MNIS',
-      rating: 1
+      experience: "HND, MNIS",
+      rating: 1,
     },
     {
-      experience: 'PGD, MNIS',
-      rating: 2
+      experience: "PGD, MNIS",
+      rating: 2,
     },
     {
-      experience: 'B.Sc, MNIS',
-      rating: 3
+      experience: "B.Sc, MNIS",
+      rating: 3,
     },
     {
-      experience: 'M.Sc, MNIS',
-      rating: 4
+      experience: "M.Sc, MNIS",
+      rating: 4,
     },
     {
-      experience: 'Ph.D, MNIS',
-      rating: 5
+      experience: "Ph.D, MNIS",
+      rating: 5,
     },
-  ]
-}
+  ],
+};
 
 const complexity_of_projects_completed = {
   /**
    * for quantity_surveyor, structural engineer, architects, mechanical engineer, electrical engineer, civil engineer
    */
-  q_s_a_m_e_c: [ 
+  q_s_a_m_e_c: [
     {
-      experience: '<2 Storey',
-      rating: 1
+      experience: "<2 Storey",
+      rating: 1,
     },
     {
-      experience: '2 - 5 Storey',
-      rating: 2
+      experience: "2 - 5 Storey",
+      rating: 2,
     },
     {
-      experience: '5 - 10 Storey',
-      rating: 3
+      experience: "5 - 10 Storey",
+      rating: 3,
     },
     {
-      experience: 'Over 10 Storey',
-      rating: 4
+      experience: "Over 10 Storey",
+      rating: 4,
     },
     {
-      experience: 'Roads, Bridges etc',
-      rating: 5
+      experience: "Roads, Bridges etc",
+      rating: 5,
     },
   ],
   surveyor: [
     {
-      experience: '1-10 Acres',
-      rating: 1
+      experience: "1-10 Acres",
+      rating: 1,
     },
     {
-      experience: '10-20 Acres',
-      rating: 2
+      experience: "10-20 Acres",
+      rating: 2,
     },
     {
-      experience: '20-50 Acres',
-      rating: 3
+      experience: "20-50 Acres",
+      rating: 3,
     },
     {
-      experience: 'Over 50 Acres',
-      rating: 4
+      experience: "Over 50 Acres",
+      rating: 4,
     },
     {
-      experience: 'Roads, Bridges etc',
-      rating: 5
-    }
-  ]
-}
+      experience: "Roads, Bridges etc",
+      rating: 5,
+    },
+  ],
+};
 
-const timely_delivery_performance = [ // in percentage
+const timely_delivery_performance = [
+  // in percentage
   {
-    experience: 'Over 15% of time',
-    rating: 1
+    experience: "Over 15% of time",
+    rating: 1,
   },
   {
-    experience: '10-15% of time',
-    rating: 2
+    experience: "10-15% of time",
+    rating: 2,
   },
   {
-    experience: '5-10% of time',
-    rating: 3
+    experience: "5-10% of time",
+    rating: 3,
   },
   {
-    experience: 'Less than 5% of time',
-    rating: 4
+    experience: "Less than 5% of time",
+    rating: 4,
   },
   {
-    experience: 'On/Before time', // on or before time
-    rating: 5
+    experience: "On/Before time", // on or before time
+    rating: 5,
   },
 ];
 
 const timely_delivery = [
   {
-    experience: {min: 16, max: '*'},
-    rating: 1
+    experience: { min: 16, max: "*" },
+    rating: 1,
   },
   {
-    experience: {min: 11, max: 15},
-    rating: 2
+    experience: { min: 11, max: 15 },
+    rating: 2,
   },
   {
-    experience: {min: 6, max: 10},
-    rating: 3
+    experience: { min: 6, max: 10 },
+    rating: 3,
   },
   {
-    experience: {min: 1, max: 5},
-    rating: 4
+    experience: { min: 1, max: 5 },
+    rating: 4,
   },
   {
-    experience: {min: 0, max: 0}, // on or before time
-    rating: 5
+    experience: { min: 0, max: 0 }, // on or before time
+    rating: 5,
   },
-]
+];
+
+const timely_delivery_calculation = (duration) => {
+  const days = duration * 7; // 7 days make a week
+
+  let calculations = timely_delivery.map((delivery) => {
+    let calculation_item;
+    if (delivery.experience.min !== "*" && delivery.experience.max !== "*") {
+      calculation_item = {
+        rating: delivery.rating,
+        min: (delivery.experience.min / 100) * days,
+        max: (delivery.experience.max / 100) * days,
+      };
+    } else if (delivery.experience.max === "*") {
+      calculation_item = {
+        rating: delivery.rating,
+        min: (delivery.experience.min / 100) * days,
+      };
+    }
+    return calculation_item;
+  });
+
+  return calculations;
+};
+
+exports.compute_elapsed_days = (completion_date, submission_date) => {
+  const compl_date = new Date(completion_date);
+  const s_date = new Date(submission_date);
+  const diffTime = Math.abs(s_date - compl_date);
+  const diff_days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  return diff_days;
+}
+
+exports.date_compare = (completion_date, submission_date) => {
+  const completion_date_time = new Date(completion_date).getTime();
+  const submission_date_time = new Date(submission_date).getTime();
+  return submission_date_time > completion_date_time
+}
+
+exports.rating_by_timely_delivery = (completion_date, submission_date, duration) => {
+  const elapsed_days = this.compute_elapsed_days(completion_date, submission_date);
+  const delivery_calculation = timely_delivery_calculation(duration);
+  let rating;
+  for (let index = 0; index < delivery_calculation.length; index++) {
+    const element = delivery_calculation[index];
+
+    if(element.max){
+      if (elapsed_days >= element.min && elapsed_days <= element.max) {
+        rating = element.rating;
+        break;
+      }
+    }else{
+      if(elapsed_days >= element.min){
+        rating = element.rating;
+        break;
+      }
+    }
+  }
+
+  return rating;
+}
 
 /**
  * Lastly, we have the Quality Delivery Performance.
@@ -421,84 +481,94 @@ const timely_delivery = [
  */
 exports.kyc_criteria_for_rating_service_partners = [
   {
-    service_type: 'quantity_surveyor',
+    service_type: "quantity_surveyor",
     meta_data: {
       years_of_experience,
       no_of_staff_members,
       cost_of_projects_completed,
       certification_of_personnel: certification_of_personnel.quantity_surveyor,
-      complexity_of_projects_completed: complexity_of_projects_completed.q_s_a_m_e_c,
-      timely_delivery_performance
-    }
+      complexity_of_projects_completed:
+        complexity_of_projects_completed.q_s_a_m_e_c,
+      timely_delivery_performance,
+    },
   },
   {
-    service_type: 'structural_engineer',
+    service_type: "structural_engineer",
     meta_data: {
       years_of_experience,
       no_of_staff_members,
       cost_of_projects_completed,
-      certification_of_personnel: certification_of_personnel.structural_electrical_civil_engineer,
-      complexity_of_projects_completed: complexity_of_projects_completed.q_s_a_m_e_c,
-      timely_delivery_performance
-    }
+      certification_of_personnel:
+        certification_of_personnel.structural_electrical_civil_engineer,
+      complexity_of_projects_completed:
+        complexity_of_projects_completed.q_s_a_m_e_c,
+      timely_delivery_performance,
+    },
   },
   {
-    service_type: 'architects',
+    service_type: "architects",
     meta_data: {
       years_of_experience,
       no_of_staff_members,
       cost_of_projects_completed,
       certification_of_personnel: certification_of_personnel.architect,
-      complexity_of_projects_completed: complexity_of_projects_completed.q_s_a_m_e_c,
-      timely_delivery_performance
-    }
+      complexity_of_projects_completed:
+        complexity_of_projects_completed.q_s_a_m_e_c,
+      timely_delivery_performance,
+    },
   },
   {
-    service_type: 'mechanical_engineer',
+    service_type: "mechanical_engineer",
     meta_data: {
       years_of_experience,
       no_of_staff_members,
       cost_of_projects_completed,
-      certification_of_personnel: certification_of_personnel.mechanical_engineer,
-      complexity_of_projects_completed: complexity_of_projects_completed.q_s_a_m_e_c,
-      timely_delivery_performance
-    }
+      certification_of_personnel:
+        certification_of_personnel.mechanical_engineer,
+      complexity_of_projects_completed:
+        complexity_of_projects_completed.q_s_a_m_e_c,
+      timely_delivery_performance,
+    },
   },
   {
-    service_type: 'electrical_engineer',
+    service_type: "electrical_engineer",
     meta_data: {
       years_of_experience,
       no_of_staff_members,
       cost_of_projects_completed,
-      certification_of_personnel: certification_of_personnel.structural_electrical_civil_engineer,
-      complexity_of_projects_completed: complexity_of_projects_completed.q_s_a_m_e_c,
-      timely_delivery_performance
-    }
+      certification_of_personnel:
+        certification_of_personnel.structural_electrical_civil_engineer,
+      complexity_of_projects_completed:
+        complexity_of_projects_completed.q_s_a_m_e_c,
+      timely_delivery_performance,
+    },
   },
   {
-    service_type: 'surveyor',
+    service_type: "surveyor",
     meta_data: {
       years_of_experience,
       no_of_staff_members,
       cost_of_projects_completed,
       certification_of_personnel: certification_of_personnel.surveyor,
-      complexity_of_projects_completed: complexity_of_projects_completed.surveyor,
-      timely_delivery_performance
-    }
+      complexity_of_projects_completed:
+        complexity_of_projects_completed.surveyor,
+      timely_delivery_performance,
+    },
   },
   {
-    service_type: 'civil_engineer',
+    service_type: "civil_engineer",
     meta_data: {
       years_of_experience,
       no_of_staff_members,
       cost_of_projects_completed,
-      certification_of_personnel: certification_of_personnel.structural_electrical_civil_engineer,
-      complexity_of_projects_completed: complexity_of_projects_completed.q_s_a_m_e_c,
-      timely_delivery_performance
-    }
+      certification_of_personnel:
+        certification_of_personnel.structural_electrical_civil_engineer,
+      complexity_of_projects_completed:
+        complexity_of_projects_completed.q_s_a_m_e_c,
+      timely_delivery_performance,
+    },
   },
 ];
-
 
 exports.avg_rating = (details) => {
   const {
