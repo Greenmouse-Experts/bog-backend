@@ -40,7 +40,7 @@ const KycOrganisationInfo = sequelise.define(
       allowNull: true
     },
     director_phone: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING,
       allowNull: true
     },
     director_email: {
@@ -48,7 +48,7 @@ const KycOrganisationInfo = sequelise.define(
       allowNull: true
     },
     contact_phone: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING,
       allowNull: true
     },
     contact_email: {

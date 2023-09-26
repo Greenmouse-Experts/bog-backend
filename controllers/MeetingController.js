@@ -143,6 +143,14 @@ exports.meetingAction = async (req, res, next) => {
       const project = await ProjectModel.findOne({
         where: { projectSlug: myMeeting.projectSlug }
       });
+
+      if(!project){
+        return res.status(404).send({
+          success: false,
+          message: "Project not found."
+        })
+      }
+
       let start_url = "";
       const topic = project.title ? project.title : myMeeting.projectSlug;
       if (status === "approved") {
