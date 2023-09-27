@@ -24,6 +24,7 @@ const Service = {
       currency,
       reference
     ) {
+      
       const data = {
         account_bank: bankCode,
         account_number: accountNumber,

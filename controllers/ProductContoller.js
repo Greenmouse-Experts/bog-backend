@@ -1365,7 +1365,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
               if (transferResponse.status === "error") {
                 return res.status(400).json({
                   success: false,
-                  message: "Transfer failed!",
+                  message: transferResponse.message || "Transfer failed!",
                 });
               }
               const trxData = {
