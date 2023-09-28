@@ -114,20 +114,25 @@ const rateServicePartner = async (user, role, data) => {
         complexity_of_projects_completed_rating,
       };
 
-      await User.update(updateData, {where: {id: userId}});
+      await User.update(updateData, { where: { id: userId } });
 
       // Get user details
       const user_details = await UserService.findUserById(userId);
 
       const rating_details = {
         years_of_experience_rating: user_details.years_of_experience_rating,
-        certification_of_personnel_rating: user_details.certification_of_personnel_rating,
+        certification_of_personnel_rating:
+          user_details.certification_of_personnel_rating,
         no_of_staff_rating: user_details.no_of_staff_rating,
-        complexity_of_projects_completed_rating: user_details.complexity_of_projects_completed_rating,
-        cost_of_projects_completed_rating: user_details.cost_of_projects_completed_rating,
-        quality_delivery_performance_rating: user_details.quality_delivery_performance_rating,
-        timely_delivery_peformance_rating: user_details.timely_delivery_peformance_rating,
-      }
+        complexity_of_projects_completed_rating:
+          user_details.complexity_of_projects_completed_rating,
+        cost_of_projects_completed_rating:
+          user_details.cost_of_projects_completed_rating,
+        quality_delivery_performance_rating:
+          user_details.quality_delivery_performance_rating,
+        timely_delivery_peformance_rating:
+          user_details.timely_delivery_peformance_rating,
+      };
 
       // Update service partner
       await updateServicePartnerRating(rating_details, userId);
@@ -140,7 +145,6 @@ const rateServicePartner = async (user, role, data) => {
 
 const updateServicePartnerRating = async (rating_details, userId) => {
   try {
-   
     const rating = avg_rating(rating_details);
 
     await ServicePartner.update({ rating }, { where: { userId } });
@@ -281,7 +285,6 @@ exports.createKycGeneralInfo = async (req, res, next) => {
 
       const userId = req.user.id;
       if (userType === USERTYPE.SERVICE_PARTNER) {
-        
         // Determine rating for service partner based
         await rateServicePartner({ userId }, role, {
           years_of_experience,
@@ -316,7 +319,7 @@ exports.createKycGeneralInfo = async (req, res, next) => {
         data: myInfo,
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -607,9 +610,49 @@ exports.ReadKycDocuments = async (req, res, next) => {
         where: { userId: profile.id },
       });
 
+      const new_result = [];
+      for (let index = 0; index < result.length; index++) {
+        const element = result[index];
+        const details_cred = {
+          id: element.id,
+          file: element.file,
+          approved: element.approved,
+          reason: element.reason,
+          createdAt: element.createdAt,
+          updatedAt: element.updatedAt,
+          deletedAt: element.deletedAt,
+        };
+
+        if (new_result.length === 0) {
+          new_result.push({
+            name: element.name,
+            userType: element.userType,
+            userId: element.userId,
+            details: [details_cred],
+          });
+        } else {
+          const resultFoundIndex = new_result.findIndex(
+            (_r) => _r.name === element.name
+          );
+
+          if (resultFoundIndex !== -1) {
+            new_result[resultFoundIndex].details.push(details_cred);
+          }else{
+            new_result.push({
+              name: element.name,
+              userType: element.userType,
+              userId: element.userId,
+              details: [details_cred],
+            });
+          }
+
+        }
+      }
+
       return res.status(200).send({
         success: true,
         data: result,
+        formatted: new_result
       });
     } catch (error) {
       return next(error);
@@ -638,48 +681,62 @@ exports.deleteKycDocuments = async (req, res, next) => {
 exports.approveDisapproveKycDocument = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const {id, userId} = req.params;
-      const {approved, reason} = req.body;
-      
-      const kycDoc = await KycDocuments.findOne({where: {id}});
-      if(!kycDoc){
-        return res.status(404).send({success: false, message: "Kyc document not found."})
+      const { id, userId } = req.params;
+      const { approved, reason } = req.body;
+
+      const kycDoc = await KycDocuments.findOne({ where: { id } });
+      if (!kycDoc) {
+        return res
+          .status(404)
+          .send({ success: false, message: "Kyc document not found." });
       }
 
       if (kycDoc.approved || kycDoc.approved === false) {
-        return res.status(404).send({success: false, message: "KYC document has already been vetted. You cannot approve or disapprove it again."})
+        return res.status(404).send({
+          success: false,
+          message:
+            "KYC document has already been vetted. You cannot approve or disapprove it again.",
+        });
       }
 
-      const userDetails = await User.findOne({where: {id: userId}})
-      if(!userDetails){
-        return res.status(404).send({success: false, message: "Account not found."})
+      const userDetails = await User.findOne({ where: { id: userId } });
+      if (!userDetails) {
+        return res
+          .status(404)
+          .send({ success: false, message: "Account not found." });
       }
 
-      let {kycScore} = userDetails;
+      let { kycScore } = userDetails;
       kycScore = JSON.parse(kycScore);
-      
-      if(!approved){
+
+      if (!approved) {
         kycScore.uploadDocument = kycScore.uploadDocument - 1;
         kycScore = JSON.stringify(kycScore);
 
         // Update User Model
-        await User.update({kycScore}, {where: {id: userId}});
+        await User.update({ kycScore }, { where: { id: userId } });
       }
 
-      await KycDocuments.update({approved, reason}, {where: {id}});
+      await KycDocuments.update({ approved, reason }, { where: { id } });
 
-      let approval_status = approved ? 'approved' : 'disapproved';
+      let approval_status = approved ? "approved" : "disapproved";
 
       // Mailer for providers
-      const kyc_document = kycDoc.name.split('_').join(' ');
+      const kyc_document = kycDoc.name.split("_").join(" ");
       if (!approved) {
-        await ProviderMailerForKycDocument(userDetails, kyc_document, approval_status, reason);
+        await ProviderMailerForKycDocument(
+          userDetails,
+          kyc_document,
+          approval_status,
+          reason
+        );
       }
-      
+
       // send notification to provider
       const profile = await getUserTypeProfile(userDetails.userType, userId);
-      const message =
-        `Your ${kyc_document} KYC document has been ${approval_status}.${approved ? '' : ` Reason: ${reason}.`}`;
+      const message = `Your ${kyc_document} KYC document has been ${approval_status}.${
+        approved ? "" : ` Reason: ${reason}.`
+      }`;
 
       const { io } = req.app;
       await Notification.createNotification({
@@ -694,14 +751,13 @@ exports.approveDisapproveKycDocument = async (req, res, next) => {
 
       return res.send({
         success: true,
-        message: `KYC document has been ${approval_status} successfully.`
-      })
-
+        message: `KYC document has been ${approval_status} successfully.`,
+      });
     } catch (error) {
       return next(error);
     }
   });
-}
+};
 
 // Admin verifies user and give score based on kyc
 exports.approveKycVerification = async (req, res, next) => {
