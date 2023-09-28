@@ -610,45 +610,8 @@ exports.ReadKycDocuments = async (req, res, next) => {
         where: { userId: profile.id },
       });
 
-      const new_result = [];
-      for (let index = 0; index < result.length; index++) {
-        const element = result[index];
-        const details_cred = {
-          id: element.id,
-          file: element.file,
-          approved: element.approved,
-          reason: element.reason,
-          createdAt: element.createdAt,
-          updatedAt: element.updatedAt,
-          deletedAt: element.deletedAt,
-        };
-
-        if (new_result.length === 0) {
-          new_result.push({
-            name: element.name,
-            userType: element.userType,
-            userId: element.userId,
-            details: [details_cred],
-          });
-        } else {
-          const resultFoundIndex = new_result.findIndex(
-            (_r) => _r.name === element.name
-          );
-
-          if (resultFoundIndex !== -1) {
-            new_result[resultFoundIndex].details.push(details_cred);
-          }else{
-            new_result.push({
-              name: element.name,
-              userType: element.userType,
-              userId: element.userId,
-              details: [details_cred],
-            });
-          }
-
-        }
-      }
-
+      const new_result = formatKycDoc(result);
+      
       return res.status(200).send({
         success: true,
         data: result,
@@ -659,6 +622,48 @@ exports.ReadKycDocuments = async (req, res, next) => {
     }
   });
 };
+
+const formatKycDoc = (result) => {
+  const new_result = [];
+  for (let index = 0; index < result.length; index++) {
+    const element = result[index];
+    const details_cred = {
+      id: element.id,
+      file: element.file,
+      approved: element.approved,
+      reason: element.reason,
+      createdAt: element.createdAt,
+      updatedAt: element.updatedAt,
+      deletedAt: element.deletedAt,
+    };
+
+    if (new_result.length === 0) {
+      new_result.push({
+        name: element.name,
+        userType: element.userType,
+        userId: element.userId,
+        details: [details_cred],
+      });
+    } else {
+      const resultFoundIndex = new_result.findIndex(
+        (_r) => _r.name === element.name
+      );
+
+      if (resultFoundIndex !== -1) {
+        new_result[resultFoundIndex].details.push(details_cred);
+      }else{
+        new_result.push({
+          name: element.name,
+          userType: element.userType,
+          userId: element.userId,
+          details: [details_cred],
+        });
+      }
+
+    }
+  }
+  return new_result;
+} 
 
 exports.deleteKycDocuments = async (req, res, next) => {
   sequelize.transaction(async (t) => {
