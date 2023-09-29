@@ -292,11 +292,7 @@ const KYCApprovalValidation = () => {
   return [
     check("userType", "userType is required").notEmpty(),
     check("userId", "userId is required").isUUID(),
-    check("kycPoint", "Kycpoint is required").isInt(),
-    check(
-      "verificationStatus",
-      "verificationStatus is required and it's boolean"
-    ).isBoolean(),
+    
   ];
 };
 
