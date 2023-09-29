@@ -2088,7 +2088,7 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Dear ${!first_name ? "user" : first_name},</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">This is to inform you that your ${kyc_document} kyc document has been ${approved}.</p><br/>
+                  <p style="font-size: 1.4em;">This is to inform you that your ${kyc_document} kyc has been ${approved}.</p><br/>
                   `
                   if(approved === 'disapproved'){
                     params.body += `<p style="font-size: 1.4em;">Reason: ${reason}</p>

@@ -611,11 +611,11 @@ exports.ReadKycDocuments = async (req, res, next) => {
       });
 
       const new_result = formatKycDoc(result);
-      
+
       return res.status(200).send({
         success: true,
         data: result,
-        formatted: new_result
+        formatted: new_result,
       });
     } catch (error) {
       return next(error);
@@ -651,7 +651,7 @@ const formatKycDoc = (result) => {
 
       if (resultFoundIndex !== -1) {
         new_result[resultFoundIndex].details.push(details_cred);
-      }else{
+      } else {
         new_result.push({
           name: element.name,
           userType: element.userType,
@@ -659,11 +659,10 @@ const formatKycDoc = (result) => {
           details: [details_cred],
         });
       }
-
     }
   }
   return new_result;
-} 
+};
 
 exports.deleteKycDocuments = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -768,37 +767,63 @@ exports.approveDisapproveKycDocument = async (req, res, next) => {
 exports.approveKycVerification = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { userType, userId, verificationStatus, kycPoint } = req.body;
+      const {
+        userType,
+        userId,
+        verificationStatus,
+        kycPoint,
+        approved,
+        reason,
+      } = req.body;
       const profile = await getUserTypeProfile(userType, userId);
-      console.log(profile);
+
       if (profile == null) {
-        return res.status(200).send({
-          success: true,
+        return res.status(404).send({
+          success: false,
           message: "User is not a professional",
         });
       }
-      const data = {
-        isVerified: verificationStatus,
-        kycPoint: verificationStatus === true ? kycPoint : 0,
-      };
 
       const id = userId;
       const user = await UserService.findUser({ id });
 
-      await updateUserTypeProfile({
-        userType,
-        id: profile.id,
-        data,
-        transaction: t,
-      });
+      if (!user) {
+        return res.status(404).send({
+          success: false,
+          message: "User account not found.",
+        });
+      }
+
+      if(approved === false && !reason){
+        return res.status(404).send({
+          success: false,
+          message: "Reason for disapproval is required.",
+        });
+      }
+
+      if (verificationStatus) {
+        const data = {
+          isVerified: verificationStatus,
+          kycPoint: verificationStatus === true ? kycPoint : 0,
+        };
+
+        await updateUserTypeProfile({
+          userType,
+          id: profile.id,
+          data,
+          transaction: t,
+        });
+      }
 
       //send email to user
       const encodeEmail = encodeURIComponent(user.email);
-      let message = helpers.kycApprovalMessage(user.fname, encodeEmail);
-      await EmailService.sendMail(user.email, message, "Kyc Approval success");
+      let message =
+        approved === undefined || approved
+          ? helpers.kycApprovalMessage(user.fname, encodeEmail)
+          : helpers.kycDisapprovalMessage(user.fname, encodeEmail, reason);
+      await EmailService.sendMail(user.email, message, approved === undefined || approved ? "Kyc has been approved" : "Kyc has been disapproved");
 
-      const messages =
-        "Your KYC was successful, your profile has been verified.";
+      const messages = `Your KYC has been disapproved. Reason: ${reason}`;
 
       const { io } = req.app;
       await Notification.createNotification({
@@ -811,9 +836,11 @@ exports.approveKycVerification = async (req, res, next) => {
         await Notification.fetchUserNotificationApi({ userId: profile.id })
       );
 
+      const kyc_msg = approved === undefined || approved ? "Kyc has been approved" : "Kyc has been disapproved";
+
       return res.status(200).send({
         success: true,
-        message: "Profile updated successfully",
+        message: kyc_msg,
       });
     } catch (error) {
       console.log(error);

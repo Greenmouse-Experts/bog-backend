@@ -105,6 +105,14 @@ const User = sequelise.define(
       type: Sequelize.INTEGER,
       defaultValue: false
     },
+    kycVerified: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
+    },
+    kycDisapprovalReason: {
+      type: Sequelize.TEXT,
+      defaultValue: false
+    },
     app: {
       type: Sequelize.STRING,
       allowNull: true
