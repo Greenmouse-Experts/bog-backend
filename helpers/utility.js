@@ -436,30 +436,37 @@ exports.compute_elapsed_days = (completion_date, submission_date) => {
   const compl_date = new Date(completion_date);
   const s_date = new Date(submission_date);
   const diffTime = Math.abs(s_date - compl_date);
-  const diff_days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  const diff_days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diff_days;
-}
+};
 
 exports.date_compare = (completion_date, submission_date) => {
   const completion_date_time = new Date(completion_date).getTime();
   const submission_date_time = new Date(submission_date).getTime();
-  return submission_date_time > completion_date_time
-}
+  return submission_date_time > completion_date_time;
+};
 
-exports.rating_by_timely_delivery = (completion_date, submission_date, duration) => {
-  const elapsed_days = this.compute_elapsed_days(completion_date, submission_date);
+exports.rating_by_timely_delivery = (
+  completion_date,
+  submission_date,
+  duration
+) => {
+  const elapsed_days = this.compute_elapsed_days(
+    completion_date,
+    submission_date
+  );
   const delivery_calculation = timely_delivery_calculation(duration);
   let rating;
   for (let index = 0; index < delivery_calculation.length; index++) {
     const element = delivery_calculation[index];
 
-    if(element.max){
+    if (element.max) {
       if (elapsed_days >= element.min && elapsed_days <= element.max) {
         rating = element.rating;
         break;
       }
-    }else{
-      if(elapsed_days >= element.min){
+    } else {
+      if (elapsed_days >= element.min) {
         rating = element.rating;
         break;
       }
@@ -467,7 +474,7 @@ exports.rating_by_timely_delivery = (completion_date, submission_date, duration)
   }
 
   return rating;
-}
+};
 
 /**
  * Lastly, we have the Quality Delivery Performance.
@@ -611,3 +618,30 @@ exports.avg_rating = (details) => {
 };
 
 exports.PERCENT_100 = 100;
+
+/**
+ * Geotechnical Investigation
+ */
+exports.GNT_LAB_TESTS = [
+  "Moisture Content Test",
+  "Grain Size Analysis Test",
+  "Atterberg Test",
+  "Specific Gravity Test",
+  "Triaxial Test",
+  "Consolidation Test",
+  "Hydrometer Test",
+  "Compaction Test",
+  "California Bearing Ratio (CBR) Test",
+  "Field Density Test",
+  "Soil Chemical Test",
+  "Water Test",
+];
+
+exports.GNT_DESC_TITLES = [
+  'Mobilization and demobilization',
+  'Borehole/SPT',
+  'Cone penetration test',
+  'Chemical analysis of ground water',
+  'Laboratory test',
+  'Reports'
+]

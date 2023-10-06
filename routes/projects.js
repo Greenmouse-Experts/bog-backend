@@ -102,6 +102,22 @@ router
     ProjectController.requestForService
   );
 
+router
+  .route("/projects/geotechnical-investigation/metadata/view")
+  .get([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.viewMetadataForGeotechnicalInvestigation);
+
+router
+  .route("/projects/geotechnical-investigation/metadata")
+  .post([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.metadataForGeotechnicalInvestigation);
+
+router
+  .route("/projects/geotechnical-investigation/order")
+  .post([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.orderForGeotechnicalInvestigation);
+
+router
+  .route("/projects/geotechnical-investigation/:projectId/view")
+  .get([Auth, Access.verifyAccess], ProjectController.viewProjectOrderForGeotechnicalInvestigation);
+
 // Land Survey
 router
   .route("/projects/land-survey/request")

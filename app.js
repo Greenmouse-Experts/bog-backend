@@ -48,6 +48,13 @@ app.use(express.static(path.join(__dirname, "uploads")));
 
 // //log file
 
+// const geo_info = require("./models/GeotechnicalInvestigationInfo");
+// const geo_orders = require("./models/GeotechnicalInvestigationOrders");
+
+// geo_info.sync()
+// geo_orders.sync()
+
+
 var fs = require("fs");
 var util = require("util");
 var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });

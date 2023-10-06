@@ -65,6 +65,8 @@ const {
 } = require("../helpers/mailer/samples");
 
 const { Service } = require("../helpers/flutterwave");
+const GeotechnicalInvestigationProjectMetadata = require("../models/GeotechnicalInvestigationProjectMetadata");
+const GeotechnicalInvestigationOrders = require("../models/GeotechnicalInvestigationOrders");
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
   const notifyType = "admin";
@@ -947,6 +949,210 @@ exports.requestForService = async (req, res, next) => {
     }
   });
 };
+
+/** 
+ * Add metadata for Geotechnical Investigation project
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.metadataForGeotechnicalInvestigation = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+
+      // See if any metadata has been added
+      const metadata = await GeotechnicalInvestigationProjectMetadata.findAll();
+      let message = '';
+      if(metadata){
+        await GeotechnicalInvestigationProjectMetadata.update(req.body, {where: {id: metadata[0].id}});
+        message = 'Geotechnical investigation metadata has been updated successfully.'
+      }else{
+        await GeotechnicalInvestigationProjectMetadata.create(req.body);
+        message = 'Geotechnical investigation metadata has been added successfully.';
+      }
+
+      return res.send({
+        success: true,
+        message
+      })
+    }
+    catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+}
+
+/**
+ * View metadata for geotechnical investigation
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.viewMetadataForGeotechnicalInvestigation = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const projectMetadata = await GeotechnicalInvestigationProjectMetadata.findAll();
+
+      return res.send({
+        success: true,
+        data: projectMetadata ? projectMetadata[0] : {}
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+}
+
+/**
+ * Order for Geotechnical Investigation project
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const {
+        total,
+        setup_dismantle_rig_amt,
+        setup_dismantle_rig_qty,
+        drilling_spt_amt,
+        drilling_spt_qty,
+        setup_dismantle_cpt_amt,
+        setup_dismantle_cpt_qty,
+        dutch_cpt_amt,
+        dutch_cpt_qty,
+        chemical_analysis_of_ground_water_amt,
+        chemical_analysis_of_ground_water_qty,
+      } = req.body;
+
+      const userId = req.user.id;
+      const user = await User.findOne({ where: { id: userId } });
+      const userType = user.userType;
+
+      if (!user.address && !user.city && !user.state) {
+        return res.status(400).send({
+          success: false,
+          message: "Home address has not been added.",
+        });
+      }
+
+      // Get gti metadata
+      const gti_metadata = await GeotechnicalInvestigationProjectMetadata.findAll();
+
+      const total_amt = (setup_dismantle_rig_amt * setup_dismantle_rig_qty) + (drilling_spt_amt * drilling_spt_qty) + (setup_dismantle_cpt_amt * setup_dismantle_cpt_qty) + (dutch_cpt_amt *
+        dutch_cpt_qty) + (chemical_analysis_of_ground_water_amt *
+          chemical_analysis_of_ground_water_qty) + gti_metadata[0].mobilization + gti_metadata[0].demobilization + gti_metadata[0].lab_test + gti_metadata[0].report;
+          
+      if(total_amt !== total){
+        return res.status(400).send({
+          success: false,
+          message: "Total is not correct.",
+        });
+      }
+
+      const profile = await userService.getUserTypeProfile(userType, userId);
+      const projectData = {
+        title: "Request for geotechnical Investigation",
+        userId: profile.id,
+        projectTypes: "geotechnical_investigation",
+        totalCost: total,
+      };
+
+      // Create project for geotechnical investigation
+      const _project = await this.createProject(projectData, t);
+
+      // Prepare data for gti project
+      const gti_project_data = {
+        userId,
+        projectId: _project.id,
+        ...req.body,
+        mobilization_amt: gti_metadata[0].mobilization,
+        demobilization_amt: gti_metadata[0].demobilization,
+        lab_test: gti_metadata[0].lab_test,
+        report: gti_metadata[0].report,
+        lab_test_types: gti_metadata[0].lab_test_types,
+      };
+
+      // Create gti data
+      await GeotechnicalInvestigationOrders.create(gti_project_data, {
+        transaction: t,
+      });
+
+      const reqData = {
+        req,
+        userId,
+        message: `${user.name} has order a project request for Geotechnical Investigation.`,
+      };
+      await this.notifyAdmin(reqData);
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // client mailer
+      const response_ = await ClientProjectRequestMailer(
+        {
+          email: user.email,
+          first_name: user.fname,
+        },
+        _project
+      );
+
+      // admins mailer
+      const response__ = await AdminProjectRequestMailer(
+        {
+          name: user.name,
+          userType,
+          id: user.id,
+        },
+        admins,
+        _project
+      );
+
+      return res.status(200).send({
+        success: true,
+        message:
+          "Geotechnical Investigation project has been requested for successfully.",
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+/**
+ * View project for gti
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.viewProjectOrderForGeotechnicalInvestigation = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const {projectId} = req.params;
+      const projectOrder = await GeotechnicalInvestigationOrders.findOne({where: {projectId}});
+
+      return res.send({
+        success: true,
+        data: projectOrder
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+}
+
+
 
 // Land Survey Request
 exports.requestForLandSurvey = async (req, res, next) => {
@@ -1984,7 +2190,7 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
           if (!myFinancial) {
             throw new Error();
           }
-          
+
           // Trigger transfer
           const transferResponse = await Service.Flutterwave.transfer(
             account_number,
@@ -1996,7 +2202,6 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
           );
 
           if (transferResponse.status === "error") {
-    
             return res.status(400).json({
               success: false,
               message: transferResponse.message || "Transfer failed!",
