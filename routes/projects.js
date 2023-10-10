@@ -104,7 +104,7 @@ router
 
 router
   .route("/projects/geotechnical-investigation/metadata/view")
-  .get([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.viewMetadataForGeotechnicalInvestigation);
+  .get([Auth, Access.verifyAccess], ProjectController.viewMetadataForGeotechnicalInvestigation);
 
 router
   .route("/projects/geotechnical-investigation/metadata")
