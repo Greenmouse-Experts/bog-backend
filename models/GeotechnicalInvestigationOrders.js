@@ -11,6 +11,14 @@ const GeotechnicalInvestigationOrders = sequelise.define(
       unique: true,
       primaryKey: true
     },
+    name: {
+      allowNull: true,
+      type: Sequelize.STRING
+    },
+    address: {
+      allowNull: true,
+      type: Sequelize.STRING
+    },
     userId: {
       allowNull: true,
       type: Sequelize.STRING

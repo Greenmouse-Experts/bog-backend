@@ -950,44 +950,46 @@ exports.requestForService = async (req, res, next) => {
   });
 };
 
-/** 
+/**
  * Add metadata for Geotechnical Investigation project
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
  */
 exports.metadataForGeotechnicalInvestigation = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-
       // See if any metadata has been added
       const metadata = await GeotechnicalInvestigationProjectMetadata.findAll();
-      let message = '';
-      if(metadata){
-        await GeotechnicalInvestigationProjectMetadata.update(req.body, {where: {id: metadata[0].id}});
-        message = 'Geotechnical investigation metadata has been updated successfully.'
-      }else{
+      let message = "";
+      if (metadata) {
+        await GeotechnicalInvestigationProjectMetadata.update(req.body, {
+          where: { id: metadata[0].id },
+        });
+        message =
+          "Geotechnical investigation metadata has been updated successfully.";
+      } else {
         await GeotechnicalInvestigationProjectMetadata.create(req.body);
-        message = 'Geotechnical investigation metadata has been added successfully.';
+        message =
+          "Geotechnical investigation metadata has been added successfully.";
       }
 
       return res.send({
         success: true,
-        message
-      })
-    }
-    catch (error) {
+        message,
+      });
+    } catch (error) {
       t.rollback();
       return next(error);
     }
   });
-}
+};
 
 /**
  * View metadata for geotechnical investigation
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
  */
 exports.viewMetadataForGeotechnicalInvestigation = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -996,14 +998,14 @@ exports.viewMetadataForGeotechnicalInvestigation = async (req, res, next) => {
 
       return res.send({
         success: true,
-        data: projectMetadata ? projectMetadata[0] : {}
+        data: projectMetadata ? projectMetadata[0] : {},
       });
     } catch (error) {
       t.rollback();
       return next(error);
     }
   });
-}
+};
 
 /**
  * Order for Geotechnical Investigation project
@@ -1026,6 +1028,8 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         dutch_cpt_qty,
         chemical_analysis_of_ground_water_amt,
         chemical_analysis_of_ground_water_qty,
+        address,
+        name,
       } = req.body;
 
       const userId = req.user.id;
@@ -1042,11 +1046,19 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
       // Get gti metadata
       const gti_metadata = await GeotechnicalInvestigationProjectMetadata.findAll();
 
-      const total_amt = (setup_dismantle_rig_amt * setup_dismantle_rig_qty) + (drilling_spt_amt * drilling_spt_qty) + (setup_dismantle_cpt_amt * setup_dismantle_cpt_qty) + (dutch_cpt_amt *
-        dutch_cpt_qty) + (chemical_analysis_of_ground_water_amt *
-          chemical_analysis_of_ground_water_qty) + gti_metadata[0].mobilization + gti_metadata[0].demobilization + gti_metadata[0].lab_test + gti_metadata[0].report;
-          
-      if(total_amt !== total){
+      const total_amt =
+        setup_dismantle_rig_amt * setup_dismantle_rig_qty +
+        drilling_spt_amt * drilling_spt_qty +
+        setup_dismantle_cpt_amt * setup_dismantle_cpt_qty +
+        dutch_cpt_amt * dutch_cpt_qty +
+        chemical_analysis_of_ground_water_amt *
+          chemical_analysis_of_ground_water_qty +
+        gti_metadata[0].mobilization +
+        gti_metadata[0].demobilization +
+        gti_metadata[0].lab_test +
+        gti_metadata[0].report;
+
+      if (total_amt !== total) {
         return res.status(400).send({
           success: false,
           message: "Total is not correct.",
@@ -1131,28 +1143,32 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
 
 /**
  * View project for gti
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
  */
-exports.viewProjectOrderForGeotechnicalInvestigation = async (req, res, next) => {
+exports.viewProjectOrderForGeotechnicalInvestigation = async (
+  req,
+  res,
+  next
+) => {
   sequelize.transaction(async (t) => {
     try {
-      const {projectId} = req.params;
-      const projectOrder = await GeotechnicalInvestigationOrders.findOne({where: {projectId}});
+      const { projectId } = req.params;
+      const projectOrder = await GeotechnicalInvestigationOrders.findOne({
+        where: { projectId },
+      });
 
       return res.send({
         success: true,
-        data: projectOrder
+        data: projectOrder,
       });
     } catch (error) {
       t.rollback();
       return next(error);
     }
   });
-}
-
-
+};
 
 // Land Survey Request
 exports.requestForLandSurvey = async (req, res, next) => {
