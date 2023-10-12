@@ -959,16 +959,37 @@ exports.requestForService = async (req, res, next) => {
 exports.metadataForGeotechnicalInvestigation = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      // See if any metadata has been added
-      const metadata = await GeotechnicalInvestigationProjectMetadata.findAll();
+      const { id, depth_of_bh } = req.body;
+
       let message = "";
-      if (metadata) {
+      if (id) {
+        const geo_investigation = await GeotechnicalInvestigationProjectMetadata.findOne(
+          { where: { id } }
+        );
+        if (!geo_investigation) {
+          return res.status(404).send({
+            success: false,
+            message: "Geotechnical investigation metadata not found.",
+          });
+        }
+
         await GeotechnicalInvestigationProjectMetadata.update(req.body, {
-          where: { id: metadata[0].id },
+          where: { id },
         });
         message =
           "Geotechnical investigation metadata has been updated successfully.";
       } else {
+        const geotechnical_investigation = await GeotechnicalInvestigationProjectMetadata.findOne(
+          { where: { depth_of_bh } }
+        );
+
+        if (geotechnical_investigation) {
+          return res.status(404).send({
+            success: false,
+            message: "Geotechnical investigation exists.",
+          });
+        }
+
         await GeotechnicalInvestigationProjectMetadata.create(req.body);
         message =
           "Geotechnical investigation metadata has been added successfully.";
@@ -1028,6 +1049,11 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         dutch_cpt_qty,
         chemical_analysis_of_ground_water_amt,
         chemical_analysis_of_ground_water_qty,
+        mobilization,
+        demobilization,
+        lab_test,
+        report,
+        lab_test_types,
         address,
         name,
       } = req.body;
@@ -1043,9 +1069,6 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         });
       }
 
-      // Get gti metadata
-      const gti_metadata = await GeotechnicalInvestigationProjectMetadata.findAll();
-
       const total_amt =
         setup_dismantle_rig_amt * setup_dismantle_rig_qty +
         drilling_spt_amt * drilling_spt_qty +
@@ -1053,10 +1076,10 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         dutch_cpt_amt * dutch_cpt_qty +
         chemical_analysis_of_ground_water_amt *
           chemical_analysis_of_ground_water_qty +
-        gti_metadata[0].mobilization +
-        gti_metadata[0].demobilization +
-        gti_metadata[0].lab_test +
-        gti_metadata[0].report;
+        mobilization +
+        demobilization +
+        lab_test +
+        report;
 
       if (total_amt !== total) {
         return res.status(400).send({
@@ -1080,12 +1103,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
       const gti_project_data = {
         userId,
         projectId: _project.id,
-        ...req.body,
-        mobilization_amt: gti_metadata[0].mobilization,
-        demobilization_amt: gti_metadata[0].demobilization,
-        lab_test: gti_metadata[0].lab_test,
-        report: gti_metadata[0].report,
-        lab_test_types: gti_metadata[0].lab_test_types,
+        lab_test_types: lab_test_types,
       };
 
       // Create gti data

@@ -1,4 +1,3 @@
-
 const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
 
@@ -9,48 +8,60 @@ const GeotechnicalInvestigationProjectMetadata = sequelise.define(
       type: Sequelize.UUID,
       defaultValue: Sequelize.UUIDV4,
       unique: true,
-      primaryKey: true
+      primaryKey: true,
     },
     mobilization: {
       allowNull: true,
-      type: Sequelize.NUMBER
+      type: Sequelize.NUMBER,
     },
     demobilization: {
       allowNull: true,
-      type: Sequelize.NUMBER
+      type: Sequelize.NUMBER,
     },
     setup_dismantle_rig: {
       allowNull: true,
-      type: Sequelize.NUMBER
+      type: Sequelize.NUMBER,
     },
-    depth_of_borehole: {
+    min_qty_bh: {
       allowNull: true,
-      type: Sequelize.NUMBER
+      type: Sequelize.NUMBER,
+    },
+    max_qty_bh: {
+      allowNull: true,
+      type: Sequelize.NUMBER,
+    },
+    depth_of_borehole_amt: {
+      allowNull: true,
+      type: Sequelize.NUMBER,
+    },
+    depth_of_bh: {
+      allowNull: true,
+      type: Sequelize.STRING,
     },
     setup_dismantle_cpt: {
       allowNull: true,
-      type: Sequelize.NUMBER
+      type: Sequelize.NUMBER,
     },
     tons_machine: {
       allowNull: true,
-      type: Sequelize.NUMBER
+      type: Sequelize.NUMBER,
     },
     chemical_analysis_of_ground_water: {
       allowNull: true,
-      type: Sequelize.NUMBER
+      type: Sequelize.NUMBER,
     },
     lab_test: {
       allowNull: true,
-      type: Sequelize.NUMBER
+      type: Sequelize.NUMBER,
     },
     report: {
       allowNull: true,
-      type: Sequelize.NUMBER
+      type: Sequelize.NUMBER,
     },
     lab_test_types: {
       allowNull: true,
-      type: Sequelize.TEXT
-    }
+      type: Sequelize.TEXT,
+    },
   },
   { paranoid: true }
 );
