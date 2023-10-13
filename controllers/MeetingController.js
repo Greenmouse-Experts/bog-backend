@@ -42,6 +42,14 @@ exports.myMeeting = async (req, res, next) => {
   }
 };
 
+exports.viewMeetingPage = async (req, res, next) => {
+  try {
+    console.log(req)
+  } catch (error) {
+    next(error)
+  }
+}
+
 exports.servicePartnerMeetings = async (req, res, next) => {
   try {
     const userId = req.user.id;

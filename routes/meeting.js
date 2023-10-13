@@ -32,4 +32,6 @@ router
   .route("/meeting/delete/:meetingId")
   .patch(Auth, MeetingController.deleteMeeting);
 
+router.route("/meeting/zoom").get(MeetingController.viewMeetingPage);
+
 module.exports = router;

@@ -118,6 +118,11 @@ app.get("/", (req, res) => {
   res.send(`BOG APP ${new Date()}`);
 });
 
+// console.log(__dirname);
+app.get("/zoomverify", (req, res) => {
+  res.sendFile(path.join(`${__dirname}/zoomverify/verifyzoom.html`))
+});
+
 app.use("/api", Routes);
 app.post("/upload", async (req, res, next) => {
   try {
