@@ -119,8 +119,9 @@ app.get("/", (req, res) => {
 });
 
 // console.log(__dirname);
-app.get("/zoomverify", (req, res) => {
+app.get("/zoomverify/verifyzoom.html", (req, res) => {
   res.sendFile(path.join(`${__dirname}/zoomverify/verifyzoom.html`))
+  // res.send()
 });
 
 app.use("/api", Routes);
