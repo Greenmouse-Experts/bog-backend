@@ -31,6 +31,6 @@ exports.zoomGenerator = async (email, title) => {
     // const response = await axios.get(uri, config);
     return response.data;
   } catch (error) {
-    console.log(error.response)
+    console.log(error)
   }
 };
