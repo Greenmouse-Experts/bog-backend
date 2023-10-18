@@ -1020,6 +1020,7 @@ exports.viewMetadataForGeotechnicalInvestigation = async (req, res, next) => {
       return res.send({
         success: true,
         data: projectMetadata
+        
       });
     } catch (error) {
       t.rollback();
