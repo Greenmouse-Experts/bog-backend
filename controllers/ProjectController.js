@@ -959,7 +959,7 @@ exports.requestForService = async (req, res, next) => {
 exports.metadataForGeotechnicalInvestigation = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { id, depth_of_bh } = req.body;
+      const { id, depth_of_bh, min_qty_bh, max_qty_bh } = req.body;
 
       let message = "";
       if (id) {
@@ -980,7 +980,7 @@ exports.metadataForGeotechnicalInvestigation = async (req, res, next) => {
           "Geotechnical investigation metadata has been updated successfully.";
       } else {
         const geotechnical_investigation = await GeotechnicalInvestigationProjectMetadata.findOne(
-          { where: { depth_of_bh } }
+          { where: { depth_of_bh, min_qty_bh, max_qty_bh } }
         );
 
         if (geotechnical_investigation) {
