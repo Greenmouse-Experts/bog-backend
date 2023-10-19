@@ -1019,8 +1019,7 @@ exports.viewMetadataForGeotechnicalInvestigation = async (req, res, next) => {
 
       return res.send({
         success: true,
-        data: projectMetadata
-        
+        data: projectMetadata,
       });
     } catch (error) {
       t.rollback();
@@ -1070,7 +1069,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         });
       }
 
-      const total_amt =
+      let total_amt =
         setup_dismantle_rig_amt * setup_dismantle_rig_qty +
         drilling_spt_amt * drilling_spt_qty +
         setup_dismantle_cpt_amt * setup_dismantle_cpt_qty +
@@ -1081,6 +1080,9 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         demobilization +
         lab_test +
         report;
+
+      const vat = total_amt * (7.5 / 100);
+      total_amt += vat;
 
       if (total_amt !== total) {
         return res.status(400).send({
