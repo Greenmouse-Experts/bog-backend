@@ -1029,6 +1029,81 @@ exports.viewMetadataForGeotechnicalInvestigation = async (req, res, next) => {
 };
 
 /**
+ * Verification for Geotechnical Investigation project
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+exports.verificationForGeotechnicalInvestigation = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const {
+        total,
+        setup_dismantle_rig_amt,
+        setup_dismantle_rig_qty,
+        drilling_spt_amt,
+        drilling_spt_qty,
+        setup_dismantle_cpt_amt,
+        setup_dismantle_cpt_qty,
+        dutch_cpt_amt,
+        dutch_cpt_qty,
+        chemical_analysis_of_ground_water_amt,
+        chemical_analysis_of_ground_water_qty,
+        mobilization,
+        demobilization,
+        lab_test,
+        report,
+        lab_test_types,
+        address,
+        name,
+      } = req.body;
+
+      const userId = req.user.id;
+      const user = await User.findOne({ where: { id: userId } });
+      const userType = user.userType;
+
+      if (!user.address && !user.city && !user.state) {
+        return res.status(400).send({
+          success: false,
+          message: "Home address has not been added.",
+        });
+      }
+
+      let total_amt =
+        setup_dismantle_rig_amt * setup_dismantle_rig_qty +
+        drilling_spt_amt * drilling_spt_qty +
+        setup_dismantle_cpt_amt * setup_dismantle_cpt_qty +
+        dutch_cpt_amt * dutch_cpt_qty +
+        chemical_analysis_of_ground_water_amt *
+          chemical_analysis_of_ground_water_qty +
+        mobilization +
+        demobilization +
+        lab_test +
+        report;
+
+      const vat = total_amt * (7.5 / 100);
+      total_amt += vat;
+
+      if (total_amt !== total) {
+        return res.status(400).send({
+          success: false,
+          message: "Total is not correct.",
+        });
+      }
+
+      return res.status(200).send({
+        success: true,
+        message:
+          "Geotechnical Investigation total is verified successfully.",
+      });
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+/**
  * Order for Geotechnical Investigation project
  * @param {*} req
  * @param {*} res
