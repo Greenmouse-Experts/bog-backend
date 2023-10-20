@@ -1085,7 +1085,7 @@ exports.verificationForGeotechnicalInvestigation = async (req, res, next) => {
 
       const vat = total_amt * (7.5 / 100);
       total_amt += vat;
-      total_amt = Number(total_amt.toFixed(2));
+      total_amt = Math.round(total_amt);
 
       if (total_amt !== total) {
         return res.status(400).send({
@@ -1160,7 +1160,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
 
       const vat = total_amt * (7.5 / 100);
       total_amt += vat;
-      total_amt = Number(total_amt.toFixed(2));
+      total_amt = Math.round(total_amt);
 
       if (total_amt !== total) {
         return res.status(400).send({
