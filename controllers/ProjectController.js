@@ -734,7 +734,7 @@ exports.createProject = async (data, transaction) => {
     const projectSlug = `BOG/PRJ/${type}/${Math.floor(
       190000000 + Math.random() * 990000000
     )}`;
-    data.ref = `PRJ-${utility.generateOrderId()}`;
+    
     data.projectSlug = projectSlug;
     data.status = "pending";
     const result = await Project.create(data);
@@ -1173,6 +1173,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         userId: profile.id,
         projectTypes: "geotechnical_investigation",
         totalCost: total,
+        ref: `PRJ-${utility.generateOrderId}`
       };
 
       // Create project for geotechnical investigation
@@ -1230,6 +1231,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         success: true,
         message:
           "Geotechnical Investigation project has been requested for successfully.",
+          ref: projectData.ref
       });
     } catch (error) {
       t.rollback();
