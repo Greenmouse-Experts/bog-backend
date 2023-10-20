@@ -65,6 +65,7 @@ const {
 } = require("../helpers/mailer/samples");
 
 const { Service } = require("../helpers/flutterwave");
+const { Paystack } = require("../helpers/paystack").Service;
 const GeotechnicalInvestigationProjectMetadata = require("../models/GeotechnicalInvestigationProjectMetadata");
 const GeotechnicalInvestigationOrders = require("../models/GeotechnicalInvestigationOrders");
 
@@ -733,6 +734,7 @@ exports.createProject = async (data, transaction) => {
     const projectSlug = `BOG/PRJ/${type}/${Math.floor(
       190000000 + Math.random() * 990000000
     )}`;
+    data.ref = `PRJ-${utility.generateOrderId()}`;
     data.projectSlug = projectSlug;
     data.status = "pending";
     const result = await Project.create(data);
@@ -1028,7 +1030,6 @@ exports.viewMetadataForGeotechnicalInvestigation = async (req, res, next) => {
   });
 };
 
-
 /**
  * Verification for Geotechnical Investigation project
  * @param {*} req
@@ -1094,8 +1095,7 @@ exports.verificationForGeotechnicalInvestigation = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message:
-          "Geotechnical Investigation total is verified successfully.",
+        message: "Geotechnical Investigation total is verified successfully.",
       });
     } catch (error) {
       t.rollback();
@@ -1232,6 +1232,112 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
           "Geotechnical Investigation project has been requested for successfully.",
       });
     } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+};
+
+exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { ref } = req.params;
+
+      const projectOrder = await GeotechnicalInvestigationOrders.findOne({
+        where: { ref },
+      });
+      if (!projectOrder) {
+        return res.status(400).send({
+          success: false,
+          message: "Project request not found.",
+        });
+      }
+
+      const response = await Paystack.verifyPayment(ref);
+      if (!response.status) {
+        return res.status(400).send({
+          success: false,
+          message: response.message,
+        });
+      }
+
+      const project = await Project.findOne({where: {id: projectOrder.projectId}});
+
+      if(!project){
+        return res.status(404).send({
+          success: false,
+          message: "Project not found.",
+        });
+      }
+
+      // Update project
+      await Project.update(
+        { approvalStatus: "approved" },
+        { where: { id: projectOrder.projectId }, transaction: t }
+      );
+
+      const { userId } = project;
+      const message = `Your project ${project.projectSlug} has been approved
+      `;
+
+      const { io } = req.app;
+      await Notification.createNotification({
+        type: "user",
+        message,
+        userId,
+      });
+      io.emit(
+        "getNotifications",
+        await Notification.fetchUserNotificationApi({ userId })
+      );
+
+      const client = await User.findOne({where: {id: projectOrder.userId}});
+
+      if(!client){
+        return res.status(404).send({
+          success: false,
+          message: "User details not found.",
+        })
+      }
+
+      // Get active project admins
+      const project_admins = await User.findAll({
+        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      });
+      const super_admins = await User.findAll({
+        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      });
+      const admins = [...project_admins, ...super_admins];
+
+      // Client mailer on project approval
+      await ClientMailerForProjectUpdate(
+        {
+          email: client.email,
+          first_name: client.fname,
+        },
+        "approved",
+        project
+      );
+
+      // Admins mailer on project approval
+      await AdminProjectUpdateMailer(
+        {
+          name: client.name,
+          userType: client.userType,
+          id: client.id,
+        },
+        admins,
+        "approved",
+        project
+      );
+
+      return res.status(200).send({
+        success: true,
+        message: "Project's payment verified and approved",
+      });
+
+    } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }

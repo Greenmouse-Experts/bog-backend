@@ -119,6 +119,10 @@ router
   .post([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.orderForGeotechnicalInvestigation);
 
 router
+  .route("/projects/geotechnical-investigation/verify-payment/:ref")
+  .get([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.verifyGeotechnicalInvestigationPayment);
+
+router
   .route("/projects/geotechnical-investigation/:projectId/view")
   .get([Auth, Access.verifyAccess], ProjectController.viewProjectOrderForGeotechnicalInvestigation);
 
