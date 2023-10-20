@@ -1185,7 +1185,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         userId,
         projectId: _project.id,
         lab_test_types: lab_test_types,
-        ref: `PRJ-${utility.generateOrderId}`
+        ref: `PRJ-${Math.floor(190000000 + Math.random() * 990000000)}`
       };
 
       // Create gti data
