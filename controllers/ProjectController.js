@@ -1174,7 +1174,8 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         title: "Request for geotechnical Investigation",
         userId: profile.id,
         projectTypes: "geotechnical_investigation",
-        totalCost: total
+        totalCost: total,
+        ref: `PRJ-${utility.generateOrderId}`
       };
 
       // Create project for geotechnical investigation
@@ -1185,7 +1186,6 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         userId,
         projectId: _project.id,
         lab_test_types: lab_test_types,
-        ref: `PRJ-${utility.generateOrderId}`
       };
 
       // Create gti data
@@ -1233,7 +1233,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         success: true,
         message:
           "Geotechnical Investigation project has been requested for successfully.",
-          ref: gti_project_data.ref
+          ref: projectData.ref
       });
     } catch (error) {
       t.rollback();
