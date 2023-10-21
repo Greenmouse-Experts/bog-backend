@@ -119,7 +119,7 @@ router
   .post([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.orderForGeotechnicalInvestigation);
 
 router
-  .route("/projects/geotechnical-investigation/verify-payment/:ref")
+  .route("/projects/geotechnical-investigation/verify-payment/:ref/:pay_ref")
   .get([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.verifyGeotechnicalInvestigationPayment);
 
 router

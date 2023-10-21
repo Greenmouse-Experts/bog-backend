@@ -66,6 +66,26 @@ const Service = {
       }
     },
 
+    async initializeTrx(data){
+      https://api.paystack.co/transaction/initialize
+      try {
+        const createUserUrl = `${this.url}/transaction/initialize`;
+        const result = await axios({
+          method: "post",
+          url: createUserUrl,
+          headers: config.header,
+          data
+        });
+        
+        const resp = result.data;
+        return resp;
+      } catch (error) {
+        console.log(error);
+        const err = error.response.data;
+        return err;
+      }
+    },
+
     async verifyPayment(reference) {
       try {
         const createUserUrl = `${this.url}/transaction/verify/${reference}`;

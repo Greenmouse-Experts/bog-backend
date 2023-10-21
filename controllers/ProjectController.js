@@ -1245,7 +1245,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
 exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { ref } = req.params;
+      const { ref, pay_ref } = req.params;
 
       const projectOrder = await GeotechnicalInvestigationOrders.findOne({
         where: { ref },
@@ -1257,13 +1257,8 @@ exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
         });
       }
 
-      const response = await Paystack.verifyPayment(ref);
-      if (!response.status) {
-        return res.status(400).send({
-          success: false,
-          message: response.message,
-        });
-      }
+      // Update gti orders model
+      await GeotechnicalInvestigationOrders.update({p_ref: pay_ref}, {where: {ref}});
 
       const project = await Project.findOne({where: {id: projectOrder.projectId}});
 

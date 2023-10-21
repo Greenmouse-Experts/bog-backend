@@ -87,6 +87,10 @@ const GeotechnicalInvestigationOrders = sequelise.define(
       allowNull: true,
       type: Sequelize.STRING
     },
+    p_ref: {
+      allowNull: true,
+      type: Sequelize.STRING
+    },
     lab_test_types: {
       allowNull: true,
       type: Sequelize.TEXT
