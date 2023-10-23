@@ -111,6 +111,10 @@ router
   .post([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.metadataForGeotechnicalInvestigation);
 
 router
+  .route("/projects/geotechnical-investigation/metadata/:metadata_id")
+  .delete([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.deleteGeotechnicalInvestigationMetadata)
+
+router
   .route("/projects/geotechnical-investigation/verification")
   .post([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.verificationForGeotechnicalInvestigation);
 

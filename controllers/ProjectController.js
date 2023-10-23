@@ -1009,6 +1009,43 @@ exports.metadataForGeotechnicalInvestigation = async (req, res, next) => {
 };
 
 /**
+ * Remove Geotechnical Investigation metadata
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+exports.deleteGeotechnicalInvestigationMetadata = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const {metadata_id} = req.params;
+
+      const geo_investigation_metadata = await GeotechnicalInvestigationProjectMetadata.findOne(
+        { where: { id: metadata_id } }
+      );
+
+      if(!geo_investigation_metadata){
+        return res.status(404).send({
+          success: false,
+          message: "Geotechnical investigation metadata not found.",
+        })
+      }
+
+      await GeotechnicalInvestigationProjectMetadata.destroy({where: {id: metadata_id}});
+
+      return res.send({
+        success: true,
+        message: "Geotechnical investigation metadata deleted successfully.",
+      });
+      
+    } catch (error) {
+      t.rollback();
+      return next(error);
+    }
+  });
+
+}
+
+/**
  * View metadata for geotechnical investigation
  * @param {*} req
  * @param {*} res
