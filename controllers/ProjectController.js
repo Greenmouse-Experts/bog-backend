@@ -577,44 +577,46 @@ exports.updateProjectDetails = async (req, res, next) => {
       });
     }
 
-    // check project bid
-    const __project_bidding = await ProjectBidding.findOne({
-      where: { userId: _project.serviceProviderId, projectId },
-    });
-    if (!__project_bidding) {
-      return res.status(404).json({
-        success: false,
-        message: "Project Bidding not found!",
+    if (_project.projectTypes !== "geotechnical_investigation") {
+      // check project bid
+      const __project_bidding = await ProjectBidding.findOne({
+        where: { userId: _project.serviceProviderId, projectId },
       });
-    }
+      if (!__project_bidding) {
+        return res.status(404).json({
+          success: false,
+          message: "Project Bidding not found!",
+        });
+      }
 
-    if (progress > 100) {
-      return res.status(400).send({
-        status: false,
-        message: "Invalid percentage value!",
-      });
-    }
+      if (progress > 100) {
+        return res.status(400).send({
+          status: false,
+          message: "Invalid percentage value!",
+        });
+      }
 
-    // for service partner that finished on or before time
-    const finishing_time = utility.compute_elapsed_days(
-      _project.service_partner_completion_date,
-      _project.provider_submission_date
-    );
-    if (
-      finishing_time === 0 ||
-      !utility.date_compare(
+      // for service partner that finished on or before time
+      const finishing_time = utility.compute_elapsed_days(
         _project.service_partner_completion_date,
         _project.provider_submission_date
-      )
-    ) {
-      req.body.timely_delivery_rating = 5; // 5-star
-    } else {
-      const rating = utility.rating_by_timely_delivery(
-        _project.service_partner_completion_date,
-        _project.provider_submission_date,
-        __project_bidding.deliveryTimeLine
       );
-      req.body.timely_delivery_rating = rating; // Computed rating
+      if (
+        finishing_time === 0 ||
+        !utility.date_compare(
+          _project.service_partner_completion_date,
+          _project.provider_submission_date
+        )
+      ) {
+        req.body.timely_delivery_rating = 5; // 5-star
+      } else {
+        const rating = utility.rating_by_timely_delivery(
+          _project.service_partner_completion_date,
+          _project.provider_submission_date,
+          __project_bidding.deliveryTimeLine
+        );
+        req.body.timely_delivery_rating = rating; // Computed rating
+      }
     }
 
     await Project.update(req.body, { where: { id: projectId } });
@@ -622,20 +624,30 @@ exports.updateProjectDetails = async (req, res, next) => {
     // Get latest project status
     const __project = await Project.findOne({ where: { id: projectId } });
 
-    // Get client details
-    const userData = await ServiceFormProjects.findOne({
-      include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
-      where: { projectID: _project.id },
-    });
-
     let client = {};
-    if (userData.length !== null) {
-      const userId = userData.userID;
+    if (_project.projectTypes !== "geotechnical_investigation") {
+      // Get client details
+      const userData = await ServiceFormProjects.findOne({
+        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        where: { projectID: _project.id },
+      });
+
+      if (userData.length !== null) {
+        const userId = userData.userID;
+        const user = await User.findOne({
+          where: { id: userId },
+          attributes: { exclude: ["password"] },
+        });
+        client = user === null ? {} : user;
+      }
+    } else {
+      const gti_details = await GeotechnicalInvestigationOrders.findOne({where: {projectId: _project.id}});
+
       const user = await User.findOne({
-        where: { id: userId },
+        where: { id: gti_details.userId },
         attributes: { exclude: ["password"] },
       });
-      client = user === null ? {} : user;
+      client = user === null ? {} : user
     }
 
     // Get active project admins
@@ -734,7 +746,7 @@ exports.createProject = async (data, transaction) => {
     const projectSlug = `BOG/PRJ/${type}/${Math.floor(
       190000000 + Math.random() * 990000000
     )}`;
-    
+
     data.projectSlug = projectSlug;
     data.status = "pending";
     const result = await Project.create(data);
@@ -1010,40 +1022,40 @@ exports.metadataForGeotechnicalInvestigation = async (req, res, next) => {
 
 /**
  * Remove Geotechnical Investigation metadata
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
  */
 exports.deleteGeotechnicalInvestigationMetadata = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const {metadata_id} = req.params;
+      const { metadata_id } = req.params;
 
       const geo_investigation_metadata = await GeotechnicalInvestigationProjectMetadata.findOne(
         { where: { id: metadata_id } }
       );
 
-      if(!geo_investigation_metadata){
+      if (!geo_investigation_metadata) {
         return res.status(404).send({
           success: false,
           message: "Geotechnical investigation metadata not found.",
-        })
+        });
       }
 
-      await GeotechnicalInvestigationProjectMetadata.destroy({where: {id: metadata_id}});
+      await GeotechnicalInvestigationProjectMetadata.destroy({
+        where: { id: metadata_id },
+      });
 
       return res.send({
         success: true,
         message: "Geotechnical investigation metadata deleted successfully.",
       });
-
     } catch (error) {
       t.rollback();
       return next(error);
     }
   });
-
-}
+};
 
 /**
  * View metadata for geotechnical investigation
@@ -1211,7 +1223,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         title: "Request for geotechnical Investigation",
         userId: profile.id,
         projectTypes: "geotechnical_investigation",
-        totalCost: total
+        totalCost: total,
       };
 
       // Create project for geotechnical investigation
@@ -1222,7 +1234,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         userId,
         projectId: _project.id,
         lab_test_types: lab_test_types,
-        ref: `PRJ-${Math.floor(190000000 + Math.random() * 990000000)}`
+        ref: `PRJ-${Math.floor(190000000 + Math.random() * 990000000)}`,
       };
 
       // Create gti data
@@ -1270,7 +1282,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
         success: true,
         message:
           "Geotechnical Investigation project has been requested for successfully.",
-          ref: gti_project_data.ref
+        ref: gti_project_data.ref,
       });
     } catch (error) {
       t.rollback();
@@ -1288,21 +1300,23 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
 exports.viewOrderDetails = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const {projectId} = req.params;
+      const { projectId } = req.params;
 
-      const order_details = await GeotechnicalInvestigationOrders.findOne({where: {projectId}});
+      const order_details = await GeotechnicalInvestigationOrders.findOne({
+        where: { projectId },
+      });
 
       return res.send({
         success: true,
-        order_details
-      })
-    }catch(error){
+        order_details,
+      });
+    } catch (error) {
       console.log(error);
       t.rollback();
       return next(error);
     }
   });
-}
+};
 
 exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -1320,11 +1334,16 @@ exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
       }
 
       // Update gti orders model
-      await GeotechnicalInvestigationOrders.update({p_ref: pay_ref}, {where: {ref}});
+      await GeotechnicalInvestigationOrders.update(
+        { p_ref: pay_ref },
+        { where: { ref } }
+      );
 
-      const project = await Project.findOne({where: {id: projectOrder.projectId}});
+      const project = await Project.findOne({
+        where: { id: projectOrder.projectId },
+      });
 
-      if(!project){
+      if (!project) {
         return res.status(404).send({
           success: false,
           message: "Project not found.",
@@ -1352,13 +1371,13 @@ exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
         await Notification.fetchUserNotificationApi({ userId })
       );
 
-      const client = await User.findOne({where: {id: projectOrder.userId}});
+      const client = await User.findOne({ where: { id: projectOrder.userId } });
 
-      if(!client){
+      if (!client) {
         return res.status(404).send({
           success: false,
           message: "User details not found.",
-        })
+        });
       }
 
       // Get active project admins
@@ -1396,7 +1415,6 @@ exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
         success: true,
         message: "Project's payment verified and approved",
       });
-
     } catch (error) {
       console.log(error);
       t.rollback();
