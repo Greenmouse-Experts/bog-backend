@@ -414,20 +414,32 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
       where: { projectId: req.params.projectId },
     });
 
-    const requestData = await ServiceFormProjects.findAll({
-      include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
-      where: { projectID: project.id },
-    });
-
     let client = {};
-    if (requestData.length > 0) {
-      const userId = requestData[0].userID;
+    let requestData = [];
+    if (project.projectTypes !== 'geotechnical_investigation') {
+      requestData = await ServiceFormProjects.findAll({
+        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        where: { projectID: project.id },
+      });
+  
+      if (requestData.length > 0) {
+        const userId = requestData[0].userID;
+        const user = await User.findOne({
+          where: { id: userId },
+          attributes: { exclude: ["password"] },
+        });
+        client = user === null ? {} : user;
+      }
+    } else {
+      const gti_details = await GeotechnicalInvestigationOrders.findOne({where: {projectId: project.id}});
+
       const user = await User.findOne({
-        where: { id: userId },
+        where: { id: gti_details.userId },
         attributes: { exclude: ["password"] },
       });
-      client = user === null ? {} : user;
+      client = user === null ? {} : user
     }
+    
 
     // project commitment fee
     const commitmentFee = await Transaction.findOne({
