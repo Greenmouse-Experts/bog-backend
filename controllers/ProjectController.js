@@ -1036,7 +1036,7 @@ exports.deleteGeotechnicalInvestigationMetadata = async (req, res, next) => {
         success: true,
         message: "Geotechnical investigation metadata deleted successfully.",
       });
-      
+
     } catch (error) {
       t.rollback();
       return next(error);
@@ -1278,6 +1278,31 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
     }
   });
 };
+
+/**
+ * View Orders for Geotechnical Investigation project
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+exports.viewOrderDetails = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const {projectId} = req.params;
+
+      const order_details = await GeotechnicalInvestigationOrders.findOne({where: {projectId}});
+
+      return res.send({
+        success: true,
+        order_details
+      })
+    }catch(error){
+      console.log(error);
+      t.rollback();
+      return next(error);
+    }
+  });
+}
 
 exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
   sequelize.transaction(async (t) => {

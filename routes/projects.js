@@ -122,6 +122,9 @@ router
   .route("/projects/geotechnical-investigation/order")
   .post([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.orderForGeotechnicalInvestigation);
 
+router.route("/projects/geotechnical-investigation/order_details/:projectId")
+    .get([Auth, Access.verifyAccess], ProjectController.viewOrderDetails)
+  
 router
   .route("/projects/geotechnical-investigation/verify-payment/:ref/:pay_ref")
   .get([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.verifyGeotechnicalInvestigationPayment);
