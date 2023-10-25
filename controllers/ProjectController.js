@@ -595,7 +595,11 @@ exports.updateProjectDetails = async (req, res, next) => {
         message: "Invalid percentage value!",
       });
     }
-    
+
+    if(progress === 100){
+      req.body.status = 'completed';
+    }
+
     if (_project.projectTypes !== "geotechnical_investigation") {
       // check project bid
       const __project_bidding = await ProjectBidding.findOne({
@@ -677,7 +681,7 @@ exports.updateProjectDetails = async (req, res, next) => {
         {
           email: client.email,
           first_name: client.fname,
-        },
+        },  
         __project.status,
         progress,
         _project
