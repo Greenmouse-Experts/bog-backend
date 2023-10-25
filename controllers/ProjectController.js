@@ -589,6 +589,13 @@ exports.updateProjectDetails = async (req, res, next) => {
       });
     }
 
+    if (progress > 100) {
+      return res.status(400).send({
+        status: false,
+        message: "Invalid percentage value!",
+      });
+    }
+    
     if (_project.projectTypes !== "geotechnical_investigation") {
       // check project bid
       const __project_bidding = await ProjectBidding.findOne({
@@ -598,13 +605,6 @@ exports.updateProjectDetails = async (req, res, next) => {
         return res.status(404).json({
           success: false,
           message: "Project Bidding not found!",
-        });
-      }
-
-      if (progress > 100) {
-        return res.status(400).send({
-          status: false,
-          message: "Invalid percentage value!",
         });
       }
 
