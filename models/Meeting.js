@@ -53,7 +53,7 @@ const Meeting = sequelise.define(
       allowNull: true
     },
     start_url: {
-      type: Sequelize.STRING,
+      type: Sequelize.TEXT,
       allowNull: true
     },
     join_url: {
