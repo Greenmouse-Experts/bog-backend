@@ -269,6 +269,9 @@ io.on("connection", async (socket) => {
     }
   });
 
+  // Chat feature starts here
+  require('./socket/user')(socket)
+
   socket.on("disconnect", () => {
     onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
 

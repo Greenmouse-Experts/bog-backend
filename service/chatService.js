@@ -11,6 +11,7 @@ const ServicePartner = require("../models/ServicePartner");
 const ProductPartner = require("../models/ProductPartner");
 const { getUserDetails } = require("./UserService");
 const { adminLevels } = require("../helpers/utility");
+const Chats = require("../models/Chats");
 
 exports.checkExistingConversation = async (participantsId) => {
   const conversations = await ChatConversations.findAll();
@@ -131,3 +132,71 @@ exports.chatControl = async (participantsId, conversationType) => {
     return false
   }
 };
+
+
+exports.sendMessage = async (data) => {
+  try {
+    let {sender_id, receiver_id, message, url, subadmin_room_no} = data;
+
+    const sender_details = await User.findOne({where: {id: sender_id}});
+    if (!Boolean(sender_details)) {
+      return {message: 'Sender details not found'}
+    }
+
+    
+    let receiver_details = null;
+    if(sender_details.userType === 'admin'){
+      receiver_details = await User.findOne({where: {id: receiver_id}});
+      if (!Boolean(receiver_details)) {
+        return {message: 'Receiver details not found'}
+      }
+    }else{
+      receiver_id = null
+    }
+
+    if (sender_details.userType === 'professional') {
+      if(!(subadmin_room_no === 5 || subadmin_room_no === 3)){
+        return {message: 'You are not permitted to send a message to this admin level.'}
+      }
+    }else if(sender_details.userType === 'vendor'){
+      if(!(subadmin_room_no === 4 || subadmin_room_no === 3)){
+        return {message: 'You are not permitted to send a message to this admin level.'}
+      }
+    }
+
+    // Send message
+    await Chats.create({
+      sender_id, receiver_id, message, url, subadmin_room_no
+    })
+
+    return {
+      ...data,
+      sender_details: sender_details,
+      receiver_details: receiver_details,
+    }
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+exports.listMessages = async (chat_room) => {
+  try {
+    
+    const chats = await Chats.findAll({where: {subadmin_room_no: chat_room}, include: [
+      {
+        model: User,
+        as: "sender_details",
+      },
+      {
+        model: User,
+        as: "receiver_details",
+      },
+    ], order: [['createdAt', 'ASC']]})
+
+    return chats;
+  } catch (error) {
+    console.log(error)
+  }
+}
