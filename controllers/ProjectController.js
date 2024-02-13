@@ -3,41 +3,41 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
-require("dotenv").config();
-const { Op, Sequelize } = require("sequelize");
-const moment = require("moment");
-const sequelize = require("../config/database/connection");
-const User = require("../models/User");
-const Project = require("../models/Project");
-const ServiceFormProjects = require("../models/ServiceFormProjects");
-const ProjectReviews = require("../models/ProjectReviews");
-const ProjectInstallments = require("../models/project_installments");
+require('dotenv').config();
+const { Op, Sequelize } = require('sequelize');
+const moment = require('moment');
+const sequelize = require('../config/database/connection');
+const User = require('../models/User');
+const Project = require('../models/Project');
+const ServiceFormProjects = require('../models/ServiceFormProjects');
+const ProjectReviews = require('../models/ProjectReviews');
+const ProjectInstallments = require('../models/project_installments');
 
-const LandSurveyProject = require("../models/LandSurveyProject");
-const DrawingProject = require("../models/DrawingProject");
-const BuildingProject = require("../models/BuildingProject");
-const ContractorProject = require("../models/ContractorProject");
-const GeoTechnical = require("../models/GeoTechnical");
-const utility = require("../helpers/utility");
-const Notification = require("../helpers/notification");
-const userService = require("../service/UserService");
-const ServiceType = require("../models/ServiceType");
-const ServicePartner = require("../models/ServicePartner");
-const ServiceProvider = require("../models/ServiceProvider");
-const ProjectBidding = require("../models/ProjectBidding");
-const ServicesFormBuilders = require("../models/ServicesFormBuilder");
-const PrivateClient = require("../models/PrivateClient");
-const CorporateClient = require("../models/CorporateClient");
-const Transaction = require("../models/Transaction");
-const TransactionPending = require("../models/TransactionPending");
-const ProjectNotifications = require("../models/project_notifications");
+const LandSurveyProject = require('../models/LandSurveyProject');
+const DrawingProject = require('../models/DrawingProject');
+const BuildingProject = require('../models/BuildingProject');
+const ContractorProject = require('../models/ContractorProject');
+const GeoTechnical = require('../models/GeoTechnical');
+const utility = require('../helpers/utility');
+const Notification = require('../helpers/notification');
+const userService = require('../service/UserService');
+const ServiceType = require('../models/ServiceType');
+const ServicePartner = require('../models/ServicePartner');
+const ServiceProvider = require('../models/ServiceProvider');
+const ProjectBidding = require('../models/ProjectBidding');
+const ServicesFormBuilders = require('../models/ServicesFormBuilder');
+const PrivateClient = require('../models/PrivateClient');
+const CorporateClient = require('../models/CorporateClient');
+const Transaction = require('../models/Transaction');
+const TransactionPending = require('../models/TransactionPending');
+const ProjectNotifications = require('../models/project_notifications');
 
-const KycFinancialData = require("../models/KycFinancialData");
+const KycFinancialData = require('../models/KycFinancialData');
 const {
   getUserTypeProfile,
   updateUserTypeProfile,
   findUserById,
-} = require("../service/UserService");
+} = require('../service/UserService');
 
 const {
   ClientProjectRequestMailer,
@@ -62,26 +62,26 @@ const {
   AdminProjectProgressNoteUpdateMailer,
   ServicePartnerMailerForProjectPayout,
   AdminProjectPayoutMailer,
-} = require("../helpers/mailer/samples");
+} = require('../helpers/mailer/samples');
 
-const { Service } = require("../helpers/flutterwave");
-const { Paystack } = require("../helpers/paystack").Service;
-const GeotechnicalInvestigationProjectMetadata = require("../models/GeotechnicalInvestigationProjectMetadata");
-const GeotechnicalInvestigationOrders = require("../models/GeotechnicalInvestigationOrders");
+const { Service } = require('../helpers/flutterwave');
+const { Paystack } = require('../helpers/paystack').Service;
+const GeotechnicalInvestigationProjectMetadata = require('../models/GeotechnicalInvestigationProjectMetadata');
+const GeotechnicalInvestigationOrders = require('../models/GeotechnicalInvestigationOrders');
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
-  const notifyType = "admin";
+  const notifyType = 'admin';
   const { io } = req.app;
   await Notification.createNotification({
     type: notifyType,
     message,
     userId,
   });
-  io.emit("getNotifications", await Notification.fetchAdminNotification());
+  io.emit('getNotifications', await Notification.fetchAdminNotification());
 };
 
 exports.notifyUser = async ({ userId, message, req }) => {
-  const notifyType = "user";
+  const notifyType = 'user';
   const { io } = req.app;
   await Notification.createNotification({
     type: notifyType,
@@ -89,7 +89,7 @@ exports.notifyUser = async ({ userId, message, req }) => {
     userId,
   });
   io.emit(
-    "getNotifications",
+    'getNotifications',
     await Notification.fetchUserNotification({ userId })
   );
 };
@@ -112,7 +112,7 @@ exports.getProjectRequest = async (req, res, next) => {
       JSON.stringify(
         await Project.findAll({
           where,
-          order: [["createdAt", "DESC"]],
+          order: [['createdAt', 'DESC']],
         })
       )
     );
@@ -153,7 +153,7 @@ exports.getServicePartnerProjectRequest = async (req, res, next) => {
       JSON.stringify(
         await Project.findAll({
           where,
-          order: [["createdAt", "DESC"]],
+          order: [['createdAt', 'DESC']],
         })
       )
     );
@@ -186,7 +186,7 @@ exports.getAllProjectRequest = async (req, res, next) => {
       JSON.stringify(
         await Project.findAll({
           where,
-          order: [["createdAt", "DESC"]],
+          order: [['createdAt', 'DESC']],
         })
       )
     );
@@ -197,18 +197,18 @@ exports.getAllProjectRequest = async (req, res, next) => {
           project.projectTypes
         );
         let projectOwner = await PrivateClient.findByPk(project.userId, {
-          include: ["privateclient"],
+          include: ['privateclient'],
         });
         if (!projectOwner) {
           projectOwner = await CorporateClient.findByPk(project.userId, {
-            include: ["corporate_user"],
+            include: ['corporate_user'],
           });
         }
         project.projectOwner = projectOwner;
-        if (project.status === "ongoing") {
+        if (project.status === 'ongoing') {
           const serviceProvider = await ServicePartner.findByPk(
             project.serviceProviderId,
-            { include: ["service_user"] }
+            { include: ['service_user'] }
           );
           project.serviceProvider = serviceProvider;
         }
@@ -236,7 +236,7 @@ exports.getAllProjectRequestV2 = async (req, res, next) => {
     }
     const projects = await Project.findAll({
       where,
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
     });
 
     // const data = await Promise.all(
@@ -285,7 +285,7 @@ exports.analyzeProjects = async (req, res, next) => {
       where: {
         userId: profile.id,
         [Op.and]: sequelize.where(
-          sequelize.fn("YEAR", sequelize.col("createdAt")),
+          sequelize.fn('YEAR', sequelize.col('createdAt')),
           y
         ),
       },
@@ -318,7 +318,7 @@ exports.analyzeServicePartnerProjects = async (req, res, next) => {
     if (servicePartner === null) {
       return res.status(404).send({
         success: false,
-        message: "Account not found!",
+        message: 'Account not found!',
       });
     }
     let { y } = req.query;
@@ -331,7 +331,7 @@ exports.analyzeServicePartnerProjects = async (req, res, next) => {
       where: {
         serviceProviderId: servicePartner?.id,
         [Op.and]: sequelize.where(
-          sequelize.fn("YEAR", sequelize.col("createdAt")),
+          sequelize.fn('YEAR', sequelize.col('createdAt')),
           y
         ),
       },
@@ -378,14 +378,14 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
   try {
     const where = { id: req.params.projectId };
     const project = await Project.findOne({
-      include: [{ model: ServicePartner, as: "serviceProvider" }],
+      include: [{ model: ServicePartner, as: 'serviceProvider' }],
       where,
     });
 
     if (project === null) {
       return res.status(404).send({
         status: false,
-        message: "Project not found!",
+        message: 'Project not found!',
       });
     }
 
@@ -394,23 +394,23 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
       userDetails = await User.findOne({
         where: { id: project.serviceProvider.userId },
         attributes: [
-          "name",
-          "email",
-          "phone",
-          "userType",
-          "createdAt",
-          "isActive",
-          "address",
-          "state",
-          "city",
-          "street",
+          'name',
+          'email',
+          'phone',
+          'userType',
+          'createdAt',
+          'isActive',
+          'address',
+          'state',
+          'city',
+          'street',
         ],
       });
     }
 
     const project_reviews = await ProjectReviews.findAll({
-      include: [{ model: User, as: "client" }],
-      attributes: { exclude: ["password"] },
+      include: [{ model: User, as: 'client' }],
+      attributes: { exclude: ['password'] },
       where: { projectId: req.params.projectId },
     });
 
@@ -418,28 +418,29 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
     let requestData = [];
     if (project.projectTypes !== 'geotechnical_investigation') {
       requestData = await ServiceFormProjects.findAll({
-        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        include: [{ model: ServicesFormBuilders, as: 'serviceForm' }],
         where: { projectID: project.id },
       });
-  
+
       if (requestData.length > 0) {
         const userId = requestData[0].userID;
         const user = await User.findOne({
           where: { id: userId },
-          attributes: { exclude: ["password"] },
+          attributes: { exclude: ['password'] },
         });
         client = user === null ? {} : user;
       }
     } else {
-      const gti_details = await GeotechnicalInvestigationOrders.findOne({where: {projectId: project.id}});
+      const gti_details = await GeotechnicalInvestigationOrders.findOne({
+        where: { projectId: project.id },
+      });
 
       const user = await User.findOne({
         where: { id: gti_details.userId },
-        attributes: { exclude: ["password"] },
+        attributes: { exclude: ['password'] },
       });
-      client = user === null ? {} : user
+      client = user === null ? {} : user;
     }
-    
 
     // project commitment fee
     const commitmentFee = await Transaction.findOne({
@@ -451,7 +452,7 @@ exports.viewProjectRequestV2 = async (req, res, next) => {
     // payout transactions
     const payoutTransactions = await Transaction.findAll({
       where: {
-        type: "Project Payout to service partner",
+        type: 'Project Payout to service partner',
         description: {
           [Op.like]: `%${project.projectSlug}%`,
         },
@@ -499,14 +500,14 @@ exports.updateProjectProgress = async (req, res, next) => {
     if (project === null) {
       return res.status(404).send({
         status: false,
-        message: "Project not found!",
+        message: 'Project not found!',
       });
     }
 
     if (project.serviceProviderId !== providerId) {
       return res.status(401).send({
         status: false,
-        message: "You are not assigned to this project!",
+        message: 'You are not assigned to this project!',
       });
     }
 
@@ -521,7 +522,7 @@ exports.updateProjectProgress = async (req, res, next) => {
     if (percent > 100) {
       return res.status(400).send({
         status: false,
-        message: "Invalid percentage value!",
+        message: 'Invalid percentage value!',
       });
     }
 
@@ -537,10 +538,10 @@ exports.updateProjectProgress = async (req, res, next) => {
 
     // Get active project admins
     const project_admins = await User.findAll({
-      where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
     });
     const super_admins = await User.findAll({
-      where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
     });
     const admins = [...project_admins, ...super_admins];
 
@@ -585,22 +586,22 @@ exports.updateProjectDetails = async (req, res, next) => {
     if (!_project) {
       return res.status(404).json({
         success: false,
-        message: "Project not found!",
+        message: 'Project not found!',
       });
     }
 
     if (progress > 100) {
       return res.status(400).send({
         status: false,
-        message: "Invalid percentage value!",
+        message: 'Invalid percentage value!',
       });
     }
 
-    if(progress === 100){
+    if (progress === 100) {
       req.body.status = 'completed';
     }
 
-    if (_project.projectTypes !== "geotechnical_investigation") {
+    if (_project.projectTypes !== 'geotechnical_investigation') {
       // check project bid
       const __project_bidding = await ProjectBidding.findOne({
         where: { userId: _project.serviceProviderId, projectId },
@@ -608,7 +609,7 @@ exports.updateProjectDetails = async (req, res, next) => {
       if (!__project_bidding) {
         return res.status(404).json({
           success: false,
-          message: "Project Bidding not found!",
+          message: 'Project Bidding not found!',
         });
       }
 
@@ -641,10 +642,10 @@ exports.updateProjectDetails = async (req, res, next) => {
     const __project = await Project.findOne({ where: { id: projectId } });
 
     let client = {};
-    if (_project.projectTypes !== "geotechnical_investigation") {
+    if (_project.projectTypes !== 'geotechnical_investigation') {
       // Get client details
       const userData = await ServiceFormProjects.findOne({
-        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        include: [{ model: ServicesFormBuilders, as: 'serviceForm' }],
         where: { projectID: _project.id },
       });
 
@@ -652,26 +653,28 @@ exports.updateProjectDetails = async (req, res, next) => {
         const userId = userData.userID;
         const user = await User.findOne({
           where: { id: userId },
-          attributes: { exclude: ["password"] },
+          attributes: { exclude: ['password'] },
         });
         client = user === null ? {} : user;
       }
     } else {
-      const gti_details = await GeotechnicalInvestigationOrders.findOne({where: {projectId: _project.id}});
+      const gti_details = await GeotechnicalInvestigationOrders.findOne({
+        where: { projectId: _project.id },
+      });
 
       const user = await User.findOne({
         where: { id: gti_details.userId },
-        attributes: { exclude: ["password"] },
+        attributes: { exclude: ['password'] },
       });
-      client = user === null ? {} : user
+      client = user === null ? {} : user;
     }
 
     // Get active project admins
     const project_admins = await User.findAll({
-      where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
     });
     const super_admins = await User.findAll({
-      where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
     });
     const admins = [...project_admins, ...super_admins];
 
@@ -681,7 +684,7 @@ exports.updateProjectDetails = async (req, res, next) => {
         {
           email: client.email,
           first_name: client.fname,
-        },  
+        },
         __project.status,
         progress,
         _project
@@ -703,7 +706,7 @@ exports.updateProjectDetails = async (req, res, next) => {
 
     return res.json({
       success: true,
-      message: "Project saved successfully!",
+      message: 'Project saved successfully!',
     });
   } catch (error) {
     next(error);
@@ -733,12 +736,12 @@ exports.userProjects = async (req, res, next) => {
     if (project === null) {
       return res.status(404).send({
         status: false,
-        message: "Project not found!",
+        message: 'Project not found!',
       });
     }
 
     const requestData = await ServiceFormProjects.findAll({
-      include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+      include: [{ model: ServicesFormBuilders, as: 'serviceForm' }],
       where: { projectID: project.id },
     });
 
@@ -764,7 +767,7 @@ exports.createProject = async (data, transaction) => {
     )}`;
 
     data.projectSlug = projectSlug;
-    data.status = "pending";
+    data.status = 'pending';
     const result = await Project.create(data);
 
     return result;
@@ -785,7 +788,7 @@ exports.deleteProjectRequest = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project Request",
+          message: 'Invalid Project Request',
         });
       }
       await Project.destroy({
@@ -795,7 +798,7 @@ exports.deleteProjectRequest = async (req, res, next) => {
       await this.deleteProjectTypeData(requestId, project.projectTypes, t);
       return res.status(200).send({
         success: true,
-        message: "Project deleted successfully",
+        message: 'Project deleted successfully',
       });
     } catch (error) {
       t.rollback();
@@ -807,19 +810,19 @@ exports.deleteProjectRequest = async (req, res, next) => {
 exports.getProjectTypeData = async (projectId, type) => {
   let data = null;
   switch (type) {
-    case "land_survey":
+    case 'land_survey':
       data = await LandSurveyProject.findOne({ where: { projectId } });
       return data;
-    case "construction_drawing":
+    case 'construction_drawing':
       data = await DrawingProject.findOne({ where: { projectId } });
       return data;
-    case "building_approval":
+    case 'building_approval':
       data = await BuildingProject.findOne({ where: { projectId } });
       return data;
-    case "contractor":
+    case 'contractor':
       data = await ContractorProject.findOne({ where: { projectId } });
       return data;
-    case "geotechnical_investigation":
+    case 'geotechnical_investigation':
       data = await GeoTechnical.findOne({ where: { projectId } });
       return data;
     default:
@@ -829,19 +832,19 @@ exports.getProjectTypeData = async (projectId, type) => {
 
 exports.deleteProjectTypeData = async (projectId, type, t) => {
   switch (type) {
-    case "land_survey":
+    case 'land_survey':
       await LandSurveyProject.destroy({ where: { projectId }, transaction: t });
       return true;
-    case "construction_drawing":
+    case 'construction_drawing':
       await DrawingProject.destroy({ where: { projectId }, transaction: t });
       return true;
-    case "building_approval":
+    case 'building_approval':
       await BuildingProject.destroy({ where: { projectId }, transaction: t });
       return true;
-    case "contractor":
+    case 'contractor':
       await ContractorProject.destroy({ where: { projectId }, transaction: t });
       return true;
-    case "geotechnical_investigation":
+    case 'geotechnical_investigation':
       await GeoTechnical.destroy({ where: { projectId }, transaction: t });
       return true;
     default:
@@ -866,26 +869,26 @@ exports.requestForService = async (req, res, next) => {
       if (!user.address && !user.city && !user.state) {
         return res.status(400).send({
           success: false,
-          message: "Home address has not been added.",
+          message: 'Home address has not been added.',
         });
       }
 
       let _project = null;
       const serviceRequestForm = [];
-      let serviceNameRes = "";
+      let serviceNameRes = '';
       for (let index = 0; index < form.length; index++) {
         const f = form[index];
 
         // Get Service form
         const serviceForm = await ServicesFormBuilders.findOne({
-          include: [{ model: ServiceType, as: "serviceType" }],
+          include: [{ model: ServiceType, as: 'serviceType' }],
           where: { id: f._id },
         });
 
         if (serviceForm === null) {
           return res.status(400).send({
             status: false,
-            msg: "This service form input does not exist!",
+            msg: 'This service form input does not exist!',
           });
         }
 
@@ -893,7 +896,7 @@ exports.requestForService = async (req, res, next) => {
           serviceFormID: serviceForm.id,
           value: f.value,
           userID: userId,
-          status: "pending",
+          status: 'pending',
         };
 
         serviceRequestForm.push(request);
@@ -904,7 +907,7 @@ exports.requestForService = async (req, res, next) => {
 
         // Get Service form
         const serviceForm = await ServicesFormBuilders.findOne({
-          include: [{ model: ServiceType, as: "serviceType" }],
+          include: [{ model: ServiceType, as: 'serviceType' }],
           where: { id: s.serviceFormID },
         });
 
@@ -934,7 +937,7 @@ exports.requestForService = async (req, res, next) => {
           value: s.value,
           userID: s.userID,
           projectID: _project.id,
-          status: "pending",
+          status: 'pending',
         };
 
         const data = await ServiceFormProjects.create(request);
@@ -942,10 +945,10 @@ exports.requestForService = async (req, res, next) => {
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
@@ -971,7 +974,7 @@ exports.requestForService = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: "Project requested",
+        message: 'Project requested',
       });
     } catch (error) {
       t.rollback();
@@ -991,7 +994,7 @@ exports.metadataForGeotechnicalInvestigation = async (req, res, next) => {
     try {
       const { id, depth_of_bh, min_qty_bh, max_qty_bh } = req.body;
 
-      let message = "";
+      let message = '';
       if (id) {
         const geo_investigation = await GeotechnicalInvestigationProjectMetadata.findOne(
           { where: { id } }
@@ -999,7 +1002,7 @@ exports.metadataForGeotechnicalInvestigation = async (req, res, next) => {
         if (!geo_investigation) {
           return res.status(404).send({
             success: false,
-            message: "Geotechnical investigation metadata not found.",
+            message: 'Geotechnical investigation metadata not found.',
           });
         }
 
@@ -1007,7 +1010,7 @@ exports.metadataForGeotechnicalInvestigation = async (req, res, next) => {
           where: { id },
         });
         message =
-          "Geotechnical investigation metadata has been updated successfully.";
+          'Geotechnical investigation metadata has been updated successfully.';
       } else {
         const geotechnical_investigation = await GeotechnicalInvestigationProjectMetadata.findOne(
           { where: { depth_of_bh, min_qty_bh, max_qty_bh } }
@@ -1016,13 +1019,13 @@ exports.metadataForGeotechnicalInvestigation = async (req, res, next) => {
         if (geotechnical_investigation) {
           return res.status(404).send({
             success: false,
-            message: "Geotechnical investigation exists.",
+            message: 'Geotechnical investigation exists.',
           });
         }
 
         await GeotechnicalInvestigationProjectMetadata.create(req.body);
         message =
-          "Geotechnical investigation metadata has been added successfully.";
+          'Geotechnical investigation metadata has been added successfully.';
       }
 
       return res.send({
@@ -1054,7 +1057,7 @@ exports.deleteGeotechnicalInvestigationMetadata = async (req, res, next) => {
       if (!geo_investigation_metadata) {
         return res.status(404).send({
           success: false,
-          message: "Geotechnical investigation metadata not found.",
+          message: 'Geotechnical investigation metadata not found.',
         });
       }
 
@@ -1064,7 +1067,7 @@ exports.deleteGeotechnicalInvestigationMetadata = async (req, res, next) => {
 
       return res.send({
         success: true,
-        message: "Geotechnical investigation metadata deleted successfully.",
+        message: 'Geotechnical investigation metadata deleted successfully.',
       });
     } catch (error) {
       t.rollback();
@@ -1132,7 +1135,7 @@ exports.verificationForGeotechnicalInvestigation = async (req, res, next) => {
       if (!user.address && !user.city && !user.state) {
         return res.status(400).send({
           success: false,
-          message: "Home address has not been added.",
+          message: 'Home address has not been added.',
         });
       }
 
@@ -1155,13 +1158,13 @@ exports.verificationForGeotechnicalInvestigation = async (req, res, next) => {
       if (total_amt !== total) {
         return res.status(400).send({
           success: false,
-          message: "Total is not correct.",
+          message: 'Total is not correct.',
         });
       }
 
       return res.status(200).send({
         success: true,
-        message: "Geotechnical Investigation total is verified successfully.",
+        message: 'Geotechnical Investigation total is verified successfully.',
       });
     } catch (error) {
       t.rollback();
@@ -1207,7 +1210,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
       if (!user.address && !user.city && !user.state) {
         return res.status(400).send({
           success: false,
-          message: "Home address has not been added.",
+          message: 'Home address has not been added.',
         });
       }
 
@@ -1230,15 +1233,15 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
       if (total_amt !== total) {
         return res.status(400).send({
           success: false,
-          message: "Total is not correct.",
+          message: 'Total is not correct.',
         });
       }
 
       const profile = await userService.getUserTypeProfile(userType, userId);
       const projectData = {
-        title: "Request for geotechnical Investigation",
+        title: 'Request for geotechnical Investigation',
         userId: profile.id,
-        projectTypes: "geotechnical_investigation",
+        projectTypes: 'geotechnical_investigation',
         totalCost: total,
       };
 
@@ -1270,10 +1273,10 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
@@ -1300,7 +1303,7 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         message:
-          "Geotechnical Investigation project has been requested for successfully.",
+          'Geotechnical Investigation project has been requested for successfully.',
         ref: gti_project_data.ref,
       });
     } catch (error) {
@@ -1348,7 +1351,7 @@ exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
       if (!projectOrder) {
         return res.status(400).send({
           success: false,
-          message: "Project request not found.",
+          message: 'Project request not found.',
         });
       }
 
@@ -1365,13 +1368,13 @@ exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Project not found.",
+          message: 'Project not found.',
         });
       }
 
       // Update project
       await Project.update(
-        { approvalStatus: "approved" },
+        { approvalStatus: 'approved' },
         { where: { id: projectOrder.projectId }, transaction: t }
       );
 
@@ -1381,12 +1384,12 @@ exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
 
       const { io } = req.app;
       await Notification.createNotification({
-        type: "user",
+        type: 'user',
         message,
         userId,
       });
       io.emit(
-        "getNotifications",
+        'getNotifications',
         await Notification.fetchUserNotificationApi({ userId })
       );
 
@@ -1395,16 +1398,16 @@ exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
       if (!client) {
         return res.status(404).send({
           success: false,
-          message: "User details not found.",
+          message: 'User details not found.',
         });
       }
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
@@ -1414,7 +1417,7 @@ exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
           email: client.email,
           first_name: client.fname,
         },
-        "approved",
+        'approved',
         project
       );
 
@@ -1426,7 +1429,7 @@ exports.verifyGeotechnicalInvestigationPayment = async (req, res, next) => {
           id: client.id,
         },
         admins,
-        "approved",
+        'approved',
         project
       );
 
@@ -1476,14 +1479,14 @@ exports.requestForLandSurvey = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const userId = req.user.id;
-      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const user = await User.findByPk(userId, { attributes: ['name'] });
       const { userType } = req.body;
       const request = req.body;
       const profile = await userService.getUserTypeProfile(userType, userId);
       const projectData = {
         title: req.body.title,
         userId: profile.id,
-        projectTypes: "land_survey",
+        projectTypes: 'land_survey',
       };
       const project = await this.createProject(projectData, t);
       request.userId = userId;
@@ -1519,10 +1522,10 @@ exports.updateLandSurveyRequest = async (req, res, next) => {
       if (!survey) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Land Survey",
+          message: 'Invalid Land Survey',
         });
       }
-      if (title && title !== "") {
+      if (title && title !== '') {
         await Project.update(
           { title },
           { where: { id: survey.projectId }, transaction: t }
@@ -1535,7 +1538,7 @@ exports.updateLandSurveyRequest = async (req, res, next) => {
       });
       return res.status(200).send({
         success: true,
-        message: "Land Survey request updated successfully",
+        message: 'Land Survey request updated successfully',
       });
     } catch (error) {
       t.rollback();
@@ -1561,7 +1564,7 @@ exports.requestForContractor = async (req, res, next) => {
       const projectData = {
         title,
         userId: profile.id,
-        projectTypes: "contractor",
+        projectTypes: 'contractor',
       };
       const project = await this.createProject(projectData, t);
       const request = {
@@ -1574,19 +1577,19 @@ exports.requestForContractor = async (req, res, next) => {
       };
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
-          if (req.files[i].fieldname === "surveyPlan") {
+          if (req.files[i].fieldname === 'surveyPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.surveyPlan = url;
           }
-          if (req.files[i].fieldname === "structuralPlan") {
+          if (req.files[i].fieldname === 'structuralPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.structuralPlan = url;
           }
-          if (req.files[i].fieldname === "architecturalPlan") {
+          if (req.files[i].fieldname === 'architecturalPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.architecturalPlan = url;
           }
-          if (req.files[i].fieldname === "mechanicalPlan") {
+          if (req.files[i].fieldname === 'mechanicalPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.mechanicalPlan = url;
           }
@@ -1596,7 +1599,7 @@ exports.requestForContractor = async (req, res, next) => {
       const data = await ContractorProject.create(request, {
         transaction: t,
       });
-      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const user = await User.findByPk(userId, { attributes: ['name'] });
       const reqData = {
         req,
         userId,
@@ -1633,11 +1636,11 @@ exports.updateContractorRequest = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Contractor Project",
+          message: 'Invalid Contractor Project',
         });
       }
 
-      if (title && title !== "") {
+      if (title && title !== '') {
         await Project.update(
           { title },
           { where: { id: project.projectId }, transaction: t }
@@ -1652,19 +1655,19 @@ exports.updateContractorRequest = async (req, res, next) => {
       };
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
-          if (req.files[i].fieldname === "surveyPlan") {
+          if (req.files[i].fieldname === 'surveyPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.surveyPlan = url;
           }
-          if (req.files[i].fieldname === "structuralPlan") {
+          if (req.files[i].fieldname === 'structuralPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.structuralPlan = url;
           }
-          if (req.files[i].fieldname === "architecturalPlan") {
+          if (req.files[i].fieldname === 'architecturalPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.architecturalPlan = url;
           }
-          if (req.files[i].fieldname === "mechanicalPlan") {
+          if (req.files[i].fieldname === 'mechanicalPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.mechanicalPlan = url;
           }
@@ -1676,7 +1679,7 @@ exports.updateContractorRequest = async (req, res, next) => {
       });
       return res.status(200).send({
         success: true,
-        message: "Contractor request updated successfully",
+        message: 'Contractor request updated successfully',
       });
     } catch (error) {
       t.rollback();
@@ -1703,7 +1706,7 @@ exports.drawingProjectsRequest = async (req, res, next) => {
       const projectData = {
         title,
         userId: profile.id,
-        projectTypes: "construction_drawing",
+        projectTypes: 'construction_drawing',
       };
       const project = await this.createProject(projectData, t);
       const request = {
@@ -1717,23 +1720,23 @@ exports.drawingProjectsRequest = async (req, res, next) => {
       };
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
-          if (req.files[i].fieldname === "surveyPlan") {
+          if (req.files[i].fieldname === 'surveyPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.surveyPlan = url;
           }
-          if (req.files[i].fieldname === "structuralPlan") {
+          if (req.files[i].fieldname === 'structuralPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.structuralPlan = url;
           }
-          if (req.files[i].fieldname === "architecturalPlan") {
+          if (req.files[i].fieldname === 'architecturalPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.architecturalPlan = url;
           }
-          if (req.files[i].fieldname === "mechanicalPlan") {
+          if (req.files[i].fieldname === 'mechanicalPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.mechanicalPlan = url;
           }
-          if (req.files[i].fieldname === "electricalPlan") {
+          if (req.files[i].fieldname === 'electricalPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.electricalPlan = url;
           }
@@ -1743,7 +1746,7 @@ exports.drawingProjectsRequest = async (req, res, next) => {
       const data = await DrawingProject.create(request, {
         transaction: t,
       });
-      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const user = await User.findByPk(userId, { attributes: ['name'] });
       const reqData = {
         req,
         userId,
@@ -1752,7 +1755,7 @@ exports.drawingProjectsRequest = async (req, res, next) => {
       await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
-        message: "Drawing Project created successfully",
+        message: 'Drawing Project created successfully',
         data,
       });
     } catch (error) {
@@ -1782,11 +1785,11 @@ exports.updateDrawingRequest = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Contractor Project",
+          message: 'Invalid Contractor Project',
         });
       }
 
-      if (title && title !== "") {
+      if (title && title !== '') {
         await Project.update(
           { title },
           { where: { id: project.projectId }, transaction: t }
@@ -1803,23 +1806,23 @@ exports.updateDrawingRequest = async (req, res, next) => {
 
       if (req.files.length > 0) {
         for (let i = 0; i < req.files.length; i++) {
-          if (req.files[i].fieldname === "surveyPlan") {
+          if (req.files[i].fieldname === 'surveyPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.surveyPlan = url;
           }
-          if (req.files[i].fieldname === "structuralPlan") {
+          if (req.files[i].fieldname === 'structuralPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.structuralPlan = url;
           }
-          if (req.files[i].fieldname === "architecturalPlan") {
+          if (req.files[i].fieldname === 'architecturalPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.architecturalPlan = url;
           }
-          if (req.files[i].fieldname === "mechanicalPlan") {
+          if (req.files[i].fieldname === 'mechanicalPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.mechanicalPlan = url;
           }
-          if (req.files[i].fieldname === "electricalPlan") {
+          if (req.files[i].fieldname === 'electricalPlan') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             request.electricalPlan = url;
           }
@@ -1831,7 +1834,7 @@ exports.updateDrawingRequest = async (req, res, next) => {
       });
       return res.status(200).send({
         success: true,
-        message: "Drawing request updated successfully",
+        message: 'Drawing request updated successfully',
       });
     } catch (error) {
       t.rollback();
@@ -1856,7 +1859,7 @@ exports.buildingApprovalProjectsRequest = async (req, res, next) => {
       const projectData = {
         title,
         userId: profile.id,
-        projectTypes: "building_approval",
+        projectTypes: 'building_approval',
       };
       const project = await this.createProject(projectData, t);
       const request = {
@@ -1877,7 +1880,7 @@ exports.buildingApprovalProjectsRequest = async (req, res, next) => {
       const data = await BuildingProject.create(request, {
         transaction: t,
       });
-      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const user = await User.findByPk(userId, { attributes: ['name'] });
       const reqData = {
         req,
         userId,
@@ -1886,7 +1889,7 @@ exports.buildingApprovalProjectsRequest = async (req, res, next) => {
       await this.notifyAdmin(reqData);
       return res.status(200).send({
         success: true,
-        message: "Building Approval Project created successfully",
+        message: 'Building Approval Project created successfully',
         data,
       });
     } catch (error) {
@@ -1914,11 +1917,11 @@ exports.updateBuildingApprovalRequest = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Contractor Project",
+          message: 'Invalid Contractor Project',
         });
       }
 
-      if (title && title !== "") {
+      if (title && title !== '') {
         await Project.update(
           { title },
           { where: { id: project.projectId }, transaction: t }
@@ -1945,7 +1948,7 @@ exports.updateBuildingApprovalRequest = async (req, res, next) => {
       });
       return res.status(200).send({
         success: true,
-        message: "Building request updated successfully",
+        message: 'Building request updated successfully',
       });
     } catch (error) {
       t.rollback();
@@ -1965,7 +1968,7 @@ exports.requestForGeoTechnicalInvestigation = async (req, res, next) => {
       const projectData = {
         title,
         userId: profile.id,
-        projectTypes: "geotechnical_investigation",
+        projectTypes: 'geotechnical_investigation',
       };
       const project = await this.createProject(projectData, t);
       request.userId = userId;
@@ -1980,7 +1983,7 @@ exports.requestForGeoTechnicalInvestigation = async (req, res, next) => {
       const data = await GeoTechnical.create(request, {
         transaction: t,
       });
-      const user = await User.findByPk(userId, { attributes: ["name"] });
+      const user = await User.findByPk(userId, { attributes: ['name'] });
       const reqData = {
         req,
         userId,
@@ -2009,10 +2012,10 @@ exports.updateGeoTechnicalInvestigationRequest = async (req, res, next) => {
       if (!survey) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Investigation",
+          message: 'Invalid Investigation',
         });
       }
-      if (title && title !== "") {
+      if (title && title !== '') {
         await Project.update(
           { title },
           { where: { id: survey.projectId }, transaction: t }
@@ -2032,7 +2035,7 @@ exports.updateGeoTechnicalInvestigationRequest = async (req, res, next) => {
       });
       return res.status(200).send({
         success: true,
-        message: "Geotechnical Investigation updated successfully",
+        message: 'Geotechnical Investigation updated successfully',
       });
     } catch (error) {
       t.rollback();
@@ -2052,11 +2055,11 @@ exports.requestProjectApproval = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project",
+          message: 'Invalid Project',
         });
       }
       const requestData = {
-        approvalStatus: "in_review",
+        approvalStatus: 'in_review',
       };
       await Project.update(requestData, {
         where: { id: projectId },
@@ -2070,8 +2073,8 @@ exports.requestProjectApproval = async (req, res, next) => {
       const trxData = {
         TransactionId,
         userId,
-        status: "PAID",
-        type: "Projects",
+        status: 'PAID',
+        type: 'Projects',
         amount,
         paymentReference,
         description: `Commitment fee for ${project.projectSlug}`,
@@ -2080,7 +2083,7 @@ exports.requestProjectApproval = async (req, res, next) => {
       const response = await Transaction.create(trxData);
 
       const user = await User.findByPk(userId, {
-        attributes: ["name", "fname", "email", "id", "userType"],
+        attributes: ['name', 'fname', 'email', 'id', 'userType'],
       });
       const reqData = {
         req,
@@ -2091,10 +2094,10 @@ exports.requestProjectApproval = async (req, res, next) => {
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
@@ -2128,7 +2131,7 @@ exports.requestProjectApproval = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: "Project sent for approval",
+        message: 'Project sent for approval',
       });
     } catch (error) {
       console.log(error);
@@ -2154,26 +2157,26 @@ exports.payProjectInstallment = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project!",
+          message: 'Invalid Project!',
         });
       }
 
       // Get project installment details
       const pr_installment = await ProjectInstallments.findOne({
-        where: { id: installmentId, type: "installment" },
+        where: { id: installmentId, type: 'installment' },
       });
 
       if (pr_installment === null) {
         return res.status(404).send({
           success: false,
-          message: "Project Installment not found!",
+          message: 'Project Installment not found!',
         });
       }
 
       if (amount < pr_installment.amount) {
         return res.status(400).send({
           success: false,
-          message: "Installment amount cannot be processed!",
+          message: 'Installment amount cannot be processed!',
         });
       }
 
@@ -2185,8 +2188,8 @@ exports.payProjectInstallment = async (req, res, next) => {
       const trxData = {
         TransactionId,
         userId,
-        status: "PAID",
-        type: "Projects",
+        status: 'PAID',
+        type: 'Projects',
         amount,
         paymentReference,
         description: `${pr_installment.title} for ${project.projectSlug}`,
@@ -2201,7 +2204,7 @@ exports.payProjectInstallment = async (req, res, next) => {
       );
 
       const user = await User.findByPk(userId, {
-        attributes: ["name", "email", "id", "userType"],
+        attributes: ['name', 'email', 'id', 'userType'],
       });
       const reqData = {
         req,
@@ -2214,10 +2217,10 @@ exports.payProjectInstallment = async (req, res, next) => {
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
@@ -2237,7 +2240,7 @@ exports.payProjectInstallment = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: "Installment paid successfully!",
+        message: 'Installment paid successfully!',
       });
     } catch (error) {
       console.log(error);
@@ -2264,7 +2267,7 @@ exports.transferToServicePartner = async (req, res, next) => {
         console.log(project);
         return res.status(404).send({
           success: false,
-          message: "Invalid Project!",
+          message: 'Invalid Project!',
         });
       }
 
@@ -2272,7 +2275,7 @@ exports.transferToServicePartner = async (req, res, next) => {
       if (amount > project.estimatedCost) {
         return res.status(422).send({
           success: false,
-          message: "Amount cannot be processed!",
+          message: 'Amount cannot be processed!',
         });
       }
 
@@ -2283,7 +2286,7 @@ exports.transferToServicePartner = async (req, res, next) => {
       if (!project.serviceProviderId) {
         return res.status(400).json({
           success: false,
-          message: "Service partner detail not found.",
+          message: 'Service partner detail not found.',
         });
       }
       const service_partner_details = await ServicePartner.findOne({
@@ -2293,11 +2296,11 @@ exports.transferToServicePartner = async (req, res, next) => {
       if (!service_partner_details) {
         return res.status(400).json({
           success: false,
-          message: "Service partner account not found.",
+          message: 'Service partner account not found.',
         });
       }
       const profile = await getUserTypeProfile(
-        "professional",
+        'professional',
         service_partner_details.userId
       );
       const data = {
@@ -2311,7 +2314,7 @@ exports.transferToServicePartner = async (req, res, next) => {
       if (!myFinancial) {
         return res.status(404).send({
           success: false,
-          message: "No financial details provided",
+          message: 'No financial details provided',
         });
       }
 
@@ -2343,7 +2346,7 @@ exports.transferToServicePartner = async (req, res, next) => {
         bank_code: bank_code,
         amount: amount,
         narration: narration,
-        NGN: "NGN",
+        NGN: 'NGN',
         paymentReference: paymentReference,
       };
 
@@ -2353,16 +2356,17 @@ exports.transferToServicePartner = async (req, res, next) => {
       //     message: "Transfer failed!"
       //   })
       // }
+      const projectType = project.projectSlug.split('/')[2];
       const slug = Math.floor(190000000 + Math.random() * 990000000);
-      const TransactionId = `BOG/TXN/PRJ/${slug}`;
+      const TransactionId = `BOG/TXN/PRJ/${projectType}/${slug}`;
 
       console.log(project);
 
       const transaction = {
         TransactionId: TransactionId,
         userId: null,
-        status: "PAID",
-        type: "Project Payout to service partner",
+        status: 'PAID',
+        type: 'Project Payout to service partner',
         amount: amount,
         paymentReference: paymentReference,
         description: narration,
@@ -2379,7 +2383,7 @@ exports.transferToServicePartner = async (req, res, next) => {
       const response = await TransactionPending.create(trxData);
 
       const user = await User.findByPk(userId, {
-        attributes: ["name", "email", "id", "userType"],
+        attributes: ['name', 'email', 'id', 'userType'],
       });
       const reqData = {
         req,
@@ -2391,7 +2395,7 @@ exports.transferToServicePartner = async (req, res, next) => {
       // Get active project admins
       const project_admins = await User.findAll({
         where: {
-          userType: "admin",
+          userType: 'admin',
           level: 5,
           isActive: 1,
           isSuspended: 0,
@@ -2399,7 +2403,7 @@ exports.transferToServicePartner = async (req, res, next) => {
       });
       const super_admins = await User.findAll({
         where: {
-          userType: "admin",
+          userType: 'admin',
           level: 1,
           isActive: 1,
           isSuspended: 0,
@@ -2426,7 +2430,7 @@ exports.transferToServicePartner = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: "Transfer Initiation was successful!",
+        message: 'Transfer Initiation was successful!',
       });
     } catch (error) {
       console.log(error);
@@ -2445,12 +2449,12 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
       const pendingTransaction = await TransactionPending.findOne({
         where: { id },
       });
-      console.log("pending transaction");
+      console.log('pending transaction');
       console.log(pendingTransaction);
       if (!pendingTransaction || pendingTransaction == null) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Pending Transaction!",
+          message: 'Invalid Pending Transaction!',
         });
       }
 
@@ -2458,7 +2462,7 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
       if (!user || user == null) {
         return res.status(404).send({
           success: false,
-          message: "No user found!",
+          message: 'No user found!',
         });
       }
       const userLevel = user.level;
@@ -2480,14 +2484,14 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
         if (userLevel == 3 && pendingTransaction.superadmin == false) {
           return res.status(400).send({
             success: false,
-            message: "Cant approve transfer until super admin approves it",
+            message: 'Cant approve transfer until super admin approves it',
           });
         } else if (userLevel == 3 && pendingTransaction.superadmin == true) {
           const service_partner_details = await ServicePartner.findOne({
             where: { id: project.serviceProviderId },
           });
           const profile = await getUserTypeProfile(
-            "professional",
+            'professional',
             service_partner_details.userId
           );
           const data = {
@@ -2514,21 +2518,21 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
             bank_code,
             amount,
             narration,
-            "NGN",
+            'NGN',
             paymentReference
           );
 
-          if (transferResponse.status === "error") {
+          if (transferResponse.status === 'error') {
             return res.status(400).json({
               success: false,
-              message: transferResponse.message || "Transfer failed!",
+              message: transferResponse.message || 'Transfer failed!',
             });
           }
           const trxData = {
             TransactionId,
             userId: null,
-            status: "PAID",
-            type: "Project Payout to service partner",
+            status: 'PAID',
+            type: 'Project Payout to service partner',
             amount,
             paymentReference,
             description: narration,
@@ -2541,7 +2545,7 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
           );
 
           const user = await User.findByPk(userId, {
-            attributes: ["name", "email", "id", "userType"],
+            attributes: ['name', 'email', 'id', 'userType'],
           });
           const reqData = {
             req,
@@ -2564,7 +2568,7 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
           // Get active project admins
           const project_admins = await User.findAll({
             where: {
-              userType: "admin",
+              userType: 'admin',
               level: 5,
               isActive: 1,
               isSuspended: 0,
@@ -2572,7 +2576,7 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
           });
           const super_admins = await User.findAll({
             where: {
-              userType: "admin",
+              userType: 'admin',
               level: 1,
               isActive: 1,
               isSuspended: 0,
@@ -2599,7 +2603,7 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
 
           return res.status(200).send({
             success: true,
-            message: "Transfer was successful!",
+            message: 'Transfer was successful!',
           });
         } else if (
           userLevel == 1 &&
@@ -2614,7 +2618,7 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
           return res.status(200).send({
             success: true,
             message:
-              "Approved, Transfer would be done once finance admin approves!",
+              'Approved, Transfer would be done once finance admin approves!',
           });
         }
       }
@@ -2639,7 +2643,7 @@ exports.getPendingTransfers = async (req, res, next) => {
       if (!pendingTransaction || pendingTransaction == null) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Pending Transaction!",
+          message: 'Invalid Pending Transaction!',
         });
       }
       for (let i = 0; i < pendingTransaction.length; i++) {
@@ -2655,7 +2659,7 @@ exports.getPendingTransfers = async (req, res, next) => {
 
       return res.send({
         success: true,
-        message: "All pending transfers",
+        message: 'All pending transfers',
         data: pendingTransaction,
       });
     } catch (error) {
@@ -2673,7 +2677,7 @@ exports.payCommitmentFee = async (req, res, next) => {
       if (project === null) {
         return res.status(404).send({
           success: false,
-          message: "Project not found!",
+          message: 'Project not found!',
         });
       }
 
@@ -2685,8 +2689,8 @@ exports.payCommitmentFee = async (req, res, next) => {
       const trxData = {
         TransactionId,
         userId,
-        status: "PAID",
-        type: "Projects",
+        status: 'PAID',
+        type: 'Projects',
         discount,
         amount,
         paymentReference,
@@ -2695,13 +2699,13 @@ exports.payCommitmentFee = async (req, res, next) => {
 
       const response = await Transaction.create(trxData);
       const prjResponse = await Project.update(
-        { status: "in_review" },
+        { status: 'in_review' },
         { where: { projectSlug } }
       );
 
       return res.send({
         success: true,
-        message: "Commitment fee has been paid successfully!",
+        message: 'Commitment fee has been paid successfully!',
       });
     } catch (error) {
       next(error);
@@ -2719,12 +2723,12 @@ exports.approveProjectRequest = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project",
+          message: 'Invalid Project',
         });
       }
       const requestData = {
-        approvalStatus: isApproved ? "approved" : "disapproved",
-        status: isApproved ? "approved" : "closed",
+        approvalStatus: isApproved ? 'approved' : 'disapproved',
+        status: isApproved ? 'approved' : 'closed',
       };
       await Project.update(requestData, {
         where: { id: projectId },
@@ -2733,24 +2737,24 @@ exports.approveProjectRequest = async (req, res, next) => {
 
       const { userId } = project;
       const message = `Your project ${project.projectSlug} has been ${
-        isApproved ? "approved" : "disapproved"
+        isApproved ? 'approved' : 'disapproved'
       }  to commence. ${isApproved &&
-        "Please wait for further information regarding cost and estimations"}`;
+        'Please wait for further information regarding cost and estimations'}`;
 
       const { io } = req.app;
       await Notification.createNotification({
-        type: "user",
+        type: 'user',
         message,
         userId,
       });
       io.emit(
-        "getNotifications",
+        'getNotifications',
         await Notification.fetchUserNotificationApi({ userId })
       );
 
       // Get client details
       const userData = await ServiceFormProjects.findOne({
-        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        include: [{ model: ServicesFormBuilders, as: 'serviceForm' }],
         where: { projectID: project.id },
       });
 
@@ -2759,17 +2763,17 @@ exports.approveProjectRequest = async (req, res, next) => {
         const userId = userData.userID;
         const user = await User.findOne({
           where: { id: userId },
-          attributes: { exclude: ["password"] },
+          attributes: { exclude: ['password'] },
         });
         client = user === null ? {} : user;
       }
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
@@ -2797,7 +2801,7 @@ exports.approveProjectRequest = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: "Project approved for commencement",
+        message: 'Project approved for commencement',
       });
     } catch (error) {
       console.log(error);
@@ -2818,7 +2822,7 @@ exports.listCapableServiceProviders = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project",
+          message: 'Invalid Project',
         });
       }
 
@@ -2847,7 +2851,7 @@ exports.listCapableServiceProvidersByRating = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project",
+          message: 'Invalid Project',
         });
       }
 
@@ -2885,17 +2889,17 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project",
+          message: 'Invalid Project',
         });
       }
 
-      if (project.approvalStatus !== "approved") {
+      if (project.approvalStatus !== 'approved') {
         return res.status(400).send({
           success: false,
           message: `You cannot dispatch a project of the '${project.approvalStatus}' approval status!`,
         });
       }
-      if (project.status !== "approved") {
+      if (project.status !== 'approved') {
         return res.status(400).send({
           success: false,
           message: `You cannot dispatch a project of the '${project.status}' status!`,
@@ -2917,7 +2921,7 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
           if (servicePartner === null) {
             return res.status(404).send({
               success: false,
-              message: "Account not found!",
+              message: 'Account not found!',
             });
           }
 
@@ -2933,7 +2937,7 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
           }
           providerData.push({
             userId: partnerId,
-            status: "pending",
+            status: 'pending',
             projectId: project.id,
           });
           servicePartnersData.push(service_partner_detail.toJSON());
@@ -2943,7 +2947,7 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
           await ServiceProvider.bulkCreate(providerData, {
             transaction: t,
           });
-          project.update({ status: "dispatched" }, { transaction: t });
+          project.update({ status: 'dispatched' }, { transaction: t });
           if (providerData.length > 0) {
             await Promise.all(
               providerData.map(async (service) => {
@@ -2954,7 +2958,7 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
 
           // Get client details
           const userData = await ServiceFormProjects.findOne({
-            include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+            include: [{ model: ServicesFormBuilders, as: 'serviceForm' }],
             where: { projectID: project.id },
           });
 
@@ -2963,24 +2967,24 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
             const userId = userData.userID;
             const user = await User.findOne({
               where: { id: userId },
-              attributes: { exclude: ["password"] },
+              attributes: { exclude: ['password'] },
             });
             client = user === null ? {} : user;
           }
 
           // Get active project admins
           const project_admins = await User.findAll({
-            where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+            where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
           });
           const super_admins = await User.findAll({
-            where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+            where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
           });
           const admins = [...project_admins, ...super_admins];
 
           // service partners mailer on project dispatched to them
           await ServicePartnersMailerForProjectDispatch(
             servicePartnersData,
-            "dispatched",
+            'dispatched',
             project
           );
 
@@ -2989,19 +2993,19 @@ exports.selectivelyDispatchProject = async (req, res, next) => {
             client,
             servicePartnersData,
             admins,
-            "dispatched",
+            'dispatched',
             project
           );
 
           return res.status(200).send({
             success: true,
-            message: "Project dispatched to service partners",
+            message: 'Project dispatched to service partners',
           });
         }
       } else {
         return res.status(422).send({
           success: false,
-          message: "Request cannot be processed!",
+          message: 'Request cannot be processed!',
         });
       }
     } catch (error) {
@@ -3023,7 +3027,7 @@ exports.dispatchProject = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project",
+          message: 'Invalid Project',
         });
       }
       const {
@@ -3032,7 +3036,7 @@ exports.dispatchProject = async (req, res, next) => {
       } = await this.getQualifiedServiceProviders(project, score, t);
       // console.log(completed);
       if (completed === true) {
-        project.update({ status: "dispatched" }, { transaction: t });
+        project.update({ status: 'dispatched' }, { transaction: t });
         if (serviceProviders.length > 0) {
           await Promise.all(
             serviceProviders.map(async (service) => {
@@ -3043,12 +3047,12 @@ exports.dispatchProject = async (req, res, next) => {
       } else {
         return res.status(400).send({
           success: false,
-          message: "Not enough service providers to dispatch job",
+          message: 'Not enough service providers to dispatch job',
         });
       }
       return res.status(200).send({
         success: true,
-        message: "Project dispatched to service partner",
+        message: 'Project dispatched to service partner',
       });
     } catch (error) {
       console.log(error);
@@ -3090,7 +3094,7 @@ exports.getQualifiedServiceProviders = async (project, score, transaction) => {
       JSON.stringify(
         await ServicePartner.findAll({
           where: wherePartner,
-          order: [[Sequelize.literal("RAND()")]],
+          order: [[Sequelize.literal('RAND()')]],
         })
       )
     );
@@ -3098,21 +3102,21 @@ exports.getQualifiedServiceProviders = async (project, score, transaction) => {
     if (servicePartners.length === 0) {
       return {
         completed: false,
-        message: "Not enough service providers",
+        message: 'Not enough service providers',
         providerData: [],
       };
     }
     // remove service partners with ongoing projects
     const where = {
-      status: "ongoing",
-      approvalStatus: "approved",
+      status: 'ongoing',
+      approvalStatus: 'approved',
       serviceProviderId: {
         [Op.ne]: null,
       },
     };
     const ongoingProjects = await Project.findAll({
       where,
-      attributes: ["serviceProviderId"],
+      attributes: ['serviceProviderId'],
     });
     const partnersWithProjects = ongoingProjects.map(
       (p) => p.serviceProviderId
@@ -3134,7 +3138,7 @@ exports.getQualifiedServiceProviders = async (project, score, transaction) => {
     // add them as service providers
     const providerData = providers.map((pr) => ({
       userId: pr.id,
-      status: "pending",
+      status: 'pending',
       projectId: project.id,
     }));
     await ServiceProvider.bulkCreate(providerData, {
@@ -3173,7 +3177,7 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
   // user has active subscription
 
   if (serviceTypes === null) {
-    return Promise.reject({ message: "Service Type does not exist!" });
+    return Promise.reject({ message: 'Service Type does not exist!' });
   }
 
   console.log(score);
@@ -3189,32 +3193,32 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
   const servicePartners = JSON.parse(
     JSON.stringify(
       await ServicePartner.findAll({
-        include: [{ model: User, as: "service_user" }],
+        include: [{ model: User, as: 'service_user' }],
         where: wherePartner,
-        order: [[Sequelize.literal("RAND()")]],
+        order: [[Sequelize.literal('RAND()')]],
       })
     )
   );
-  console.log("display service providers");
+  console.log('display service providers');
   console.log({ servicePartners });
   if (servicePartners.length === 0) {
     return {
-      message: "Not enough service providers",
+      message: 'Not enough service providers',
       providerData: [],
     };
   }
 
   // remove service partners with ongoing projects
   const where = {
-    status: "ongoing",
-    approvalStatus: "approved",
+    status: 'ongoing',
+    approvalStatus: 'approved',
     serviceProviderId: {
       [Op.ne]: null,
     },
   };
   const ongoingProjects = await Project.findAll({
     where,
-    attributes: ["serviceProviderId"],
+    attributes: ['serviceProviderId'],
   });
 
   const partnersWithProjects = ongoingProjects.map((p) => p.serviceProviderId);
@@ -3233,7 +3237,7 @@ exports.getQualifiedProvidersOnly = async (project, score, transaction) => {
   let providers = [...qualifiedPartners];
 
   return {
-    message: "Competent Service Providers",
+    message: 'Competent Service Providers',
     providerData: providers,
   };
 };
@@ -3263,7 +3267,7 @@ exports.getQualifiedProvidersOnlyByRating = async (
   // user has active subscription
 
   if (serviceTypes === null) {
-    return Promise.reject({ message: "Service Type does not exist!" });
+    return Promise.reject({ message: 'Service Type does not exist!' });
   }
 
   const wherePartner = {
@@ -3277,33 +3281,33 @@ exports.getQualifiedProvidersOnlyByRating = async (
   const servicePartners = JSON.parse(
     JSON.stringify(
       await ServicePartner.findAll({
-        include: [{ model: User, as: "service_user" }],
+        include: [{ model: User, as: 'service_user' }],
         where: wherePartner,
-        order: [[Sequelize.literal("RAND()")]],
+        order: [[Sequelize.literal('RAND()')]],
       })
     )
   );
 
-  console.log("display service providers");
+  console.log('display service providers');
   console.log({ servicePartners });
   if (servicePartners.length === 0) {
     return {
-      message: "Not enough service providers",
+      message: 'Not enough service providers',
       providerData: [],
     };
   }
 
   // remove service partners with ongoing projects
   const where = {
-    status: "ongoing",
-    approvalStatus: "approved",
+    status: 'ongoing',
+    approvalStatus: 'approved',
     serviceProviderId: {
       [Op.ne]: null,
     },
   };
   const ongoingProjects = await Project.findAll({
     where,
-    attributes: ["serviceProviderId"],
+    attributes: ['serviceProviderId'],
   });
 
   const partnersWithProjects = ongoingProjects.map((p) => p.serviceProviderId);
@@ -3322,7 +3326,7 @@ exports.getQualifiedProvidersOnlyByRating = async (
   let providers = [...qualifiedPartners];
 
   return {
-    message: "Competent Service Providers",
+    message: 'Competent Service Providers',
     providerData: providers,
   };
 };
@@ -3333,13 +3337,13 @@ exports.getQualifiedProvidersOnlyByRating = async (
  */
 exports.verifyServicePartnerByProject = async (partnerId) => {
   const where = {
-    status: "ongoing",
-    approvalStatus: "approved",
+    status: 'ongoing',
+    approvalStatus: 'approved',
     serviceProviderId: partnerId,
   };
   const ongoingProject = await Project.findOne({
     where,
-    attributes: ["serviceProviderId"],
+    attributes: ['serviceProviderId'],
   });
 
   return ongoingProject;
@@ -3350,7 +3354,7 @@ exports.getRandom = (arr, n) => {
   let len = arr.length;
   const taken = new Array(len);
   if (n > len)
-    throw new RangeError("getRandom: more elements taken than available");
+    throw new RangeError('getRandom: more elements taken than available');
   while (n--) {
     // console.log(len)
     const x = Math.floor(Math.random() * len);
@@ -3368,12 +3372,12 @@ exports.notifyServicePartner = async (req, userId) => {
 
   const { io } = req.app;
   await Notification.createNotification({
-    type: "user",
+    type: 'user',
     message,
     userId,
   });
   io.emit(
-    "getNotifications",
+    'getNotifications',
     await Notification.fetchUserNotificationApi({ userId })
   );
   return true;
@@ -3388,11 +3392,11 @@ exports.getDispatchedProject = async (req, res, next) => {
       JSON.stringify(
         await ServiceProvider.findAll({
           where,
-          order: [["createdAt", "DESC"]],
+          order: [['createdAt', 'DESC']],
           include: [
             {
               model: Project,
-              as: "project",
+              as: 'project',
             },
           ],
         })
@@ -3415,7 +3419,7 @@ exports.getDispatchedProject = async (req, res, next) => {
                     where: {
                       userId,
                       projectId:
-                        request.project === null ? "" : request.project.id,
+                        request.project === null ? '' : request.project.id,
                     },
                   })
                 )
@@ -3451,7 +3455,7 @@ exports.getAssignedProjects = async (req, res, next) => {
       JSON.stringify(
         await Project.findAll({
           where,
-          order: [["createdAt", "DESC"]],
+          order: [['createdAt', 'DESC']],
         })
       )
     );
@@ -3493,7 +3497,7 @@ exports.assignProject = async (req, res, next) => {
       if (partner_business_details === null) {
         return res.status(404).json({
           success: false,
-          message: "Service partner business details not found!",
+          message: 'Service partner business details not found!',
         });
       }
 
@@ -3504,7 +3508,7 @@ exports.assignProject = async (req, res, next) => {
       if (partner_detail === null) {
         return res.status(404).json({
           success: false,
-          message: "Service partner account not found!",
+          message: 'Service partner account not found!',
         });
       }
 
@@ -3512,14 +3516,14 @@ exports.assignProject = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project",
+          message: 'Invalid Project',
         });
       }
 
-      const endDate = moment().add(duration, "weeks");
+      const endDate = moment().add(duration, 'weeks');
       const request = {
         serviceProviderId: userId,
-        status: "ongoing",
+        status: 'ongoing',
         estimatedCost,
         totalCost,
         duration,
@@ -3529,7 +3533,7 @@ exports.assignProject = async (req, res, next) => {
 
       // Get client details
       const userData = await ServiceFormProjects.findOne({
-        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        include: [{ model: ServicesFormBuilders, as: 'serviceForm' }],
         where: { projectID: project.id },
       });
 
@@ -3538,17 +3542,17 @@ exports.assignProject = async (req, res, next) => {
         const userId = userData.userID;
         const user = await User.findOne({
           where: { id: userId },
-          attributes: { exclude: ["password"] },
+          attributes: { exclude: ['password'] },
         });
         client = user === null ? {} : user;
       }
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
@@ -3568,13 +3572,13 @@ exports.assignProject = async (req, res, next) => {
           id: partner_detail.id,
         },
         admins,
-        "assigned",
+        'assigned',
         project
       );
 
       return res.status(200).send({
         success: true,
-        message: "Project assigned to service partner",
+        message: 'Project assigned to service partner',
       });
     } catch (error) {
       console.log(error);
@@ -3598,7 +3602,7 @@ exports.acknowledgeCompletion = async (req, res, next) => {
       if (project_details === null) {
         return res.status(404).json({
           success: false,
-          message: "Project not found!",
+          message: 'Project not found!',
         });
       }
 
@@ -3609,7 +3613,7 @@ exports.acknowledgeCompletion = async (req, res, next) => {
       if (service_partner_details === null) {
         return res.status(404).json({
           success: false,
-          message: "Service provider not found!",
+          message: 'Service provider not found!',
         });
       }
 
@@ -3625,7 +3629,7 @@ exports.acknowledgeCompletion = async (req, res, next) => {
       if (__delivery_performance === undefined) {
         return res.status(400).json({
           success: false,
-          message: "Not recognized... Pls supply one the provided option value",
+          message: 'Not recognized... Pls supply one the provided option value',
         });
       }
 
@@ -3672,8 +3676,8 @@ const avgRatingForTimelyDeliveryPerformance = async (
           await Project.findAll({
             attributes: [
               [
-                Sequelize.fn("avg", Sequelize.col("timely_delivery_rating")),
-                "avg_rating",
+                Sequelize.fn('avg', Sequelize.col('timely_delivery_rating')),
+                'avg_rating',
               ],
             ],
             where: {
@@ -3742,7 +3746,7 @@ exports.bidForProject = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project",
+          message: 'Invalid Project',
         });
       }
       const where = {
@@ -3750,7 +3754,7 @@ exports.bidForProject = async (req, res, next) => {
         projectId,
       };
       await ServiceProvider.update(
-        { status: "accepted" },
+        { status: 'accepted' },
         { where, transaction: t }
       );
 
@@ -3761,7 +3765,7 @@ exports.bidForProject = async (req, res, next) => {
       if (servicePartner == null) {
         return res.status(400).send({
           success: false,
-          message: "You are not a service partner",
+          message: 'You are not a service partner',
         });
       }
 
@@ -3771,7 +3775,7 @@ exports.bidForProject = async (req, res, next) => {
       if (projectBid == null) {
         return res.status(400).send({
           success: false,
-          message: "Go and apply to bid first!",
+          message: 'Go and apply to bid first!',
         });
       }
 
@@ -3801,14 +3805,14 @@ exports.bidForProject = async (req, res, next) => {
         assigned_at: new Date(),
         service_partner_completion_date: moment().add(
           data.deliveryTimeLine,
-          "weeks"
+          'weeks'
         ),
       };
       await Project.update(dates_for_project, { where: { id: projectId } });
 
       // Get client details
       const userData = await ServiceFormProjects.findOne({
-        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        include: [{ model: ServicesFormBuilders, as: 'serviceForm' }],
         where: { projectID: project.id },
       });
 
@@ -3817,17 +3821,17 @@ exports.bidForProject = async (req, res, next) => {
         const userId = userData.userID;
         const user = await User.findOne({
           where: { id: userId },
-          attributes: { exclude: ["password"] },
+          attributes: { exclude: ['password'] },
         });
         client = user === null ? {} : user;
       }
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
@@ -3842,13 +3846,13 @@ exports.bidForProject = async (req, res, next) => {
         client,
         { first_name: fname, name, email, id },
         admins,
-        "bade for",
+        'bade for',
         project
       );
 
       return res.status(200).send({
         success: true,
-        message: "Project Bade successfully",
+        message: 'Project Bade successfully',
         data: bid,
       });
     } catch (error) {
@@ -3869,7 +3873,7 @@ exports.applyForProject = async (req, res, next) => {
       if (!project) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Project",
+          message: 'Invalid Project',
         });
       }
       const where = {
@@ -3884,11 +3888,11 @@ exports.applyForProject = async (req, res, next) => {
       if (servicePartner == null) {
         return res.status(400).send({
           success: false,
-          message: "You are not a service partner",
+          message: 'You are not a service partner',
         });
       }
       await ServiceProvider.update(
-        { status: "accepted" },
+        { status: 'accepted' },
         { where, transaction: t }
       );
 
@@ -3898,7 +3902,7 @@ exports.applyForProject = async (req, res, next) => {
       if (projectBid !== null) {
         return res.status(400).send({
           success: false,
-          message: "You cannot apply to bid for a project twice!",
+          message: 'You cannot apply to bid for a project twice!',
         });
       }
       console.log(projectBid);
@@ -3911,7 +3915,7 @@ exports.applyForProject = async (req, res, next) => {
 
       // Get client details
       const userData = await ServiceFormProjects.findOne({
-        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        include: [{ model: ServicesFormBuilders, as: 'serviceForm' }],
         where: { projectID: project.id },
       });
 
@@ -3920,17 +3924,17 @@ exports.applyForProject = async (req, res, next) => {
         const userId = userData.userID;
         const user = await User.findOne({
           where: { id: userId },
-          attributes: { exclude: ["password"] },
+          attributes: { exclude: ['password'] },
         });
         client = user === null ? {} : user;
       }
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
@@ -3945,13 +3949,13 @@ exports.applyForProject = async (req, res, next) => {
         client,
         { first_name: fname, name, email, id },
         admins,
-        "bade for",
+        'bade for',
         project
       );
 
       return res.status(200).send({
         success: true,
-        message: "Project Application Successful",
+        message: 'Project Application Successful',
         data: bid,
       });
     } catch (error) {
@@ -3996,16 +4000,16 @@ exports.getProjectBids = async (req, res, next) => {
     for (let i = 0; i < bids.length; i++) {
       console.log(bids[i].userId);
       const user = await userService.getUserFromProfile(
-        "professional",
+        'professional',
         bids[i].userId
       );
       bids[i].userDetails = user;
       const completedProjects = await Project.count({
-        where: { serviceProviderId: bids[i].userId, status: "completed" },
+        where: { serviceProviderId: bids[i].userId, status: 'completed' },
       });
 
       const ongoingProjects = await Project.count({
-        where: { serviceProviderId: bids[i].userId, status: "ongoing" },
+        where: { serviceProviderId: bids[i].userId, status: 'ongoing' },
       });
       bids[i].completedProjects = completedProjects;
       bids[i].ongoingProjects = ongoingProjects;
@@ -4033,7 +4037,7 @@ exports.getIndividualProjectBid = async (req, res, next) => {
         await ProjectBidding.findOne({ where: { projectId, userId } })
       )
     );
-    const user = await userService.getUserFromProfile("professional", userId);
+    const user = await userService.getUserFromProfile('professional', userId);
     bid.userDetails = user;
     return res.status(200).send({
       success: true,
@@ -4060,7 +4064,7 @@ exports.createProjectInstallment = async (req, res, next) => {
     let { title, amount, type, project_slug, dueDate } = req.body;
 
     if (type === undefined) {
-      type = "cost";
+      type = 'cost';
     }
 
     const _response = await Project.findOne({
@@ -4070,7 +4074,7 @@ exports.createProjectInstallment = async (req, res, next) => {
     if (_response === null) {
       return res.status(404).json({
         success: false,
-        message: "Project not found!",
+        message: 'Project not found!',
       });
     }
 
@@ -4084,13 +4088,13 @@ exports.createProjectInstallment = async (req, res, next) => {
       });
     }
 
-    if (type === "installment") {
+    if (type === 'installment') {
       // installment total amount
       let installments = await ProjectInstallments.findAll({
         attributes: [
-          [Sequelize.fn("sum", Sequelize.col("amount")), "totalAmount"],
+          [Sequelize.fn('sum', Sequelize.col('amount')), 'totalAmount'],
         ],
-        where: { project_id: _response.id, type: "installment" },
+        where: { project_id: _response.id, type: 'installment' },
         raw: true,
       });
 
@@ -4101,13 +4105,13 @@ exports.createProjectInstallment = async (req, res, next) => {
           message: `Your total installment breakdown amount exceeds the total cost of the project!`,
         });
       }
-    } else if (type === "cost") {
+    } else if (type === 'cost') {
       // cost total amount
       let cost = await ProjectInstallments.findAll({
         attributes: [
-          [Sequelize.fn("sum", Sequelize.col("amount")), "totalAmount"],
+          [Sequelize.fn('sum', Sequelize.col('amount')), 'totalAmount'],
         ],
-        where: { project_id: _response.id, type: "cost" },
+        where: { project_id: _response.id, type: 'cost' },
         raw: true,
       });
       let cost_sum = cost[0].totalAmount + amount;
@@ -4160,38 +4164,38 @@ exports.createProjectNotification = async (req, res, next) => {
     if (project === null) {
       return res.status(404).json({
         success: false,
-        message: "Project not found!",
+        message: 'Project not found!',
       });
     }
 
     //  Service partner
-    if (userType === "professional") {
+    if (userType === 'professional') {
       const user = await ServicePartner.findOne({ where: { userId: id } });
       if (user === null) {
         return res.status(404).json({
           success: false,
-          message: "Service Partner account not found!",
+          message: 'Service Partner account not found!',
         });
       }
 
       if (project.serviceProviderId !== user.id) {
         return res.status(401).json({
           success: false,
-          message: "Unauthorized access to perform this action!",
+          message: 'Unauthorized access to perform this action!',
         });
       }
 
-      by = "service_partner";
+      by = 'service_partner';
       service_partner_id = user.id;
     }
     // Check if not a service partner and not an admin
-    else if (userType !== "admin" && userType !== "professional") {
+    else if (userType !== 'admin' && userType !== 'professional') {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized access to perform this action!",
+        message: 'Unauthorized access to perform this action!',
       });
     } else {
-      by = "admin";
+      by = 'admin';
     }
 
     // Add project notification
@@ -4203,10 +4207,10 @@ exports.createProjectNotification = async (req, res, next) => {
       by,
     });
 
-    if (userType === "admin") {
+    if (userType === 'admin') {
       // Get client details
       const userData = await ServiceFormProjects.findOne({
-        include: [{ model: ServicesFormBuilders, as: "serviceForm" }],
+        include: [{ model: ServicesFormBuilders, as: 'serviceForm' }],
         where: { projectID: project.id },
       });
 
@@ -4215,21 +4219,21 @@ exports.createProjectNotification = async (req, res, next) => {
         const userId = userData.userID;
         const _user = await User.findOne({
           where: { id: userId },
-          attributes: { exclude: ["password"] },
+          attributes: { exclude: ['password'] },
         });
         client = _user === null ? {} : _user;
       }
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
-      let _img = image === undefined ? "" : image;
+      let _img = image === undefined ? '' : image;
       // Client mailer
       await ClientMailerForProjectProgressNoteUpdate(
         { email: client.email, first_name: client.fname },
@@ -4268,7 +4272,7 @@ exports.viewProjectNotifications = async (req, res, next) => {
     if (project === null) {
       return res.status(404).json({
         success: false,
-        message: "Project not found!",
+        message: 'Project not found!',
       });
     }
 
@@ -4299,7 +4303,7 @@ exports.viewProjectInstallment = async (req, res, next) => {
     let { type } = req.query;
 
     if (type === undefined) {
-      type = "cost";
+      type = 'cost';
     }
 
     const _response = await Project.findOne({ where: { id: project_id } });

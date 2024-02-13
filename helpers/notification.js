@@ -1,23 +1,19 @@
 // const Sequelize = require("sequelize");
-const { Op } = require("sequelize");
+const { Op } = require('sequelize');
 
 // local imports
-const Notification = require("../models/Notification");
+const Notification = require('../models/Notification');
 
 exports.createNotification = async ({ userId, type, message }) => {
   try {
-
-
-
     const request = {
       userId,
       type,
-      message
+      message,
     };
     await Notification.create(request);
-  
 
-    console.log("Notification sent");
+    console.log('Notification sent');
     return true;
   } catch (error) {
     return error;
@@ -29,30 +25,28 @@ exports.fetchUserNotification = async ({ userId }) => {
     const notifications = await Notification.findAll({
       where: {
         userId,
-        type: "user",
-        [Op.or]: [{ status: "pending" }, { status: "unread" }]
+        type: 'user',
+        [Op.or]: [{ status: 'pending' }, { status: 'unread' }],
       },
-      order: [["createdAt", "DESC"]],
-      limit: 5
+      order: [['createdAt', 'DESC']],
+      limit: 5,
     });
     return notifications;
   } catch (error) {
     return error;
   }
 };
-exports.fetchUserNotificationApi = async notifyParam => {
+exports.fetchUserNotificationApi = async (notifyParam) => {
   try {
-
-    
     const { userId } = notifyParam;
     const notifications = await Notification.findAll({
       where: {
         userId,
-        type: "user",
-        [Op.or]: [{ status: "pending" }, { status: "unread" }]
+        type: 'user',
+        [Op.or]: [{ status: 'pending' }, { status: 'unread' }],
       },
-      order: [["createdAt", "DESC"]],
-      limit: 5
+      order: [['createdAt', 'DESC']],
+      limit: 5,
     });
     return notifications;
   } catch (error) {
@@ -64,11 +58,11 @@ exports.fetchAdminNotification = async () => {
   try {
     const notifications = await Notification.findAll({
       where: {
-        type: "admin",
-        [Op.or]: [{ status: "pending" }, { status: "unread" }]
+        type: 'admin',
+        [Op.or]: [{ status: 'pending' }, { status: 'unread' }],
       },
-      order: [["createdAt", "DESC"]],
-      limit: 5
+      order: [['createdAt', 'DESC']],
+      limit: 5,
     });
     return JSON.parse(JSON.stringify(notifications));
   } catch (error) {
@@ -76,10 +70,10 @@ exports.fetchAdminNotification = async () => {
   }
 };
 
-exports.updateNotification = async id => {
+exports.updateNotification = async (id) => {
   try {
     await Notification.update(
-      { isRead: true, status: "read" },
+      { isRead: true, status: 'read' },
       { where: { id } }
     );
     return true;
@@ -88,7 +82,7 @@ exports.updateNotification = async id => {
   }
 };
 
-exports.deleteNotifications = async id => {
+exports.deleteNotifications = async (id) => {
   try {
     await Notification.destroy({ where: { id } });
     return true;
@@ -97,17 +91,15 @@ exports.deleteNotifications = async id => {
   }
 };
 
-
-
 exports.fetchUserNotificationApi2 = async (senderId) => {
   try {
     const notifications = await Notification.findAll({
       where: {
         userId: senderId,
-        type: "user",
-        [Op.or]: [{ status: "pending" }, { status: "unread" }],
+        type: 'user',
+        [Op.or]: [{ status: 'pending' }, { status: 'unread' }],
       },
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
       limit: 5,
     });
     return notifications;

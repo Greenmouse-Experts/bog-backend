@@ -1,33 +1,33 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
-require("dotenv").config();
-const { Op } = require("sequelize");
-const sequelize = require("../config/database/connection");
-const Addresses = require("../models/addresses");
+require('dotenv').config();
+const { Op } = require('sequelize');
+const sequelize = require('../config/database/connection');
+const Addresses = require('../models/addresses');
 
 exports.createAddress = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { title, address, state, country, insurancecharge } = req.body;
+      const { title, lga, state, country, insurancecharge } = req.body;
 
       const _address = await Addresses.findOne({
-        where: { title, address, state, country },
+        where: { title, lga, state, country },
       });
 
       if (_address !== null) {
         return res.status(400).send({
           status: false,
-          message: "Address exists!",
+          message: 'Address exists!',
         });
       }
 
-      const response = await Addresses.create({...req.body, status: true});
+      const response = await Addresses.create({ ...req.body, status: true });
 
       return res.status(200).send({
         success: true,
-        message: "Address created!",
-        data: response
+        message: 'Address created!',
+        data: response,
       });
     } catch (error) {
       t.rollback();
@@ -38,8 +38,8 @@ exports.createAddress = async (req, res, next) => {
 
 exports.viewAddresses = async (req, res, next) => {
   try {
-    const {q} = req.query;
-    let params = typeof q !== 'undefined' ? {where: {state: q}} : {}
+    const { q } = req.query;
+    let params = typeof q !== 'undefined' ? { where: { state: q } } : {};
     const addresses = await Addresses.findAll(params);
     return res.status(200).send({
       success: true,
@@ -73,13 +73,13 @@ exports.updateAddress = async (req, res, next) => {
       if (address === null) {
         return res.status(404).send({
           success: false,
-          message: "Address not found!",
+          message: 'Address not found!',
         });
       }
-      await Addresses.update(req.body, { where: { id }});
+      await Addresses.update(req.body, { where: { id } });
       return res.status(200).send({
         success: true,
-        message: "Address updated!"
+        message: 'Address updated!',
       });
     } catch (error) {
       t.rollback();
@@ -98,13 +98,13 @@ exports.deleteAddress = async (req, res, next) => {
       if (address === null) {
         return res.status(404).send({
           success: false,
-          message: "Address not found!",
+          message: 'Address not found!',
         });
       }
       await Addresses.destroy({ where: { id } });
       return res.status(200).send({
         success: true,
-        message: "Address deleted!",
+        message: 'Address deleted!',
       });
     } catch (error) {
       t.rollback();

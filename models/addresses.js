@@ -1,11 +1,11 @@
 'use strict';
 
-const Sequelize = require("sequelize");
-const sequelise = require("../config/database/connection");
-const User = require("./User")
+const Sequelize = require('sequelize');
+const sequelise = require('../config/database/connection');
+const User = require('./User');
 
 const Addresses = sequelise.define(
-  "addresses",
+  'addresses',
   {
     id: {
       type: Sequelize.UUID,
@@ -60,6 +60,10 @@ const Addresses = sequelise.define(
     insurancecharge: {
       allowNull: true,
       type: Sequelize.STRING,
+    },
+    lga: {
+      allowNull: true,
+      type: Sequelize.TEXT,
     },
   },
   { paranoid: true }
