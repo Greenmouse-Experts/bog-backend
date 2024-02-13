@@ -1,2 +1,2 @@
-# bog_backend_demo
-A demo for bog backend
+# bog_backend
+bog backend
