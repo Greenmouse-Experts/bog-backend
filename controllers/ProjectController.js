@@ -2180,11 +2180,15 @@ exports.payProjectInstallment = async (req, res, next) => {
         });
       }
 
+      const projectLastDigits = project.projectSlug.substr(
+        project.projectSlug.length - 4
+      );
+
       const paymentReference = `TR-${Math.floor(
         190000000000 + Math.random() * 990000000000
       )}`;
-      const slug = Math.floor(190000000 + Math.random() * 990000000);
-      const TransactionId = `BOG/TXN/PRJ/${slug}`;
+      const slug = Math.floor(19000 + Math.random() * 99000);
+      const TransactionId = `BOG/TXN/PRJ/${slug}${projectLastDigits}`;
       const trxData = {
         TransactionId,
         userId,
