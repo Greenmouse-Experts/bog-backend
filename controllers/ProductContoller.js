@@ -1,52 +1,52 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
-require("dotenv").config();
-const { Op } = require("sequelize");
-const sequelize = require("../config/database/connection");
-const Category = require("../models/ProductCategory");
-const Product = require("../models/Product");
-const ProductImage = require("../models/ProductImage");
-const User = require("../models/User");
+require('dotenv').config();
+const { Op } = require('sequelize');
+const sequelize = require('../config/database/connection');
+const Category = require('../models/ProductCategory');
+const Product = require('../models/Product');
+const ProductImage = require('../models/ProductImage');
+const User = require('../models/User');
 // const cloudinary = require("../helpers/cloudinary");
-const Reviews = require("../models/Reviews");
-const Notification = require("../helpers/notification");
-const OrderItem = require("../models/OrderItem");
-const Order = require("../models/Order");
-const ProductEarning = require("../models/ProductEarnings");
-const ProductPartner = require("../models/ProductPartner");
-const TransactionPending = require("../models/TransactionPending");
-const { getUserTypeProfile, findUserById } = require("../service/UserService");
-const KycFinancialData = require("../models/KycFinancialData");
-const Transaction = require("../models/Transaction");
-const { Service } = require("../helpers/flutterwave");
+const Reviews = require('../models/Reviews');
+const Notification = require('../helpers/notification');
+const OrderItem = require('../models/OrderItem');
+const Order = require('../models/Order');
+const ProductEarning = require('../models/ProductEarnings');
+const ProductPartner = require('../models/ProductPartner');
+const TransactionPending = require('../models/TransactionPending');
+const { getUserTypeProfile, findUserById } = require('../service/UserService');
+const KycFinancialData = require('../models/KycFinancialData');
+const Transaction = require('../models/Transaction');
+const { Service } = require('../helpers/flutterwave');
 const {
   ServicePartnerMailerForProjectPayout,
   AdminProjectPayoutMailer,
   PartnerProductApprovalMessage,
-} = require("../helpers/mailer/samples");
-const Notifications = require("../models/Notification");
+} = require('../helpers/mailer/samples');
+const Notifications = require('../models/Notification');
 
-const cloudinary = require("../helpers/cloudinaryMediaProvider");
+const cloudinary = require('../helpers/cloudinaryMediaProvider');
 
 // services
-const UserService = require("../service/UserService");
+const UserService = require('../service/UserService');
 
 exports.notifyAdmin = async ({ userId, message, req }) => {
-  const notifyType = "admin";
+  const notifyType = 'admin';
   const { io } = req.app;
   await Notification.createNotification({
     type: notifyType,
     message,
     userId,
   });
-  io.emit("getNotifications", await Notification.fetchAdminNotification());
+  io.emit('getNotifications', await Notification.fetchAdminNotification());
 };
 
 exports.getProducts = async (req, res, next) => {
   try {
     const where = {
-      status: "approved",
+      status: 'approved',
       showInShop: true,
     };
     let _orders = await Order.findAll();
@@ -58,25 +58,25 @@ exports.getProducts = async (req, res, next) => {
           include: [
             {
               model: User,
-              as: "creator",
-              attributes: ["id", "name", "email", "phone", "photo"],
+              as: 'creator',
+              attributes: ['id', 'name', 'email', 'phone', 'photo'],
             },
             {
               model: Reviews,
-              as: "review",
+              as: 'review',
             },
             {
               model: Category,
-              as: "category",
-              attributes: ["id", "name", "description"],
+              as: 'category',
+              attributes: ['id', 'name', 'description'],
             },
             {
               model: ProductImage,
-              as: "product_image",
-              attributes: ["id", "name", "image", "url"],
+              as: 'product_image',
+              attributes: ['id', 'name', 'image', 'url'],
             },
           ],
-          order: [["createdAt", "DESC"]],
+          order: [['createdAt', 'DESC']],
         })
       )
     );
@@ -108,7 +108,7 @@ exports.getProducts = async (req, res, next) => {
         const order_ = orders[index2];
         const orderTrx = _orders.filter(
           (_order) =>
-            _order.id === order_.orderId && _order.status !== "cancelled"
+            _order.id === order_.orderId && _order.status !== 'cancelled'
         );
         if (orderTrx.length > 0) {
           orderTotal += order_.quantity;
@@ -136,7 +136,7 @@ exports.getProducts = async (req, res, next) => {
 exports.getSimilarProducts = async (req, res, next) => {
   try {
     const where = {
-      status: "approved",
+      status: 'approved',
       showInShop: true,
       categoryId: req.query.category,
     };
@@ -145,26 +145,26 @@ exports.getSimilarProducts = async (req, res, next) => {
       include: [
         {
           model: User,
-          as: "creator",
-          attributes: ["id", "name", "email", "phone", "photo"],
+          as: 'creator',
+          attributes: ['id', 'name', 'email', 'phone', 'photo'],
         },
         {
           model: Category,
-          as: "category",
-          attributes: ["id", "name", "description"],
+          as: 'category',
+          attributes: ['id', 'name', 'description'],
         },
         {
           model: ProductImage,
-          as: "product_image",
-          attributes: ["id", "name", "image", "url"],
+          as: 'product_image',
+          attributes: ['id', 'name', 'image', 'url'],
         },
         {
           model: Reviews,
-          as: "product_reviews",
-          attributes: ["id", "star", "reviews", "userId"],
+          as: 'product_reviews',
+          attributes: ['id', 'star', 'reviews', 'userId'],
         },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
     });
     return res.status(200).send({
       success: true,
@@ -182,7 +182,7 @@ exports.getAllCategories = async (req, res, next) => {
       categories.map(async (category) => {
         const where = {
           categoryId: category.id,
-          status: "approved",
+          status: 'approved',
         };
         const count = await Product.count({ where });
         return {
@@ -248,7 +248,7 @@ exports.updateCategory = async (req, res, next) => {
       if (!category) {
         return res.status(404).send({
           success: false,
-          message: "Invalid category",
+          message: 'Invalid category',
         });
       }
       await Category.update(
@@ -282,13 +282,13 @@ exports.deleteCategory = async (req, res, next) => {
       if (!category) {
         return res.status(404).send({
           success: false,
-          message: "Invalid category",
+          message: 'Invalid category',
         });
       }
       await Category.destroy({ where: { id: categoryId }, transaction: t });
       return res.status(200).send({
         success: true,
-        message: "Category deleted successfully",
+        message: 'Category deleted successfully',
       });
     } catch (error) {
       t.rollback();
@@ -300,7 +300,16 @@ exports.deleteCategory = async (req, res, next) => {
 exports.createProduct = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { categoryId, name, price, quantity, unit, description, min_qty, max_qty } = req.body;
+      const {
+        categoryId,
+        name,
+        price,
+        quantity,
+        unit,
+        description,
+        min_qty,
+        max_qty,
+      } = req.body;
       const creatorId = req.user.id;
       const request = {
         categoryId,
@@ -315,11 +324,11 @@ exports.createProduct = async (req, res, next) => {
         status: req.body.status,
       };
 
-      if(Number(min_qty) > Number(max_qty)){
+      if (Number(min_qty) > Number(max_qty)) {
         return res.status(422).json({
           success: false,
-          message: "Minimum qty cannot be more than the entered maximum qty."
-        })
+          message: 'Minimum qty cannot be more than the entered maximum qty.',
+        });
       }
       // console.log(request)
       // const images = await cloudinary.upload(req);
@@ -344,23 +353,23 @@ exports.createProduct = async (req, res, next) => {
         include: [
           {
             model: ProductImage,
-            as: "product_image",
+            as: 'product_image',
           },
         ],
       });
 
       const mesg = `A new Product was created`;
-      const notifyType = "admin";
+      const notifyType = 'admin';
       const { io } = req.app;
       await Notification.createNotification({
         type: notifyType,
         message: mesg,
       });
-      io.emit("getNotifications", await Notification.fetchAdminNotification());
+      io.emit('getNotifications', await Notification.fetchAdminNotification());
 
       return res.status(200).send({
         success: true,
-        message: "Product created successfully",
+        message: 'Product created successfully',
         data: product,
       });
     } catch (error) {
@@ -408,23 +417,23 @@ exports.createProductV2 = async (req, res, next) => {
         include: [
           {
             model: ProductImage,
-            as: "product_image",
+            as: 'product_image',
           },
         ],
       });
 
       const mesg = `A new Product was created`;
-      const notifyType = "admin";
+      const notifyType = 'admin';
       const { io } = req.app;
       await Notification.createNotification({
         type: notifyType,
         message: mesg,
       });
-      io.emit("getNotifications", await Notification.fetchAdminNotification());
+      io.emit('getNotifications', await Notification.fetchAdminNotification());
 
       return res.status(200).send({
         success: true,
-        message: "Product created successfully",
+        message: 'Product created successfully',
         data: product,
       });
     } catch (error) {
@@ -441,17 +450,17 @@ exports.updateProductV2 = async (req, res, next) => {
       const request = req.body;
       const creatorId = req.user.id;
       const product = await Product.findByPk(productId, {
-        attributes: ["id"],
+        attributes: ['id'],
       });
       console.log(request);
       if (!product) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Product",
+          message: 'Invalid Product',
         });
       }
 
-      if (typeof images !== "undefined") {
+      if (typeof images !== 'undefined') {
         const images = await cloudinary.upload(req);
         // const photos = [];
 
@@ -471,7 +480,7 @@ exports.updateProductV2 = async (req, res, next) => {
           }
           const images = await ProductImage.findAll({
             where: { productId },
-            attributes: ["id"],
+            attributes: ['id'],
           });
           // if (images.length > 0) {
           //   const Ids = images.map((img) => img.id);
@@ -492,25 +501,25 @@ exports.updateProductV2 = async (req, res, next) => {
         include: [
           {
             model: User,
-            as: "creator",
-            attributes: ["id", "name", "email", "phone", "photo"],
+            as: 'creator',
+            attributes: ['id', 'name', 'email', 'phone', 'photo'],
           },
           {
             model: Category,
-            as: "category",
-            attributes: ["id", "name", "description"],
+            as: 'category',
+            attributes: ['id', 'name', 'description'],
           },
           {
             model: ProductImage,
-            as: "product_image",
-            attributes: ["id", "name", "image", "url"],
+            as: 'product_image',
+            attributes: ['id', 'name', 'image', 'url'],
           },
         ],
       });
 
       return res.status(200).send({
         success: true,
-        message: "Product updated successfully",
+        message: 'Product updated successfully',
         data: result,
       });
     } catch (error) {
@@ -528,12 +537,12 @@ exports.updateProduct = async (req, res, next) => {
       const request = req.body;
       const creatorId = req.user.id;
       const product = await Product.findByPk(productId, {
-        attributes: ["id"],
+        attributes: ['id'],
       });
       if (!product) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Product",
+          message: 'Invalid Product',
         });
       }
 
@@ -554,7 +563,7 @@ exports.updateProduct = async (req, res, next) => {
 
         const images = await ProductImage.findAll({
           where: { productId },
-          attributes: ["id"],
+          attributes: ['id'],
         });
 
         await ProductImage.destroy({
@@ -578,25 +587,25 @@ exports.updateProduct = async (req, res, next) => {
         include: [
           {
             model: User,
-            as: "creator",
-            attributes: ["id", "name", "email", "phone", "photo"],
+            as: 'creator',
+            attributes: ['id', 'name', 'email', 'phone', 'photo'],
           },
           {
             model: Category,
-            as: "category",
-            attributes: ["id", "name", "description"],
+            as: 'category',
+            attributes: ['id', 'name', 'description'],
           },
           {
             model: ProductImage,
-            as: "product_image",
-            attributes: ["id", "name", "image", "url"],
+            as: 'product_image',
+            attributes: ['id', 'name', 'image', 'url'],
           },
         ],
       });
 
       return res.status(200).send({
         success: true,
-        message: "Product updated successfully",
+        message: 'Product updated successfully',
         data: result,
       });
     } catch (error) {
@@ -612,12 +621,12 @@ exports.deleteProductImage = async (req, res, next) => {
       const { productimgId } = req.params;
 
       const productImg = await ProductImage.findByPk(productimgId, {
-        attributes: ["id"],
+        attributes: ['id'],
       });
       if (!productImg) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Product Image",
+          message: 'Invalid Product Image',
         });
       }
 
@@ -625,7 +634,7 @@ exports.deleteProductImage = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: "Product image deleted successfully",
+        message: 'Product image deleted successfully',
       });
     } catch (error) {
       t.rollback();
@@ -653,16 +662,16 @@ exports.getAllProducts = async (req, res, next) => {
           include: [
             {
               model: Category,
-              as: "category",
-              attributes: ["id", "name", "description"],
+              as: 'category',
+              attributes: ['id', 'name', 'description'],
             },
             {
               model: ProductImage,
-              as: "product_image",
-              attributes: ["id", "name", "image", "url"],
+              as: 'product_image',
+              attributes: ['id', 'name', 'image', 'url'],
             },
           ],
-          order: [["createdAt", "DESC"]],
+          order: [['createdAt', 'DESC']],
         })
       )
     );
@@ -685,7 +694,7 @@ exports.getAllProducts = async (req, res, next) => {
         const order_ = orders[index2];
         const orderTrx = _orders.filter(
           (_order) =>
-            _order.id === order_.orderId && _order.status !== "cancelled"
+            _order.id === order_.orderId && _order.status !== 'cancelled'
         );
         if (orderTrx.length > 0) {
           orderTotal += order_.quantity;
@@ -717,18 +726,18 @@ exports.getSingleProducts = async (req, res, next) => {
       include: [
         {
           model: User,
-          as: "creator",
-          attributes: ["id", "name", "email", "phone", "photo"],
+          as: 'creator',
+          attributes: ['id', 'name', 'email', 'phone', 'photo'],
         },
         {
           model: Category,
-          as: "category",
-          attributes: ["id", "name", "description"],
+          as: 'category',
+          attributes: ['id', 'name', 'description'],
         },
         {
           model: ProductImage,
-          as: "product_image",
-          attributes: ["id", "name", "image", "url"],
+          as: 'product_image',
+          attributes: ['id', 'name', 'image', 'url'],
         },
       ],
     });
@@ -749,7 +758,7 @@ exports.getSingleProducts = async (req, res, next) => {
       const order_ = orders[index2];
       const orderTrx = _orders.filter(
         (_order) =>
-          _order.id === order_.orderId && _order.status !== "cancelled"
+          _order.id === order_.orderId && _order.status !== 'cancelled'
       );
       if (orderTrx.length > 0) {
         orderTotal += order_.quantity;
@@ -758,7 +767,7 @@ exports.getSingleProducts = async (req, res, next) => {
 
     const review_details = await Reviews.findAll({
       where: { productId: req.params.productId },
-      include: [{ model: User, as: "client" }],
+      include: [{ model: User, as: 'client' }],
     });
     return res.status(200).send({
       success: true,
@@ -787,7 +796,7 @@ exports.deleteProduct = async (req, res, next) => {
       if (!product) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Product",
+          message: 'Invalid Product',
         });
       }
       // if (creatorId !== product.creatorId) {
@@ -805,7 +814,7 @@ exports.deleteProduct = async (req, res, next) => {
       await Product.destroy({ where: { id: productId }, transaction: t });
       return res.status(200).send({
         success: true,
-        message: "Product deleted successfully",
+        message: 'Product deleted successfully',
       });
     } catch (error) {
       t.rollback();
@@ -817,10 +826,10 @@ exports.deleteProduct = async (req, res, next) => {
 exports.deleteOldProduct = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const products = await Product.findAll({ order: [["createdAt", "ASC"]] });
+      const products = await Product.findAll({ order: [['createdAt', 'ASC']] });
       const data = products
         .map((product) => {
-          if (product.image.startsWith("upload")) {
+          if (product.image.startsWith('upload')) {
             return product;
           }
           return null;
@@ -831,7 +840,7 @@ exports.deleteOldProduct = async (req, res, next) => {
       await Product.destroy({ where: { id: Ids }, transaction: t });
       return res.status(200).send({
         success: true,
-        message: "Product deleted successfully",
+        message: 'Product deleted successfully',
         data,
       });
     } catch (error) {
@@ -852,35 +861,35 @@ exports.addProductToShop = async (req, res, next) => {
       if (!product) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Product",
+          message: 'Invalid Product',
         });
       }
-      if (product.status === "disapproved") {
+      if (product.status === 'disapproved') {
         return res.status(400).send({
           success: false,
           message:
-            "This Product has been disapproved by admin. Please update or create a new one",
+            'This Product has been disapproved by admin. Please update or create a new one',
         });
       }
       await Product.update(
-        { status: "in_review" },
+        { status: 'in_review' },
         { where: { id: productId }, transaction: t }
       );
 
       const mesg = `A product (${product.name}) has been sent for reviewed to be allowed in shop`;
       const userId = product.creatorId;
-      const notifyType = "admin";
+      const notifyType = 'admin';
       const { io } = req.app;
       await Notification.createNotification({
         type: notifyType,
         message: mesg,
         userId,
       });
-      io.emit("getNotifications", await Notification.fetchAdminNotification());
+      io.emit('getNotifications', await Notification.fetchAdminNotification());
 
       return res.status(200).send({
         success: true,
-        message: "Product sent for review. Please wait for admin approval",
+        message: 'Product sent for review. Please wait for admin approval',
       });
     } catch (error) {
       t.rollback();
@@ -893,9 +902,9 @@ exports.getProductsForAdmin = async (req, res, next) => {
   try {
     const where = {
       [Op.or]: [
-        { status: "in_review" },
-        { status: "approved" },
-        { status: "disapproved" },
+        { status: 'in_review' },
+        { status: 'approved' },
+        { status: 'disapproved' },
       ],
     };
     if (req.query.status) {
@@ -906,21 +915,21 @@ exports.getProductsForAdmin = async (req, res, next) => {
       include: [
         {
           model: User,
-          as: "creator",
-          attributes: ["id", "name", "email", "phone", "photo"],
+          as: 'creator',
+          attributes: ['id', 'name', 'email', 'phone', 'photo'],
         },
         {
           model: Category,
-          as: "category",
-          attributes: ["id", "name", "description"],
+          as: 'category',
+          attributes: ['id', 'name', 'description'],
         },
         {
           model: ProductImage,
-          as: "product_image",
-          attributes: ["id", "name", "image", "url"],
+          as: 'product_image',
+          attributes: ['id', 'name', 'image', 'url'],
         },
       ],
-      order: [["updatedAt", "DESC"]],
+      order: [['updatedAt', 'DESC']],
     });
     return res.status(200).send({
       success: true,
@@ -944,14 +953,14 @@ exports.approveProduct = async (req, res, next) => {
       if (!product) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Product",
+          message: 'Invalid Product',
         });
       }
 
       let profile;
-      if (userType === "vendor") {
+      if (userType === 'vendor') {
         profile = await UserService.getUserTypeProfile(
-          "product_partner",
+          'product_partner',
           product.creatorId
         );
       }
@@ -962,23 +971,23 @@ exports.approveProduct = async (req, res, next) => {
 
       const data = {
         status,
-        approval_reason: status === "disapproved" ? reason || undefined : null,
+        approval_reason: status === 'disapproved' ? reason || undefined : null,
       };
-      if (status === "approved") {
+      if (status === 'approved') {
         data.showInShop = true;
       }
       await Product.update(data, { where: { id: productId }, transaction: t });
 
       const reason_details =
-        reason && status === "disapproved" ? ` due to ${reason}` : "";
+        reason && status === 'disapproved' ? ` due to ${reason}` : '';
 
       const mesg =
-        status === "in_review"
+        status === 'in_review'
           ? `Your product ${product.name} is under review`
           : `Your product ${product.name} has been reviewed and ${status}${reason_details}.`;
 
-      const userId = userType === "vendor" ? profile.id : undefined;
-      const notifyType = userType === "vendor" ? "user" : "admin";
+      const userId = userType === 'vendor' ? profile.id : undefined;
+      const notifyType = userType === 'vendor' ? 'user' : 'admin';
       const { io } = req.app;
 
       await Notification.createNotification({
@@ -986,14 +995,14 @@ exports.approveProduct = async (req, res, next) => {
         message: mesg,
         userId,
       });
-      if (userType === "vendor") {
+      if (userType === 'vendor') {
         io.emit(
-          "getNotifications",
+          'getNotifications',
           await Notification.fetchUserNotificationApi({ userId })
         );
       } else {
         io.emit(
-          "getNotifications",
+          'getNotifications',
           await Notification.fetchAdminNotification()
         );
       }
@@ -1027,11 +1036,11 @@ exports.transferToProductPartner = async (req, res, next) => {
       console.log(orderItemId);
       const { bank_code, account_number, bank_name } = req.body;
       const orderitem = await OrderItem.findOne({ where: { id: orderItemId } });
-      if (!orderitem || orderitem == null || orderitem == "undefined") {
+      if (!orderitem || orderitem == null || orderitem == 'undefined') {
         console.log(orderitem);
         return res.status(404).send({
           success: false,
-          message: "No Order!",
+          message: 'No Order!',
         });
       }
 
@@ -1043,22 +1052,22 @@ exports.transferToProductPartner = async (req, res, next) => {
       if (
         !orderCompletionCheck ||
         orderCompletionCheck == null ||
-        orderCompletionCheck == "undefined"
+        orderCompletionCheck == 'undefined'
       ) {
         console.log(orderCompletionCheck);
         return res.status(404).send({
           success: false,
-          message: "Order hasnt been completed!",
+          message: 'Order hasnt been completed!',
         });
       }
       const pEarnings = await ProductEarning.findAll({
-        where: { orderItemId, status: "pending" },
+        where: { orderItemId, status: 'pending' },
       });
-      if (!pEarnings || pEarnings == null || pEarnings == "undefined") {
+      if (!pEarnings || pEarnings == null || pEarnings == 'undefined') {
         return res.status(404).send({
           success: false,
           message:
-            "Cant find an order for this product with that Id that hasnt been paid out",
+            'Cant find an order for this product with that Id that hasnt been paid out',
         });
       }
       console.log(pEarnings);
@@ -1069,7 +1078,7 @@ exports.transferToProductPartner = async (req, res, next) => {
       if (pendingTransaction !== null) {
         return res.status(404).send({
           success: false,
-          message: "Already Initiated",
+          message: 'Already Initiated',
         });
       }
       //  return res.status(200).send({
@@ -1082,7 +1091,7 @@ exports.transferToProductPartner = async (req, res, next) => {
       } else {
         dfee = orderitem.deliveryFee;
       }
-      console.log("deliveryFee = " + dfee);
+      console.log('deliveryFee = ' + dfee);
 
       let discount;
       if (orderitem.discount == null) {
@@ -1090,7 +1099,7 @@ exports.transferToProductPartner = async (req, res, next) => {
       } else {
         discount = orderitem.discount;
       }
-      console.log("discount = " + discount);
+      console.log('discount = ' + discount);
 
       let a1 = orderitem.amount - discount;
       let amount = a1 + discount;
@@ -1115,7 +1124,7 @@ exports.transferToProductPartner = async (req, res, next) => {
 
         console.log(product_partner_details);
         const profile = await getUserTypeProfile(
-          "product_partner",
+          'product_partner',
           product_partner_details.userId
         );
         const data = {
@@ -1148,7 +1157,7 @@ exports.transferToProductPartner = async (req, res, next) => {
               bank_code: bank_code,
               amount: amount,
               narration: narration,
-              NGN: "NGN",
+              NGN: 'NGN',
               paymentReference: paymentReference,
             };
 
@@ -1169,8 +1178,8 @@ exports.transferToProductPartner = async (req, res, next) => {
             const transaction = {
               TransactionId: TransactionId,
               userId: null,
-              status: "PAID",
-              type: "Products",
+              status: 'PAID',
+              type: 'Products',
               amount: amount,
               paymentReference: paymentReference,
               description: narration,
@@ -1191,7 +1200,7 @@ exports.transferToProductPartner = async (req, res, next) => {
             const response = await TransactionPending.create(trxData);
 
             const user = await User.findByPk(userId, {
-              attributes: ["name", "email", "id", "userType"],
+              attributes: ['name', 'email', 'id', 'userType'],
             });
             const reqData = {
               req,
@@ -1203,7 +1212,7 @@ exports.transferToProductPartner = async (req, res, next) => {
             // Get active project admins
             const product_admins = await User.findAll({
               where: {
-                userType: "admin",
+                userType: 'admin',
                 level: 4,
                 isActive: 1,
                 isSuspended: 0,
@@ -1211,7 +1220,7 @@ exports.transferToProductPartner = async (req, res, next) => {
             });
             const super_admins = await User.findAll({
               where: {
-                userType: "admin",
+                userType: 'admin',
                 level: 1,
                 isActive: 1,
                 isSuspended: 0,
@@ -1235,18 +1244,18 @@ exports.transferToProductPartner = async (req, res, next) => {
 
             return res.status(200).send({
               success: true,
-              message: "Transfer Initiation was successful!",
+              message: 'Transfer Initiation was successful!',
             });
           } else {
             return res.status(404).send({
               success: false,
-              message: "kyc not found",
+              message: 'kyc not found',
             });
           }
         } else {
           return res.status(404).send({
             success: false,
-            message: "product partner not found",
+            message: 'product partner not found',
           });
         }
       }
@@ -1270,7 +1279,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
       if (!pendingTransaction || pendingTransaction == null) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Pending Transaction!",
+          message: 'Invalid Pending Transaction!',
         });
       }
 
@@ -1281,7 +1290,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
         console.log(prevTransfer);
         return res.status(404).send({
           success: false,
-          message: "Transaction Already Approved and Completed!",
+          message: 'Transaction Already Approved and Completed!',
         });
       }
 
@@ -1289,7 +1298,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
       if (!user || user == null) {
         return res.status(404).send({
           success: false,
-          message: "No user found!",
+          message: 'No user found!',
         });
       }
       const userLevel = user.level;
@@ -1312,7 +1321,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
         where: {
           productOwnerId: product.creatorId,
           orderItemId: pendingTransaction.orderItemId,
-          status: "pending",
+          status: 'pending',
         },
       });
       console.log(pEarning);
@@ -1320,7 +1329,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
       if (!pEarning || user == pEarning) {
         return res.status(404).send({
           success: false,
-          message: "No pending transaction found!",
+          message: 'No pending transaction found!',
         });
       }
 
@@ -1328,14 +1337,14 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
         if (userLevel == 3 && pendingTransaction.superadmin == false) {
           return res.status(404).send({
             success: false,
-            message: "Cant approve transfer until super admin approves it",
+            message: 'Cant approve transfer until super admin approves it',
           });
         } else if (userLevel == 3 && pendingTransaction.superadmin == true) {
           const product_partner_details = await ProductPartner.findOne({
             where: { userId: product.creatorId },
           });
           const profile = await getUserTypeProfile(
-            "product_partner",
+            'product_partner',
             product_partner_details.userId
           );
           const data = {
@@ -1358,21 +1367,21 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
                 bank_code,
                 amount,
                 narration,
-                "NGN",
+                'NGN',
                 paymentReference
               );
 
-              if (transferResponse.status === "error") {
+              if (transferResponse.status === 'error') {
                 return res.status(400).json({
                   success: false,
-                  message: transferResponse.message || "Transfer failed!",
+                  message: transferResponse.message || 'Transfer failed!',
                 });
               }
               const trxData = {
                 TransactionId,
                 userId: null,
-                status: "PAID",
-                type: "Product Payout to product partner",
+                status: 'PAID',
+                type: 'Product Payout to product partner',
                 amount,
                 paymentReference,
                 description: narration,
@@ -1381,7 +1390,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
               const response = await Transaction.create(trxData, { t });
 
               const user = await User.findByPk(userId, {
-                attributes: ["name", "email", "id", "userType"],
+                attributes: ['name', 'email', 'id', 'userType'],
               });
               const reqData = {
                 req,
@@ -1406,12 +1415,12 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
               //update transactio from pending to paid
 
               await ProductEarning.update(
-                { status: "paid" },
+                { status: 'paid' },
                 {
                   where: {
                     productOwnerId: product.creatorId,
                     orderItemId: pendingTransaction.orderItemId,
-                    status: "pending",
+                    status: 'pending',
                   },
                 }
               );
@@ -1419,7 +1428,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
               // Get active project admins
               const product_admins = await User.findAll({
                 where: {
-                  userType: "admin",
+                  userType: 'admin',
                   level: 4,
                   isActive: 1,
                   isSuspended: 0,
@@ -1427,7 +1436,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
               });
               const super_admins = await User.findAll({
                 where: {
-                  userType: "admin",
+                  userType: 'admin',
                   level: 1,
                   isActive: 1,
                   isSuspended: 0,
@@ -1454,7 +1463,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
 
               return res.status(200).send({
                 success: true,
-                message: "Transfer was successful!",
+                message: 'Transfer was successful!',
               });
             }
           }
@@ -1462,7 +1471,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
           userLevel == 1 &&
           pendingTransaction.financialadmin == false
         ) {
-          console.log("yippe");
+          console.log('yippe');
           await TransactionPending.update(
             { superadmin: true },
             { where: { id } }
@@ -1471,12 +1480,12 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
           return res.status(200).send({
             success: true,
             message:
-              "Approved, Transfer would be done once finance admin approves!",
+              'Approved, Transfer would be done once finance admin approves!',
           });
         } else if (userLevel == 1 && pendingTransaction.superadmin == true) {
           return res.status(404).send({
             success: false,
-            message: "Super Admin already Approved",
+            message: 'Super Admin already Approved',
           });
         }
       }
@@ -1501,7 +1510,7 @@ exports.getPendingTransfers = async (req, res, next) => {
       if (!pendingTransaction || pendingTransaction == null) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Pending Transaction!",
+          message: 'Invalid Pending Transaction!',
         });
       }
       for (let i = 0; i < pendingTransaction.length; i++) {
@@ -1517,7 +1526,7 @@ exports.getPendingTransfers = async (req, res, next) => {
 
       return res.send({
         success: true,
-        message: "All Pending Product Earning Transfers!",
+        message: 'All Pending Product Earning Transfers!',
         data: pendingTransaction,
       });
     } catch (error) {

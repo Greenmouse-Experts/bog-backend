@@ -2,16 +2,16 @@ exports.generateOrderId = Math.floor(190000000 + Math.random() * 990000000);
 
 exports.projectSlug = (type) => {
   let slug;
-  if (type === "land_survey") {
-    slug = "LNS";
-  } else if (type === "construction_drawing") {
-    slug = "CND";
-  } else if (type === "building_approval") {
-    slug = "BDA";
-  } else if (type === "geotechnical_investigation") {
-    slug = "GTI";
-  } else if (type === "contractor") {
-    slug = "CNT";
+  if (type === 'land_survey') {
+    slug = 'LNS';
+  } else if (type === 'construction_drawing') {
+    slug = 'CND';
+  } else if (type === 'building_approval') {
+    slug = 'BDA';
+  } else if (type === 'geotechnical_investigation') {
+    slug = 'GTI';
+  } else if (type === 'contractor') {
+    slug = 'CNT';
   } else {
     slug = type.toUpperCase().slice(0, 3);
   }
@@ -22,79 +22,80 @@ exports.projectSlug = (type) => {
  * List of the levels of administrators
  */
 exports.adminLevels = [
-  { level: 1, type: "super admin" },
-  { level: 2, type: "article admin" },
-  { level: 3, type: "finance admin" },
-  { level: 4, type: "product admin" },
-  { level: 5, type: "project admin" },
-  { level: 6, type: "general admin" },
+  { level: 1, type: 'super admin' },
+  { level: 2, type: 'article admin' },
+  { level: 3, type: 'finance admin' },
+  { level: 4, type: 'product admin' },
+  { level: 5, type: 'project admin' },
+  { level: 6, type: 'general admin' },
 ];
 
 exports.adminLevelCheck = [
-  { level: 1, type: "general" },
-  { level: 2, type: "article" },
-  { level: 3, type: "finance" },
-  { level: 4, type: "product" },
-  { level: 5, type: "project" },
-  { level: 6, type: "general" },
+  { level: 1, type: 'general' },
+  { level: 2, type: 'article' },
+  { level: 3, type: 'finance' },
+  { level: 4, type: 'product' },
+  { level: 5, type: 'project' },
+  { level: 6, type: 'general' },
 ];
 
 exports.adminPrivileges = [
   {
-    type: "general admin",
+    type: 'general admin',
     privileges: [
-      "BLOG",
-      "PROFILE",
-      "TRANSACTION",
-      "PRODUCT",
-      "ORDER",
-      "NOTIFICATION",
-      "PROJECT",
-      "MEETING",
+      'BLOG',
+      'PROFILE',
+      'TRANSACTION',
+      'PRODUCT',
+      'ORDER',
+      'NOTIFICATION',
+      'PROJECT',
+      'MEETING',
     ],
   },
-  { type: "article admin", privileges: ["BLOG", "PROFILE"] },
+  { type: 'article admin', privileges: ['BLOG', 'PROFILE'] },
   {
-    type: "finance admin",
+    type: 'finance admin',
     privileges: [
-      "TRANSACTION",
-      "PROFILE",
-      "PROJECT",
-      "PRODUCT",
-      "PAYOUT",
-      "NOTIFICATION",
+      'TRANSACTION',
+      'ORDER',
+      'PROFILE',
+      'PROJECT',
+      'PRODUCT',
+      'PAYOUT',
+      'NOTIFICATION',
     ],
   },
   {
-    type: "product admin",
-    privileges: ["PRODUCT", "ADDRESS", "ORDER", "NOTIFICATION", "PROFILE"],
+    type: 'product admin',
+    privileges: ['PRODUCT', 'ADDRESS', 'ORDER', 'NOTIFICATION', 'PROFILE'],
   },
   {
-    type: "project admin",
+    type: 'project admin',
     privileges: [
-      "PROJECT",
-      "FEE",
-      "SERVICE",
-      "MEETING",
-      "NOTIFICATION",
-      "PROFILE",
+      'PROJECT',
+      'FEE',
+      'SERVICE',
+      'MEETING',
+      'NOTIFICATION',
+      'PROFILE',
     ],
   },
 ];
 
 exports.generalInformation = {
-  foundationDesign: [{ type: "strip", formula: "" }, "pad", "raft", "pile"],
-  frameStructureDesign: ["concrete columns", "beams", "slab"],
+  foundationDesign: [{ type: 'strip', formula: '' }, 'pad', 'raft', 'pile'],
+  frameStructureDesign: ['concrete columns', 'beams', 'slab'],
   blockWork: [
-    "225mm thick sandcrete block",
-    "150mm thick sandcrete block",
-    "100mm thick sandcrete block",
-    "clay bricks",
+    '225mm thick sandcrete block',
+    '150mm thick sandcrete block',
+    '100mm thick sandcrete block',
+    'clay bricks',
   ],
   roofDesign: [
-    "concrete roof slab & beam",
-    "stonecoated roofing",
-    "aluminium roofing",
+    'concrete roof slab & beam',
+    'stonecoated roofing',
+    'aluminium roofing',
   ],
 };
 
@@ -102,28 +103,28 @@ exports.formula = {};
 
 exports.ticket_issues = [
   {
-    name: "Billing",
-    slug: "billing",
-    desc: "For financial issues",
+    name: 'Billing',
+    slug: 'billing',
+    desc: 'For financial issues',
   },
   {
-    name: "Sales",
-    slug: "sales",
-    desc: "For Product & Service issues",
+    name: 'Sales',
+    slug: 'sales',
+    desc: 'For Product & Service issues',
   },
   {
-    name: "Technical",
-    slug: "technical",
-    desc: "For system use/behavior issues",
+    name: 'Technical',
+    slug: 'technical',
+    desc: 'For system use/behavior issues',
   },
 ];
 
 const money = (value) => {
-  return parseInt(value.replace(/,/g, ""), 10);
+  return parseInt(value.replace(/,/g, ''), 10);
 };
 
 exports.USERTYPE = {
-  SERVICE_PARTNER: "professional",
+  SERVICE_PARTNER: 'professional',
 };
 
 /**
@@ -132,69 +133,69 @@ exports.USERTYPE = {
 
 const years_of_experience = [
   {
-    experience: "3-5",
+    experience: '3-5',
     rating: 1,
   },
   {
-    experience: "6-10",
+    experience: '6-10',
     rating: 2,
   },
   {
-    experience: "11-15",
+    experience: '11-15',
     rating: 3,
   },
   {
-    experience: "16-20",
+    experience: '16-20',
     rating: 4,
   },
   {
-    experience: "Over 20",
+    experience: 'Over 20',
     rating: 5,
   },
 ];
 
 const no_of_staff_members = [
   {
-    experience: "1-10",
+    experience: '1-10',
     rating: 1,
   },
   {
-    experience: "11-50",
+    experience: '11-50',
     rating: 2,
   },
   {
-    experience: "51-100",
+    experience: '51-100',
     rating: 3,
   },
   {
-    experience: "101-200",
+    experience: '101-200',
     rating: 4,
   },
   {
-    experience: "Over 200",
+    experience: 'Over 200',
     rating: 5,
   },
 ];
 
 const cost_of_projects_completed = [
   {
-    experience: "Less than 50 million",
+    experience: 'Less than 50 million',
     rating: 1,
   },
   {
-    experience: "51-100 million",
+    experience: '51-100 million',
     rating: 2,
   },
   {
-    experience: "101-200 million",
+    experience: '101-200 million',
     rating: 3,
   },
   {
-    experience: "201-500 million",
+    experience: '201-500 million',
     rating: 4,
   },
   {
-    experience: "Over 500 million",
+    experience: 'Over 500 million',
     rating: 5,
   },
 ];
@@ -202,111 +203,111 @@ const cost_of_projects_completed = [
 const certification_of_personnel = {
   quantity_surveyor: [
     {
-      experience: "HND, MNIQS, RQS",
+      experience: 'HND, MNIQS, RQS',
       rating: 1,
     },
     {
-      experience: "PGD, MNIQS, RQS",
+      experience: 'PGD, MNIQS, RQS',
       rating: 2,
     },
     {
-      experience: "B.Sc, MNIQS, RQS",
+      experience: 'B.Sc, MNIQS, RQS',
       rating: 3,
     },
     {
-      experience: "M.Sc, MNIQS, RQS",
+      experience: 'M.Sc, MNIQS, RQS',
       rating: 4,
     },
     {
-      experience: "Ph.D, MNIQS, RQS",
+      experience: 'Ph.D, MNIQS, RQS',
       rating: 5,
     },
   ],
   structural_electrical_civil_engineer: [
     {
-      experience: "HND, COREN",
+      experience: 'HND, COREN',
       rating: 1,
     },
     {
-      experience: "PGD, COREN",
+      experience: 'PGD, COREN',
       rating: 2,
     },
     {
-      experience: "B.Sc, COREN",
+      experience: 'B.Sc, COREN',
       rating: 3,
     },
     {
-      experience: "M.Sc, COREN",
+      experience: 'M.Sc, COREN',
       rating: 4,
     },
     {
-      experience: "Ph.D, COREN",
+      experience: 'Ph.D, COREN',
       rating: 5,
     },
   ],
   architect: [
     {
-      experience: "HND, ATECH",
+      experience: 'HND, ATECH',
       rating: 1,
     },
     {
-      experience: "PGD, ATECH",
+      experience: 'PGD, ATECH',
       rating: 2,
     },
     {
-      experience: "B.Sc, G.M.NIA",
+      experience: 'B.Sc, G.M.NIA',
       rating: 3,
     },
     {
-      experience: "M.Sc, A.M.NIA,/MNIA",
+      experience: 'M.Sc, A.M.NIA,/MNIA',
       rating: 4,
     },
     {
-      experience: "Ph.D, MNIA",
+      experience: 'Ph.D, MNIA',
       rating: 5,
     },
   ],
   mechanical_engineer: [
     {
-      experience: "HND, PGD, B.Sc, M.Sc, Ph.D",
+      experience: 'HND, PGD, B.Sc, M.Sc, Ph.D',
       rating: 1,
     },
     {
-      experience: "PGD, MNIMECHE",
+      experience: 'PGD, MNIMECHE',
       rating: 2,
     },
     {
-      experience: "B.Sc, MNIMECHE",
+      experience: 'B.Sc, MNIMECHE',
       rating: 3,
     },
     {
-      experience: "M.Sc, MNIMECHE",
+      experience: 'M.Sc, MNIMECHE',
       rating: 4,
     },
     {
-      experience: "Ph.D, MNIMECHE",
+      experience: 'Ph.D, MNIMECHE',
       rating: 5,
     },
   ],
   surveyor: [
     {
-      experience: "HND, MNIS",
+      experience: 'HND, MNIS',
       rating: 1,
     },
     {
-      experience: "PGD, MNIS",
+      experience: 'PGD, MNIS',
       rating: 2,
     },
     {
-      experience: "B.Sc, MNIS",
+      experience: 'B.Sc, MNIS',
       rating: 3,
     },
     {
-      experience: "M.Sc, MNIS",
+      experience: 'M.Sc, MNIS',
       rating: 4,
     },
     {
-      experience: "Ph.D, MNIS",
+      experience: 'Ph.D, MNIS',
       rating: 5,
     },
   ],
@@ -318,45 +319,45 @@ const complexity_of_projects_completed = {
    */
   q_s_a_m_e_c: [
     {
-      experience: "<2 Storey",
+      experience: '<2 Storey',
       rating: 1,
     },
     {
-      experience: "2 - 5 Storey",
+      experience: '2 - 5 Storey',
       rating: 2,
     },
     {
-      experience: "5 - 10 Storey",
+      experience: '5 - 10 Storey',
       rating: 3,
     },
     {
-      experience: "Over 10 Storey",
+      experience: 'Over 10 Storey',
       rating: 4,
     },
     {
-      experience: "Roads, Bridges etc",
+      experience: 'Roads, Bridges etc',
       rating: 5,
     },
   ],
   surveyor: [
     {
-      experience: "1-10 Acres",
+      experience: '1-10 Acres',
       rating: 1,
     },
     {
-      experience: "10-20 Acres",
+      experience: '10-20 Acres',
       rating: 2,
     },
     {
-      experience: "20-50 Acres",
+      experience: '20-50 Acres',
       rating: 3,
     },
     {
-      experience: "Over 50 Acres",
+      experience: 'Over 50 Acres',
       rating: 4,
     },
     {
-      experience: "Roads, Bridges etc",
+      experience: 'Roads, Bridges etc',
       rating: 5,
     },
   ],
@@ -365,30 +366,30 @@ const complexity_of_projects_completed = {
 const timely_delivery_performance = [
   // in percentage
   {
-    experience: "Over 15% of time",
+    experience: 'Over 15% of time',
     rating: 1,
   },
   {
-    experience: "10-15% of time",
+    experience: '10-15% of time',
     rating: 2,
   },
   {
-    experience: "5-10% of time",
+    experience: '5-10% of time',
     rating: 3,
   },
   {
-    experience: "Less than 5% of time",
+    experience: 'Less than 5% of time',
     rating: 4,
   },
   {
-    experience: "On/Before time", // on or before time
+    experience: 'On/Before time', // on or before time
     rating: 5,
   },
 ];
 
 const timely_delivery = [
   {
-    experience: { min: 16, max: "*" },
+    experience: { min: 16, max: '*' },
     rating: 1,
   },
   {
@@ -414,13 +415,13 @@ const timely_delivery_calculation = (duration) => {
 
   let calculations = timely_delivery.map((delivery) => {
     let calculation_item;
-    if (delivery.experience.min !== "*" && delivery.experience.max !== "*") {
+    if (delivery.experience.min !== '*' && delivery.experience.max !== '*') {
       calculation_item = {
         rating: delivery.rating,
         min: (delivery.experience.min / 100) * days,
         max: (delivery.experience.max / 100) * days,
       };
-    } else if (delivery.experience.max === "*") {
+    } else if (delivery.experience.max === '*') {
       calculation_item = {
         rating: delivery.rating,
         min: (delivery.experience.min / 100) * days,
@@ -488,7 +489,7 @@ exports.rating_by_timely_delivery = (
  */
 exports.kyc_criteria_for_rating_service_partners = [
   {
-    service_type: "quantity_surveyor",
+    service_type: 'quantity_surveyor',
     meta_data: {
       years_of_experience,
       no_of_staff_members,
@@ -500,7 +501,7 @@ exports.kyc_criteria_for_rating_service_partners = [
     },
   },
   {
-    service_type: "structural_engineer",
+    service_type: 'structural_engineer',
     meta_data: {
       years_of_experience,
       no_of_staff_members,
@@ -513,7 +514,7 @@ exports.kyc_criteria_for_rating_service_partners = [
     },
   },
   {
-    service_type: "architects",
+    service_type: 'architects',
     meta_data: {
       years_of_experience,
       no_of_staff_members,
@@ -525,7 +526,7 @@ exports.kyc_criteria_for_rating_service_partners = [
     },
   },
   {
-    service_type: "mechanical_engineer",
+    service_type: 'mechanical_engineer',
     meta_data: {
       years_of_experience,
       no_of_staff_members,
@@ -538,7 +539,7 @@ exports.kyc_criteria_for_rating_service_partners = [
     },
   },
   {
-    service_type: "electrical_engineer",
+    service_type: 'electrical_engineer',
     meta_data: {
       years_of_experience,
       no_of_staff_members,
@@ -551,7 +552,7 @@ exports.kyc_criteria_for_rating_service_partners = [
     },
   },
   {
-    service_type: "surveyor",
+    service_type: 'surveyor',
     meta_data: {
       years_of_experience,
       no_of_staff_members,
@@ -563,7 +564,7 @@ exports.kyc_criteria_for_rating_service_partners = [
     },
   },
   {
-    service_type: "civil_engineer",
+    service_type: 'civil_engineer',
     meta_data: {
       years_of_experience,
       no_of_staff_members,
@@ -623,18 +624,18 @@ exports.PERCENT_100 = 100;
  * Geotechnical Investigation
  */
 exports.GNT_LAB_TESTS = [
-  "Moisture Content Test",
-  "Grain Size Analysis Test",
-  "Atterberg Test",
-  "Specific Gravity Test",
-  "Triaxial Test",
-  "Consolidation Test",
-  "Hydrometer Test",
-  "Compaction Test",
-  "California Bearing Ratio (CBR) Test",
-  "Field Density Test",
-  "Soil Chemical Test",
-  "Water Test",
+  'Moisture Content Test',
+  'Grain Size Analysis Test',
+  'Atterberg Test',
+  'Specific Gravity Test',
+  'Triaxial Test',
+  'Consolidation Test',
+  'Hydrometer Test',
+  'Compaction Test',
+  'California Bearing Ratio (CBR) Test',
+  'Field Density Test',
+  'Soil Chemical Test',
+  'Water Test',
 ];
 
 exports.GNT_DESC_TITLES = [
@@ -643,5 +644,5 @@ exports.GNT_DESC_TITLES = [
   'Cone penetration test',
   'Chemical analysis of ground water',
   'Laboratory test',
-  'Reports'
-]
+  'Reports',
+];
