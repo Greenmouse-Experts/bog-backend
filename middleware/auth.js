@@ -8,7 +8,7 @@ module.exports = function(req, res, next) {
   if (!token) {
     return res.status(401).send({
       success: false,
-      message: 'Access Denied',
+      message: 'Access Denied. Authorization token not passed',
     });
   }
 
