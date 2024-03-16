@@ -188,6 +188,10 @@ const productValidation = () => {
   ];
 };
 
+const trxProofValidation = () => {
+  return [check('trx_proof', 'Please Enter trx proof').notEmpty()];
+};
+
 const productApprovalValidation = () => {
   return [
     check('productId', 'Product id is required').isUUID(),
@@ -415,4 +419,5 @@ module.exports = {
   subscribeRequestValidation,
   ServiceFormBuilderValidation,
   ServiceValidation,
+  trxProofValidation,
 };

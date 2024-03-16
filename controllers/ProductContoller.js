@@ -1362,21 +1362,21 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
             if (myFinancial !== null) {
               console.log(_product_partner);
               // Trigger transfer
-              const transferResponse = await Service.Flutterwave.transfer(
-                account_number,
-                bank_code,
-                amount,
-                narration,
-                'NGN',
-                paymentReference
-              );
+              // const transferResponse = await Service.Flutterwave.transfer(
+              //   account_number,
+              //   bank_code,
+              //   amount,
+              //   narration,
+              //   'NGN',
+              //   paymentReference
+              // );
 
-              if (transferResponse.status === 'error') {
-                return res.status(400).json({
-                  success: false,
-                  message: transferResponse.message || 'Transfer failed!',
-                });
-              }
+              // if (transferResponse.status === 'error') {
+              //   return res.status(400).json({
+              //     success: false,
+              //     message: transferResponse.message || 'Transfer failed!',
+              //   });
+              // }
               const trxData = {
                 TransactionId,
                 userId: null,
@@ -1395,24 +1395,24 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
               const reqData = {
                 req,
                 userId: null,
-                message: `Admin has made a payout of NGN ${amount} to product partner ${profile.company_name} [${product.description}]`,
+                message: `Admin has initiated a payout of NGN ${amount} to product partner ${profile.company_name} [${product.description}]`,
               };
               await this.notifyAdmin(reqData);
 
               const reqData2 = {
                 req,
                 userId: product.creatorId,
-                message: `Admin has made a payout of NGN ${amount} to you for [${product.description}]`,
+                message: `Admin has initiated a payout of NGN ${amount} to you for [${product.description}]`,
               };
               await this.notifyAdmin(reqData2);
 
-              //update fin admin approve to true when transfer complete
+              // update financial admin approve to true when transfer complete
               await TransactionPending.update(
                 { financialadmin: true },
                 { where: { id } }
               );
 
-              //update transactio from pending to paid
+              // update transaction from pending to paid
 
               await ProductEarning.update(
                 { status: 'paid' },
@@ -1471,7 +1471,6 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
           userLevel == 1 &&
           pendingTransaction.financialadmin == false
         ) {
-          console.log('yippe');
           await TransactionPending.update(
             { superadmin: true },
             { where: { id } }

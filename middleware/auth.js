@@ -1,14 +1,14 @@
 /* eslint-disable consistent-return */
-require("dotenv").config();
-const jwt = require("jsonwebtoken");
+require('dotenv').config();
+const jwt = require('jsonwebtoken');
 
 module.exports = function(req, res, next) {
-  const token = req.header("authorization");
+  const token = req.header('authorization');
   // console.log(token)
   if (!token) {
     return res.status(401).send({
       success: false,
-      message: "Access Denied"
+      message: 'Access Denied',
     });
   }
 
@@ -20,7 +20,7 @@ module.exports = function(req, res, next) {
   } catch (error) {
     return res.status(401).send({
       success: false,
-      message: "Token is not valid"
+      message: 'Authorization token is expired. Try to login again',
     });
   }
 };

@@ -1,56 +1,60 @@
-const Sequelize = require("sequelize");
-const sequelise = require("../config/database/connection");
-const User = require("./User");
+const Sequelize = require('sequelize');
+const sequelise = require('../config/database/connection');
+const User = require('./User');
 
 const Transaction = sequelise.define(
-  "transactions",
+  'transactions',
   {
     id: {
       type: Sequelize.UUID,
       defaultValue: Sequelize.UUIDV4,
       unique: true,
-      primaryKey: true
+      primaryKey: true,
     },
     TransactionId: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     userId: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     amount: {
       type: Sequelize.FLOAT,
-      allowNull: true
+      allowNull: true,
     },
     status: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     type: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     paymentReference: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     description: {
       type: Sequelize.STRING,
-      allowNull: true
-    }
+      allowNull: true,
+    },
+    trx_proof: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
   },
   { paranoid: true }
 );
 
 User.hasMany(Transaction, {
-  foreignKey: "userId",
-  as: "transactions"
+  foreignKey: 'userId',
+  as: 'transactions',
 });
 
 Transaction.belongsTo(User, {
-  foreignKey: "userId",
-  as: "user"
+  foreignKey: 'userId',
+  as: 'user',
 });
 
 module.exports = Transaction;
