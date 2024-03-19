@@ -2364,8 +2364,6 @@ exports.transferToServicePartner = async (req, res, next) => {
       const slug = Math.floor(190000000 + Math.random() * 990000000);
       const TransactionId = `BOG/TXN/PRJ/${projectType}/${slug}`;
 
-      console.log(project);
-
       const transaction = {
         TransactionId: TransactionId,
         userId: null,

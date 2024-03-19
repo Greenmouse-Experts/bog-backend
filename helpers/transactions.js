@@ -4,6 +4,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
 const Transaction = require('../models/Transaction');
+const TransactionPending = require('../models/TransactionPending');
 const sequelize = require('../config/database/connection');
 const User = require('../models/User');
 const Order = require('../models/Order');
@@ -238,7 +239,7 @@ exports.addTrxProof = async (req, res, next) => {
     const where = { id: req.params.txId };
     const Txns = JSON.parse(
       JSON.stringify(
-        await Transaction.findOne({
+        await TransactionPending.findOne({
           where,
           include: [
             {
@@ -258,7 +259,7 @@ exports.addTrxProof = async (req, res, next) => {
     }
 
     // Update trx
-    await Transaction.update({ trx_proof }, { where });
+    await TransactionPending.update({ trx_proof }, { where });
 
     return res.status(200).send({
       success: true,

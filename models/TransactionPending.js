@@ -1,9 +1,9 @@
-const Sequelize = require("sequelize");
-const sequelise = require("../config/database/connection");
-const User = require("./User");
+const Sequelize = require('sequelize');
+const sequelise = require('../config/database/connection');
+const User = require('./User');
 
 const TransactionPending = sequelise.define(
-  "pendingtransaction",
+  'pendingtransaction',
   {
     id: {
       type: Sequelize.UUID,
@@ -43,38 +43,42 @@ const TransactionPending = sequelise.define(
       allowNull: true,
       type: Sequelize.TEXT,
       get: function() {
-        if (this.getDataValue("transaction") !== undefined) {
-          return JSON.parse(this.getDataValue("transaction"));
+        if (this.getDataValue('transaction') !== undefined) {
+          return JSON.parse(this.getDataValue('transaction'));
         }
       },
       set(value) {
-        this.setDataValue("transaction", JSON.stringify(value));
+        this.setDataValue('transaction', JSON.stringify(value));
       },
     },
     transfer: {
       allowNull: true,
       type: Sequelize.TEXT,
       get: function() {
-        if (this.getDataValue("transfer") !== undefined) {
-          return JSON.parse(this.getDataValue("transfer"));
+        if (this.getDataValue('transfer') !== undefined) {
+          return JSON.parse(this.getDataValue('transfer'));
         }
       },
       set(value) {
-        this.setDataValue("transfer", JSON.stringify(value));
+        this.setDataValue('transfer', JSON.stringify(value));
       },
+    },
+    trx_proof: {
+      type: Sequelize.STRING,
+      allowNull: true,
     },
   },
   { paranoid: true }
 );
 
 User.hasMany(TransactionPending, {
-  foreignKey: "userId",
-  as: "pendingtransactions",
+  foreignKey: 'userId',
+  as: 'pendingtransactions',
 });
 
 TransactionPending.belongsTo(User, {
-  foreignKey: "userId",
-  as: "user",
+  foreignKey: 'userId',
+  as: 'user',
 });
 
 module.exports = TransactionPending;

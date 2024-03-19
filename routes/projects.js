@@ -1,10 +1,10 @@
-const express = require("express");
+const express = require('express');
 
 const router = express.Router();
-const Auth = require("../middleware/auth");
-const Access = require("../middleware/access");
+const Auth = require('../middleware/auth');
+const Access = require('../middleware/access');
 
-const upload = require("../helpers/upload");
+const upload = require('../helpers/upload');
 
 const {
   validate,
@@ -16,20 +16,20 @@ const {
   projectInstallmentValidation,
   paymentInstallmentValidation,
   projectNotificationValidation,
-} = require("../helpers/validators");
-const ProjectController = require("../controllers/ProjectController");
+} = require('../helpers/validators');
+const ProjectController = require('../controllers/ProjectController');
 
 // Projects
 router
-  .route("/projects/my-request")
+  .route('/projects/my-request')
   .get(Auth, ProjectController.getProjectRequest);
 
 router
-  .route("/projects/service-request")
+  .route('/projects/service-request')
   .get(Auth, ProjectController.getServicePartnerProjectRequest);
 
 router
-  .route("/projects/dispatched-projects/:userId")
+  .route('/projects/dispatched-projects/:userId')
   .get(Auth, ProjectController.getDispatchedProject);
 
 // Get dispatched projects v2
@@ -37,12 +37,12 @@ router
 //   .get(Auth, ProjectController.getV2DispatchedProject)
 
 router
-  .route("/projects/assigned-projects/:userId")
+  .route('/projects/assigned-projects/:userId')
   .get(Auth, ProjectController.getAssignedProjects);
 
 // Update project's progress
 router
-  .route("/projects/progress/:providerId/:projectId")
+  .route('/projects/progress/:providerId/:projectId')
   .put(
     projectProgressValidation(),
     validate,
@@ -51,7 +51,7 @@ router
   );
 
 router
-  .route("/projects/update/:projectId")
+  .route('/projects/update/:projectId')
   .put(
     [Auth, Access.verifyAccess, Access.verifyAdmin],
     ProjectController.updateProjectDetails
@@ -62,80 +62,102 @@ router
 //   .route("/projects/v2/assigned-projects/:userId")
 //   .get(Auth, ProjectController.getV2AssignedProjects);
 
-router.route("/projects/all").get(Auth, ProjectController.getAllProjectRequest);
+router.route('/projects/all').get(Auth, ProjectController.getAllProjectRequest);
 
 router
-  .route("/projects/v2/all")
+  .route('/projects/v2/all')
   .get([Auth, Access.verifyAccess], ProjectController.getAllProjectRequestV2);
 
 // View all project v2 ?y=${year} default is present year
 router
-  .route("/projects/analyze")
+  .route('/projects/analyze')
   .get([Auth, Access.verifyAccess], ProjectController.analyzeProjects);
 
 // View all project v2 ?y=${year} default is present year
 router
-  .route("/projects/service-partner-analyze")
+  .route('/projects/service-partner-analyze')
   .get(
     [Auth, Access.verifyAccess, Access.verifyUser],
     ProjectController.analyzeServicePartnerProjects
   );
 
 router
-  .route("/projects/view-project/:projectId")
+  .route('/projects/view-project/:projectId')
   .get([Auth, Access.verifyAccess], ProjectController.viewProjectRequest);
 
 // Project request view v2
 router
-  .route("/projects/v2/view-project/:projectId")
+  .route('/projects/v2/view-project/:projectId')
   .get([Auth, Access.verifyAccess], ProjectController.viewProjectRequestV2);
 
 router
-  .route("/projects/delete/:requestId")
+  .route('/projects/delete/:requestId')
   .delete([Auth, Access.verifyAccess], ProjectController.deleteProjectRequest);
 
 // Request service type
 router
-  .route("/projects/request")
+  .route('/projects/request')
   .post(
     [Auth, Access.verifyAccess, Access.verifyUser],
     ProjectController.requestForService
   );
 
 router
-  .route("/projects/geotechnical-investigation/metadata/view")
-  .get([Auth, Access.verifyAccess], ProjectController.viewMetadataForGeotechnicalInvestigation);
+  .route('/projects/geotechnical-investigation/metadata/view')
+  .get(
+    [Auth, Access.verifyAccess],
+    ProjectController.viewMetadataForGeotechnicalInvestigation
+  );
 
 router
-  .route("/projects/geotechnical-investigation/metadata")
-  .post([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.metadataForGeotechnicalInvestigation);
+  .route('/projects/geotechnical-investigation/metadata')
+  .post(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    ProjectController.metadataForGeotechnicalInvestigation
+  );
 
 router
-  .route("/projects/geotechnical-investigation/metadata/:metadata_id")
-  .delete([Auth, Access.verifyAccess, Access.verifyAdmin], ProjectController.deleteGeotechnicalInvestigationMetadata)
+  .route('/projects/geotechnical-investigation/metadata/:metadata_id')
+  .delete(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    ProjectController.deleteGeotechnicalInvestigationMetadata
+  );
 
 router
-  .route("/projects/geotechnical-investigation/verification")
-  .post([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.verificationForGeotechnicalInvestigation);
+  .route('/projects/geotechnical-investigation/verification')
+  .post(
+    [Auth, Access.verifyAccess, Access.verifyUser],
+    ProjectController.verificationForGeotechnicalInvestigation
+  );
 
 router
-  .route("/projects/geotechnical-investigation/order")
-  .post([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.orderForGeotechnicalInvestigation);
-
-router.route("/projects/geotechnical-investigation/order_details/:projectId")
-    .get([Auth, Access.verifyAccess], ProjectController.viewOrderDetails)
-  
-router
-  .route("/projects/geotechnical-investigation/verify-payment/:ref/:pay_ref")
-  .get([Auth, Access.verifyAccess, Access.verifyUser], ProjectController.verifyGeotechnicalInvestigationPayment);
+  .route('/projects/geotechnical-investigation/order')
+  .post(
+    [Auth, Access.verifyAccess, Access.verifyUser],
+    ProjectController.orderForGeotechnicalInvestigation
+  );
 
 router
-  .route("/projects/geotechnical-investigation/:projectId/view")
-  .get([Auth, Access.verifyAccess], ProjectController.viewProjectOrderForGeotechnicalInvestigation);
+  .route('/projects/geotechnical-investigation/order_details/:projectId')
+  .get([Auth, Access.verifyAccess], ProjectController.viewOrderDetails);
+
+router
+  .route('/projects/geotechnical-investigation/verify-payment/:ref/:pay_ref')
+  .get(
+    [Auth, Access.verifyAccess, Access.verifyUser],
+    ProjectController.verifyGeotechnicalInvestigationPayment
+  );
+
+router
+  .route('/projects/geotechnical-investigation/:projectId/view')
+  .get(
+    [Auth, Access.verifyAccess],
+    ProjectController.viewProjectOrderForGeotechnicalInvestigation
+  );
 
 // Land Survey
 router
-  .route("/projects/land-survey/request")
+  .route('/projects/land-survey/request')
   .post(
     landSurveyRequestValidation(),
     validate,
@@ -144,39 +166,39 @@ router
   );
 
 router
-  .route("/projects/land-survey/update-request")
+  .route('/projects/land-survey/update-request')
   .patch(Auth, ProjectController.updateLandSurveyRequest);
 
 // Contractor Project
 router
-  .route("/projects/contractor/request")
+  .route('/projects/contractor/request')
   .post(Auth, upload.any(), ProjectController.requestForContractor);
 
 router
-  .route("/projects/contractor/update-request")
+  .route('/projects/contractor/update-request')
   .patch(Auth, upload.any(), ProjectController.updateContractorRequest);
 
 // Drawing Project
 router
-  .route("/projects/drawing/request")
+  .route('/projects/drawing/request')
   .post(Auth, upload.any(), ProjectController.drawingProjectsRequest);
 
 router
-  .route("/projects/drawing/update-request")
+  .route('/projects/drawing/update-request')
   .patch(Auth, upload.any(), ProjectController.updateDrawingRequest);
 
 // Building Approval Project
 router
-  .route("/projects/building-approval/request")
+  .route('/projects/building-approval/request')
   .post(Auth, upload.any(), ProjectController.buildingApprovalProjectsRequest);
 
 router
-  .route("/projects/building-approval/update-request")
+  .route('/projects/building-approval/update-request')
   .patch(Auth, upload.any(), ProjectController.updateBuildingApprovalRequest);
 
 // Geotechnical Project
 router
-  .route("/projects/geotechnical/request")
+  .route('/projects/geotechnical/request')
   .post(
     Auth,
     upload.any(),
@@ -184,7 +206,7 @@ router
   );
 
 router
-  .route("/projects/geotechnical/update-request")
+  .route('/projects/geotechnical/update-request')
   .patch(
     Auth,
     upload.any(),
@@ -192,11 +214,11 @@ router
   );
 
 router
-  .route("/projects/request-for-approval/:projectId")
+  .route('/projects/request-for-approval/:projectId')
   .patch(Auth, ProjectController.requestProjectApproval);
 
 router
-  .route("/projects/approve-project/:projectId")
+  .route('/projects/approve-project/:projectId')
   .patch(
     [Auth, Access.verifyAccess, Access.verifyAdmin],
     ProjectController.approveProjectRequest
@@ -204,7 +226,7 @@ router
 
 // 1 // list competent providers
 router
-  .route("/projects/list-providers/:projectId")
+  .route('/projects/list-providers/:projectId')
   .put(
     [Auth, Access.verifyAccess, Access.verifyAdmin],
     ProjectController.listCapableServiceProvidersByRating
@@ -212,18 +234,18 @@ router
 
 // 2 // dispatch to selected providers from the list
 router
-  .route("/projects/v2/dispatch-project/:projectId")
+  .route('/projects/v2/dispatch-project/:projectId')
   .put(
     [Auth, Access.verifyAccess, Access.verifyAdmin],
     ProjectController.selectivelyDispatchProject
   );
 
 router
-  .route("/projects/dispatch-project/:projectId")
+  .route('/projects/dispatch-project/:projectId')
   .patch(Auth, ProjectController.dispatchProject);
 
 router
-  .route("/projects/assign-project")
+  .route('/projects/assign-project')
   .post(
     projectAssignmentRequestValidation(),
     validate,
@@ -232,14 +254,14 @@ router
   );
 
 router
-  .route("/projects/acknowledge-completion/:projectId")
+  .route('/projects/acknowledge-completion/:projectId')
   .patch(
     [Auth, Access.verifyAccess, Access.verifyAdmin],
     ProjectController.acknowledgeCompletion
   );
 
 router
-  .route("/projects/installments/create")
+  .route('/projects/installments/create')
   .post(
     [Auth, Access.verifyAccess, Access.verifyAdmin],
     projectInstallmentValidation(),
@@ -249,12 +271,12 @@ router
 
 // Get project installments ?type=${cost | installment}
 router
-  .route("/projects/installments/:project_id/view")
+  .route('/projects/installments/:project_id/view')
   .get([Auth, Access.verifyAccess], ProjectController.viewProjectInstallment);
 
 // Pay project installment
 router
-  .route("/projects/installments/:projectId/payment")
+  .route('/projects/installments/:projectId/payment')
   .post(
     [Auth, Access.verifyAccess, Access.verifyUser],
     paymentInstallmentValidation(),
@@ -264,21 +286,21 @@ router
 
 // Transfer to service partners
 router
-  .route("/projects/transfer/:projectId")
+  .route('/projects/transfer/:projectId')
   .post(
     [Auth, Access.verifyAccess, Access.verifyAdmin],
     ProjectController.transferToServicePartner
   );
 
 router
-  .route("/projects/pendingTransfers")
+  .route('/projects/pendingTransfers')
   .get(
     [Auth, Access.verifyAccess, Access.verifyAdmin],
     ProjectController.getPendingTransfers
   );
 
 router
-  .route("/projects/approveTransfer/:id")
+  .route('/projects/approveTransfer/:id')
   .post(
     [Auth, Access.verifyAccess, Access.verifyAdmin],
     ProjectController.approveTransferToServicePartner
@@ -286,7 +308,7 @@ router
 
 // Add Project notification
 router
-  .route("/projects/notification/create")
+  .route('/projects/notification/create')
   .post(
     [Auth, Access.verifyAccess],
     projectNotificationValidation(),
@@ -296,11 +318,11 @@ router
 
 // View project notifications
 router
-  .route("/projects/notification/:projectId/view")
+  .route('/projects/notification/:projectId/view')
   .get([Auth, Access.verifyAccess], ProjectController.viewProjectNotifications);
 
 router
-  .route("/projects/bid-project")
+  .route('/projects/bid-project')
   .post(
     [Auth, Access.verifyAccess, Access.verifyUser],
     upload.any(),
@@ -308,7 +330,7 @@ router
   );
 
 router
-  .route("/projects/apply-project")
+  .route('/projects/apply-project')
   .post(
     projectApplyRequestValidation(),
     validate,
@@ -316,10 +338,10 @@ router
     ProjectController.applyForProject
   );
 
-router.route("/projects/bids/:projectId").get(ProjectController.getProjectBids);
+router.route('/projects/bids/:projectId').get(ProjectController.getProjectBids);
 
 router
-  .route("/projects/individual-bid/:projectId/:userId")
+  .route('/projects/individual-bid/:projectId/:userId')
   .get(ProjectController.getIndividualProjectBid);
 
 module.exports = router;
