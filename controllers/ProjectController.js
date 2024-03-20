@@ -2348,6 +2348,7 @@ exports.transferToServicePartner = async (req, res, next) => {
       const transfer = {
         account_number: account_number,
         bank_code: bank_code,
+        bank_name: bank_name,
         amount: amount,
         narration: narration,
         NGN: 'NGN',
