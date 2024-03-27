@@ -1,13 +1,13 @@
 /* eslint-disable radix */
 /* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
-const easyinvoice = require("easyinvoice");
-const fs = require("fs");
-const btoa = require("btoa");
-const moment = require("moment");
+const easyinvoice = require('easyinvoice');
+const fs = require('fs');
+const btoa = require('btoa');
+const moment = require('moment');
 
-const { invoice } = require("../helpers/invoice");
-const Product = require("../models/Product");
+const { invoice } = require('../helpers/invoice');
+const Product = require('../models/Product');
 
 exports.createInvoice = async (orderData, user) => {
   const { order_items, orderSlug, contact } = orderData;
@@ -25,22 +25,23 @@ exports.createInvoice = async (orderData, user) => {
       description: items.product.name.substring(0, 27),
       quantity: items.quantity,
       price: parseInt(items.product.price),
-      "tax-rate": items.taxrate || 0,
+      'tax-rate': items.taxRate || 0,
     };
   });
 
   let _subtotal = 0;
   let insurancecharge = 0;
+  let taxRate = 7.5;
   if (
     orderData.insuranceFee == true &&
-    orderData.order_items[0].shippingAddress.deliveryaddress !== "No address"
+    orderData.order_items[0].shippingAddress.deliveryaddress !== 'No address'
   ) {
     insurancecharge =
       orderData.order_items[0].shippingAddress.deliveryaddress.insurancecharge;
   }
-  let deliveryTime = "Not stated";
+  let deliveryTime = 'Not stated';
   if (
-    orderData.order_items[0].shippingAddress.deliveryaddress !== "No address"
+    orderData.order_items[0].shippingAddress.deliveryaddress !== 'No address'
   ) {
     deliveryTime =
       orderData.order_items[0].shippingAddress.deliveryaddress.delivery_time;
@@ -67,7 +68,7 @@ exports.createInvoice = async (orderData, user) => {
 
   // }
 
-  let landmarkAddress = "Not stated by user";
+  let landmarkAddress = 'Not stated by user';
   if (
     orderData.order_items[0].shippingAddress.deliveryaddress.title !== null &&
     orderData.order_items[0].shippingAddress.deliveryaddress.address !== null &&
@@ -76,35 +77,35 @@ exports.createInvoice = async (orderData, user) => {
   ) {
     landmarkAddress =
       orderData.order_items[0].shippingAddress.deliveryaddress.title +
-      ", " +
+      ', ' +
       orderData.order_items[0].shippingAddress.deliveryaddress.address +
-      ", " +
+      ', ' +
       orderData.order_items[0].shippingAddress.deliveryaddress.state +
-      ", " +
+      ', ' +
       orderData.order_items[0].shippingAddress.deliveryaddress.country;
   }
 
   const invoiceData = {
     logo:
-      "https://res.cloudinary.com/greenmouse-tech/image/upload/v1669563824/BOG/logo_1_1_ubgtnr.png",
-    document_title: "INVOICE",
-    company_from: "13, Olufunmilola Okikiolu Street",
-    zip_from: "Off Toyin Street, Ikeja",
-    city_from: "Lagos State",
-    country_from: "Nigeria",
-    sender_custom_1: "",
-    sender_custom_2: "",
-    sender_custom_3: "",
+      'https://res.cloudinary.com/greenmouse-tech/image/upload/v1669563824/BOG/logo_1_1_ubgtnr.png',
+    document_title: 'INVOICE',
+    company_from: '13, Olufunmilola Okikiolu Street',
+    zip_from: 'Off Toyin Street, Ikeja',
+    city_from: 'Lagos State',
+    country_from: 'Nigeria',
+    sender_custom_1: '',
+    sender_custom_2: '',
+    sender_custom_3: '',
     client: {
       address_to: homeaddress,
-      city_to: "",
+      city_to: '',
       country_to: orderData.contact.country,
-      client_custom_1: "",
-      client_custom_2: "",
-      client_custom_3: "",
+      client_custom_1: '',
+      client_custom_2: '',
+      client_custom_3: '',
     },
     ref: orderSlug,
-    date_ordered: moment(new Date()).format("MMMM Do YYYY, h:mm:ss a"),
+    date_ordered: moment(new Date()).format('MMMM Do YYYY, h:mm:ss a'),
     delivery_address: orderData.order_items[0].shippingAddress.address,
     // ", " +
     // orderData.order_items[0].shippingAddress.city,
@@ -114,18 +115,23 @@ exports.createInvoice = async (orderData, user) => {
     delivery_fee: orderData.deliveryFee.toLocaleString(),
     insurancecharge: insurancecharge,
     landmarkAddress: landmarkAddress,
+    taxRate: `${taxRate}% (${(
+      (parseInt(taxRate) / 100) *
+      parseInt(_subtotal)
+    ).toLocaleString()})`,
     total: (
       parseInt(_subtotal) +
       parseInt(orderData.deliveryFee) +
-      parseInt(insurancecharge)
+      parseInt(insurancecharge) +
+      (parseInt(taxRate) / 100) * parseInt(_subtotal)
     ).toLocaleString(),
   };
 
-  console.log("Invoice Generator");
+  console.log('Invoice Generator');
   const preparedInvoiceTemplate = invoice(invoiceData);
   const data = {
     customize: {
-      template: Buffer.from(preparedInvoiceTemplate).toString("base64"),
+      template: Buffer.from(preparedInvoiceTemplate).toString('base64'),
       // template: fs.readFileSync("./index.html", "base64"),
     },
     // information: {
@@ -164,13 +170,13 @@ exports.createInvoice = async (orderData, user) => {
     //   total: 8500,
     // },
   };
-  console.log("Create your invoice! Easy!");
+  console.log('Create your invoice! Easy!');
   const result = await easyinvoice.createInvoice(data);
   //   console.log("Create your invoice! Easy!");
 
   //   // The response will contain a base64 encoded PDF file
   //   // console.log('PDF base64 string: ', result.pdf);
-  fs.writeFileSync(`uploads/${orderSlug}.pdf`, result.pdf, "base64");
+  fs.writeFileSync(`uploads/${orderSlug}.pdf`, result.pdf, 'base64');
   // easyinvoice.download('myInvoice.pdf', result.pdf);
 
   //   await easyinvoice.createInvoice(data, async function(result) {
