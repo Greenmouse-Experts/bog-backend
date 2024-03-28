@@ -2265,10 +2265,15 @@ exports.transferToServicePartner = async (req, res, next) => {
     try {
       const userId = req.user.id;
       const { projectId } = req.params;
-      const { amount, bank_code, account_number, bank_name } = req.body;
+      const {
+        amount,
+        bank_code,
+        account_number,
+        bank_name,
+        account_name,
+      } = req.body;
       const project = await Project.findOne({ where: { id: projectId } });
       if (!project) {
-        console.log(project);
         return res.status(404).send({
           success: false,
           message: 'Invalid Project!',
@@ -2347,6 +2352,7 @@ exports.transferToServicePartner = async (req, res, next) => {
       // );
       const transfer = {
         account_number: account_number,
+        account_name: account_name,
         bank_code: bank_code,
         bank_name: bank_name,
         amount: amount,
@@ -2642,6 +2648,7 @@ exports.getPendingTransfers = async (req, res, next) => {
           financialadmin: false,
           TransactionId: { [Op.like]: `%PRJ%` },
         },
+        order: [['createdAt', 'DESC']],
       });
       if (!pendingTransaction || pendingTransaction == null) {
         return res.status(404).send({

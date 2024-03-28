@@ -15,7 +15,7 @@ exports.createAddress = async (req, res, next) => {
         where: { title, lga, state, country },
       });
 
-      if (_address !== null) {
+      if (_address) {
         return res.status(400).send({
           status: false,
           message: 'Address exists!',
