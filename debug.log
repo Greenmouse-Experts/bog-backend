@@ -3,35 +3,35 @@ Connection to database establised
 Connected to email server
 pendingtransaction {
   dataValues: {
-    id: '343abea8-e6d6-4309-8849-c7da64b905d5',
-    TransactionId: 'BOG/TXN/PRJ/CND/1083140863',
-    orderItemId: null,
+    id: '37173361-c017-4ab8-85b4-18a5bc2f61de',
+    TransactionId: 'BOG/TXN/PROD/792120731',
+    orderItemId: '1d3dbfb5-e933-4108-a735-a7c86f1f005c',
     userId: null,
     superadmin: false,
     financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/CND/1083140863","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-909721830689","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","account_name":"Emmanuel Olaleye","bank_code":"056","bank_name":"Polaris Bank","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-909721830689"}',
+    orderId: '85d90880-9e93-4151-a144-bdff42f3ac53',
+    orderSlug: 'BOG/ORD/896933700',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/792120731","userId":null,"status":"PAID","type":"Products","paymentReference":"TR-567481074968","description":"Transfer to product partner Greenmouse [Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\\r\\n\\r\\nAlthough all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.]","product":null}',
+    transfer: '{"narration":"Transfer to product partner Greenmouse [Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\\r\\n\\r\\nAlthough all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.]","NGN":"NGN","paymentReference":"TR-567481074968"}',
     trx_proof: null,
-    createdAt: 2024-03-28T14:03:53.000Z,
-    updatedAt: 2024-03-28T14:03:53.000Z,
+    createdAt: 2024-03-28T14:24:09.000Z,
+    updatedAt: 2024-03-28T14:24:09.000Z,
     deletedAt: null
   },
   _previousDataValues: {
-    id: '343abea8-e6d6-4309-8849-c7da64b905d5',
-    TransactionId: 'BOG/TXN/PRJ/CND/1083140863',
-    orderItemId: null,
+    id: '37173361-c017-4ab8-85b4-18a5bc2f61de',
+    TransactionId: 'BOG/TXN/PROD/792120731',
+    orderItemId: '1d3dbfb5-e933-4108-a735-a7c86f1f005c',
     userId: null,
     superadmin: false,
     financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/CND/1083140863","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-909721830689","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","account_name":"Emmanuel Olaleye","bank_code":"056","bank_name":"Polaris Bank","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-909721830689"}',
+    orderId: '85d90880-9e93-4151-a144-bdff42f3ac53',
+    orderSlug: 'BOG/ORD/896933700',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/792120731","userId":null,"status":"PAID","type":"Products","paymentReference":"TR-567481074968","description":"Transfer to product partner Greenmouse [Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\\r\\n\\r\\nAlthough all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.]","product":null}',
+    transfer: '{"narration":"Transfer to product partner Greenmouse [Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\\r\\n\\r\\nAlthough all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.]","NGN":"NGN","paymentReference":"TR-567481074968"}',
     trx_proof: null,
-    createdAt: 2024-03-28T14:03:53.000Z,
-    updatedAt: 2024-03-28T14:03:53.000Z,
+    createdAt: 2024-03-28T14:24:09.000Z,
+    updatedAt: 2024-03-28T14:24:09.000Z,
     deletedAt: null
   },
   uniqno: 1,
@@ -55,399 +55,35 @@ pendingtransaction {
 }
 pendingtransaction {
   dataValues: {
-    id: 'e0e0a312-db8d-422c-885c-4cf56d91a89f',
-    TransactionId: 'BOG/TXN/PRJ/CND/1073895705',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/CND/1073895705","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-1012820912424","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","bank_code":"056","bank_name":"Polaris Bank","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-1012820912424"}',
-    trx_proof: null,
-    createdAt: 2024-03-28T14:02:57.000Z,
-    updatedAt: 2024-03-28T14:02:57.000Z,
-    deletedAt: null
-  },
-  _previousDataValues: {
-    id: 'e0e0a312-db8d-422c-885c-4cf56d91a89f',
-    TransactionId: 'BOG/TXN/PRJ/CND/1073895705',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/CND/1073895705","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-1012820912424","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","bank_code":"056","bank_name":"Polaris Bank","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-1012820912424"}',
-    trx_proof: null,
-    createdAt: 2024-03-28T14:02:57.000Z,
-    updatedAt: 2024-03-28T14:02:57.000Z,
-    deletedAt: null
-  },
-  uniqno: 1,
-  _changed: Set(0) {},
-  _options: {
-    isNewRecord: false,
-    _schema: null,
-    _schemaDelimiter: '',
-    raw: true,
-    attributes: [
-      'id',          'TransactionId',
-      'orderItemId', 'userId',
-      'superadmin',  'financialadmin',
-      'orderId',     'orderSlug',
-      'transaction', 'transfer',
-      'trx_proof',   'createdAt',
-      'updatedAt',   'deletedAt'
-    ]
-  },
-  isNewRecord: false
-}
-pendingtransaction {
-  dataValues: {
-    id: '82663c43-dd24-4fbd-99b6-13d5872cb22e',
-    TransactionId: 'BOG/TXN/PRJ/CND/339578313',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/CND/339578313","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-627341183192","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","bank_code":"056","bank_name":"Access Bank","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-627341183192"}',
-    trx_proof: null,
-    createdAt: 2024-03-28T13:58:57.000Z,
-    updatedAt: 2024-03-28T13:58:57.000Z,
-    deletedAt: null
-  },
-  _previousDataValues: {
-    id: '82663c43-dd24-4fbd-99b6-13d5872cb22e',
-    TransactionId: 'BOG/TXN/PRJ/CND/339578313',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/CND/339578313","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-627341183192","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","bank_code":"056","bank_name":"Access Bank","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-627341183192"}',
-    trx_proof: null,
-    createdAt: 2024-03-28T13:58:57.000Z,
-    updatedAt: 2024-03-28T13:58:57.000Z,
-    deletedAt: null
-  },
-  uniqno: 1,
-  _changed: Set(0) {},
-  _options: {
-    isNewRecord: false,
-    _schema: null,
-    _schemaDelimiter: '',
-    raw: true,
-    attributes: [
-      'id',          'TransactionId',
-      'orderItemId', 'userId',
-      'superadmin',  'financialadmin',
-      'orderId',     'orderSlug',
-      'transaction', 'transfer',
-      'trx_proof',   'createdAt',
-      'updatedAt',   'deletedAt'
-    ]
-  },
-  isNewRecord: false
-}
-pendingtransaction {
-  dataValues: {
-    id: 'add5966f-f7cf-40a7-becc-5b12c94a91c1',
-    TransactionId: 'BOG/TXN/PRJ/CND/1022466996',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/CND/1022466996","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-969973197401","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","bank_code":"056","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-969973197401"}',
-    trx_proof: null,
-    createdAt: 2024-03-20T13:39:32.000Z,
-    updatedAt: 2024-03-20T13:39:32.000Z,
-    deletedAt: null
-  },
-  _previousDataValues: {
-    id: 'add5966f-f7cf-40a7-becc-5b12c94a91c1',
-    TransactionId: 'BOG/TXN/PRJ/CND/1022466996',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/CND/1022466996","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-969973197401","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","bank_code":"056","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-969973197401"}',
-    trx_proof: null,
-    createdAt: 2024-03-20T13:39:32.000Z,
-    updatedAt: 2024-03-20T13:39:32.000Z,
-    deletedAt: null
-  },
-  uniqno: 1,
-  _changed: Set(0) {},
-  _options: {
-    isNewRecord: false,
-    _schema: null,
-    _schemaDelimiter: '',
-    raw: true,
-    attributes: [
-      'id',          'TransactionId',
-      'orderItemId', 'userId',
-      'superadmin',  'financialadmin',
-      'orderId',     'orderSlug',
-      'transaction', 'transfer',
-      'trx_proof',   'createdAt',
-      'updatedAt',   'deletedAt'
-    ]
-  },
-  isNewRecord: false
-}
-pendingtransaction {
-  dataValues: {
-    id: '20162896-4111-4c4a-96fa-dd78d1ddd23c',
-    TransactionId: 'BOG/TXN/PRJ/CND/241755027',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/CND/241755027","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-1144603165839","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","bank_code":"056","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-1144603165839"}',
-    trx_proof: null,
-    createdAt: 2024-03-20T13:37:24.000Z,
-    updatedAt: 2024-03-20T13:37:24.000Z,
-    deletedAt: null
-  },
-  _previousDataValues: {
-    id: '20162896-4111-4c4a-96fa-dd78d1ddd23c',
-    TransactionId: 'BOG/TXN/PRJ/CND/241755027',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/CND/241755027","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-1144603165839","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","bank_code":"056","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-1144603165839"}',
-    trx_proof: null,
-    createdAt: 2024-03-20T13:37:24.000Z,
-    updatedAt: 2024-03-20T13:37:24.000Z,
-    deletedAt: null
-  },
-  uniqno: 1,
-  _changed: Set(0) {},
-  _options: {
-    isNewRecord: false,
-    _schema: null,
-    _schemaDelimiter: '',
-    raw: true,
-    attributes: [
-      'id',          'TransactionId',
-      'orderItemId', 'userId',
-      'superadmin',  'financialadmin',
-      'orderId',     'orderSlug',
-      'transaction', 'transfer',
-      'trx_proof',   'createdAt',
-      'updatedAt',   'deletedAt'
-    ]
-  },
-  isNewRecord: false
-}
-pendingtransaction {
-  dataValues: {
-    id: 'cc4b4e01-ec5d-41cd-877a-c478c55c44c4',
-    TransactionId: 'BOG/TXN/PRJ/CND/1072500625',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/CND/1072500625","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-911366763570","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","bank_code":"056","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-911366763570"}',
-    trx_proof: null,
-    createdAt: 2024-02-13T15:55:43.000Z,
-    updatedAt: 2024-02-13T15:55:43.000Z,
-    deletedAt: null
-  },
-  _previousDataValues: {
-    id: 'cc4b4e01-ec5d-41cd-877a-c478c55c44c4',
-    TransactionId: 'BOG/TXN/PRJ/CND/1072500625',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/CND/1072500625","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-911366763570","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","bank_code":"056","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-911366763570"}',
-    trx_proof: null,
-    createdAt: 2024-02-13T15:55:43.000Z,
-    updatedAt: 2024-02-13T15:55:43.000Z,
-    deletedAt: null
-  },
-  uniqno: 1,
-  _changed: Set(0) {},
-  _options: {
-    isNewRecord: false,
-    _schema: null,
-    _schemaDelimiter: '',
-    raw: true,
-    attributes: [
-      'id',          'TransactionId',
-      'orderItemId', 'userId',
-      'superadmin',  'financialadmin',
-      'orderId',     'orderSlug',
-      'transaction', 'transfer',
-      'trx_proof',   'createdAt',
-      'updatedAt',   'deletedAt'
-    ]
-  },
-  isNewRecord: false
-}
-pendingtransaction {
-  dataValues: {
-    id: '3b8455c8-069b-4440-9a28-9aa3e67a5d34',
-    TransactionId: 'BOG/TXN/PRJ/708131104/1168626831',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/708131104/1168626831","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-952097600694","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","bank_code":"056","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-952097600694"}',
-    trx_proof: null,
-    createdAt: 2024-02-13T15:53:38.000Z,
-    updatedAt: 2024-02-13T15:53:38.000Z,
-    deletedAt: null
-  },
-  _previousDataValues: {
-    id: '3b8455c8-069b-4440-9a28-9aa3e67a5d34',
-    TransactionId: 'BOG/TXN/PRJ/708131104/1168626831',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/708131104/1168626831","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":4000,"paymentReference":"TR-952097600694","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"1130820442","bank_code":"056","amount":4000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-952097600694"}',
-    trx_proof: null,
-    createdAt: 2024-02-13T15:53:38.000Z,
-    updatedAt: 2024-02-13T15:53:38.000Z,
-    deletedAt: null
-  },
-  uniqno: 1,
-  _changed: Set(0) {},
-  _options: {
-    isNewRecord: false,
-    _schema: null,
-    _schemaDelimiter: '',
-    raw: true,
-    attributes: [
-      'id',          'TransactionId',
-      'orderItemId', 'userId',
-      'superadmin',  'financialadmin',
-      'orderId',     'orderSlug',
-      'transaction', 'transfer',
-      'trx_proof',   'createdAt',
-      'updatedAt',   'deletedAt'
-    ]
-  },
-  isNewRecord: false
-}
-pendingtransaction {
-  dataValues: {
-    id: 'd447b3f4-fb24-4e8e-b8f3-bbe358f1c129',
-    TransactionId: 'BOG/TXN/PRJ/708131104/666947068',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/708131104/666947068","userId":null,"status":"PAID","type":"Project Payout to service partner","paymentReference":"TR-774318539620","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-774318539620"}',
-    trx_proof: null,
-    createdAt: 2024-02-13T15:51:37.000Z,
-    updatedAt: 2024-02-13T15:51:37.000Z,
-    deletedAt: null
-  },
-  _previousDataValues: {
-    id: 'd447b3f4-fb24-4e8e-b8f3-bbe358f1c129',
-    TransactionId: 'BOG/TXN/PRJ/708131104/666947068',
-    orderItemId: null,
-    userId: null,
-    superadmin: false,
-    financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/708131104/666947068","userId":null,"status":"PAID","type":"Project Payout to service partner","paymentReference":"TR-774318539620","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-774318539620"}',
-    trx_proof: null,
-    createdAt: 2024-02-13T15:51:37.000Z,
-    updatedAt: 2024-02-13T15:51:37.000Z,
-    deletedAt: null
-  },
-  uniqno: 1,
-  _changed: Set(0) {},
-  _options: {
-    isNewRecord: false,
-    _schema: null,
-    _schemaDelimiter: '',
-    raw: true,
-    attributes: [
-      'id',          'TransactionId',
-      'orderItemId', 'userId',
-      'superadmin',  'financialadmin',
-      'orderId',     'orderSlug',
-      'transaction', 'transfer',
-      'trx_proof',   'createdAt',
-      'updatedAt',   'deletedAt'
-    ]
-  },
-  isNewRecord: false
-}
-pendingtransaction {
-  dataValues: {
-    id: '3ee9dd65-04f6-417f-b366-34d648d2c3ad',
-    TransactionId: 'BOG/TXN/PRJ/579713472',
-    orderItemId: null,
+    id: 'fc8e16fe-dbbf-475f-9fcf-7e9257305ebf',
+    TransactionId: 'BOG/TXN/PROD/472599123',
+    orderItemId: '0669b5db-2f47-425d-8a7a-10402e107758',
     userId: null,
     superadmin: true,
     financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/579713472","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":20000,"paymentReference":"TR-768598903431","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"3110939299","bank_code":"044","amount":20000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-768598903431"}',
+    orderId: 'a4a2cc23-a835-4cce-b9c0-1b260343884e',
+    orderSlug: 'BOG/ORD/420803474',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/472599123","userId":null,"status":"PAID","type":"Products","amount":20,"paymentReference":"TR-734484759668","description":"Transfer to product partner  [n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.]","product":{"id":"5327d82c-0908-4f07-91e6-abc47d6593ab","name":"Italian Celing","description":"n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.","categoryId":"b12689a8-fe0f-42e9-989f-defd21ad5b0d","creatorId":"b3feec73-56a2-4651-be39-e24b84ae8bd6","price":"20","quantity":"10","weight":null,"unit":"no unit","image":"https://bog.greenmouseproperties.com/uploads/7VHz8kFCeling.jpeg","showInShop":true,"status":"approved","createdAt":"2023-06-06T11:31:57.000Z","updatedAt":"2023-06-06T11:33:45.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":20,"narration":"Transfer to product partner  [n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.]","NGN":"NGN","paymentReference":"TR-734484759668"}',
     trx_proof: null,
-    createdAt: 2023-09-27T19:01:35.000Z,
-    updatedAt: 2023-09-27T19:09:32.000Z,
+    createdAt: 2023-08-07T16:49:14.000Z,
+    updatedAt: 2023-08-07T16:52:08.000Z,
     deletedAt: null
   },
   _previousDataValues: {
-    id: '3ee9dd65-04f6-417f-b366-34d648d2c3ad',
-    TransactionId: 'BOG/TXN/PRJ/579713472',
-    orderItemId: null,
+    id: 'fc8e16fe-dbbf-475f-9fcf-7e9257305ebf',
+    TransactionId: 'BOG/TXN/PROD/472599123',
+    orderItemId: '0669b5db-2f47-425d-8a7a-10402e107758',
     userId: null,
     superadmin: true,
     financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/579713472","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":20000,"paymentReference":"TR-768598903431","description":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","project":{"id":"5a4b4e5d-1a56-4ad7-b94c-84eb3be75b19","userId":"31a3ad9b-af6b-48f9-a90f-521cdc83d8a4","title":"Drawings","projectSlug":"BOG/PRJ/CND/708131104","description":null,"projectTypes":"construction_drawing","status":"ongoing","approvalStatus":"approved","serviceProviderId":"bb78c8d1-5db9-4fff-88f0-549197845e4a","totalCost":299884,"estimatedCost":394893,"duration":4,"progress":28,"service_partner_progress":100,"endDate":"2023-10-12T15:11:07.000Z","totalEndDate":null,"assigned_at":"2023-09-14T14:58:43.000Z","service_partner_completion_date":"2023-10-05T14:58:43.000Z","completion_acknowledged":true,"service_partner_delivery_performance":"5-10% of time","timely_delivery_rating":1,"provider_submission_date":"2023-10-08T16:39:55.000Z","createdAt":"2023-09-13T08:57:05.000Z","updatedAt":"2023-09-25T16:52:47.000Z","deletedAt":null}}',
-    transfer: '{"account_number":"3110939299","bank_code":"044","amount":20000,"narration":"Transfer to service partner Greenmouse Technologies [BOG/PRJ/CND/708131104]","NGN":"NGN","paymentReference":"TR-768598903431"}',
+    orderId: 'a4a2cc23-a835-4cce-b9c0-1b260343884e',
+    orderSlug: 'BOG/ORD/420803474',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/472599123","userId":null,"status":"PAID","type":"Products","amount":20,"paymentReference":"TR-734484759668","description":"Transfer to product partner  [n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.]","product":{"id":"5327d82c-0908-4f07-91e6-abc47d6593ab","name":"Italian Celing","description":"n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.","categoryId":"b12689a8-fe0f-42e9-989f-defd21ad5b0d","creatorId":"b3feec73-56a2-4651-be39-e24b84ae8bd6","price":"20","quantity":"10","weight":null,"unit":"no unit","image":"https://bog.greenmouseproperties.com/uploads/7VHz8kFCeling.jpeg","showInShop":true,"status":"approved","createdAt":"2023-06-06T11:31:57.000Z","updatedAt":"2023-06-06T11:33:45.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":20,"narration":"Transfer to product partner  [n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.]","NGN":"NGN","paymentReference":"TR-734484759668"}',
     trx_proof: null,
-    createdAt: 2023-09-27T19:01:35.000Z,
-    updatedAt: 2023-09-27T19:09:32.000Z,
+    createdAt: 2023-08-07T16:49:14.000Z,
+    updatedAt: 2023-08-07T16:52:08.000Z,
     deletedAt: null
   },
   uniqno: 1,
@@ -471,35 +107,599 @@ pendingtransaction {
 }
 pendingtransaction {
   dataValues: {
-    id: 'd4b0d9fd-3409-4009-95d6-536fb945abf9',
-    TransactionId: 'BOG/TXN/PRJ/314036616',
-    orderItemId: null,
+    id: '0d882ae0-e807-4e1f-9efb-f59437834b44',
+    TransactionId: 'BOG/TXN/PROD/311363925',
+    orderItemId: 'f37fc3ec-815f-4fe7-9bfc-f73faad8d736',
     userId: null,
-    superadmin: false,
+    superadmin: true,
     financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/314036616","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":30000,"paymentReference":"TR-429330008056","description":"Transfer to service partner Greenmouse [BOG/PRJ/CNT/947237552]","project":{"id":"bb9e6e59-dbe8-4c80-89c1-88d313146d02","userId":"bda16c68-664f-40e7-b270-e6fdd515018b","title":"Excavation","projectSlug":"BOG/PRJ/CNT/947237552","description":null,"projectTypes":"contractor","status":"ongoing","approvalStatus":"approved","serviceProviderId":"cd1c078b-2fc1-48a4-83ba-51c8b3f35c55","totalCost":5000000,"estimatedCost":5000000,"duration":3,"progress":100,"service_partner_progress":30,"endDate":"2023-05-12T13:44:38.000Z","totalEndDate":null,"createdAt":"2023-04-21T13:13:30.000Z","updatedAt":"2023-04-28T10:38:33.000Z","deletedAt":null}}',
-    transfer: '{"bank_code":"044","amount":30000,"narration":"Transfer to service partner Greenmouse [BOG/PRJ/CNT/947237552]","NGN":"NGN","paymentReference":"TR-429330008056"}',
-    trx_proof: 'https://trxproof.jkl.png',
-    createdAt: 2023-06-06T11:47:44.000Z,
-    updatedAt: 2024-03-19T16:28:39.000Z,
+    orderId: '2f5c3b4c-96f2-404d-a9c3-047a0ae069b6',
+    orderSlug: 'BOG/ORD/726702370',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/311363925","userId":null,"status":"PAID","type":"Products","amount":1000,"paymentReference":"TR-997687893701","description":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","product":{"id":"2a8e06c9-3330-47e1-9a69-af3d52ae519c","name":"QA Steel","description":"Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.","categoryId":"219968e6-b6c6-4c7e-a32f-3830ad501de8","creatorId":"81588e5b-7869-43e2-b44f-46b27413f21e","price":"500","quantity":"190","weight":null,"unit":"pieces","image":"https://bog.greenmouseproperties.com/uploads/l3btiG5rod4.jpeg","showInShop":true,"status":"approved","createdAt":"2023-08-03T15:01:52.000Z","updatedAt":"2023-08-03T15:15:04.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":1000,"narration":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","NGN":"NGN","paymentReference":"TR-997687893701"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:48:47.000Z,
+    updatedAt: 2023-08-07T16:52:04.000Z,
     deletedAt: null
   },
   _previousDataValues: {
-    id: 'd4b0d9fd-3409-4009-95d6-536fb945abf9',
-    TransactionId: 'BOG/TXN/PRJ/314036616',
-    orderItemId: null,
+    id: '0d882ae0-e807-4e1f-9efb-f59437834b44',
+    TransactionId: 'BOG/TXN/PROD/311363925',
+    orderItemId: 'f37fc3ec-815f-4fe7-9bfc-f73faad8d736',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: '2f5c3b4c-96f2-404d-a9c3-047a0ae069b6',
+    orderSlug: 'BOG/ORD/726702370',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/311363925","userId":null,"status":"PAID","type":"Products","amount":1000,"paymentReference":"TR-997687893701","description":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","product":{"id":"2a8e06c9-3330-47e1-9a69-af3d52ae519c","name":"QA Steel","description":"Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.","categoryId":"219968e6-b6c6-4c7e-a32f-3830ad501de8","creatorId":"81588e5b-7869-43e2-b44f-46b27413f21e","price":"500","quantity":"190","weight":null,"unit":"pieces","image":"https://bog.greenmouseproperties.com/uploads/l3btiG5rod4.jpeg","showInShop":true,"status":"approved","createdAt":"2023-08-03T15:01:52.000Z","updatedAt":"2023-08-03T15:15:04.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":1000,"narration":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","NGN":"NGN","paymentReference":"TR-997687893701"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:48:47.000Z,
+    updatedAt: 2023-08-07T16:52:04.000Z,
+    deletedAt: null
+  },
+  uniqno: 1,
+  _changed: Set(0) {},
+  _options: {
+    isNewRecord: false,
+    _schema: null,
+    _schemaDelimiter: '',
+    raw: true,
+    attributes: [
+      'id',          'TransactionId',
+      'orderItemId', 'userId',
+      'superadmin',  'financialadmin',
+      'orderId',     'orderSlug',
+      'transaction', 'transfer',
+      'trx_proof',   'createdAt',
+      'updatedAt',   'deletedAt'
+    ]
+  },
+  isNewRecord: false
+}
+pendingtransaction {
+  dataValues: {
+    id: '9d6a760d-2544-4018-84ce-da1f0e11c286',
+    TransactionId: 'BOG/TXN/PROD/399748835',
+    orderItemId: '85ab8031-c392-4d5b-be72-a3e251dbf4ba',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: 'ef67e62a-728b-4678-aa9a-cbb755f71548',
+    orderSlug: 'BOG/ORD/854733294',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/399748835","userId":null,"status":"PAID","type":"Products","amount":1000,"paymentReference":"TR-814081757784","description":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","product":{"id":"2a8e06c9-3330-47e1-9a69-af3d52ae519c","name":"QA Steel","description":"Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.","categoryId":"219968e6-b6c6-4c7e-a32f-3830ad501de8","creatorId":"81588e5b-7869-43e2-b44f-46b27413f21e","price":"500","quantity":"190","weight":null,"unit":"pieces","image":"https://bog.greenmouseproperties.com/uploads/l3btiG5rod4.jpeg","showInShop":true,"status":"approved","createdAt":"2023-08-03T15:01:52.000Z","updatedAt":"2023-08-03T15:15:04.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":1000,"narration":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","NGN":"NGN","paymentReference":"TR-814081757784"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:40:45.000Z,
+    updatedAt: 2023-08-07T16:50:57.000Z,
+    deletedAt: null
+  },
+  _previousDataValues: {
+    id: '9d6a760d-2544-4018-84ce-da1f0e11c286',
+    TransactionId: 'BOG/TXN/PROD/399748835',
+    orderItemId: '85ab8031-c392-4d5b-be72-a3e251dbf4ba',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: 'ef67e62a-728b-4678-aa9a-cbb755f71548',
+    orderSlug: 'BOG/ORD/854733294',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/399748835","userId":null,"status":"PAID","type":"Products","amount":1000,"paymentReference":"TR-814081757784","description":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","product":{"id":"2a8e06c9-3330-47e1-9a69-af3d52ae519c","name":"QA Steel","description":"Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.","categoryId":"219968e6-b6c6-4c7e-a32f-3830ad501de8","creatorId":"81588e5b-7869-43e2-b44f-46b27413f21e","price":"500","quantity":"190","weight":null,"unit":"pieces","image":"https://bog.greenmouseproperties.com/uploads/l3btiG5rod4.jpeg","showInShop":true,"status":"approved","createdAt":"2023-08-03T15:01:52.000Z","updatedAt":"2023-08-03T15:15:04.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":1000,"narration":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","NGN":"NGN","paymentReference":"TR-814081757784"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:40:45.000Z,
+    updatedAt: 2023-08-07T16:50:57.000Z,
+    deletedAt: null
+  },
+  uniqno: 1,
+  _changed: Set(0) {},
+  _options: {
+    isNewRecord: false,
+    _schema: null,
+    _schemaDelimiter: '',
+    raw: true,
+    attributes: [
+      'id',          'TransactionId',
+      'orderItemId', 'userId',
+      'superadmin',  'financialadmin',
+      'orderId',     'orderSlug',
+      'transaction', 'transfer',
+      'trx_proof',   'createdAt',
+      'updatedAt',   'deletedAt'
+    ]
+  },
+  isNewRecord: false
+}
+[]
+pendingtransaction {
+  dataValues: {
+    id: '37173361-c017-4ab8-85b4-18a5bc2f61de',
+    TransactionId: 'BOG/TXN/PROD/792120731',
+    orderItemId: '1d3dbfb5-e933-4108-a735-a7c86f1f005c',
     userId: null,
     superadmin: false,
     financialadmin: false,
-    orderId: null,
-    orderSlug: null,
-    transaction: '{"TransactionId":"BOG/TXN/PRJ/314036616","userId":null,"status":"PAID","type":"Project Payout to service partner","amount":30000,"paymentReference":"TR-429330008056","description":"Transfer to service partner Greenmouse [BOG/PRJ/CNT/947237552]","project":{"id":"bb9e6e59-dbe8-4c80-89c1-88d313146d02","userId":"bda16c68-664f-40e7-b270-e6fdd515018b","title":"Excavation","projectSlug":"BOG/PRJ/CNT/947237552","description":null,"projectTypes":"contractor","status":"ongoing","approvalStatus":"approved","serviceProviderId":"cd1c078b-2fc1-48a4-83ba-51c8b3f35c55","totalCost":5000000,"estimatedCost":5000000,"duration":3,"progress":100,"service_partner_progress":30,"endDate":"2023-05-12T13:44:38.000Z","totalEndDate":null,"createdAt":"2023-04-21T13:13:30.000Z","updatedAt":"2023-04-28T10:38:33.000Z","deletedAt":null}}',
-    transfer: '{"bank_code":"044","amount":30000,"narration":"Transfer to service partner Greenmouse [BOG/PRJ/CNT/947237552]","NGN":"NGN","paymentReference":"TR-429330008056"}',
-    trx_proof: 'https://trxproof.jkl.png',
-    createdAt: 2023-06-06T11:47:44.000Z,
-    updatedAt: 2024-03-19T16:28:39.000Z,
+    orderId: '85d90880-9e93-4151-a144-bdff42f3ac53',
+    orderSlug: 'BOG/ORD/896933700',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/792120731","userId":null,"status":"PAID","type":"Products","paymentReference":"TR-567481074968","description":"Transfer to product partner Greenmouse [Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\\r\\n\\r\\nAlthough all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.]","product":null}',
+    transfer: '{"narration":"Transfer to product partner Greenmouse [Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\\r\\n\\r\\nAlthough all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.]","NGN":"NGN","paymentReference":"TR-567481074968"}',
+    trx_proof: null,
+    createdAt: 2024-03-28T14:24:09.000Z,
+    updatedAt: 2024-03-28T14:24:09.000Z,
+    deletedAt: null
+  },
+  _previousDataValues: {
+    id: '37173361-c017-4ab8-85b4-18a5bc2f61de',
+    TransactionId: 'BOG/TXN/PROD/792120731',
+    orderItemId: '1d3dbfb5-e933-4108-a735-a7c86f1f005c',
+    userId: null,
+    superadmin: false,
+    financialadmin: false,
+    orderId: '85d90880-9e93-4151-a144-bdff42f3ac53',
+    orderSlug: 'BOG/ORD/896933700',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/792120731","userId":null,"status":"PAID","type":"Products","paymentReference":"TR-567481074968","description":"Transfer to product partner Greenmouse [Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\\r\\n\\r\\nAlthough all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.]","product":null}',
+    transfer: '{"narration":"Transfer to product partner Greenmouse [Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\\r\\n\\r\\nAlthough all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.]","NGN":"NGN","paymentReference":"TR-567481074968"}',
+    trx_proof: null,
+    createdAt: 2024-03-28T14:24:09.000Z,
+    updatedAt: 2024-03-28T14:24:09.000Z,
+    deletedAt: null
+  },
+  uniqno: 1,
+  _changed: Set(0) {},
+  _options: {
+    isNewRecord: false,
+    _schema: null,
+    _schemaDelimiter: '',
+    raw: true,
+    attributes: [
+      'id',          'TransactionId',
+      'orderItemId', 'userId',
+      'superadmin',  'financialadmin',
+      'orderId',     'orderSlug',
+      'transaction', 'transfer',
+      'trx_proof',   'createdAt',
+      'updatedAt',   'deletedAt'
+    ]
+  },
+  isNewRecord: false
+}
+pendingtransaction {
+  dataValues: {
+    id: 'fc8e16fe-dbbf-475f-9fcf-7e9257305ebf',
+    TransactionId: 'BOG/TXN/PROD/472599123',
+    orderItemId: '0669b5db-2f47-425d-8a7a-10402e107758',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: 'a4a2cc23-a835-4cce-b9c0-1b260343884e',
+    orderSlug: 'BOG/ORD/420803474',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/472599123","userId":null,"status":"PAID","type":"Products","amount":20,"paymentReference":"TR-734484759668","description":"Transfer to product partner  [n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.]","product":{"id":"5327d82c-0908-4f07-91e6-abc47d6593ab","name":"Italian Celing","description":"n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.","categoryId":"b12689a8-fe0f-42e9-989f-defd21ad5b0d","creatorId":"b3feec73-56a2-4651-be39-e24b84ae8bd6","price":"20","quantity":"10","weight":null,"unit":"no unit","image":"https://bog.greenmouseproperties.com/uploads/7VHz8kFCeling.jpeg","showInShop":true,"status":"approved","createdAt":"2023-06-06T11:31:57.000Z","updatedAt":"2023-06-06T11:33:45.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":20,"narration":"Transfer to product partner  [n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.]","NGN":"NGN","paymentReference":"TR-734484759668"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:49:14.000Z,
+    updatedAt: 2023-08-07T16:52:08.000Z,
+    deletedAt: null
+  },
+  _previousDataValues: {
+    id: 'fc8e16fe-dbbf-475f-9fcf-7e9257305ebf',
+    TransactionId: 'BOG/TXN/PROD/472599123',
+    orderItemId: '0669b5db-2f47-425d-8a7a-10402e107758',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: 'a4a2cc23-a835-4cce-b9c0-1b260343884e',
+    orderSlug: 'BOG/ORD/420803474',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/472599123","userId":null,"status":"PAID","type":"Products","amount":20,"paymentReference":"TR-734484759668","description":"Transfer to product partner  [n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.]","product":{"id":"5327d82c-0908-4f07-91e6-abc47d6593ab","name":"Italian Celing","description":"n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.","categoryId":"b12689a8-fe0f-42e9-989f-defd21ad5b0d","creatorId":"b3feec73-56a2-4651-be39-e24b84ae8bd6","price":"20","quantity":"10","weight":null,"unit":"no unit","image":"https://bog.greenmouseproperties.com/uploads/7VHz8kFCeling.jpeg","showInShop":true,"status":"approved","createdAt":"2023-06-06T11:31:57.000Z","updatedAt":"2023-06-06T11:33:45.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":20,"narration":"Transfer to product partner  [n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.]","NGN":"NGN","paymentReference":"TR-734484759668"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:49:14.000Z,
+    updatedAt: 2023-08-07T16:52:08.000Z,
+    deletedAt: null
+  },
+  uniqno: 1,
+  _changed: Set(0) {},
+  _options: {
+    isNewRecord: false,
+    _schema: null,
+    _schemaDelimiter: '',
+    raw: true,
+    attributes: [
+      'id',          'TransactionId',
+      'orderItemId', 'userId',
+      'superadmin',  'financialadmin',
+      'orderId',     'orderSlug',
+      'transaction', 'transfer',
+      'trx_proof',   'createdAt',
+      'updatedAt',   'deletedAt'
+    ]
+  },
+  isNewRecord: false
+}
+pendingtransaction {
+  dataValues: {
+    id: '0d882ae0-e807-4e1f-9efb-f59437834b44',
+    TransactionId: 'BOG/TXN/PROD/311363925',
+    orderItemId: 'f37fc3ec-815f-4fe7-9bfc-f73faad8d736',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: '2f5c3b4c-96f2-404d-a9c3-047a0ae069b6',
+    orderSlug: 'BOG/ORD/726702370',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/311363925","userId":null,"status":"PAID","type":"Products","amount":1000,"paymentReference":"TR-997687893701","description":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","product":{"id":"2a8e06c9-3330-47e1-9a69-af3d52ae519c","name":"QA Steel","description":"Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.","categoryId":"219968e6-b6c6-4c7e-a32f-3830ad501de8","creatorId":"81588e5b-7869-43e2-b44f-46b27413f21e","price":"500","quantity":"190","weight":null,"unit":"pieces","image":"https://bog.greenmouseproperties.com/uploads/l3btiG5rod4.jpeg","showInShop":true,"status":"approved","createdAt":"2023-08-03T15:01:52.000Z","updatedAt":"2023-08-03T15:15:04.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":1000,"narration":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","NGN":"NGN","paymentReference":"TR-997687893701"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:48:47.000Z,
+    updatedAt: 2023-08-07T16:52:04.000Z,
+    deletedAt: null
+  },
+  _previousDataValues: {
+    id: '0d882ae0-e807-4e1f-9efb-f59437834b44',
+    TransactionId: 'BOG/TXN/PROD/311363925',
+    orderItemId: 'f37fc3ec-815f-4fe7-9bfc-f73faad8d736',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: '2f5c3b4c-96f2-404d-a9c3-047a0ae069b6',
+    orderSlug: 'BOG/ORD/726702370',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/311363925","userId":null,"status":"PAID","type":"Products","amount":1000,"paymentReference":"TR-997687893701","description":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","product":{"id":"2a8e06c9-3330-47e1-9a69-af3d52ae519c","name":"QA Steel","description":"Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.","categoryId":"219968e6-b6c6-4c7e-a32f-3830ad501de8","creatorId":"81588e5b-7869-43e2-b44f-46b27413f21e","price":"500","quantity":"190","weight":null,"unit":"pieces","image":"https://bog.greenmouseproperties.com/uploads/l3btiG5rod4.jpeg","showInShop":true,"status":"approved","createdAt":"2023-08-03T15:01:52.000Z","updatedAt":"2023-08-03T15:15:04.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":1000,"narration":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","NGN":"NGN","paymentReference":"TR-997687893701"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:48:47.000Z,
+    updatedAt: 2023-08-07T16:52:04.000Z,
+    deletedAt: null
+  },
+  uniqno: 1,
+  _changed: Set(0) {},
+  _options: {
+    isNewRecord: false,
+    _schema: null,
+    _schemaDelimiter: '',
+    raw: true,
+    attributes: [
+      'id',          'TransactionId',
+      'orderItemId', 'userId',
+      'superadmin',  'financialadmin',
+      'orderId',     'orderSlug',
+      'transaction', 'transfer',
+      'trx_proof',   'createdAt',
+      'updatedAt',   'deletedAt'
+    ]
+  },
+  isNewRecord: false
+}
+pendingtransaction {
+  dataValues: {
+    id: '9d6a760d-2544-4018-84ce-da1f0e11c286',
+    TransactionId: 'BOG/TXN/PROD/399748835',
+    orderItemId: '85ab8031-c392-4d5b-be72-a3e251dbf4ba',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: 'ef67e62a-728b-4678-aa9a-cbb755f71548',
+    orderSlug: 'BOG/ORD/854733294',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/399748835","userId":null,"status":"PAID","type":"Products","amount":1000,"paymentReference":"TR-814081757784","description":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","product":{"id":"2a8e06c9-3330-47e1-9a69-af3d52ae519c","name":"QA Steel","description":"Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.","categoryId":"219968e6-b6c6-4c7e-a32f-3830ad501de8","creatorId":"81588e5b-7869-43e2-b44f-46b27413f21e","price":"500","quantity":"190","weight":null,"unit":"pieces","image":"https://bog.greenmouseproperties.com/uploads/l3btiG5rod4.jpeg","showInShop":true,"status":"approved","createdAt":"2023-08-03T15:01:52.000Z","updatedAt":"2023-08-03T15:15:04.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":1000,"narration":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","NGN":"NGN","paymentReference":"TR-814081757784"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:40:45.000Z,
+    updatedAt: 2023-08-07T16:50:57.000Z,
+    deletedAt: null
+  },
+  _previousDataValues: {
+    id: '9d6a760d-2544-4018-84ce-da1f0e11c286',
+    TransactionId: 'BOG/TXN/PROD/399748835',
+    orderItemId: '85ab8031-c392-4d5b-be72-a3e251dbf4ba',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: 'ef67e62a-728b-4678-aa9a-cbb755f71548',
+    orderSlug: 'BOG/ORD/854733294',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/399748835","userId":null,"status":"PAID","type":"Products","amount":1000,"paymentReference":"TR-814081757784","description":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","product":{"id":"2a8e06c9-3330-47e1-9a69-af3d52ae519c","name":"QA Steel","description":"Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.","categoryId":"219968e6-b6c6-4c7e-a32f-3830ad501de8","creatorId":"81588e5b-7869-43e2-b44f-46b27413f21e","price":"500","quantity":"190","weight":null,"unit":"pieces","image":"https://bog.greenmouseproperties.com/uploads/l3btiG5rod4.jpeg","showInShop":true,"status":"approved","createdAt":"2023-08-03T15:01:52.000Z","updatedAt":"2023-08-03T15:15:04.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":1000,"narration":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","NGN":"NGN","paymentReference":"TR-814081757784"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:40:45.000Z,
+    updatedAt: 2023-08-07T16:50:57.000Z,
+    deletedAt: null
+  },
+  uniqno: 1,
+  _changed: Set(0) {},
+  _options: {
+    isNewRecord: false,
+    _schema: null,
+    _schemaDelimiter: '',
+    raw: true,
+    attributes: [
+      'id',          'TransactionId',
+      'orderItemId', 'userId',
+      'superadmin',  'financialadmin',
+      'orderId',     'orderSlug',
+      'transaction', 'transfer',
+      'trx_proof',   'createdAt',
+      'updatedAt',   'deletedAt'
+    ]
+  },
+  isNewRecord: false
+}
+[]
+deliveryFee = 0
+product_partners {
+  dataValues: {
+    id: '7a7b1c45-a5f3-4fe9-a890-73e7aec4d79f',
+    userId: 'd565fe9b-96ba-4f9e-ab0f-db5f3eafbbb2',
+    userType: 'vendor',
+    isVerified: true,
+    company_address: null,
+    company_state: null,
+    company_city: null,
+    company_street: null,
+    company_name: 'Greenmouse',
+    cac_number: null,
+    tin: null,
+    years_of_experience: null,
+    certificate_of_operation: null,
+    professional_certificate: null,
+    kycPoint: 90,
+    planId: null,
+    expiredAt: 2023-09-28T15:35:13.000Z,
+    hasActiveSubscription: false,
+    createdAt: 2023-04-13T15:22:23.000Z,
+    updatedAt: 2023-10-25T05:53:00.000Z,
+    deletedAt: null
+  },
+  _previousDataValues: {
+    id: '7a7b1c45-a5f3-4fe9-a890-73e7aec4d79f',
+    userId: 'd565fe9b-96ba-4f9e-ab0f-db5f3eafbbb2',
+    userType: 'vendor',
+    isVerified: true,
+    company_address: null,
+    company_state: null,
+    company_city: null,
+    company_street: null,
+    company_name: 'Greenmouse',
+    cac_number: null,
+    tin: null,
+    years_of_experience: null,
+    certificate_of_operation: null,
+    professional_certificate: null,
+    kycPoint: 90,
+    planId: null,
+    expiredAt: 2023-09-28T15:35:13.000Z,
+    hasActiveSubscription: false,
+    createdAt: 2023-04-13T15:22:23.000Z,
+    updatedAt: 2023-10-25T05:53:00.000Z,
+    deletedAt: null
+  },
+  uniqno: 1,
+  _changed: Set(0) {},
+  _options: {
+    isNewRecord: false,
+    _schema: null,
+    _schemaDelimiter: '',
+    raw: true,
+    attributes: [
+      'id',
+      'userId',
+      'userType',
+      'isVerified',
+      'company_address',
+      'company_state',
+      'company_city',
+      'company_street',
+      'company_name',
+      'cac_number',
+      'tin',
+      'years_of_experience',
+      'certificate_of_operation',
+      'professional_certificate',
+      'kycPoint',
+      'planId',
+      'expiredAt',
+      'hasActiveSubscription',
+      'createdAt',
+      'updatedAt',
+      'deletedAt'
+    ]
+  },
+  isNewRecord: false
+}
+{
+  id: '485be07a-fdaf-483d-8a89-f2f35c2f697d',
+  name: '5mm QA Steel 2023',
+  price: '50000',
+  unit: '25 x 8 mm',
+  image: 'https://bog.greenmouseproperties.com/uploads/Y6csNRFSteel.jpeg',
+  description: 'Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\r\n' +
+    '\r\n' +
+    'Although all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.'
+}
+null
+85d90880-9e93-4151-a144-bdff42f3ac53
+Notification sent
+pendingtransaction {
+  dataValues: {
+    id: '75fcb6a4-359d-44fc-afcc-300b9f882170',
+    TransactionId: 'BOG/TXN/PROD/1045440772',
+    orderItemId: '1d3dbfb5-e933-4108-a735-a7c86f1f005c',
+    userId: null,
+    superadmin: false,
+    financialadmin: false,
+    orderId: '85d90880-9e93-4151-a144-bdff42f3ac53',
+    orderSlug: 'BOG/ORD/896933700',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/1045440772","userId":null,"status":"PAID","type":"Products","amount":5000,"paymentReference":"TR-1139869972053","description":"Transfer to product partner Greenmouse [Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\\r\\n\\r\\nAlthough all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.]","product":null}',
+    transfer: '{"account_number":"1130820442","bank_name":"Polaris Bank","account_name":"Emmanuel Olaleye","bank_code":"056","amount":5000,"narration":"Transfer to product partner Greenmouse [Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\\r\\n\\r\\nAlthough all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.]","NGN":"NGN","paymentReference":"TR-1139869972053"}',
+    trx_proof: null,
+    createdAt: 2024-03-28T14:30:37.000Z,
+    updatedAt: 2024-03-28T14:30:37.000Z,
+    deletedAt: null
+  },
+  _previousDataValues: {
+    id: '75fcb6a4-359d-44fc-afcc-300b9f882170',
+    TransactionId: 'BOG/TXN/PROD/1045440772',
+    orderItemId: '1d3dbfb5-e933-4108-a735-a7c86f1f005c',
+    userId: null,
+    superadmin: false,
+    financialadmin: false,
+    orderId: '85d90880-9e93-4151-a144-bdff42f3ac53',
+    orderSlug: 'BOG/ORD/896933700',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/1045440772","userId":null,"status":"PAID","type":"Products","amount":5000,"paymentReference":"TR-1139869972053","description":"Transfer to product partner Greenmouse [Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\\r\\n\\r\\nAlthough all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.]","product":null}',
+    transfer: '{"account_number":"1130820442","bank_name":"Polaris Bank","account_name":"Emmanuel Olaleye","bank_code":"056","amount":5000,"narration":"Transfer to product partner Greenmouse [Iron, the major elemental component of steel, is one of the most plentiful elements in the earth’s crust. All steel alloys are primarily iron and 0.002–2.1 % carbon by weight. In this range, carbon bonds with iron to create a strong molecular structure. The resulting lattice microstructure helps achieve certain material properties, like tensile strength and hardness, that we rely on in steel.\\r\\n\\r\\nAlthough all steel is made of iron and carbon, different types of steel contain different percentages of each element. Steel can also include other elements like nickel, molybdenum, manganese, titanium, boron, cobalt, or vanadium. Adding different elements to the “recipe” for a steel alloy affects its material properties. The method of manufacture and treatment of the steel further enhances those abilities.]","NGN":"NGN","paymentReference":"TR-1139869972053"}',
+    trx_proof: null,
+    createdAt: 2024-03-28T14:30:37.000Z,
+    updatedAt: 2024-03-28T14:30:37.000Z,
+    deletedAt: null
+  },
+  uniqno: 1,
+  _changed: Set(0) {},
+  _options: {
+    isNewRecord: false,
+    _schema: null,
+    _schemaDelimiter: '',
+    raw: true,
+    attributes: [
+      'id',          'TransactionId',
+      'orderItemId', 'userId',
+      'superadmin',  'financialadmin',
+      'orderId',     'orderSlug',
+      'transaction', 'transfer',
+      'trx_proof',   'createdAt',
+      'updatedAt',   'deletedAt'
+    ]
+  },
+  isNewRecord: false
+}
+pendingtransaction {
+  dataValues: {
+    id: 'fc8e16fe-dbbf-475f-9fcf-7e9257305ebf',
+    TransactionId: 'BOG/TXN/PROD/472599123',
+    orderItemId: '0669b5db-2f47-425d-8a7a-10402e107758',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: 'a4a2cc23-a835-4cce-b9c0-1b260343884e',
+    orderSlug: 'BOG/ORD/420803474',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/472599123","userId":null,"status":"PAID","type":"Products","amount":20,"paymentReference":"TR-734484759668","description":"Transfer to product partner  [n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.]","product":{"id":"5327d82c-0908-4f07-91e6-abc47d6593ab","name":"Italian Celing","description":"n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.","categoryId":"b12689a8-fe0f-42e9-989f-defd21ad5b0d","creatorId":"b3feec73-56a2-4651-be39-e24b84ae8bd6","price":"20","quantity":"10","weight":null,"unit":"no unit","image":"https://bog.greenmouseproperties.com/uploads/7VHz8kFCeling.jpeg","showInShop":true,"status":"approved","createdAt":"2023-06-06T11:31:57.000Z","updatedAt":"2023-06-06T11:33:45.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":20,"narration":"Transfer to product partner  [n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.]","NGN":"NGN","paymentReference":"TR-734484759668"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:49:14.000Z,
+    updatedAt: 2023-08-07T16:52:08.000Z,
+    deletedAt: null
+  },
+  _previousDataValues: {
+    id: 'fc8e16fe-dbbf-475f-9fcf-7e9257305ebf',
+    TransactionId: 'BOG/TXN/PROD/472599123',
+    orderItemId: '0669b5db-2f47-425d-8a7a-10402e107758',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: 'a4a2cc23-a835-4cce-b9c0-1b260343884e',
+    orderSlug: 'BOG/ORD/420803474',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/472599123","userId":null,"status":"PAID","type":"Products","amount":20,"paymentReference":"TR-734484759668","description":"Transfer to product partner  [n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.]","product":{"id":"5327d82c-0908-4f07-91e6-abc47d6593ab","name":"Italian Celing","description":"n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.","categoryId":"b12689a8-fe0f-42e9-989f-defd21ad5b0d","creatorId":"b3feec73-56a2-4651-be39-e24b84ae8bd6","price":"20","quantity":"10","weight":null,"unit":"no unit","image":"https://bog.greenmouseproperties.com/uploads/7VHz8kFCeling.jpeg","showInShop":true,"status":"approved","createdAt":"2023-06-06T11:31:57.000Z","updatedAt":"2023-06-06T11:33:45.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":20,"narration":"Transfer to product partner  [n regular light-frame construction and conventional roof framing, the ceiling is constructed using an arrangement of timber joists and beams that run across the length and width of the ceiling. Other materials, such as metal and concrete, may also be involved in making a ceiling.]","NGN":"NGN","paymentReference":"TR-734484759668"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:49:14.000Z,
+    updatedAt: 2023-08-07T16:52:08.000Z,
+    deletedAt: null
+  },
+  uniqno: 1,
+  _changed: Set(0) {},
+  _options: {
+    isNewRecord: false,
+    _schema: null,
+    _schemaDelimiter: '',
+    raw: true,
+    attributes: [
+      'id',          'TransactionId',
+      'orderItemId', 'userId',
+      'superadmin',  'financialadmin',
+      'orderId',     'orderSlug',
+      'transaction', 'transfer',
+      'trx_proof',   'createdAt',
+      'updatedAt',   'deletedAt'
+    ]
+  },
+  isNewRecord: false
+}
+pendingtransaction {
+  dataValues: {
+    id: '0d882ae0-e807-4e1f-9efb-f59437834b44',
+    TransactionId: 'BOG/TXN/PROD/311363925',
+    orderItemId: 'f37fc3ec-815f-4fe7-9bfc-f73faad8d736',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: '2f5c3b4c-96f2-404d-a9c3-047a0ae069b6',
+    orderSlug: 'BOG/ORD/726702370',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/311363925","userId":null,"status":"PAID","type":"Products","amount":1000,"paymentReference":"TR-997687893701","description":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","product":{"id":"2a8e06c9-3330-47e1-9a69-af3d52ae519c","name":"QA Steel","description":"Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.","categoryId":"219968e6-b6c6-4c7e-a32f-3830ad501de8","creatorId":"81588e5b-7869-43e2-b44f-46b27413f21e","price":"500","quantity":"190","weight":null,"unit":"pieces","image":"https://bog.greenmouseproperties.com/uploads/l3btiG5rod4.jpeg","showInShop":true,"status":"approved","createdAt":"2023-08-03T15:01:52.000Z","updatedAt":"2023-08-03T15:15:04.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":1000,"narration":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","NGN":"NGN","paymentReference":"TR-997687893701"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:48:47.000Z,
+    updatedAt: 2023-08-07T16:52:04.000Z,
+    deletedAt: null
+  },
+  _previousDataValues: {
+    id: '0d882ae0-e807-4e1f-9efb-f59437834b44',
+    TransactionId: 'BOG/TXN/PROD/311363925',
+    orderItemId: 'f37fc3ec-815f-4fe7-9bfc-f73faad8d736',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: '2f5c3b4c-96f2-404d-a9c3-047a0ae069b6',
+    orderSlug: 'BOG/ORD/726702370',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/311363925","userId":null,"status":"PAID","type":"Products","amount":1000,"paymentReference":"TR-997687893701","description":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","product":{"id":"2a8e06c9-3330-47e1-9a69-af3d52ae519c","name":"QA Steel","description":"Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.","categoryId":"219968e6-b6c6-4c7e-a32f-3830ad501de8","creatorId":"81588e5b-7869-43e2-b44f-46b27413f21e","price":"500","quantity":"190","weight":null,"unit":"pieces","image":"https://bog.greenmouseproperties.com/uploads/l3btiG5rod4.jpeg","showInShop":true,"status":"approved","createdAt":"2023-08-03T15:01:52.000Z","updatedAt":"2023-08-03T15:15:04.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":1000,"narration":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","NGN":"NGN","paymentReference":"TR-997687893701"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:48:47.000Z,
+    updatedAt: 2023-08-07T16:52:04.000Z,
+    deletedAt: null
+  },
+  uniqno: 1,
+  _changed: Set(0) {},
+  _options: {
+    isNewRecord: false,
+    _schema: null,
+    _schemaDelimiter: '',
+    raw: true,
+    attributes: [
+      'id',          'TransactionId',
+      'orderItemId', 'userId',
+      'superadmin',  'financialadmin',
+      'orderId',     'orderSlug',
+      'transaction', 'transfer',
+      'trx_proof',   'createdAt',
+      'updatedAt',   'deletedAt'
+    ]
+  },
+  isNewRecord: false
+}
+pendingtransaction {
+  dataValues: {
+    id: '9d6a760d-2544-4018-84ce-da1f0e11c286',
+    TransactionId: 'BOG/TXN/PROD/399748835',
+    orderItemId: '85ab8031-c392-4d5b-be72-a3e251dbf4ba',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: 'ef67e62a-728b-4678-aa9a-cbb755f71548',
+    orderSlug: 'BOG/ORD/854733294',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/399748835","userId":null,"status":"PAID","type":"Products","amount":1000,"paymentReference":"TR-814081757784","description":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","product":{"id":"2a8e06c9-3330-47e1-9a69-af3d52ae519c","name":"QA Steel","description":"Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.","categoryId":"219968e6-b6c6-4c7e-a32f-3830ad501de8","creatorId":"81588e5b-7869-43e2-b44f-46b27413f21e","price":"500","quantity":"190","weight":null,"unit":"pieces","image":"https://bog.greenmouseproperties.com/uploads/l3btiG5rod4.jpeg","showInShop":true,"status":"approved","createdAt":"2023-08-03T15:01:52.000Z","updatedAt":"2023-08-03T15:15:04.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":1000,"narration":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","NGN":"NGN","paymentReference":"TR-814081757784"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:40:45.000Z,
+    updatedAt: 2023-08-07T16:50:57.000Z,
+    deletedAt: null
+  },
+  _previousDataValues: {
+    id: '9d6a760d-2544-4018-84ce-da1f0e11c286',
+    TransactionId: 'BOG/TXN/PROD/399748835',
+    orderItemId: '85ab8031-c392-4d5b-be72-a3e251dbf4ba',
+    userId: null,
+    superadmin: true,
+    financialadmin: false,
+    orderId: 'ef67e62a-728b-4678-aa9a-cbb755f71548',
+    orderSlug: 'BOG/ORD/854733294',
+    transaction: '{"TransactionId":"BOG/TXN/PROD/399748835","userId":null,"status":"PAID","type":"Products","amount":1000,"paymentReference":"TR-814081757784","description":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","product":{"id":"2a8e06c9-3330-47e1-9a69-af3d52ae519c","name":"QA Steel","description":"Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.","categoryId":"219968e6-b6c6-4c7e-a32f-3830ad501de8","creatorId":"81588e5b-7869-43e2-b44f-46b27413f21e","price":"500","quantity":"190","weight":null,"unit":"pieces","image":"https://bog.greenmouseproperties.com/uploads/l3btiG5rod4.jpeg","showInShop":true,"status":"approved","createdAt":"2023-08-03T15:01:52.000Z","updatedAt":"2023-08-03T15:15:04.000Z","deletedAt":null}}',
+    transfer: '{"bank_code":"044","amount":1000,"narration":"Transfer to product partner Greenmouse [Best rod of all kind. a long, thin pole made of wood or metal: He was given a fishing rod for his birthday. The concrete is strengthened with steel rods.]","NGN":"NGN","paymentReference":"TR-814081757784"}',
+    trx_proof: null,
+    createdAt: 2023-08-07T16:40:45.000Z,
+    updatedAt: 2023-08-07T16:50:57.000Z,
     deletedAt: null
   },
   uniqno: 1,

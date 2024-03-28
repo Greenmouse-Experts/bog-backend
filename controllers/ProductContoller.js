@@ -1032,9 +1032,14 @@ exports.transferToProductPartner = async (req, res, next) => {
     try {
       const userId = req.user.id;
       const { orderItemId } = req.params;
-      console.log(req.params);
-      console.log(orderItemId);
-      const { bank_code, account_number, bank_name } = req.body;
+
+      const {
+        bank_code,
+        account_number,
+        bank_name,
+        account_name,
+        amount,
+      } = req.body;
       const orderitem = await OrderItem.findOne({ where: { id: orderItemId } });
       if (!orderitem || orderitem == null || orderitem == 'undefined') {
         console.log(orderitem);
@@ -1099,11 +1104,6 @@ exports.transferToProductPartner = async (req, res, next) => {
       } else {
         discount = orderitem.discount;
       }
-      console.log('discount = ' + discount);
-
-      let a1 = orderitem.amount - discount;
-      let amount = a1 + discount;
-      console.log(amount);
 
       // Check to see if amount is not greater than the bid from the service partner
       // if (amount > project.estimatedCost) {
@@ -1154,6 +1154,8 @@ exports.transferToProductPartner = async (req, res, next) => {
             // );
             const transfer = {
               account_number: account_number,
+              bank_name: bank_name,
+              account_name: account_name,
               bank_code: bank_code,
               amount: amount,
               narration: narration,
@@ -1505,6 +1507,7 @@ exports.getPendingTransfers = async (req, res, next) => {
           financialadmin: false,
           TransactionId: { [Op.like]: `%PROD%` },
         },
+        order: [['createdAt', 'DESC']],
       });
       if (!pendingTransaction || pendingTransaction == null) {
         return res.status(404).send({
