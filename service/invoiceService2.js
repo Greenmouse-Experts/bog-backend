@@ -85,9 +85,7 @@ exports.createInvoice = async (orderData, user) => {
       orderData.order_items[0].shippingAddress.deliveryaddress.country;
   }
 
-  const taxRateValue = Math.round(
-    (parseInt(taxRate) / 100) * parseInt(_subtotal)
-  );
+  const taxRateValue = Math.round((taxRate / 100) * parseInt(_subtotal));
 
   const invoiceData = {
     logo:
