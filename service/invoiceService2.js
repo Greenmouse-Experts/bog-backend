@@ -115,15 +115,14 @@ exports.createInvoice = async (orderData, user) => {
     delivery_fee: orderData.deliveryFee.toLocaleString(),
     insurancecharge: insurancecharge,
     landmarkAddress: landmarkAddress,
-    taxRate: `${taxRate}% (${(
-      (parseInt(taxRate) / 100) *
-      parseInt(_subtotal)
-    ).toLocaleString()})`,
-    total: (
-      parseInt(_subtotal) +
-      parseInt(orderData.deliveryFee) +
-      parseInt(insurancecharge) +
+    taxRate: `${taxRate}% (${Math.round(
       (parseInt(taxRate) / 100) * parseInt(_subtotal)
+    ).toLocaleString()})`,
+    total: Math.round(
+      parseInt(_subtotal) +
+        parseInt(orderData.deliveryFee) +
+        parseInt(insurancecharge) +
+        (parseInt(taxRate) / 100) * parseInt(_subtotal)
     ).toLocaleString(),
   };
 

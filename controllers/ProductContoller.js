@@ -1042,7 +1042,6 @@ exports.transferToProductPartner = async (req, res, next) => {
       } = req.body;
       const orderitem = await OrderItem.findOne({ where: { id: orderItemId } });
       if (!orderitem || orderitem == null || orderitem == 'undefined') {
-        console.log(orderitem);
         return res.status(404).send({
           success: false,
           message: 'No Order!',
