@@ -85,6 +85,10 @@ exports.createInvoice = async (orderData, user) => {
       orderData.order_items[0].shippingAddress.deliveryaddress.country;
   }
 
+  const taxRateValue = Math.round(
+    (parseInt(taxRate) / 100) * parseInt(_subtotal)
+  );
+
   const invoiceData = {
     logo:
       'https://res.cloudinary.com/greenmouse-tech/image/upload/v1669563824/BOG/logo_1_1_ubgtnr.png',
@@ -115,14 +119,12 @@ exports.createInvoice = async (orderData, user) => {
     delivery_fee: orderData.deliveryFee.toLocaleString(),
     insurancecharge: insurancecharge,
     landmarkAddress: landmarkAddress,
-    taxRate: `${taxRate}% (${Math.round(
-      (parseInt(taxRate) / 100) * parseInt(_subtotal)
-    ).toLocaleString()})`,
+    taxRate: `${taxRate}% (${taxRateValue.toLocaleString()})`,
     total: Math.round(
       parseInt(_subtotal) +
         parseInt(orderData.deliveryFee) +
         parseInt(insurancecharge) +
-        (parseInt(taxRate) / 100) * parseInt(_subtotal)
+        taxRateValue
     ).toLocaleString(),
   };
 
