@@ -1,30 +1,30 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-unused-vars */
-require("dotenv").config();
-const sequelize = require("../config/database/connection");
-const SupplyCategory = require("../models/KycCategoryOfSuppies");
-const KycDocuments = require("../models/KycDocuments");
-const KycFinancialData = require("../models/KycFinancialData");
-const KycGeneralInfo = require("../models/KycGeneralInfo");
-const KycOrganisationInfo = require("../models/KycOrganisationInfo");
-const KycTaxPermits = require("../models/KycTaxPermits");
-const KycWorkExperience = require("../models/KycWorkExperience");
+require('dotenv').config();
+const sequelize = require('../config/database/connection');
+const SupplyCategory = require('../models/KycCategoryOfSuppies');
+const KycDocuments = require('../models/KycDocuments');
+const KycFinancialData = require('../models/KycFinancialData');
+const KycGeneralInfo = require('../models/KycGeneralInfo');
+const KycOrganisationInfo = require('../models/KycOrganisationInfo');
+const KycTaxPermits = require('../models/KycTaxPermits');
+const KycWorkExperience = require('../models/KycWorkExperience');
 const {
   getUserTypeProfile,
   updateUserTypeProfile,
-} = require("../service/UserService");
-const Notification = require("../helpers/notification");
-const helpers = require("../helpers/message");
-const EmailService = require("../service/emailService");
-const UserService = require("../service/UserService");
+} = require('../service/UserService');
+const Notification = require('../helpers/notification');
+const helpers = require('../helpers/message');
+const EmailService = require('../service/emailService');
+const UserService = require('../service/UserService');
 const {
   USERTYPE,
   kyc_criteria_for_rating_service_partners,
   avg_rating,
-} = require("../helpers/utility");
-const ServicePartner = require("../models/ServicePartner");
-const User = require("../models/User");
-const { ProviderMailerForKycDocument } = require("../helpers/mailer/samples");
+} = require('../helpers/utility');
+const ServicePartner = require('../models/ServicePartner');
+const User = require('../models/User');
+const { ProviderMailerForKycDocument } = require('../helpers/mailer/samples');
 
 /**
  *
@@ -180,7 +180,7 @@ exports.createSupplyCategories = async (req, res, next) => {
       const myCategories = await SupplyCategory.create(data, {
         transaction: t,
       });
-      myCategories.categories = myCategories.categories.split(",");
+      myCategories.categories = myCategories.categories.split(',');
       return res.status(200).send({
         success: true,
         data: myCategories,
@@ -203,7 +203,7 @@ exports.ReadSupplyCategories = async (req, res, next) => {
       console.log(result);
       if (result !== null) {
         result.categories =
-          result.categories !== null ? result.categories.split(",") : {};
+          result.categories !== null ? result.categories.split(',') : {};
       } else {
         result = {};
       }
@@ -565,7 +565,7 @@ exports.deleteKycWorkExperience = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        data: "Work deleted successfully",
+        data: 'Work deleted successfully',
       });
     } catch (error) {
       return next(error);
@@ -674,7 +674,7 @@ exports.deleteKycDocuments = async (req, res, next) => {
       });
       return res.status(200).send({
         success: true,
-        data: "Document deleted successfully",
+        data: 'Document deleted successfully',
       });
     } catch (error) {
       return next(error);
@@ -692,14 +692,14 @@ exports.approveDisapproveKycDocument = async (req, res, next) => {
       if (!kycDoc) {
         return res
           .status(404)
-          .send({ success: false, message: "Kyc document not found." });
+          .send({ success: false, message: 'Kyc document not found.' });
       }
 
       if (kycDoc.approved || kycDoc.approved === false) {
         return res.status(404).send({
           success: false,
           message:
-            "KYC document has already been vetted. You cannot approve or disapprove it again.",
+            'KYC document has already been vetted. You cannot approve or disapprove it again.',
         });
       }
 
@@ -707,7 +707,7 @@ exports.approveDisapproveKycDocument = async (req, res, next) => {
       if (!userDetails) {
         return res
           .status(404)
-          .send({ success: false, message: "Account not found." });
+          .send({ success: false, message: 'Account not found.' });
       }
 
       let { kycScore } = userDetails;
@@ -723,10 +723,10 @@ exports.approveDisapproveKycDocument = async (req, res, next) => {
 
       await KycDocuments.update({ approved, reason }, { where: { id } });
 
-      let approval_status = approved ? "approved" : "disapproved";
+      let approval_status = approved ? 'approved' : 'disapproved';
 
       // Mailer for providers
-      const kyc_document = kycDoc.name.split("_").join(" ");
+      const kyc_document = kycDoc.name.split('_').join(' ');
       if (!approved) {
         await ProviderMailerForKycDocument(
           userDetails,
@@ -739,17 +739,17 @@ exports.approveDisapproveKycDocument = async (req, res, next) => {
       // send notification to provider
       const profile = await getUserTypeProfile(userDetails.userType, userId);
       const message = `Your ${kyc_document} KYC document has been ${approval_status}.${
-        approved ? "" : ` Reason: ${reason}.`
+        approved ? '' : ` Reason: ${reason}.`
       }`;
 
       const { io } = req.app;
       await Notification.createNotification({
-        type: "user",
+        type: 'user',
         message: message,
         userId: profile.id,
       });
       io.emit(
-        "getNotifications",
+        'getNotifications',
         await Notification.fetchUserNotificationApi({ userId: profile.id })
       );
 
@@ -777,10 +777,18 @@ exports.approveKycVerification = async (req, res, next) => {
       } = req.body;
       const profile = await getUserTypeProfile(userType, userId);
 
+      // Must be > 0 and <= 100
+      if (isNaN(kycPoint) || kycPoint <= 0 || kycPoint > 100) {
+        return res.status(400).send({
+          success: false,
+          message: 'Kyc point must be in the range of 0 and 100',
+        });
+      }
+
       if (profile == null) {
         return res.status(404).send({
           success: false,
-          message: "User is not a professional",
+          message: 'User is not a professional',
         });
       }
 
@@ -790,14 +798,14 @@ exports.approveKycVerification = async (req, res, next) => {
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: "User account not found.",
+          message: 'User account not found.',
         });
       }
 
-      if(approved === false && !reason){
+      if (approved === false && !reason) {
         return res.status(404).send({
           success: false,
-          message: "Reason for disapproval is required.",
+          message: 'Reason for disapproval is required.',
         });
       }
 
@@ -821,22 +829,31 @@ exports.approveKycVerification = async (req, res, next) => {
         approved === undefined || approved
           ? helpers.kycApprovalMessage(user.fname, encodeEmail)
           : helpers.kycDisapprovalMessage(user.fname, encodeEmail, reason);
-      await EmailService.sendMail(user.email, message, approved === undefined || approved ? "Kyc has been approved" : "Kyc has been disapproved");
+      await EmailService.sendMail(
+        user.email,
+        message,
+        approved === undefined || approved
+          ? 'Kyc has been approved'
+          : 'Kyc has been disapproved'
+      );
 
       const messages = `Your KYC has been disapproved. Reason: ${reason}`;
 
       const { io } = req.app;
       await Notification.createNotification({
-        type: "user",
+        type: 'user',
         message: messages,
         userId: profile.id,
       });
       io.emit(
-        "getNotifications",
+        'getNotifications',
         await Notification.fetchUserNotificationApi({ userId: profile.id })
       );
 
-      const kyc_msg = approved === undefined || approved ? "Kyc has been approved" : "Kyc has been disapproved";
+      const kyc_msg =
+        approved === undefined || approved
+          ? 'Kyc has been approved'
+          : 'Kyc has been disapproved';
 
       return res.status(200).send({
         success: true,
@@ -858,7 +875,7 @@ exports.getUserKycDetails = async (req, res, next) => {
       if (!userType) {
         return res.status(400).send({
           success: false,
-          message: "userType is required",
+          message: 'userType is required',
         });
       }
       const profile = await getUserTypeProfile(userType, userId);
@@ -889,7 +906,7 @@ exports.getUserKycDetails = async (req, res, next) => {
         where: { userId: profile.id },
       });
       let isKycCompleted = true;
-      if (userType === "vendor") {
+      if (userType === 'vendor') {
         if (
           !kycFinancialData &&
           kycDocuments.length === 0 &&

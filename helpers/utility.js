@@ -127,6 +127,13 @@ exports.USERTYPE = {
   SERVICE_PARTNER: 'professional',
 };
 
+exports.USERROLES = [
+  'professional',
+  'vendor',
+  'corporate_client',
+  'private_client',
+];
+
 /**
  * Criteria for rating service partners
  */

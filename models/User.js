@@ -1,267 +1,283 @@
-const Sequelize = require("sequelize");
-const sequelise = require("../config/database/connection");
-const BankDetail = require("./BankDetail");
-const UserConnector = require("./UserConnector");
-const UserProfile = require("./UserProfile");
-const Referral = require("./Referral");
-const PrivateClient = require("./PrivateClient");
-const CorporateClient = require("./CorporateClient");
-const ServicePartner = require("./ServicePartner");
-const ProductPartner = require("./ProductPartner");
+const Sequelize = require('sequelize');
+const sequelise = require('../config/database/connection');
+const BankDetail = require('./BankDetail');
+const UserConnector = require('./UserConnector');
+const UserProfile = require('./UserProfile');
+const Referral = require('./Referral');
+const PrivateClient = require('./PrivateClient');
+const CorporateClient = require('./CorporateClient');
+const ServicePartner = require('./ServicePartner');
+const ProductPartner = require('./ProductPartner');
 
 const User = sequelise.define(
-  "users",
+  'users',
   {
     id: {
       type: Sequelize.UUID,
       defaultValue: Sequelize.UUIDV4,
       unique: true,
-      primaryKey: true
+      primaryKey: true,
     },
     name: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     email: {
       type: Sequelize.STRING,
       allowNull: true,
-      unique: true
+      unique: true,
     },
     password: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     phone: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     isActive: {
       type: Sequelize.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
     },
     token: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     userType: {
       type: Sequelize.ENUM(
-        "professional",
-        "vendor",
-        "private_client",
-        "corporate_client",
-        "admin"
+        'professional',
+        'vendor',
+        'private_client',
+        'corporate_client',
+        'admin'
       ),
-      allowNull: true
+      allowNull: true,
     },
     address: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     state: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     city: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     street: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     level: {
       type: Sequelize.INTEGER,
-      defaultValue: 1
+      defaultValue: 1,
     },
     photo: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     fname: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     lname: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     referralId: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     aboutUs: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     isSuspended: {
       type: Sequelize.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
     },
     kycScore: {
       type: Sequelize.INTEGER,
-      defaultValue: false
+      defaultValue: false,
     },
     kycTotal: {
       type: Sequelize.INTEGER,
-      defaultValue: false
+      defaultValue: false,
     },
     kycVerified: {
       type: Sequelize.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
     },
     kycDisapprovalReason: {
       type: Sequelize.TEXT,
-      defaultValue: false
+      defaultValue: false,
     },
     app: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     facebook_id: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     google_id: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     apple_id: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     login_trials: {
       type: Sequelize.INTEGER,
-      allowNull: true
+      allowNull: true,
     },
     reason_for_suspension: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     last_login: {
       type: Sequelize.DATE,
-      allowNull: true
+      allowNull: true,
     },
     years_of_experience_rating: {
       type: Sequelize.NUMBER,
-      allowNull: true
+      allowNull: true,
     },
     certification_of_personnel_rating: {
       type: Sequelize.NUMBER,
-      allowNull: true
+      allowNull: true,
     },
     no_of_staff_rating: {
       type: Sequelize.NUMBER,
-      allowNull: true
+      allowNull: true,
     },
     complexity_of_projects_completed_rating: {
       type: Sequelize.NUMBER,
-      allowNull: true
+      allowNull: true,
     },
     cost_of_projects_completed_rating: {
       type: Sequelize.NUMBER,
-      allowNull: true
+      allowNull: true,
     },
     quality_delivery_performance_rating: {
       type: Sequelize.NUMBER,
-      allowNull: true
+      allowNull: true,
     },
     timely_delivery_peformance_rating: {
       type: Sequelize.NUMBER,
-      allowNull: true
+      allowNull: true,
+    },
+    professional_account_creation_date: {
+      type: Sequelize.DATE,
+      allowNull: true,
+    },
+    vendor_account_creation_date: {
+      type: Sequelize.DATE,
+      allowNull: true,
+    },
+    corporate_client_account_creation_date: {
+      type: Sequelize.DATE,
+      allowNull: true,
+    },
+    private_client_account_creation_date: {
+      type: Sequelize.DATE,
+      allowNull: true,
     },
   },
   { paranoid: true }
 );
 
 User.hasOne(BankDetail, {
-  foreignKey: "userId",
-  as: "bank_detail",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'userId',
+  as: 'bank_detail',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 User.hasOne(UserProfile, {
-  foreignKey: "userId",
-  as: "profile",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'userId',
+  as: 'profile',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 User.hasOne(PrivateClient, {
-  foreignKey: "userId",
-  as: "private_client",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'userId',
+  as: 'private_client',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 PrivateClient.belongsTo(User, {
-  foreignKey: "userId",
-  as: "private_user",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'userId',
+  as: 'private_user',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 User.hasOne(CorporateClient, {
-  foreignKey: "userId",
-  as: "corporate_client",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'userId',
+  as: 'corporate_client',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 CorporateClient.belongsTo(User, {
-  foreignKey: "userId",
-  as: "corporate_user",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'userId',
+  as: 'corporate_user',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 User.hasOne(ServicePartner, {
-  foreignKey: "userId",
-  as: "service_partner",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'userId',
+  as: 'service_partner',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 ServicePartner.belongsTo(User, {
-  foreignKey: "userId",
-  as: "service_user",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'userId',
+  as: 'service_user',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 User.hasOne(ProductPartner, {
-  foreignKey: "userId",
-  as: "product_partner",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'userId',
+  as: 'product_partner',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 ProductPartner.belongsTo(User, {
-  foreignKey: "userId",
-  as: "product_user",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'userId',
+  as: 'product_user',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 User.hasMany(UserConnector, {
-  foreignKey: "userId",
-  as: "connectors",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'userId',
+  as: 'connectors',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 User.hasMany(Referral, {
-  foreignKey: "userId",
-  as: "referrals",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'userId',
+  as: 'referrals',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 Referral.belongsTo(User, {
-  foreignKey: "referredId",
-  as: "referred",
-  onDelete: "cascade",
-  hooks: true
+  foreignKey: 'referredId',
+  as: 'referred',
+  onDelete: 'cascade',
+  hooks: true,
 });
 
 module.exports = User;

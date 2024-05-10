@@ -6,31 +6,36 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-unused-vars */
-require("dotenv").config();
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+require('dotenv').config();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-const passport = require("passport-facebook");
-const FacebookStrategy = require("passport-facebook-token");
+const passport = require('passport-facebook');
+const FacebookStrategy = require('passport-facebook-token');
 // const store = require('store2')
 // const createClient = require('redis');
 
-const randomstring = require("randomstring");
-const { Op } = require("sequelize");
-const sequelize = require("../config/database/connection");
-const UserService = require("../service/UserService");
-const helpers = require("../helpers/message");
-const EmailService = require("../service/emailService");
-const ServicePartner = require("../models/ServicePartner");
-const ProductPartner = require("../models/ProductPartner");
-const Projects = require("../models/Project");
-const PrivateClient = require("../models/PrivateClient");
-const CorporateClient = require("../models/CorporateClient");
-const User = require("../models/User");
-const Notification = require("../helpers/notification");
+const randomstring = require('randomstring');
+const { Op } = require('sequelize');
+const sequelize = require('../config/database/connection');
+const UserService = require('../service/UserService');
+const helpers = require('../helpers/message');
+const EmailService = require('../service/emailService');
+const ServicePartner = require('../models/ServicePartner');
+const ProductPartner = require('../models/ProductPartner');
+const Projects = require('../models/Project');
+const PrivateClient = require('../models/PrivateClient');
+const CorporateClient = require('../models/CorporateClient');
+const User = require('../models/User');
+const Notification = require('../helpers/notification');
 
-const { adminLevels, adminPrivileges } = require("../helpers/utility");
-const ServiceProvider = require("../models/ServiceProvider");
+const {
+  adminLevels,
+  adminPrivileges,
+  USERTYPE,
+  USERROLES,
+} = require('../helpers/utility');
+const ServiceProvider = require('../models/ServiceProvider');
 
 const {
   ClientForgotPasswordMobileMailer,
@@ -40,9 +45,9 @@ const {
   clientWelcomeMessage,
   servicePartnerWelcomeMessage,
   productPartnerWelcomeMessage,
-} = require("../helpers/mailer/samples");
+} = require('../helpers/mailer/samples');
 
-const axios = require("axios");
+const axios = require('axios');
 
 // const Client = require("../helpers/storage")
 
@@ -74,7 +79,7 @@ exports.registerUser = async (req, res, next) => {
       if (!isUserType) {
         return res.status(400).send({
           success: false,
-          message: "Invalid User Entity passed",
+          message: 'Invalid User Entity passed',
         });
       }
       let user = await UserService.findUser({ email });
@@ -95,16 +100,22 @@ exports.registerUser = async (req, res, next) => {
           aboutUs: req.body.aboutUs,
         };
 
+        USERROLES.forEach((role) => {
+          if (role === req.body.userType) {
+            userData[`${role}_account_creation_date`] = new Date();
+          }
+        });
+
         user = await UserService.createNewUser(userData, t);
         let token = helpers.generateWebToken();
         const encodeEmail = encodeURIComponent(email);
         let message = helpers.verifyEmailMessage(name, encodeEmail, token);
-        if (req.body.platform === "mobile") {
+        if (req.body.platform === 'mobile') {
           token = helpers.generateMobileToken();
           message = helpers.mobileVerifyMessage(name, token);
         }
-        if (userType !== "admin") {
-          await EmailService.sendMail(email, message, "Verify Email");
+        if (userType !== 'admin') {
+          await EmailService.sendMail(email, message, 'Verify Email');
         }
         const data = {
           token,
@@ -112,7 +123,7 @@ exports.registerUser = async (req, res, next) => {
         };
         await UserService.updateUser(data, t);
         // check if refferalId was passed
-        if (req.body.reference && req.body.reference !== "") {
+        if (req.body.reference && req.body.reference !== '') {
           const where = {
             referralId: {
               [Op.eq]: req.body.reference,
@@ -127,7 +138,7 @@ exports.registerUser = async (req, res, next) => {
             await UserService.createReferral(referenceData, t);
           }
         }
-        if (userType !== "admin" || userType !== "other") {
+        if (userType !== 'admin' || userType !== 'other') {
           const request = {
             userId: user.id,
             userType,
@@ -141,10 +152,11 @@ exports.registerUser = async (req, res, next) => {
         if (isUser) {
           return res.status(400).send({
             success: false,
-            message: "This Email is already in Use for this user entity",
+            message: 'This Email is already in Use for this user entity',
           });
         }
-        if (userType !== "admin" || userType !== "other") {
+
+        if (userType !== 'admin' || userType !== 'other') {
           const request = {
             userId: user.id,
             userType,
@@ -153,9 +165,17 @@ exports.registerUser = async (req, res, next) => {
           };
           const result = await this.addUserProfile(request, t);
         }
+
+        let userData = {};
+        USERROLES.forEach((role) => {
+          if (role === req.body.userType) {
+            userData[`${role}_account_creation_date`] = new Date();
+          }
+        });
+        (userData.id = user.id), await UserService.updateUser(userData, t);
       }
 
-      const type = ["professional", "vendor", "corporate_client"];
+      const type = ['professional', 'vendor', 'corporate_client'];
       if (type.includes(userType)) {
         const data = {
           userId: user.id,
@@ -168,18 +188,18 @@ exports.registerUser = async (req, res, next) => {
         userType
       )}`;
       const userId = user.id;
-      const notifyType = "admin";
+      const notifyType = 'admin';
       const { io } = req.app;
       await Notification.createNotification({
         userId,
         type: notifyType,
         message: mesg,
       });
-      io.emit("getNotifications", await Notification.fetchAdminNotification());
+      io.emit('getNotifications', await Notification.fetchAdminNotification());
 
       return res.status(201).send({
         success: true,
-        message: "User Created Successfully",
+        message: 'User Created Successfully',
         exists: user_exists ? true : false,
       });
     } catch (error) {
@@ -191,7 +211,7 @@ exports.registerUser = async (req, res, next) => {
 };
 
 exports.testfblogin = async (req, res) => {
-  passport.authenticate("facebook");
+  passport.authenticate('facebook');
 };
 
 /**
@@ -220,7 +240,7 @@ exports.facebookSignup = async (req, res, next) => {
       if (user !== null) {
         return res.status(404).json({
           success: false,
-          message: "Account exists!",
+          message: 'Account exists!',
         });
       }
 
@@ -233,10 +253,10 @@ exports.facebookSignup = async (req, res, next) => {
         level: 1,
         facebook_id,
         isActive: true,
-        app: "facebook",
+        app: 'facebook',
       });
 
-      if (user_type !== "admin" || user_type !== "other") {
+      if (user_type !== 'admin' || user_type !== 'other') {
         const request = {
           userId: user_.id,
           userType: user_type,
@@ -245,7 +265,7 @@ exports.facebookSignup = async (req, res, next) => {
         const result = await this.addUserProfile(request, t);
       }
 
-      const type = ["corporate_client"];
+      const type = ['corporate_client'];
       if (type.includes(user_type)) {
         const data = {
           userId: user_.id,
@@ -258,18 +278,18 @@ exports.facebookSignup = async (req, res, next) => {
         user_type
       )}`;
       const userId = user_.id;
-      const notifyType = "admin";
+      const notifyType = 'admin';
       const { io } = req.app;
       await Notification.createNotification({
         userId,
         type: notifyType,
         message: mesg,
       });
-      io.emit("getNotifications", await Notification.fetchAdminNotification());
+      io.emit('getNotifications', await Notification.fetchAdminNotification());
 
       return res.status(201).send({
         success: true,
-        message: "User Created Successfully",
+        message: 'User Created Successfully',
       });
     } catch (err) {
       console.error(err);
@@ -324,7 +344,7 @@ exports.appleSign = async (req, res, next) => {
 
         return res.status(200).send({
           success: true,
-          message: "User Logged In Sucessfully",
+          message: 'User Logged In Sucessfully',
           token,
           user: data,
         });
@@ -332,17 +352,17 @@ exports.appleSign = async (req, res, next) => {
 
       const user_ = await User.create({
         name,
-        fname: name.split(" ")[0],
-        lname: name.split(" ")[1],
+        fname: name.split(' ')[0],
+        lname: name.split(' ')[1],
         email,
         userType: user_type,
         level: 1,
         apple_id: id,
         isActive: true,
-        app: "apple",
+        app: 'apple',
       });
 
-      if (user_type !== "admin" || user_type !== "other") {
+      if (user_type !== 'admin' || user_type !== 'other') {
         const request = {
           userId: user_.id,
           userType: user_type,
@@ -351,7 +371,7 @@ exports.appleSign = async (req, res, next) => {
         const result = await this.addUserProfile(request, t);
       }
 
-      const type = ["corporate_client"];
+      const type = ['corporate_client'];
       if (type.includes(user_type)) {
         const data = {
           userId: user_.id,
@@ -362,20 +382,20 @@ exports.appleSign = async (req, res, next) => {
 
       const mesg = `A new user just signed up as ${UserService.getUserType(
         user_type
-      )} through ${"apple"}`;
+      )} through ${'apple'}`;
       const userId = user_.id;
-      const notifyType = "admin";
+      const notifyType = 'admin';
       const { io } = req.app;
       await Notification.createNotification({
         userId,
         type: notifyType,
         message: mesg,
       });
-      io.emit("getNotifications", await Notification.fetchAdminNotification());
+      io.emit('getNotifications', await Notification.fetchAdminNotification());
 
       return res.status(201).send({
         success: true,
-        message: "User Created Successfully",
+        message: 'User Created Successfully',
       });
     } catch (err) {
       console.error(err);
@@ -430,7 +450,7 @@ exports.googleSign = async (req, res, next) => {
 
         return res.status(200).send({
           success: true,
-          message: "User Logged In Sucessfully",
+          message: 'User Logged In Sucessfully',
           token,
           user: data,
         });
@@ -438,17 +458,17 @@ exports.googleSign = async (req, res, next) => {
 
       const user_ = await User.create({
         name,
-        fname: name.split(" ")[0],
-        lname: name.split(" ")[1],
+        fname: name.split(' ')[0],
+        lname: name.split(' ')[1],
         email,
         userType: user_type,
         level: 1,
         google_id: id,
         isActive: true,
-        app: "google",
+        app: 'google',
       });
 
-      if (user_type !== "admin" || user_type !== "other") {
+      if (user_type !== 'admin' || user_type !== 'other') {
         const request = {
           userId: user_.id,
           userType: user_type,
@@ -457,7 +477,7 @@ exports.googleSign = async (req, res, next) => {
         const result = await this.addUserProfile(request, t);
       }
 
-      const type = ["corporate_client"];
+      const type = ['corporate_client'];
       if (type.includes(user_type)) {
         const data = {
           userId: user_.id,
@@ -468,20 +488,20 @@ exports.googleSign = async (req, res, next) => {
 
       const mesg = `A new user just signed up as ${UserService.getUserType(
         user_type
-      )} through ${"google"}`;
+      )} through ${'google'}`;
       const userId = user_.id;
-      const notifyType = "admin";
+      const notifyType = 'admin';
       const { io } = req.app;
       await Notification.createNotification({
         userId,
         type: notifyType,
         message: mesg,
       });
-      io.emit("getNotifications", await Notification.fetchAdminNotification());
+      io.emit('getNotifications', await Notification.fetchAdminNotification());
 
       return res.status(201).send({
         success: true,
-        message: "User Created Successfully",
+        message: 'User Created Successfully',
       });
     } catch (err) {
       console.error(err);
@@ -510,7 +530,7 @@ exports.facebookSignin = async (req, res) => {
     if (user === null) {
       return res.status(404).json({
         success: false,
-        message: "Facebook account not found!",
+        message: 'Facebook account not found!',
       });
     }
 
@@ -527,7 +547,7 @@ exports.facebookSignin = async (req, res) => {
       ...user.toJSON(),
     };
     const userId = user.id;
-    if (req.body.userType && req.body.userType !== "") {
+    if (req.body.userType && req.body.userType !== '') {
       const { userType } = req.body;
       profile = await UserService.getUserTypeProfile(userType, userId);
       if (profile) {
@@ -544,7 +564,7 @@ exports.facebookSignin = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: "User Logged In Sucessfully",
+      message: 'User Logged In Sucessfully',
       token,
       user: data,
     });
@@ -572,7 +592,7 @@ exports.googleSignin = async (req, res) => {
     if (user === null) {
       return res.status(404).json({
         success: false,
-        message: "Google account not found!",
+        message: 'Google account not found!',
       });
     }
 
@@ -589,7 +609,7 @@ exports.googleSignin = async (req, res) => {
       ...user,
     };
     const userId = user.id;
-    if (req.body.userType && req.body.userType !== "") {
+    if (req.body.userType && req.body.userType !== '') {
       const { userType } = req.body;
       profile = await UserService.getUserTypeProfile(userType, userId);
       if (profile) {
@@ -606,7 +626,7 @@ exports.googleSignin = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: "User Logged In Sucessfully",
+      message: 'User Logged In Sucessfully',
       token,
       user: data,
     });
@@ -624,14 +644,14 @@ exports.registerAdmin = async (req, res, next) => {
       if (!isUserType) {
         return res.status(400).send({
           success: false,
-          message: "Invalid User Entity passed",
+          message: 'Invalid User Entity passed',
         });
       }
       const user = await UserService.findUser({ email });
       if (user) {
         return res.status(400).send({
           success: false,
-          message: "This Email is already in Use for this user entity",
+          message: 'This Email is already in Use for this user entity',
         });
       }
 
@@ -647,10 +667,11 @@ exports.registerAdmin = async (req, res, next) => {
 
       return res.status(201).send({
         success: true,
-        message: "User Created Successfully",
+        message: 'User Created Successfully',
         admin,
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -668,33 +689,33 @@ exports.loginUser = async (req, res, next) => {
       if (!user) {
         return res.status(400).send({
           success: false,
-          message: "Invalid Email Address!",
+          message: 'Invalid Email Address!',
         });
       }
-      if (user.userType === "admin") {
+      if (user.userType === 'admin') {
         return res.status(400).send({
           success: false,
-          message: "This account is not available",
+          message: 'This account is not available',
         });
       }
       if (!user.isActive) {
         return res.status(400).send({
           success: false,
-          message: "Please Verify account",
+          message: 'Please Verify account',
         });
       }
       if (user.isSuspended) {
         return res.status(400).send({
           success: false,
           message:
-            "Your account has been suspended. Reach out to the admin for further information",
+            'Your account has been suspended. Reach out to the admin for further information',
         });
       }
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(404).send({
           success: false,
-          message: "Incorrect Password!",
+          message: 'Incorrect Password!',
         });
       }
 
@@ -715,7 +736,7 @@ exports.loginUser = async (req, res, next) => {
         ...user,
       };
       const userId = user.id;
-      if (req.body.userType && req.body.userType !== "") {
+      if (req.body.userType && req.body.userType !== '') {
         const { userType } = req.body;
         profile = await UserService.getUserTypeProfile(userType, userId);
         if (profile) {
@@ -731,13 +752,13 @@ exports.loginUser = async (req, res, next) => {
       }
 
       if (user.last_login === null) {
-        if (user.userType.includes("client")) {
+        if (user.userType.includes('client')) {
           // for corporate and private clients
           await clientWelcomeMessage(user);
-        } else if (user.userType === "professional") {
+        } else if (user.userType === 'professional') {
           // for service partners
           await servicePartnerWelcomeMessage(user);
-        } else if (user.userType === "vendor") {
+        } else if (user.userType === 'vendor') {
           // for product partners
           await productPartnerWelcomeMessage(user);
         }
@@ -759,7 +780,7 @@ exports.loginUser = async (req, res, next) => {
 
       return res.status(201).send({
         success: true,
-        message: "User Logged In Sucessfully",
+        message: 'User Logged In Sucessfully',
         token,
         refresh_token,
         user: data,
@@ -775,9 +796,9 @@ exports.loginUser = async (req, res, next) => {
 exports.refreshToken = async (req, res, next) => {
   try {
     const payload = {
-      user: req.user
+      user: req.user,
     };
-  
+
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_SECRET_EXPIRATION,
     });
@@ -850,38 +871,38 @@ exports.switchAccount = async (req, res, next) => {
       if (!user) {
         return res.status(400).send({
           success: false,
-          message: "Invalid User",
+          message: 'Invalid User',
         });
       }
-      if (user.userType === "admin") {
+      if (user.userType === 'admin') {
         return res.status(400).send({
           success: false,
-          message: "This user is not available",
+          message: 'This user is not available',
         });
       }
       let profile;
       const attributes = {
-        exclude: ["createdAt", "updatedAt", "deletedAt"],
+        exclude: ['createdAt', 'updatedAt', 'deletedAt'],
       };
-      if (userType === "professional") {
+      if (userType === 'professional') {
         profile = JSON.parse(
           JSON.stringify(
             await ServicePartner.findOne({ where: { userId }, attributes })
           )
         );
-      } else if (userType === "vendor") {
+      } else if (userType === 'vendor') {
         profile = JSON.parse(
           JSON.stringify(
             await ProductPartner.findOne({ where: { userId }, attributes })
           )
         );
-      } else if (userType === "private_client") {
+      } else if (userType === 'private_client') {
         profile = JSON.parse(
           JSON.stringify(
             await PrivateClient.findOne({ where: { userId }, attributes })
           )
         );
-      } else if (userType === "corporate_client") {
+      } else if (userType === 'corporate_client') {
         profile = JSON.parse(
           JSON.stringify(
             await CorporateClient.findOne({ where: { userId }, attributes })
@@ -900,7 +921,7 @@ exports.switchAccount = async (req, res, next) => {
       });
       return res.status(201).send({
         success: true,
-        message: "User Logged In Sucessfully",
+        message: 'User Logged In Sucessfully',
         token,
         user,
       });
@@ -938,7 +959,7 @@ exports.deleteAccount = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: "User account deleted successfully!",
+        message: 'User account deleted successfully!',
       });
     } catch (error) {
       console.log(error);
@@ -965,7 +986,7 @@ exports.contactAdmin = async (req, res, next) => {
         if (!validateCaptcha) {
           return res.status(400).send({
             success: false,
-            message: "Please answer the captcha correctly",
+            message: 'Please answer the captcha correctly',
             validateCaptcha,
           });
         }
@@ -981,12 +1002,12 @@ exports.contactAdmin = async (req, res, next) => {
       await EmailService.sendMail(
         process.env.EMAIL_FROM,
         html_data,
-        "Contact Us"
+        'Contact Us'
       );
 
       return res.status(200).send({
         success: true,
-        message: "Message sent successfully!",
+        message: 'Message sent successfully!',
       });
     } catch (error) {
       t.rollback();
@@ -997,7 +1018,7 @@ exports.contactAdmin = async (req, res, next) => {
 
 exports.getAccountsData = async (userId) => {
   try {
-    const attributes = ["id", "userId", "userType"];
+    const attributes = ['id', 'userId', 'userType'];
     const accounts = {
       service_partner: await ServicePartner.findOne({
         where: { userId },
@@ -1041,22 +1062,22 @@ exports.verifyLogin = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const { email, password } = req.body;
-      if (typeof email !== "undefined") {
+      if (typeof email !== 'undefined') {
         const user = await UserService.findUser({ email });
 
         if (!user) {
           return res.status(400).send({
             success: false,
-            message: "Invalid Email Address!",
+            message: 'Invalid Email Address!',
           });
         }
 
-        if (typeof password !== "undefined") {
+        if (typeof password !== 'undefined') {
           const isMatch = await bcrypt.compare(password, user.password);
           if (!isMatch) {
             return res.status(404).send({
               success: false,
-              message: "Incorrect Password!",
+              message: 'Incorrect Password!',
             });
           }
         }
@@ -1077,26 +1098,26 @@ exports.loginAdmin = async (req, res, next) => {
       if (!user) {
         return res.status(400).send({
           success: false,
-          message: "Invalid Email Address!",
+          message: 'Invalid Email Address!',
         });
       }
-      if (user.userType !== "admin") {
+      if (user.userType !== 'admin') {
         return res.status(400).send({
           success: false,
-          message: "This Account is not known",
+          message: 'This Account is not known',
         });
       }
       if (user.isSuspended) {
         return res.status(400).send({
           success: false,
-          message: "Your access has been revoked by the superadmin",
+          message: 'Your access has been revoked by the superadmin',
         });
       }
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Password!",
+          message: 'Invalid Password!',
         });
       }
       const payload = {
@@ -1122,7 +1143,7 @@ exports.loginAdmin = async (req, res, next) => {
 
       return res.status(201).send({
         success: true,
-        message: "Admin Logged In Sucessfully",
+        message: 'Admin Logged In Sucessfully',
         token,
         refresh_token,
         user: { ...user.toJSON(), role: _adminPrivilege },
@@ -1142,7 +1163,7 @@ exports.getLoggedInUser = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
         user: null,
       });
     }
@@ -1162,14 +1183,14 @@ exports.getLoggedInUser = async (req, res) => {
       ...user,
     };
     const userId = user.id;
-    if (req.query.userType && req.query.userType !== "") {
+    if (req.query.userType && req.query.userType !== '') {
       const { userType } = req.query;
       profile = await UserService.getUserTypeProfile(userType, userId);
       if (profile) {
         data.profile = profile;
         data.userType = userType;
       }
-    } else if (user.userType !== "admin") {
+    } else if (user.userType !== 'admin') {
       profile = await UserService.getUserTypeProfile(user.userType, userId);
       if (profile) {
         data.profile = profile;
@@ -1178,7 +1199,7 @@ exports.getLoggedInUser = async (req, res) => {
     }
 
     const rating =
-      user.userType === "professional"
+      user.userType === 'professional'
         ? avg_rating({
             years_of_experience_rating,
             certification_of_personnel_rating,
@@ -1195,10 +1216,10 @@ exports.getLoggedInUser = async (req, res) => {
       user: { ...data, rating },
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -1213,7 +1234,7 @@ exports.verifyUser = async (req, res, next) => {
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: "No User found with this email",
+          message: 'No User found with this email',
         });
       }
 
@@ -1225,7 +1246,7 @@ exports.verifyUser = async (req, res, next) => {
       await UserService.updateUser(data, transaction);
       return res.status(200).send({
         success: true,
-        message: "Account Activated Successfully",
+        message: 'Account Activated Successfully',
       });
     } catch (error) {
       transaction.rollback();
@@ -1245,7 +1266,7 @@ exports.verifyUserEmail = async (req, res, next) => {
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: "No User found with this email",
+          message: 'No User found with this email',
         });
       }
 
@@ -1257,7 +1278,7 @@ exports.verifyUserEmail = async (req, res, next) => {
       await UserService.updateUser(data, transaction);
       return res.status(200).send({
         success: true,
-        message: "Account Activated Successfully",
+        message: 'Account Activated Successfully',
         name: user.name,
         email: user.email,
       });
@@ -1277,7 +1298,7 @@ exports.updateUserAccount = async (req, res, next) => {
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: "Invalid user",
+          message: 'Invalid user',
         });
       }
       if (req.file) {
@@ -1288,7 +1309,7 @@ exports.updateUserAccount = async (req, res, next) => {
       await UserService.updateUser(data, t);
       return res.status(201).send({
         success: true,
-        message: "Profile Updated Successfully",
+        message: 'Profile Updated Successfully',
       });
     } catch (error) {
       t.rollback();
@@ -1306,22 +1327,22 @@ exports.updateUserProfile = async (req, res, next) => {
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: "Invalid user",
+          message: 'Invalid user',
         });
       }
 
       const where = {
         userId,
       };
-      if (user.userType === "professional") {
+      if (user.userType === 'professional') {
         let operation;
         let professional;
         for (let i = 0; i < req.files.length; i++) {
-          if (req.files[i].fieldname === "operation") {
+          if (req.files[i].fieldname === 'operation') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             operation = url;
           }
-          if (req.files[i].fieldname === "professional") {
+          if (req.files[i].fieldname === 'professional') {
             const url = `${process.env.APP_URL}/${req.files[i].path}`;
             professional = url;
           }
@@ -1336,8 +1357,8 @@ exports.updateUserProfile = async (req, res, next) => {
         };
         await UserService.updateUserProfile(requestData, where, t);
       } else if (
-        user.userType === "vendor" ||
-        user.userType === "corporate_client"
+        user.userType === 'vendor' ||
+        user.userType === 'corporate_client'
       ) {
         const requestData = {
           userId,
@@ -1352,7 +1373,7 @@ exports.updateUserProfile = async (req, res, next) => {
 
       return res.status(201).send({
         success: true,
-        message: "Profile Updated Successfully",
+        message: 'Profile Updated Successfully',
       });
     } catch (error) {
       t.rollback();
@@ -1369,7 +1390,7 @@ exports.changePassword = async (req, res, next) => {
       if (newPassword !== confirmPassword) {
         return res.status(400).send({
           success: false,
-          message: "Passwords do not match",
+          message: 'Passwords do not match',
         });
       }
 
@@ -1378,7 +1399,7 @@ exports.changePassword = async (req, res, next) => {
       if (!bcrypt.compareSync(oldPassword, user.password)) {
         return res.status(400).send({
           success: false,
-          message: "Incorrect Old Password",
+          message: 'Incorrect Old Password',
         });
       }
       const currentPassword = bcrypt.hashSync(newPassword, 10);
@@ -1389,7 +1410,7 @@ exports.changePassword = async (req, res, next) => {
       await UserService.updateUser(data, t);
       return res.status(200).send({
         success: true,
-        message: "Password Changed Successfully",
+        message: 'Password Changed Successfully',
       });
     } catch (error) {
       t.rollback();
@@ -1407,12 +1428,12 @@ exports.forgotPassword = async (req, res, next) => {
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: "Invalid user",
+          message: 'Invalid user',
         });
       }
 
-      let token = "";
-      if (req.body.platform === "mobile") {
+      let token = '';
+      if (req.body.platform === 'mobile') {
         token = helpers.generateMobileToken();
         await ClientForgotPasswordMobileMailer(
           { email, first_name: user.fname },
@@ -1435,7 +1456,7 @@ exports.forgotPassword = async (req, res, next) => {
       await UserService.updateUser(data, t);
       return res.status(200).send({
         success: true,
-        message: "Password Reset Email Sent Successfully",
+        message: 'Password Reset Email Sent Successfully',
       });
     } catch (error) {
       t.rollback();
@@ -1453,7 +1474,7 @@ exports.resetPassword = async (req, res, next) => {
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: "Invalid user",
+          message: 'Invalid user',
         });
       }
 
@@ -1465,7 +1486,7 @@ exports.resetPassword = async (req, res, next) => {
       await UserService.updateUser(data, t);
       return res.status(200).send({
         status: true,
-        message: "Password Changed Successfully",
+        message: 'Password Changed Successfully',
       });
     } catch (error) {
       t.rollback();
@@ -1481,18 +1502,18 @@ exports.resendCode = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User found with this email",
+        message: 'No User found with this email',
       });
     }
 
     let token = helpers.generateWebToken();
     let message = helpers.verifyEmailMessage(user.name, email, token);
-    if (req.body.platform === "mobile") {
+    if (req.body.platform === 'mobile') {
       token = helpers.generateMobileToken();
       message = helpers.mobileVerifyMessage(user.name, token);
     }
 
-    await EmailService.sendMail(email, message, "Verify Email");
+    await EmailService.sendMail(email, message, 'Verify Email');
     const data = {
       token,
       id: user.id,
@@ -1501,12 +1522,12 @@ exports.resendCode = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: "Token Sent check email or mobile number",
+      message: 'Token Sent check email or mobile number',
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -1517,13 +1538,13 @@ exports.getAllUsers = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
       });
     }
 
     const where = {
       userType: {
-        [Op.ne]: "admin",
+        [Op.ne]: 'admin',
       },
     };
     const userData = JSON.parse(
@@ -1566,7 +1587,7 @@ exports.getAllUsers = async (req, res) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -1582,7 +1603,7 @@ exports.analyzeUser = async (req, res, next) => {
 
       const usersByYear = await User.findAll({
         where: sequelize.where(
-          sequelize.fn("YEAR", sequelize.col("createdAt")),
+          sequelize.fn('YEAR', sequelize.col('createdAt')),
           y
         ),
       });
@@ -1604,14 +1625,14 @@ exports.getAllAdmin = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
       });
     }
 
     const where = {
-      userType: "admin",
+      userType: 'admin',
     };
-    const users = await User.findAll({ where, order: [["createdAt", "DESC"]] });
+    const users = await User.findAll({ where, order: [['createdAt', 'DESC']] });
 
     return res.status(200).send({
       success: true,
@@ -1620,7 +1641,7 @@ exports.getAllAdmin = async (req, res) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -1631,15 +1652,15 @@ exports.getAllProjectAdmin = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
       });
     }
 
     const where = {
-      userType: "admin",
+      userType: 'admin',
       level: 5,
     };
-    const users = await User.findAll({ where, order: [["createdAt", "DESC"]] });
+    const users = await User.findAll({ where, order: [['createdAt', 'DESC']] });
 
     return res.status(200).send({
       success: true,
@@ -1648,7 +1669,7 @@ exports.getAllProjectAdmin = async (req, res) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -1659,15 +1680,15 @@ exports.getAllProductAdmin = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
       });
     }
 
     const where = {
-      userType: "admin",
+      userType: 'admin',
       level: 4,
     };
-    const users = await User.findAll({ where, order: [["createdAt", "DESC"]] });
+    const users = await User.findAll({ where, order: [['createdAt', 'DESC']] });
 
     return res.status(200).send({
       success: true,
@@ -1676,7 +1697,7 @@ exports.getAllProductAdmin = async (req, res) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -1687,14 +1708,14 @@ exports.getAllGeneralAdmin = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
       });
     }
 
     const where = {
-      userType: "admin",
+      userType: 'admin',
     };
-    const users = await User.findAll({ where, order: [["createdAt", "DESC"]] });
+    const users = await User.findAll({ where, order: [['createdAt', 'DESC']] });
 
     return res.status(200).send({
       success: true,
@@ -1703,7 +1724,7 @@ exports.getAllGeneralAdmin = async (req, res) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -1714,48 +1735,48 @@ exports.getChatAdmins = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
       });
     }
 
     const superAdmins = await User.findAll({
       where: {
-        userType: "admin",
+        userType: 'admin',
         level: 1,
       },
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
     });
 
     const productAdmins = await User.findAll({
       where: {
-        userType: "admin",
+        userType: 'admin',
         level: 4,
       },
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
     });
 
     const projectAdmins = await User.findAll({
       where: {
-        userType: "admin",
+        userType: 'admin',
         level: 5,
       },
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
     });
 
     const financialadmins = await User.findAll({
       where: {
-        userType: "admin",
+        userType: 'admin',
         level: 3,
       },
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
     });
 
     const generaladmins = await User.findAll({
       where: {
-        userType: "admin",
+        userType: 'admin',
         level: 6,
       },
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
     });
 
     let admin = {
@@ -1772,7 +1793,7 @@ exports.getChatAdmins = async (req, res) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -1783,12 +1804,12 @@ exports.findAdmin = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
       });
     }
 
     const where = {
-      userType: "admin",
+      userType: 'admin',
       id: req.params.adminId,
     };
     const admin = await User.findOne({ where });
@@ -1800,7 +1821,7 @@ exports.findAdmin = async (req, res) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -1812,35 +1833,35 @@ exports.revokeAccess = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
       });
     }
     if (user.level === 1) {
       return res.status(401).send({
         success: false,
-        message: "UnAuthorised access",
+        message: 'UnAuthorised access',
       });
     }
     await User.destroy({ where: { id: userId } });
 
     const mesg = `The Admin ${user.email} rights has been revoked by super admin`;
-    const notifyType = "admin";
+    const notifyType = 'admin';
     const { io } = req.app;
     await Notification.createNotification({
       userId,
       type: notifyType,
       message: mesg,
     });
-    io.emit("getNotifications", await Notification.fetchAdminNotification());
+    io.emit('getNotifications', await Notification.fetchAdminNotification());
 
     return res.status(200).send({
       success: true,
-      message: "Admin Access revoked",
+      message: 'Admin Access revoked',
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -1868,10 +1889,10 @@ exports.findSingleUser = async (req, res) => {
         where: { serviceProviderId: servicePartner.id },
       });
       ongoingProjects = projectDetails.filter(
-        (_detail) => _detail.status === "ongoing"
+        (_detail) => _detail.status === 'ongoing'
       );
       completedProjects = projectDetails.filter(
-        (_detail) => _detail.status === "completed"
+        (_detail) => _detail.status === 'completed'
       );
     }
 
@@ -1886,7 +1907,7 @@ exports.findSingleUser = async (req, res) => {
     } = userData;
 
     const rating =
-      userData.userType === "professional"
+      userData.userType === 'professional'
         ? avg_rating({
             years_of_experience_rating,
             certification_of_personnel_rating,
@@ -1911,7 +1932,7 @@ exports.findSingleUser = async (req, res) => {
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -1922,32 +1943,32 @@ exports.addUserProfile = async (data, t) => {
     const where = {
       userId,
     };
-    if (userType === "professional") {
+    if (userType === 'professional') {
       const request = {
         userId,
         company_name,
-        userType: "professional",
+        userType: 'professional',
         serviceTypeId,
       };
       await ServicePartner.create(request, { transaction: t });
-    } else if (userType === "vendor") {
+    } else if (userType === 'vendor') {
       const request = {
         userId,
         company_name,
-        userType: "vendor",
+        userType: 'vendor',
       };
       await ProductPartner.create(request, { transaction: t });
-    } else if (userType === "private_client") {
+    } else if (userType === 'private_client') {
       const request = {
         userId,
-        userType: "private_client",
+        userType: 'private_client',
       };
       await PrivateClient.create(request, { transaction: t });
-    } else if (userType === "corporate_client") {
+    } else if (userType === 'corporate_client') {
       const request = {
         userId,
         company_name,
-        userType: "corporate_client",
+        userType: 'corporate_client',
       };
       await CorporateClient.create(request, { transaction: t });
     }
@@ -1963,13 +1984,13 @@ exports.checkIfAccountExist = async (userType, userId) => {
     userId,
   };
   let user;
-  if (userType === "professional") {
+  if (userType === 'professional') {
     user = await ServicePartner.findOne({ where });
-  } else if (userType === "vendor") {
+  } else if (userType === 'vendor') {
     user = await ProductPartner.findOne({ where });
-  } else if (userType === "private_client") {
+  } else if (userType === 'private_client') {
     user = await PrivateClient.findOne({ where });
-  } else if (userType === "corporate_client") {
+  } else if (userType === 'corporate_client') {
     user = await CorporateClient.findOne({ where });
   }
   return user;
@@ -1982,7 +2003,7 @@ exports.suspendUser = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
       });
     }
 
@@ -1996,7 +2017,7 @@ exports.suspendUser = async (req, res) => {
     const super_admins = JSON.parse(
       JSON.stringify(
         await User.findAll({
-          where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+          where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
         })
       )
     );
@@ -2012,13 +2033,13 @@ exports.suspendUser = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: "User suspended",
+      message: 'User suspended',
     });
   } catch (error) {
     console.log(error);
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -2031,7 +2052,7 @@ exports.resetUserPassword = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
       });
     }
 
@@ -2043,12 +2064,12 @@ exports.resetUserPassword = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: "Password changed!",
+      message: 'Password changed!',
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -2060,7 +2081,7 @@ exports.deleteUser = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
       });
     }
 
@@ -2068,12 +2089,12 @@ exports.deleteUser = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: "User deleted!",
+      message: 'User deleted!',
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -2085,13 +2106,13 @@ exports.unsuspendUser = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "No User Found",
+        message: 'No User Found',
       });
     }
-    if (user.userType !== "admin") {
+    if (user.userType !== 'admin') {
       return res.status(401).send({
         success: false,
-        message: "UnAuthorised access",
+        message: 'UnAuthorised access',
       });
     }
     const update = {
@@ -2103,12 +2124,12 @@ exports.unsuspendUser = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: "User suspended",
+      message: 'User suspended',
     });
   } catch (error) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };

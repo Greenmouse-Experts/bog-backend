@@ -87,6 +87,8 @@ exports.createInvoice = async (orderData, user) => {
 
   const taxRateValue = Math.round((taxRate / 100) * parseInt(_subtotal));
 
+  console.log(homeaddress);
+
   const invoiceData = {
     logo:
       'https://res.cloudinary.com/greenmouse-tech/image/upload/v1669563824/BOG/logo_1_1_ubgtnr.png',
