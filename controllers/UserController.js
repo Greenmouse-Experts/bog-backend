@@ -59,10 +59,48 @@ const axios = require('axios');
 
 // client.on('error', err => console.log('Redis Client Error', err));
 
+exports.findName = async (req, res, next) => {
+  try {
+    const { name } = req.body;
+    const user_found = await User.findOne({ where: { name } });
+    if (user_found) {
+      return res.status(400).send({
+        success: false,
+        message: 'Name exists.',
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.findPhone = async (req, res, next) => {
+  try {
+    const { phone } = req.body;
+    const user_found = await User.findOne({ where: { phone } });
+    if (user_found) {
+      return res.status(400).send({
+        success: false,
+        message: 'Phone number exists.',
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { email, userType, name, captcha } = req.body;
+      const { email, phone, userType, name, captcha } = req.body;
 
       // if (!req.body.platform && userType !== "admin") {
       //   const validateCaptcha = await UserService.validateCaptcha(captcha);
@@ -82,7 +120,25 @@ exports.registerUser = async (req, res, next) => {
           message: 'Invalid User Entity passed',
         });
       }
+
+      let user_found = await User.findOne({ where: { name } });
+      if (user_found) {
+        return res.status(400).send({
+          success: false,
+          message: 'Name exists.',
+        });
+      }
+
+      user_found = await User.findOne({ where: { phone } });
+      if (user_found) {
+        return res.status(400).send({
+          success: false,
+          message: 'Phone number exists.',
+        });
+      }
+
       let user = await UserService.findUser({ email });
+
       let user_exists = user;
 
       if (!user) {
@@ -199,7 +255,7 @@ exports.registerUser = async (req, res, next) => {
 
       return res.status(201).send({
         success: true,
-        message: 'User Created Successfully',
+        message: 'User created Successfully',
         exists: user_exists ? true : false,
       });
     } catch (error) {

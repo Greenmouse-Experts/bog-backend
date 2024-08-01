@@ -25,6 +25,14 @@ const registerValidation = () => {
   ];
 };
 
+const nameValidation = () => {
+  return [check('name', 'Name is required').notEmpty()];
+};
+
+const phoneValidation = () => {
+  return [check('phone', 'Phone number is required').notEmpty()];
+};
+
 const adminValidation = () => {
   return [
     check('name', 'Name is required').notEmpty(),
@@ -420,4 +428,6 @@ module.exports = {
   ServiceFormBuilderValidation,
   ServiceValidation,
   trxProofValidation,
+  nameValidation,
+  phoneValidation,
 };
