@@ -24,6 +24,7 @@ const {
   tokenValidation,
   nameValidation,
   phoneValidation,
+  updateAccountValidation,
 } = require('../helpers/validators');
 const refreshAuth = require('../middleware/refreshAuth');
 
@@ -146,11 +147,23 @@ router
 
 router
   .route('/user/update-account')
-  .patch(Auth, upload.single('photo'), UserController.updateUserAccount);
+  .patch(
+    Auth,
+    updateAccountValidation(),
+    validate,
+    upload.single('photo'),
+    UserController.updateUserAccount
+  );
 
 router
   .route('/user/update-profile')
-  .patch(Auth, upload.any(), UserController.updateUserProfile);
+  .patch(
+    Auth,
+    updateAccountValidation(),
+    validate,
+    upload.any(),
+    UserController.updateUserProfile
+  );
 
 router
   .route('/user/delete-account/:id')

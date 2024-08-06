@@ -277,6 +277,7 @@ exports.createKycGeneralInfo = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
       const {
+        organisation_name,
         userType,
         role,
         years_of_experience,
@@ -289,6 +290,17 @@ exports.createKycGeneralInfo = async (req, res, next) => {
         await rateServicePartner({ userId }, role, {
           years_of_experience,
           certification_of_personnel,
+        });
+      }
+
+      // Check name
+      const orgName = await KycGeneralInfo.findOne({
+        where: { organisation_name },
+      });
+      if (orgName) {
+        return res.status(400).send({
+          success: false,
+          message: 'Organization name exists.',
         });
       }
 
@@ -355,8 +367,17 @@ exports.createKycOrganisationInfo = async (req, res, next) => {
         no_of_staff,
         cost_of_projects_completed,
         complexity_of_projects_completed,
+        Incorporation_date,
       } = req.body;
       const userId = req.user.id;
+
+      // Verify incorporation date
+      if (new Date(Incorporation_date).getTime() >= new Date().getTime()) {
+        return res.status(400).send({
+          success: false,
+          message: 'Incorporation date is invalid.',
+        });
+      }
 
       if (userType === USERTYPE.SERVICE_PARTNER) {
         // Determine rating for service partner based
@@ -375,6 +396,7 @@ exports.createKycOrganisationInfo = async (req, res, next) => {
       const getOrgInfo = await KycOrganisationInfo.findOne({
         where: { userId: profile.id },
       });
+
       if (getOrgInfo) {
         const updatedOrgInfo = await KycOrganisationInfo.update(req.body, {
           where: { userId: profile.id },
@@ -394,6 +416,8 @@ exports.createKycOrganisationInfo = async (req, res, next) => {
         data: OrganisationInfo,
       });
     } catch (error) {
+      console.log(error);
+      t.rollback();
       return next(error);
     }
   });

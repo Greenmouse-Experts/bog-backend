@@ -112,6 +112,16 @@ const resetAdminPasswordValidation = () => {
   ];
 };
 
+const updateAccountValidation = () => {
+  return [
+    check('fname', 'First name is required').notEmpty(),
+    check('lname', 'Last name is required').notEmpty(),
+    check('phone', 'Phone is required').notEmpty(),
+    check('city', 'City is required').notEmpty(),
+    check('state', 'State is required').notEmpty(),
+  ];
+};
+
 const resetPasswordValidation = () => {
   return [
     check('email', 'Please use a valid Email').isEmail(),
@@ -297,6 +307,41 @@ const contractorRequestValidation = () => {
 const BasicKYCRequirements = () => {
   return [check('userType', "Couldn't get profile type").notEmpty()];
 };
+
+const GeneralInfoRequirements = () => {
+  return [
+    check('organisation_name', 'Organization name is required').notEmpty(),
+    check('registration_number', 'Registration number is required').notEmpty(),
+    check('business_address', 'Business address is required').notEmpty(),
+    check('email_address', 'Business email address is required').notEmpty(),
+    check('contact_number', 'Contact number is required').notEmpty(),
+    check('operational_address', 'Operational address is required').notEmpty(),
+  ];
+};
+
+const OrganizationInfoRequirements = () => {
+  return [
+    check('Incorporation_date', 'Incorporation date is required').notEmpty(),
+  ];
+};
+
+const TaxPermitRequirements = () => {
+  return [
+    check('VAT', 'VAT is required').notEmpty(),
+    check('TIN', 'TIN is required').notEmpty(),
+  ];
+};
+
+const WorkExperienceRequirements = () => {
+  return [
+    check('name', 'Name is required').notEmpty(),
+    check('value', 'Value is required').notEmpty(),
+    check('Date', 'Date is required').notEmpty(),
+    check('years_of_experience', 'Years of experience is required').notEmpty(),
+    check('company_involvement', 'Company involvement is required').notEmpty(),
+  ];
+};
+
 const CalculatorCalculator = () => {
   return [
     check('name', 'Please provide the rate name').notEmpty(),
@@ -430,4 +475,9 @@ module.exports = {
   trxProofValidation,
   nameValidation,
   phoneValidation,
+  GeneralInfoRequirements,
+  OrganizationInfoRequirements,
+  TaxPermitRequirements,
+  WorkExperienceRequirements,
+  updateAccountValidation,
 };
