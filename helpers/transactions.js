@@ -123,8 +123,8 @@ exports.getOneTxns = async (req, res, next) => {
       success: true,
       data: {
         transaction: {
+          user: detail ? (detail.user ? detail?.user : Txns?.user) : null,
           ...Txns,
-          user: detail.user ? detail?.user : Txns.user,
         },
         detail,
       },
