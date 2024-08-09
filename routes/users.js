@@ -232,5 +232,25 @@ router
   );
 
 router.route('/users/get-user/:userId').get(UserController.findSingleUser);
+router
+  .route('/admin/create-update-social')
+  .post(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    UserController.adminCreateUpdateSocial
+  );
+
+router
+  .route('/admin/supportsocials')
+  .get(
+    [Auth, Access.verifyAccess, Access.verifyAdmin], 
+    UserController.adminGetSupportSocial
+  );
+
+router
+  .route('/user/get-social')
+  .get(
+    Auth,
+    UserController.userGetSupportSocial
+  );
 
 module.exports = router;

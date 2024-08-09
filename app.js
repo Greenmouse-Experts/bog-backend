@@ -95,7 +95,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "100mb" }));
 //   })
 // );
 
-//to cancel error 413
+// to cancel error 413
 // app.use(express.json({ limit: "20mb", extended: true }));
 // app.use(
 //   express.urlencoded({ limit: "20mb", extended: true, parameterLimit: 50000 })
@@ -134,7 +134,7 @@ app.post("/upload", async (req, res, next) => {
     return res.status(400).json({
       status: false,
       message: "Problem occured!",
-      error,
+      error
     });
   }
 });
@@ -172,7 +172,7 @@ io.on("connection", async (socket) => {
     io.emit("getOnlineUsers", onlineUsers);
   });
 
-  //send message
+  // send message
   socket.on("send_message", async (data) => {
     // io.in(room).emit("receive_message", data); // Send to all users in room, including sender
 

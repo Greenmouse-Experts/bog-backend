@@ -48,6 +48,7 @@ const {
 } = require('../helpers/mailer/samples');
 
 const axios = require('axios');
+const SupportSocial = require('../models/supportsocial');
 
 // const Client = require("../helpers/storage")
 
@@ -1692,7 +1693,7 @@ exports.getAllAdmin = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      users,
+      users
     });
   } catch (error) {
     return res.status(500).send({
@@ -2187,5 +2188,125 @@ exports.unsuspendUser = async (req, res) => {
       success: false,
       message: 'Server Error',
     });
+  }
+};
+
+exports.adminCreateUpdateSocial = async (req, res, next) => {
+  try {
+    const { whatsapp, twitter } = req.body;
+
+    // Validate whatsapp is an array of numbers
+    if (whatsapp && (!Array.isArray(whatsapp) || !whatsapp.every(num => typeof num === 'number'))) {
+      return res.status(400).send({ success: false, message: 'WhatsApp must be an array of numbers' });
+    }
+
+    // Validate twitter is an array of strings
+    if (twitter && (!Array.isArray(twitter) || !twitter.every(str => typeof str === 'string'))) {
+      return res.status(400).json({ success: false, message: 'Twitter must be an array of strings' });
+    }
+
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: 'No User Found',
+      });
+    }
+    if (user.userType !== 'admin') {
+      return res.status(401).send({
+        success: false,
+        message: 'Unauthorized access',
+      });
+    }
+
+    // Check if a SupportSocial entry already exists
+    let supportSocial = await SupportSocial.findOne();
+
+    if (supportSocial) {
+      // Update existing entry
+      if (whatsapp) {
+        supportSocial.whatsapp = whatsapp;
+      }
+
+      if (twitter) {
+        supportSocial.twitter = twitter;
+      }
+
+      await supportSocial.save();
+
+      return res.status(200).send({
+        success: true,
+        message: 'Support social updated successfully',
+        data: supportSocial
+      });
+    } else {
+      // Create new entry
+      supportSocial = await SupportSocial.create({
+        whatsapp,
+        twitter
+      });
+
+      return res.status(201).send({
+        success: true,
+        message: 'Support social created successfully',
+        data: supportSocial
+      });
+    }
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.adminGetSupportSocial = async (req, res, next) => {
+  try {
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: 'No User Found',
+      });
+    }
+    if (user.userType !== 'admin') {
+      return res.status(401).send({
+        success: false,
+        message: 'Unauthorized access',
+      });
+    }
+
+    const supportSocials = await SupportSocial.findOne();
+
+    return res.status(200).send({
+      success: true,
+      data: supportSocials
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.userGetSupportSocial = async (req, res, next) => {
+  try {
+    const user = await UserService.getUserDetails({ id: req.user.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: 'No User Found',
+      });
+    }
+    if (user.userType !== 'admin') {
+      return res.status(401).send({
+        success: false,
+        message: 'Unauthorized access',
+      });
+    }
+
+    const supportSocials = await SupportSocial.findOne();
+
+    return res.status(200).send({
+      success: true,
+      data: supportSocials
+    });
+  } catch (error) {
+    return next(error);
   }
 };

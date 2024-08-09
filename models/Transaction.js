@@ -9,40 +9,40 @@ const Transaction = sequelise.define(
       type: Sequelize.UUID,
       defaultValue: Sequelize.UUIDV4,
       unique: true,
-      primaryKey: true,
+      primaryKey: true
     },
     TransactionId: {
       type: Sequelize.STRING,
-      allowNull: true,
+      allowNull: true
     },
     userId: {
       type: Sequelize.STRING,
-      allowNull: true,
+      allowNull: true
     },
     amount: {
       type: Sequelize.FLOAT,
-      allowNull: true,
+      allowNull: true
     },
     status: {
       type: Sequelize.STRING,
-      allowNull: true,
+      allowNull: true
     },
     type: {
       type: Sequelize.STRING,
-      allowNull: true,
+      allowNull: true
     },
     paymentReference: {
       type: Sequelize.STRING,
-      allowNull: true,
+      allowNull: true
     },
     description: {
       type: Sequelize.STRING,
-      allowNull: true,
+      allowNull: true
     },
     trx_proof: {
       type: Sequelize.STRING,
-      allowNull: true,
-    },
+      allowNull: true
+    }
   },
   { paranoid: true }
 );

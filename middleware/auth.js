@@ -8,7 +8,7 @@ module.exports = function(req, res, next) {
   if (!token) {
     return res.status(401).send({
       success: false,
-      message: 'Access Denied. Authorization token not passed',
+      message: 'Access Denied. Authorization token not passed'
     });
   }
 
@@ -20,7 +20,7 @@ module.exports = function(req, res, next) {
   } catch (error) {
     return res.status(401).send({
       success: false,
-      message: 'Authorization token is expired. Try to login again',
+      message: 'Authorization token is expired. Try to login again'
     });
   }
 };
