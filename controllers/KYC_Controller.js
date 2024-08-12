@@ -326,7 +326,7 @@ exports.createKycGeneralInfo = async (req, res, next) => {
       if (orgName) {
         return res.status(400).send({
           success: false,
-          message: 'Organization name exists.'
+          message: `Organization name exists.`
         });
       }
 
