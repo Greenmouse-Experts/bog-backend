@@ -323,12 +323,14 @@ exports.createKycGeneralInfo = async (req, res, next) => {
         where: { organisation_name },
         transaction: t
       });
-      if (orgName) {
+
+      if (orgName && orgName.userId !== profile.id) {
         return res.status(400).send({
           success: false,
-          message: `Organization name exists.`
+          message: 'Organization name exists.'
         });
       }
+
 
       const getMyInfo = await KycGeneralInfo.findOne({
         where: { userId: profile.id }
