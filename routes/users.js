@@ -24,9 +24,9 @@ const {
   tokenValidation,
   nameValidation,
   phoneValidation,
-  updateAccountValidation,
-} = require('../helpers/validators');
-const refreshAuth = require('../middleware/refreshAuth');
+  updateAccountValidation
+} = require("../helpers/validators");
+const refreshAuth = require("../middleware/refreshAuth");
 
 // @route  api/signup
 // @method POST
@@ -240,14 +240,14 @@ router
   );
 
 router
-  .route('/admin/supportsocials')
+  .route('/admin/get/supportsocials')
   .get(
     [Auth, Access.verifyAccess, Access.verifyAdmin], 
     UserController.adminGetSupportSocial
   );
 
 router
-  .route('/user/get-social')
+  .route('/user/get/supportsocials')
   .get(
     Auth,
     UserController.userGetSupportSocial

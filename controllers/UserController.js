@@ -2260,6 +2260,7 @@ exports.adminCreateUpdateSocial = async (req, res, next) => {
 exports.adminGetSupportSocial = async (req, res, next) => {
   try {
     const user = await UserService.getUserDetails({ id: req.user.id });
+
     if (!user) {
       return res.status(404).send({
         success: false,
@@ -2291,12 +2292,6 @@ exports.userGetSupportSocial = async (req, res, next) => {
       return res.status(404).send({
         success: false,
         message: 'No User Found',
-      });
-    }
-    if (user.userType !== 'admin') {
-      return res.status(401).send({
-        success: false,
-        message: 'Unauthorized access',
       });
     }
 
