@@ -160,37 +160,42 @@ exports.createSupplyCategories = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
+      if (profile.isVerified) {
+        return res.status(403).send({
+          success: false,
+          message: 'User is verified and cannot update categories'
+        });
+      }  
       const data = {
         ...req.body,
-        userId: profile.id,
+        userId: profile.id
       };
       const getCategories = await SupplyCategory.findOne({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
       if (getCategories) {
         const myCategories = await SupplyCategory.update(req.body, {
           where: { userId: profile.id },
-          transaction: t,
+          transaction: t
         });
         return res.status(200).send({
           success: true,
-          data: myCategories,
+          data: myCategories
         });
       }
       const myCategories = await SupplyCategory.create(data, {
-        transaction: t,
+        transaction: t
       });
       myCategories.categories = myCategories.categories.split(',');
       return res.status(200).send({
         success: true,
-        data: myCategories,
+        data: myCategories
       });
     } catch (error) {
       return next(error);
     }
   });
 };
-
 exports.ReadSupplyCategories = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -224,34 +229,39 @@ exports.createKycFinancialData = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
+      if (profile.isVerified) {
+        return res.status(403).send({
+          success: false,
+          message: 'User is verified and cannot update categories'
+        });
+      } 
       const data = {
         ...req.body,
-        userId: profile.id,
+        userId: profile.id
       };
       let myFinancial = await KycFinancialData.findOne({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
       if (myFinancial) {
         await KycFinancialData.update(req.body, {
           where: { userId: profile.id },
-          transaction: t,
+          transaction: t
         });
       } else {
         myFinancial = await KycFinancialData.create(data, {
-          transaction: t,
+          transaction: t
         });
       }
 
       return res.status(200).send({
         success: true,
-        data: myFinancial,
+        data: myFinancial
       });
     } catch (error) {
       return next(error);
     }
   });
 };
-
 exports.ReadKycFinancialData = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -281,63 +291,73 @@ exports.createKycGeneralInfo = async (req, res, next) => {
         userType,
         role,
         years_of_experience,
-        certification_of_personnel,
+        certification_of_personnel
       } = req.body;
 
       const userId = req.user.id;
+
       if (userType === USERTYPE.SERVICE_PARTNER) {
         // Determine rating for service partner based
         await rateServicePartner({ userId }, role, {
           years_of_experience,
-          certification_of_personnel,
-        });
-      }
-
-      // Check name
-      const orgName = await KycGeneralInfo.findOne({
-        where: { organisation_name },
-      });
-      if (orgName) {
-        return res.status(400).send({
-          success: false,
-          message: 'Organization name exists.',
+          certification_of_personnel
         });
       }
 
       const profile = await getUserTypeProfile(userType, userId);
 
+      if (profile.isVerified) {
+        return res.status(403).send({
+          success: false,
+          message: 'User is verified and cannot update categories'
+        });
+      }
+
       const data = {
         ...req.body,
-        userId: profile.id,
+        userId: profile.id
       };
+
+      // Check name
+      const orgName = await KycGeneralInfo.findOne({
+        where: { organisation_name },
+        transaction: t
+      });
+      if (orgName) {
+        return res.status(400).send({
+          success: false,
+          message: 'Organization name exists.'
+        });
+      }
+
       const getMyInfo = await KycGeneralInfo.findOne({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
       if (getMyInfo) {
         const updatedInfo = await KycGeneralInfo.update(req.body, {
           where: { userId: profile.id },
-          transaction: t,
+          transaction: t
         });
         return res.status(200).send({
           success: true,
-          data: updatedInfo,
+          data: updatedInfo
         });
       }
       const myInfo = await KycGeneralInfo.create(data, {
-        transaction: t,
+        transaction: t
       });
+
       return res.status(200).send({
         success: true,
-        data: myInfo,
+        data: myInfo
       });
     } catch (error) {
-      console.log(error);
       t.rollback();
+      console.error('Transaction error:', error); // Enhanced error logging
       return next(error);
     }
   });
 };
-
 exports.ReadKycGeneralInfo = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -357,6 +377,7 @@ exports.ReadKycGeneralInfo = async (req, res, next) => {
     }
   });
 };
+
 // Organisation Info controllers
 exports.createKycOrganisationInfo = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -367,7 +388,7 @@ exports.createKycOrganisationInfo = async (req, res, next) => {
         no_of_staff,
         cost_of_projects_completed,
         complexity_of_projects_completed,
-        Incorporation_date,
+        Incorporation_date
       } = req.body;
       const userId = req.user.id;
 
@@ -375,7 +396,7 @@ exports.createKycOrganisationInfo = async (req, res, next) => {
       if (new Date(Incorporation_date).getTime() >= new Date().getTime()) {
         return res.status(400).send({
           success: false,
-          message: 'Incorporation date is invalid.',
+          message: 'Incorporation date is invalid.'
         });
       }
 
@@ -384,36 +405,43 @@ exports.createKycOrganisationInfo = async (req, res, next) => {
         rateServicePartner({ userId }, role, {
           no_of_staff,
           cost_of_projects_completed,
-          complexity_of_projects_completed,
+          complexity_of_projects_completed
         });
       }
 
       const profile = await getUserTypeProfile(userType, userId);
+
+      if (profile.isVerified) {
+        return res.status(403).send({
+          success: false,
+          message: 'User is verified and cannot update categories'
+        });
+      }  
       const data = {
         ...req.body,
         userId: profile.id,
       };
       const getOrgInfo = await KycOrganisationInfo.findOne({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
 
       if (getOrgInfo) {
         const updatedOrgInfo = await KycOrganisationInfo.update(req.body, {
           where: { userId: profile.id },
-          transaction: t,
+          transaction: t
         });
         return res.status(200).send({
           success: true,
-          data: updatedOrgInfo,
+          data: updatedOrgInfo
         });
       }
       const OrganisationInfo = await KycOrganisationInfo.create(data, {
-        transaction: t,
+        transaction: t
       });
 
       return res.status(200).send({
         success: true,
-        data: OrganisationInfo,
+        data: OrganisationInfo
       });
     } catch (error) {
       console.log(error);
@@ -422,7 +450,6 @@ exports.createKycOrganisationInfo = async (req, res, next) => {
     }
   });
 };
-
 exports.ReadKycOrganisationInfo = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -450,37 +477,42 @@ exports.createKycTaxPermits = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
+      if (profile.isVerified) {
+        return res.status(403).send({
+          success: false,
+          message: 'User is verified and cannot update categories'
+        });
+      }  
       const data = {
         ...req.body,
-        userId: profile.id,
+        userId: profile.id
       };
       const getPermits = await KycTaxPermits.findOne({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
       if (getPermits) {
         const updatedPermits = await KycTaxPermits.update(req.body, {
           where: { userId: profile.id },
-          transaction: t,
+          transaction: t
         });
         return res.status(200).send({
           success: true,
-          data: updatedPermits,
+          data: updatedPermits
         });
       }
       const taxPermits = await KycTaxPermits.create(data, {
-        transaction: t,
+        transaction: t
       });
 
       return res.status(200).send({
         success: true,
-        data: taxPermits,
+        data: taxPermits
       });
     } catch (error) {
       return next(error);
     }
   });
 };
-
 exports.ReadKycTaxPermits = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -508,27 +540,32 @@ exports.createKycWorkExperience = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
+      if (profile.isVerified) {
+        return res.status(403).send({
+          success: false,
+          message: 'User is verified and cannot update categories'
+        });
+      }  
       const url = `${process.env.APP_URL}/${req.file.path}`;
 
       const data = {
         ...req.body,
         userId: profile.id,
-        fileUrl: url,
+        fileUrl: url
       };
       const experiences = await KycWorkExperience.create(data, {
-        transaction: t,
+        transaction: t
       });
 
       return res.status(200).send({
         success: true,
-        data: experiences,
+        data: experiences
       });
     } catch (error) {
       return next(error);
     }
   });
 };
-
 exports.ReadKycWorkExperience = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -536,7 +573,7 @@ exports.ReadKycWorkExperience = async (req, res, next) => {
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
       const result = await KycWorkExperience.findAll({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
 
       return res.status(200).send({
@@ -548,7 +585,6 @@ exports.ReadKycWorkExperience = async (req, res, next) => {
     }
   });
 };
-
 exports.UpdateKycWorkExperience = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -577,7 +613,6 @@ exports.UpdateKycWorkExperience = async (req, res, next) => {
     }
   });
 };
-
 exports.deleteKycWorkExperience = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -604,26 +639,31 @@ exports.createKycDocuments = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
+      if (profile.isVerified) {
+        return res.status(403).send({
+          success: false,
+          message: 'User is verified and cannot update categories'
+        });
+      } 
       const loadFiles = req.files.map((file, i) => ({
         name: file.fieldname,
         file: `${process.env.APP_URL}/${file.path}`,
         userType,
-        userId: profile.id,
+        userId: profile.id
       }));
 
       const documents = await KycDocuments.bulkCreate(loadFiles, {
-        transaction: t,
+        transaction: t
       });
       return res.status(200).send({
         success: true,
-        data: documents,
+        data: documents
       });
     } catch (error) {
       return next(error);
     }
   });
 };
-
 exports.ReadKycDocuments = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -646,7 +686,6 @@ exports.ReadKycDocuments = async (req, res, next) => {
     }
   });
 };
-
 const formatKycDoc = (result) => {
   const new_result = [];
   for (let index = 0; index < result.length; index++) {
@@ -687,7 +726,6 @@ const formatKycDoc = (result) => {
   }
   return new_result;
 };
-
 exports.deleteKycDocuments = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
@@ -705,6 +743,7 @@ exports.deleteKycDocuments = async (req, res, next) => {
     }
   });
 };
+
 
 exports.approveDisapproveKycDocument = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -797,7 +836,7 @@ exports.approveKycVerification = async (req, res, next) => {
         verificationStatus,
         kycPoint,
         approved,
-        reason,
+        reason
       } = req.body;
       const profile = await getUserTypeProfile(userType, userId);
 
@@ -805,14 +844,14 @@ exports.approveKycVerification = async (req, res, next) => {
       if (isNaN(kycPoint) || kycPoint <= 0 || kycPoint > 100) {
         return res.status(400).send({
           success: false,
-          message: 'Kyc point must be in the range of 0 and 100',
+          message: `Kyc point must be in the range of 0 and 100`
         });
       }
 
       if (profile == null) {
         return res.status(404).send({
           success: false,
-          message: 'User is not a professional',
+          message: `User is not a professional`
         });
       }
 
@@ -822,28 +861,28 @@ exports.approveKycVerification = async (req, res, next) => {
       if (!user) {
         return res.status(404).send({
           success: false,
-          message: 'User account not found.',
+          message: `User account not found.`
         });
       }
 
       if (approved === false && !reason) {
         return res.status(404).send({
           success: false,
-          message: 'Reason for disapproval is required.',
+          message: `Reason for disapproval is required.`
         });
       }
 
       if (verificationStatus) {
         const data = {
           isVerified: verificationStatus,
-          kycPoint: verificationStatus === true ? kycPoint : 0,
+          kycPoint: verificationStatus === true ? kycPoint : 0
         };
 
         await updateUserTypeProfile({
           userType,
           id: profile.id,
           data,
-          transaction: t,
+          transaction: t
         });
       }
 
@@ -904,30 +943,30 @@ exports.getUserKycDetails = async (req, res, next) => {
       }
       const profile = await getUserTypeProfile(userType, userId);
       const suppyCategory = await SupplyCategory.findOne({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
       const kycFinancialData = await KycFinancialData.findOne({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
 
       const kycGeneralInfo = await KycGeneralInfo.findOne({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
 
       const kycOrganisationInfo = await KycOrganisationInfo.findOne({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
 
       const kycTaxPermits = await KycTaxPermits.findOne({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
 
       const kycWorkExperience = await KycWorkExperience.findAll({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
 
       const kycDocuments = await KycDocuments.findAll({
-        where: { userId: profile.id },
+        where: { userId: profile.id }
       });
       let isKycCompleted = true;
       if (userType === 'vendor') {
@@ -961,11 +1000,11 @@ exports.getUserKycDetails = async (req, res, next) => {
         kycOrganisationInfo,
         kycTaxPermits,
         kycWorkExperience,
-        kycDocuments,
+        kycDocuments
       };
       return res.status(200).send({
         success: true,
-        data,
+        data
       });
     } catch (error) {
       return next(error);

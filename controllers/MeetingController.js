@@ -94,7 +94,7 @@ exports.servicePartnerMeetings = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: meetings,
+      data: meetings
     });
   } catch (error) {
     return next(error);
@@ -114,7 +114,7 @@ exports.createMeeting = async (req, res, next) => {
         ...req.body,
         meetingSlug: `BOG/MET/${type}/${Math.floor(
           190000000 + Math.random() * 990000000
-        )}`,
+        )}`
       };
       if (userType !== 'admin') {
         const profile = await getUserTypeProfile(userType, userId);
@@ -126,7 +126,7 @@ exports.createMeeting = async (req, res, next) => {
       }
 
       const myMeetings = await MeetingModel.create(meetingData, {
-        transaction: t,
+        transaction: t
       });
       const user = await User.findByPk(req.user.id, {
         attributes: ['email', 'name', 'fname', 'lname'],
@@ -138,13 +138,13 @@ exports.createMeeting = async (req, res, next) => {
       await Notification.createNotification({
         type: notifyType,
         message: mesg,
-        userId,
+        userId
       });
       io.emit('getNotifications', await Notification.fetchAdminNotification());
 
       return res.status(200).send({
         success: true,
-        data: myMeetings,
+        data: myMeetings
       });
     } catch (error) {
       return next(error);

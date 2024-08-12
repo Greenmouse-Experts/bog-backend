@@ -38,7 +38,7 @@ const {
   deleteKycDocuments,
   approveKycVerification,
   getUserKycDetails,
-  approveDisapproveKycDocument,
+  approveDisapproveKycDocument
 } = KYC_Controller;
 
 router
