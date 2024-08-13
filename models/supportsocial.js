@@ -13,7 +13,10 @@ const SupportSocial = sequelise.define(
       type: Sequelize.JSON
     }
   },
-  { paranoid: false }
+  {
+    paranoid: false,
+    tableName: "supportsocials"
+  }
 );
 
 module.exports = SupportSocial;
