@@ -2,7 +2,7 @@ const Sequelize = require("sequelize");
 const sequelise = require("../config/database/connection");
 
 const SupportSocial = sequelise.define(
-  "supportsocials",
+  "support_socials",
   {
     whatsapp: {
       allowNull: true,
@@ -15,7 +15,7 @@ const SupportSocial = sequelise.define(
   },
   {
     paranoid: false,
-    tableName: "supportsocials"
+    tableName: "support_socials"
   }
 );
 
