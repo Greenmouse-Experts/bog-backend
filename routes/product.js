@@ -87,5 +87,8 @@ router
     ProductController.approveTransferToProductPartner
   );
 
+router
+  .route("/products/check")
+  .get([Auth, Access.verifyAccess], ProductController.checkProducts);
 
 module.exports = router;
