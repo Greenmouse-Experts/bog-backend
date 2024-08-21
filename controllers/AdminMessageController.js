@@ -1,22 +1,22 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
-require("dotenv").config();
-const { Op } = require("sequelize");
-const moment = require("moment");
-const sequelize = require("../config/database/connection");
-const AdminMessage = require("../models/AdminMessage");
+require('dotenv').config();
+const { Op } = require('sequelize');
+const moment = require('moment');
+const sequelize = require('../config/database/connection');
+const AdminMessage = require('../models/AdminMessage');
 
 exports.postAnnouncement = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { date, title, content, user } = req.body;
 
       const request = {
-        expiredAt: moment(date).format("YYYY-MM-DD HH:mm:ss"),
+        expiredAt: moment(date).format('YYYY-MM-DD HH:mm:ss'),
         content,
         title,
-        user
+        user,
       };
       if (req.file) {
         const url = `${process.env.APP_URL}/${req.file.path}`;
@@ -26,7 +26,7 @@ exports.postAnnouncement = async (req, res, next) => {
       const data = await AdminMessage.create(request, { transaction: t });
       return res.status(201).send({
         success: true,
-        data
+        data,
       });
     } catch (error) {
       t.rollback();
@@ -38,11 +38,11 @@ exports.postAnnouncement = async (req, res, next) => {
 exports.viewAnnouncements = async (req, res, next) => {
   try {
     const messages = await AdminMessage.findAll({
-      order: [["createdAt", "DESC"]]
+      order: [['createdAt', 'DESC']],
     });
     return res.status(200).send({
       success: true,
-      data: messages
+      data: messages,
     });
   } catch (error) {
     return next(error);
@@ -50,13 +50,13 @@ exports.viewAnnouncements = async (req, res, next) => {
 };
 
 exports.deleteAnnouncement = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { id } = req.params;
       await AdminMessage.destroy({ where: { id }, transaction: t });
       return res.status(200).send({
         success: true,
-        message: "Announcement deleted Successfully"
+        message: 'Announcement deleted Successfully',
       });
     } catch (error) {
       t.rollback();
@@ -70,19 +70,19 @@ exports.allAdminMessages = async (req, res, next) => {
     const { userType } = req.query;
     const where = {
       expiredAt: {
-        [Op.gte]: moment().format("YYYY-MM-DD HH:mm:ss")
+        [Op.gte]: moment().format('YYYY-MM-DD HH:mm:ss'),
       },
-      [Op.or]: [{ user: "all" }, { user: userType }]
+      [Op.or]: [{ user: 'all' }, { user: userType }],
     };
 
     const messages = await AdminMessage.findAll({
       where,
-      order: [["createdAt", "DESC"]]
+      order: [['createdAt', 'DESC']],
     });
-    console.log(messages)
+    console.log(messages);
     return res.status(200).send({
       success: true,
-      data: messages
+      data: messages,
     });
   } catch (error) {
     return next(error);

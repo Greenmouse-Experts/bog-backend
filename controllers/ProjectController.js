@@ -1155,7 +1155,10 @@ exports.verificationForGeotechnicalInvestigation = async (req, res, next) => {
       total_amt += vat;
       total_amt = Math.round(total_amt);
 
-      if (total_amt !== total) {
+      console.log(total_amt);
+      console.log(total);
+
+      if (total_amt !== parseInt(total)) {
         return res.status(400).send({
           success: false,
           message: 'Total is not correct.',

@@ -1,12 +1,12 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-unused-vars */
-const { Op } = require("sequelize");
-const Notification = require("../models/Notification");
-const NotificationService = require("../helpers/notification");
-const sequelize = require("../config/database/connection");
+const { Op } = require('sequelize');
+const Notification = require('../models/Notification');
+const NotificationService = require('../helpers/notification');
+const sequelize = require('../config/database/connection');
 
 // Service methods
-const UserService = require("../service/UserService");
+const UserService = require('../service/UserService');
 
 exports.getAllAdminNotifications = async (req, res, next) => {
   try {
@@ -14,19 +14,19 @@ exports.getAllAdminNotifications = async (req, res, next) => {
 
     let notifications = await Notification.findAll({
       where: {
-        type: "admin",
+        type: 'admin',
       },
-      order: [["createdAt", "DESC"]]
+      order: [['createdAt', 'DESC']],
     });
 
     if (level !== 1) {
       // Get privileged Notifications
-      notifications = notifications.filter(_notification => {
+      notifications = notifications.filter((_notification) => {
         // Check if the sub admin is permitted to view this message
-        const _privilegedMsg = role.privileges.filter(_priv =>
+        const _privilegedMsg = role.privileges.filter((_priv) =>
           _notification.message.toLowerCase().includes(_priv.toLowerCase())
         );
-        
+
         if (_privilegedMsg.length > 0) {
           return _notification;
         }
@@ -35,7 +35,7 @@ exports.getAllAdminNotifications = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: notifications
+      data: notifications,
     });
   } catch (error) {
     return next(error);
@@ -44,36 +44,36 @@ exports.getAllAdminNotifications = async (req, res, next) => {
 
 exports.getAllAUserNotifications = async (req, res, next) => {
   try {
-    const {id} = req._credentials;
-    const {userType} = req.query;
-    
+    const { id } = req._credentials;
+    const { userType } = req.query;
+
     // Retrieve profile details
     const profile = await UserService.getUserTypeProfile(userType, id);
     if (!profile) {
       return res.status(400).json({
         success: false,
-        message: "Profile does not exist!",
-        data: []
+        message: 'Profile does not exist!',
+        data: [],
       });
     }
 
-    if (profile.id !== req.params.userId) {
-      return res.status(403).json({
-        success: false,
-        message: "Unauthorized access"
-      });
-    }
+    // if (profile.id !== req.params.userId) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: "Unauthorized access"
+    //   });
+    // }
 
     const notifications = await Notification.findAll({
       where: {
-        type: "user",
-        userId: req.params.userId
+        type: 'user',
+        userId: req.params.userId,
       },
-      order: [["createdAt", "DESC"]]
+      order: [['createdAt', 'DESC']],
     });
     return res.status(200).send({
       success: true,
-      data: notifications
+      data: notifications,
     });
   } catch (error) {
     return next(error);
@@ -83,37 +83,37 @@ exports.getAllAUserNotifications = async (req, res, next) => {
 exports.markNotificationAsRead = async (req, res, next) => {
   try {
     const data = {
-      status: "read",
-      isRead: true
+      status: 'read',
+      isRead: true,
     };
     const notification = await Notification.findByPk(req.params.notificationId);
     if (!notification) {
       return res.status(200).send({
         success: true,
-        message: "Notification mark as read"
+        message: 'Notification mark as read',
       });
     }
     await Notification.update(data, {
-      where: { id: req.params.notificationId }
+      where: { id: req.params.notificationId },
     });
     const { io } = req.app;
-    if (notification.type === "admin") {
+    if (notification.type === 'admin') {
       io.emit(
-        "getNotifications",
+        'getNotifications',
         await NotificationService.fetchAdminNotification()
       );
-    } else if (notification.type === "user") {
+    } else if (notification.type === 'user') {
       io.emit(
-        "getNotifications",
+        'getNotifications',
         await NotificationService.fetchUserNotificationApi({
-          userId: notification.userId
+          userId: notification.userId,
         })
       );
     }
 
     return res.status(200).send({
       success: true,
-      message: "Notification mark as read"
+      message: 'Notification mark as read',
     });
   } catch (error) {
     return next(error);
@@ -121,13 +121,13 @@ exports.markNotificationAsRead = async (req, res, next) => {
 };
 
 exports.deleteNotification = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { notificationId } = req.params;
       await NotificationService.deleteNotifications(notificationId);
       return res.status(200).send({
         success: true,
-        message: "Notification deleted"
+        message: 'Notification deleted',
       });
     } catch (error) {
       return next(error);

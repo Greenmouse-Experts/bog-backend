@@ -25,6 +25,7 @@ const {
 const ServicePartner = require('../models/ServicePartner');
 const User = require('../models/User');
 const { ProviderMailerForKycDocument } = require('../helpers/mailer/samples');
+const { Op } = require('sequelize');
 
 /**
  *
@@ -293,18 +294,34 @@ exports.createKycGeneralInfo = async (req, res, next) => {
         });
       }
 
-      // Check name
-      const orgName = await KycGeneralInfo.findOne({
-        where: { organisation_name },
-      });
-      if (orgName) {
-        return res.status(400).send({
-          success: false,
-          message: 'Organization name exists.',
-        });
-      }
-
       const profile = await getUserTypeProfile(userType, userId);
+
+      // Check if kyc is approved
+      const user = await UserService.findUser({ id: userId });
+
+      if (user.kycVerified) {
+        // Check name
+        const orgName = await KycGeneralInfo.findOne({
+          where: { organisation_name },
+        });
+        if (orgName) {
+          return res.status(400).send({
+            success: false,
+            message: 'Organization name exists.',
+          });
+        }
+      } else {
+        // Check name
+        const orgName = await KycGeneralInfo.findOne({
+          where: { organisation_name, userId: { [Op.ne]: profile.id } },
+        });
+        if (orgName) {
+          return res.status(400).send({
+            success: false,
+            message: 'Organization name exists.',
+          });
+        }
+      }
 
       const data = {
         ...req.body,
@@ -802,11 +819,13 @@ exports.approveKycVerification = async (req, res, next) => {
       const profile = await getUserTypeProfile(userType, userId);
 
       // Must be > 0 and <= 100
-      if (isNaN(kycPoint) || kycPoint <= 0 || kycPoint > 100) {
-        return res.status(400).send({
-          success: false,
-          message: 'Kyc point must be in the range of 0 and 100',
-        });
+      if (approved) {
+        if (isNaN(kycPoint) || kycPoint <= 0 || kycPoint > 100) {
+          return res.status(400).send({
+            success: false,
+            message: 'Kyc point must be in the range of 0 and 100',
+          });
+        }
       }
 
       if (profile == null) {
@@ -861,7 +880,11 @@ exports.approveKycVerification = async (req, res, next) => {
           : 'Kyc has been disapproved'
       );
 
-      const messages = `Your KYC has been disapproved. Reason: ${reason}`;
+      const messages = `Your KYC has been ${
+        approved === undefined || approved
+          ? 'approved'
+          : 'disapproved. Reason: ${reason}'
+      }`;
 
       const { io } = req.app;
       await Notification.createNotification({

@@ -1,4 +1,4 @@
-const { mailer_template, Mailer, Logo } = require("./Engine");
+const { mailer_template, Mailer, Logo } = require('./Engine');
 
 module.exports = {
   /**
@@ -11,7 +11,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/myprojectdetails?projectId=${_project.id}`;
 
@@ -25,7 +25,7 @@ module.exports = {
                         <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                     </p>
                 `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -38,7 +38,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -56,7 +56,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/myprojectdetails?projectId=${_project.id}`;
 
@@ -73,7 +73,7 @@ module.exports = {
                         <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                     </p>
                 `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -86,7 +86,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -104,7 +104,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/myprojectdetails?projectId=${_project.id}`;
 
@@ -118,7 +118,7 @@ module.exports = {
                         <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                     </p>
                 `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -131,7 +131,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -150,7 +150,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/myprojectdetails?projectId=${_project.id}`;
 
@@ -165,7 +165,7 @@ module.exports = {
                         <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                     </p>
                 `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -178,7 +178,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -201,7 +201,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/myprojectdetails?projectId=${_project.id}`;
 
@@ -217,7 +217,7 @@ module.exports = {
                         <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                     </p>
                 `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -230,7 +230,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -254,7 +254,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/myprojectdetails?projectId=${_project.id}`;
 
@@ -272,7 +272,7 @@ module.exports = {
                         <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                     </p>
                 `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -285,7 +285,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -311,7 +311,7 @@ module.exports = {
       // partner_emails.push(partner.email);
       let params = {};
       params.logo = Logo;
-      params.header_color = "white";
+      params.header_color = 'white';
 
       const link = `${process.env.SITE_URL}/login?redir_url=/dashboard/projectfile?projectId=${_project.id}`;
 
@@ -325,7 +325,7 @@ module.exports = {
                         <a href="${link}" target="_BLANK" title="View submission" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Submission</a>
                     </p>
                 `;
-      params.footer = "";
+      params.footer = '';
       params.date = new Date().getFullYear();
 
       let params2 = {
@@ -359,7 +359,7 @@ module.exports = {
       // partner_emails.push(partner.email);
       let params = {};
       params.logo = Logo;
-      params.header_color = "white";
+      params.header_color = 'white';
 
       const link = `${process.env.SITE_URL}/dashboard/projectfile?projectId=${_project.id}`;
 
@@ -373,7 +373,7 @@ module.exports = {
                         <a href="${link}" target="_BLANK" title="View submission" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Submission</a>
                     </p>
                 `;
-      params.footer = "";
+      params.footer = '';
       params.date = new Date().getFullYear();
 
       let params2 = {
@@ -398,9 +398,9 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
-    const link = `${process.env.SITE_URL}/dashboard/projectfile?projectId=${_project.id}`;
+    const link = `${process.env.SITE_URL}/login?redir_url=/dashboard/projects`;
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Service partner ${first_name}</b></p>`;
     params.body += `
@@ -412,7 +412,7 @@ module.exports = {
                         <a href="${link}" target="_BLANK" title="View submission" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Submission</a>
                     </p>
                 `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -425,7 +425,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -447,7 +447,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectfile?projectId=${project.id}`;
 
@@ -461,7 +461,7 @@ module.exports = {
                         <a href="${link}" target="_BLANK" title="View details" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Details</a>
                     </p>
                 `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -474,7 +474,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -494,16 +494,22 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
-    const link = `${process.env.SITE_URL}/dashboard/projectfile?projectId=${_project.id}`;
+    const link = `${process.env.SITE_URL}/login?redir_url=/dashboard/projects`;
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Service partner ${first_name}</b></p>`;
     params.body += `
                     <p style="font-size: 1.4em;">This is to inform you that the project with the ID of ${_project.projectSlug} has been assigned to you</p>
                 `;
 
-    params.footer = "";
+    params.body += `
+    <p style="margin-top:30px; font-size: 1em;">
+        <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View project Details</a>
+    </p>
+`;
+
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -516,7 +522,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -538,7 +544,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectfile?projectId=${_project.id}`;
 
@@ -553,7 +559,7 @@ module.exports = {
                 </p>
             `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -566,7 +572,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -590,7 +596,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
 
@@ -604,7 +610,7 @@ module.exports = {
                     <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                 </p>
             `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -617,7 +623,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -642,7 +648,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
 
@@ -659,7 +665,7 @@ module.exports = {
                     <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                 </p>
             `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -672,7 +678,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -697,7 +703,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
 
@@ -711,7 +717,7 @@ module.exports = {
                     <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                 </p>
             `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -724,7 +730,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -756,7 +762,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
 
@@ -780,7 +786,7 @@ module.exports = {
                     <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                 </p>
             `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -793,7 +799,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -825,7 +831,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
 
@@ -839,7 +845,7 @@ module.exports = {
                     <a href="${link}" target="_BLANK" title="View bids" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Bids</a>
                 </p>
             `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -852,7 +858,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -884,7 +890,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
 
@@ -898,7 +904,7 @@ module.exports = {
                     <a href="${link}" target="_BLANK" title="View project details" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View project details</a>
                 </p>
             `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -911,7 +917,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -939,7 +945,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
 
@@ -953,7 +959,7 @@ module.exports = {
                     <a href="${link}" target="_BLANK" title="View project details" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View project details</a>
                 </p>
             `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -966,7 +972,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -998,7 +1004,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
 
@@ -1013,7 +1019,7 @@ module.exports = {
                     <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                 </p>
             `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1026,7 +1032,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -1055,7 +1061,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
 
@@ -1074,7 +1080,7 @@ module.exports = {
                     <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
                 </p>
             `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1087,7 +1093,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -1118,7 +1124,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
 
@@ -1136,7 +1142,7 @@ module.exports = {
                   <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
               </p>
           `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1149,7 +1155,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -1179,7 +1185,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/projectadmindetails?projectId=${_project.id}`;
 
@@ -1195,7 +1201,7 @@ module.exports = {
                   <a href="${link}" target="_BLANK" title="View project" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Project Details</a>
               </p>
           `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1208,7 +1214,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -1225,7 +1231,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/resetpassword?email=${email}&token=${token}`;
 
@@ -1240,7 +1246,7 @@ module.exports = {
                         <a href="${link}" target="_BLANK" title="Reset Password" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">Reset Password</a>
                     </p>
                 `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1253,7 +1259,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -1270,7 +1276,7 @@ module.exports = {
 
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, ${first_name}</b></p>`;
     params.body += `
@@ -1280,7 +1286,7 @@ module.exports = {
                     <p style="font-size: 1.4em;">If this was not initiated by you, do not proceed.</p>
                 `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1293,7 +1299,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         throw Promise.reject(err);
@@ -1376,7 +1382,7 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/orderadmindetail?productId=${orders[0].product.id}`;
 
@@ -1408,7 +1414,7 @@ module.exports = {
                       <a href="${link}" target="_BLANK" title="click to view your order" style="padding:20px;color:white;font-size:1.2em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Order</a>
                   </p>
               `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1422,7 +1428,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful");
+        return Promise.resolve('Successful');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -1439,10 +1445,10 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
-    let link = "";
-    if (status === "completed") {
+    let link = '';
+    if (status === 'completed') {
       link = `${process.env.SITE_URL}/login?redir_url=/dashboard/order-detail/${trx.id}?f=1`;
     } else {
       link = `${process.env.SITE_URL}/login?redir_url=/dashboard/order-detail/${trx.id}`;
@@ -1451,11 +1457,11 @@ module.exports = {
     params.body = `<p style="font-size:1.7em;"><b>Hi, ${user.name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">This is to inform you that your order has been ${
-                    status === "pending" ? "updated to pending" : status
+                    status === 'pending' ? 'updated to pending' : status
                   }</p><br/>
               `;
     params.body += `<p style="font-size: 1.4em;">Reference No: (${trx.ref})</p>`;
-    if (status === "completed") {
+    if (status === 'completed') {
       params.body += `<br/><p style="font-size: 1.4em;">Please click the button below to tell us your experience on the delivery and the product in Order Review box leaving star rating. Thanks!</p>`;
       params.body += `
                     <p style="margin-top:30px; font-size: 1em;">
@@ -1463,7 +1469,7 @@ module.exports = {
                     </p>
                 `;
     } else {
-      if (status === "cancelled") {
+      if (status === 'cancelled') {
         params.body += `<br/>
       <p style="font-size: 1.4em;"><b>PS:</b> Your money will be refunded in 7 working days' time.</p>`;
       }
@@ -1475,17 +1481,17 @@ module.exports = {
                     </p>
                 `;
     }
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
       email: user.email,
       subject: `Your Order [${trx.ref}] ${
-        status === "completed"
+        status === 'completed'
           ? status
-          : status === "cancelled"
-          ? "has been cancelled"
-          : ""
+          : status === 'cancelled'
+          ? 'has been cancelled'
+          : ''
       }`,
     };
 
@@ -1494,7 +1500,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -1510,7 +1516,7 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/order-detail/${trx.id}`;
 
@@ -1525,7 +1531,7 @@ module.exports = {
                       <a href="${link}" target="_BLANK" title="click to view your order" style="padding:20px;color:white;font-size:1.2em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Order</a>
                   </p>
               `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1538,7 +1544,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -1554,7 +1560,7 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/order-detail/${trx.id}`;
 
@@ -1569,7 +1575,7 @@ module.exports = {
                       <a href="${link}" target="_BLANK" title="click to view your order" style="padding:20px;color:white;font-size:1.2em;background-color:#000;text-decoration:none;border-radius:5px;border:0">View Order</a>
                   </p>
               `;
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1582,7 +1588,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -1606,20 +1612,20 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">This is to inform you that the order [${
                     trx.ref
                   }] has been ${
-      status === "pending" ? "updated to pending" : status
+      status === 'pending' ? 'updated to pending' : status
     }</p><br/>
                   <p style="font-size: 1.4em;">Name: ${client.name}</p>
                   <p style="font-size: 1.4em;">Email: ${client.email}</p>
               `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1632,7 +1638,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -1655,7 +1661,7 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
     params.body += `
@@ -1664,7 +1670,7 @@ module.exports = {
                   <p style="font-size: 1.4em;">Email: ${client.email}</p>
               `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1677,7 +1683,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -1700,7 +1706,7 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
     params.body += `
@@ -1709,7 +1715,7 @@ module.exports = {
                   <p style="font-size: 1.4em;">Email: ${client.email}</p>
               `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1722,7 +1728,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -1740,10 +1746,10 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, ${
-      !first_name ? "user" : first_name
+      !first_name ? 'user' : first_name
     }</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">This is to inform you that your account has been suspended.</p><br/>
@@ -1751,7 +1757,7 @@ module.exports = {
                   <p style="font-size: 1.2em;">${reason}</p>
               `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1764,7 +1770,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -1789,23 +1795,23 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     params.body = `<p style="font-size:1.7em;"><b>Hi, Administrator</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">This is to inform you a user's account [${
-                    !first_name ? "user" : `${first_name} ${last_name}`
+                    !first_name ? 'user' : `${first_name} ${last_name}`
                   }] has been suspended.</p><br/>
                   <p style="font-size: 1.4em;">Email: ${email}</p>
                   <p style="font-size: 1.4em;">Reason: ${reason}</p>
               `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
       email: admin_emails,
-      subject: `Account suspension [${!first_name ? "user" : first_name}]`,
+      subject: `Account suspension [${!first_name ? 'user' : first_name}]`,
     };
 
     const template = mailer_template(params);
@@ -1813,7 +1819,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -1830,14 +1836,14 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/shop`;
     const link2 = `${process.env.SITE_URL}/services`;
 
     params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
       process.env.APP_NAME
-    }, ${!first_name ? "user" : first_name}</b></p>`;
+    }, ${!first_name ? 'user' : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
                   <p style="font-size: 1.4em;">You can proceed to <a href="${link}">placing your orders</a>, <a href="${link2}">requesting for a service</a> etc.</p>
@@ -1846,7 +1852,7 @@ module.exports = {
                   <p style="font-size: 1.4em;">${process.env.APP_NAME} team.</p>
               `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1859,7 +1865,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -1876,7 +1882,7 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/kyc`;
     const link2 = `${process.env.SITE_URL}/dashboard/subscription`;
@@ -1884,7 +1890,7 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
       process.env.APP_NAME
-    }, ${!first_name ? "user" : first_name}</b></p>`;
+    }, ${!first_name ? 'user' : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
                   <p style="font-size: 1.4em;">You can proceed to <a href="${link}">completing your KYC</a>, <a href="${link2}">subscribing,</a> <a href="${link3}">bid for projects</a> etc.</p>
@@ -1893,7 +1899,7 @@ module.exports = {
                   <p style="font-size: 1.4em;">${process.env.APP_NAME} team.</p>
               `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1906,7 +1912,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -1923,7 +1929,7 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/kyc`;
     const link2 = `${process.env.SITE_URL}/dashboard/subscription`;
@@ -1932,7 +1938,7 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
       process.env.APP_NAME
-    }, ${!first_name ? "user" : first_name}</b></p>`;
+    }, ${!first_name ? 'user' : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
                   <p style="font-size: 1.4em;">You can proceed to <a href="${link}">completing your KYC</a>, <a href="${link2}">subscribing,</a> <a href="${link3}">listing products</a>, <a href="${link4}">tracking orders</a> etc.</p>
@@ -1941,7 +1947,7 @@ module.exports = {
                   <p style="font-size: 1.4em;">${process.env.APP_NAME} team.</p>
               `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -1954,7 +1960,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -1977,19 +1983,19 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/login`;
 
     params.body = `<p style="font-size:1.7em;"><b>Hello ${
-      !first_name ? "user" : first_name
+      !first_name ? 'user' : first_name
     }</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">This is to inform you that your product <b>${
                     product.name
                   }</b> ${
-      status === "in_review"
-        ? "is under review"
+      status === 'in_review'
+        ? 'is under review'
         : ` has been reviewed and ${status}`
     }${reason_details}.</p><br/>
                   <p style="font-size: 1.4em;">You can view this by logging to your <a href="${link}">dashboard</a>.</p>
@@ -1997,14 +2003,14 @@ module.exports = {
                   <p style="font-size: 1.4em;">${process.env.APP_NAME} team.</p>
               `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
       email,
       subject: `Your product ${
-        status === "in_review"
-          ? "is under review"
+        status === 'in_review'
+          ? 'is under review'
           : ` has been reviewed and ${status}`
       }`,
     };
@@ -2014,7 +2020,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         console.log(err);
@@ -2034,13 +2040,13 @@ module.exports = {
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}/dashboard/complaints`;
 
     params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
       process.env.APP_NAME
-    }, ${!first_name ? "user" : first_name}</b></p>`;
+    }, ${!first_name ? 'user' : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">This is to inform you that you just made a complaint for the ticket issue ${issue_type} has been sent.</p><br/>
                   <p style="font-size: 1.4em;">Status: ${status}</p>
@@ -2051,7 +2057,7 @@ module.exports = {
                   <p style="font-size: 1.4em;">For more info, click <a href="${link}">here</a>.</p>
               `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -2064,7 +2070,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);
@@ -2073,32 +2079,39 @@ module.exports = {
 
   /**
    * Disapproval message for kyc document
-   * @param {*} user 
-   * @param {*} issue 
+   * @param {*} user
+   * @param {*} issue
    */
-  ProviderMailerForKycDocument: async (user, kyc_document, approved, reason) => {
+  ProviderMailerForKycDocument: async (
+    user,
+    kyc_document,
+    approved,
+    reason
+  ) => {
     const { first_name, email } = user;
 
     // setup mail credentials
     let params = {};
     params.logo = Logo;
-    params.header_color = "white";
+    params.header_color = 'white';
 
     const link = `${process.env.SITE_URL}?redir_url=/dashboard/kyc`;
 
-    params.body = `<p style="font-size:1.7em;"><b>Dear ${!first_name ? "user" : first_name},</b></p>`;
+    params.body = `<p style="font-size:1.7em;"><b>Dear ${
+      !first_name ? 'user' : first_name
+    },</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">This is to inform you that your ${kyc_document} kyc has been ${approved}.</p><br/>
-                  `
-                  if(approved === 'disapproved'){
-                    params.body += `<p style="font-size: 1.4em;">Reason: ${reason}</p>
+                  `;
+    if (approved === 'disapproved') {
+      params.body += `<p style="font-size: 1.4em;">Reason: ${reason}</p>
                     `;
-                  }
-                  params.body += `
+    }
+    params.body += `
                   <p style="font-size: 1.4em;">For more info, click <a href="${link}">here</a>.</p>
               `;
 
-    params.footer = "";
+    params.footer = '';
     params.date = new Date().getFullYear();
 
     let params2 = {
@@ -2111,7 +2124,7 @@ module.exports = {
     // Send Mail
     Mailer(template, params2)
       .then((response) => {
-        return Promise.resolve("Successful!");
+        return Promise.resolve('Successful!');
       })
       .catch((err) => {
         return Promise.reject(err);

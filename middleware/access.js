@@ -2,23 +2,23 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-undef */
 /* eslint-disable consistent-return */
-require("dotenv").config();
-const axios = require("axios");
+require('dotenv').config();
+const axios = require('axios');
 
-const fs = require("fs");
-const config = fs.readFileSync("./config/config.json");
-const AppleAuth = require("apple-auth");
-const jwt = require("jsonwebtoken");
+const fs = require('fs');
+const config = fs.readFileSync('./config/config.json');
+const AppleAuth = require('apple-auth');
+const jwt = require('jsonwebtoken');
 
-const UserService = require("../service/UserService");
-const User = require("../models/User");
+const UserService = require('../service/UserService');
+const User = require('../models/User');
 
-const { adminLevels, adminPrivileges } = require("../helpers/utility");
+const { adminLevels, adminPrivileges } = require('../helpers/utility');
 
 let auth = new AppleAuth(
   config,
-  fs.readFileSync("./config/AuthKey.p8").toString(), //read the key file
-  "text"
+  fs.readFileSync('./config/AuthKey.p8').toString(), //read the key file
+  'text'
 );
 
 exports.verifyAccess = async (req, res, next) => {
@@ -31,11 +31,11 @@ exports.verifyAccess = async (req, res, next) => {
     if (userDetails === null) {
       res.status(404).send({
         success: false,
-        message: "Admin not found!",
+        message: 'Admin not found!',
       });
     } else {
       // Level number 1 is for super admin role
-      if (userDetails.level === 1 || userDetails.userType !== "admin") {
+      if (userDetails.level === 1 || userDetails.userType !== 'admin') {
         req._credentials = {
           ...userDetails.toJSON(),
         };
@@ -48,10 +48,9 @@ exports.verifyAccess = async (req, res, next) => {
         if (Object.keys(levelDetails).length === 0) {
           return res.status(404).send({
             success: false,
-            message: "Admin level does not exist!",
+            message: 'Admin level does not exist!',
           });
         }
-        
 
         // Get the privileges of the admin's level
         const _adminPrivileges = adminPrivileges.find(
@@ -64,11 +63,10 @@ exports.verifyAccess = async (req, res, next) => {
           });
         }
 
-        const _path = _adminPrivileges.privileges.filter((_privilege) => _privilege && path.includes(_privilege.toLowerCase())
+        const _path = _adminPrivileges.privileges.filter(
+          (_privilege) => _privilege && path.includes(_privilege.toLowerCase())
         );
 
-        console.log(_path)
-        
         if (_path.length === 0) {
           return res.status(403).send({
             success: false,
@@ -95,10 +93,10 @@ exports.verifyAccess = async (req, res, next) => {
 exports.verifyAdmin = (req, res, next) => {
   const { _credentials } = req;
 
-  if (_credentials.userType !== "admin") {
+  if (_credentials.userType !== 'admin') {
     return res.status(403).send({
       success: false,
-      message: "Unauthorized Access!",
+      message: 'Unauthorized Access!',
     });
   } else {
     next();
@@ -108,10 +106,10 @@ exports.verifyAdmin = (req, res, next) => {
 exports.verifyUser = (req, res, next) => {
   const { _credentials } = req;
 
-  if (_credentials.userType === "admin") {
+  if (_credentials.userType === 'admin') {
     return res.status(403).send({
       success: false,
-      message: "Unauthorized Access!",
+      message: 'Unauthorized Access!',
     });
   } else {
     next();
@@ -122,10 +120,10 @@ exports.authenticateFBSignup = async (req, res, next) => {
   try {
     const { facebook_access_token } = req.body;
     const { data } = await axios({
-      url: "https://graph.facebook.com/me",
-      method: "get",
+      url: 'https://graph.facebook.com/me',
+      method: 'get',
       params: {
-        fields: ["id", "email", "first_name", "last_name"].join(","),
+        fields: ['id', 'email', 'first_name', 'last_name'].join(','),
         access_token: facebook_access_token,
       },
     });
@@ -134,7 +132,7 @@ exports.authenticateFBSignup = async (req, res, next) => {
   } catch (error) {
     return res.status(400).json({
       success: false,
-      msg: "FB access error",
+      msg: 'FB access error',
     });
   }
 };
@@ -142,13 +140,13 @@ exports.authenticateFBSignup = async (req, res, next) => {
 exports.authenticateGoogleSignin = async (req, res, next) => {
   try {
     const { access_token } = req.body;
-    console.log(access_token)
+    console.log(access_token);
     const { data } = await axios.get(
       `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${access_token}`,
       {
         headers: {
           Authorization: `Bearer ${access_token}`,
-          Accept: "application/json",
+          Accept: 'application/json',
         },
       }
     );
@@ -156,7 +154,7 @@ exports.authenticateGoogleSignin = async (req, res, next) => {
     if (data.verified_email === false) {
       return res.status(400).json({
         success: true,
-        message: "This email address is not verified!",
+        message: 'This email address is not verified!',
       });
     }
 
@@ -165,40 +163,38 @@ exports.authenticateGoogleSignin = async (req, res, next) => {
   } catch (error) {
     return res.status(400).json({
       success: false,
-      msg: "Google auth access error",
+      msg: 'Google auth access error',
     });
   }
 };
 
 exports.authenticateAppleSignin = async (req, res, next) => {
   try {
-
     //authenticate our code we recieved from apple login with our key file
     const response = await auth.accessToken(req.body.authorization.code);
     // decode our token
     const idToken = jwt.decode(response.id_token);
-    
+
     const user = {};
     user.id = idToken.sub;
     //extract email from idToken
     if (idToken.email) user.email = idToken.email;
-    
+
     //check if user exists in the returned response from Apple
     //Apple returns the user only once, so you might want to save their details
     // in a database for future logins
-    
-    if (req.body.user) { 
+
+    if (req.body.user) {
       const { name } = JSON.parse(req.body.user);
       user.name = name;
     }
 
     req.apple_details = user;
     next();
-
   } catch (error) {
     return res.status(400).json({
       success: false,
-      msg: "Apple auth access error",
+      msg: 'Apple auth access error',
     });
   }
 };

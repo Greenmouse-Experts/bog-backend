@@ -1535,3 +1535,64 @@ exports.getPendingTransfers = async (req, res, next) => {
     }
   });
 };
+
+exports.checkProducts = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const productsToCheck = req.body.products; // Array of objects with id and name
+
+      if (!Array.isArray(productsToCheck) || productsToCheck.length === 0) {
+        return res
+          .status(400)
+          .send({
+            status: false,
+            message: 'No products selected to check availability',
+          });
+      }
+
+      // Extract product IDs from the request
+      const productIds = productsToCheck.map((product) => product.id);
+
+      // Find products by IDs and check their availability
+      const products = await Product.findAll({
+        where: {
+          id: productIds,
+          deletedAt: null, // Ensure the product is not deleted
+        },
+        attributes: ['id', 'name'], // Fetch only id and name
+      });
+
+      // Create a map of available products
+      const availableProductsMap = products.reduce((acc, product) => {
+        acc[product.id] = product.name;
+        return acc;
+      }, {});
+
+      // Determine unavailable products
+      const unavailableProducts = productsToCheck.filter(
+        (product) => !availableProductsMap[product.id]
+      );
+
+      // Extract names of unavailable products
+      const unavailableProductDetails = unavailableProducts.map((product) => ({
+        id: product.id,
+        name: product.name,
+      }));
+
+      if (unavailableProductDetails.length > 0) {
+        return res.send({
+          success: true,
+          message: 'Some products are unavailable',
+          unavailableProducts: unavailableProductDetails,
+        });
+      }
+      // Proceed with checkout process if all products are available
+      return res.send({
+        success: true,
+        message: 'All products are available for checkout',
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+};

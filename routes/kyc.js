@@ -53,11 +53,9 @@ router
   .post(BasicKYCRequirements(), validate, Auth, createKycFinancialData);
 
 router.route('/kyc-financial-data/fetch').get(Auth, ReadKycFinancialData);
-//
+
 // kyc_general_info
-router
-  .route('/kyc-general-info/create')
-  .post(GeneralInfoRequirements(), validate, Auth, createKycGeneralInfo);
+router.route('/kyc-general-info/create').post(Auth, createKycGeneralInfo);
 
 router.route('/kyc-general-info/fetch').get(Auth, ReadKycGeneralInfo);
 
@@ -65,12 +63,7 @@ router.route('/kyc-general-info/fetch').get(Auth, ReadKycGeneralInfo);
 // kyc_organisation_info
 router
   .route('/kyc-organisation-info/create')
-  .post(
-    OrganizationInfoRequirements(),
-    validate,
-    Auth,
-    createKycOrganisationInfo
-  );
+  .post(Auth, createKycOrganisationInfo);
 
 router.route('/kyc-organisation-info/fetch').get(Auth, ReadKycOrganisationInfo);
 
@@ -84,13 +77,7 @@ router.route('/kyc-tax-permits/fetch').get(Auth, ReadKycTaxPermits);
 // kyc_work_experience
 router
   .route('/kyc-work-experience/create')
-  .post(
-    WorkExperienceRequirements(),
-    validate,
-    Auth,
-    upload.single('document'),
-    createKycWorkExperience
-  );
+  .post(Auth, upload.single('document'), createKycWorkExperience);
 
 router.route('/kyc-work-experience/fetch').get(Auth, ReadKycWorkExperience);
 
