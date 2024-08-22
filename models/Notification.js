@@ -1,38 +1,42 @@
-const Sequelize = require("sequelize");
-const sequelise = require("../config/database/connection");
+const Sequelize = require('sequelize');
+const sequelise = require('../config/database/connection');
 
 const Notifications = sequelise.define(
-  "notifications",
+  'notifications',
   {
     id: {
       type: Sequelize.UUID,
       defaultValue: Sequelize.UUIDV4,
       unique: true,
-      primaryKey: true
+      primaryKey: true,
     },
     userId: {
       type: Sequelize.UUID,
-      allowNull: true
+      allowNull: true,
     },
     type: {
       allowNull: true,
-      type: Sequelize.ENUM("user", "admin")
+      type: Sequelize.ENUM('user', 'admin'),
+    },
+    userType: {
+      allowNull: true,
+      type: Sequelize.STRING,
     },
     message: {
       allowNull: true,
-      type: Sequelize.TEXT
+      type: Sequelize.TEXT,
     },
     isRead: {
       allowNull: true,
       type: Sequelize.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
     },
     status: {
       allowNull: true,
       type: Sequelize.ENUM,
-      values: ["pending", "read", "unread"],
-      defaultValue: "pending"
-    }
+      values: ['pending', 'read', 'unread'],
+      defaultValue: 'pending',
+    },
   },
   { paranoid: true }
 );

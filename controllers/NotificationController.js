@@ -7,6 +7,7 @@ const sequelize = require('../config/database/connection');
 
 // Service methods
 const UserService = require('../service/UserService');
+const User = require('../models/User');
 
 exports.getAllAdminNotifications = async (req, res, next) => {
   try {
@@ -44,7 +45,7 @@ exports.getAllAdminNotifications = async (req, res, next) => {
 
 exports.getAllAUserNotifications = async (req, res, next) => {
   try {
-    const { id } = req._credentials;
+    const { id, userType: exactUserType } = req._credentials;
     const { userType } = req.query;
 
     // Retrieve profile details
@@ -64,13 +65,31 @@ exports.getAllAUserNotifications = async (req, res, next) => {
     //   });
     // }
 
+    let _userType = null;
+    if (userType === 'vendor') {
+      _userType = 'product_partner';
+    } else if (userType === 'service_partner') {
+      _userType = 'professional';
+    } else {
+      _userType = userType;
+    }
+
     const notifications = await Notification.findAll({
       where: {
         type: 'user',
-        userId: req.params.userId,
+        [Op.and]: {
+          [Op.or]: [
+            { userId: null, userType: _userType },
+            { userType: null, userId: req.params.userId },
+          ],
+        },
+        // [Op.and]: {
+        //   [Op.or]: [{ userId: req.params.userId }, { userId: null }],
+        // },
       },
       order: [['createdAt', 'DESC']],
     });
+
     return res.status(200).send({
       success: true,
       data: notifications,

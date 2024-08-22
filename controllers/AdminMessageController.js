@@ -6,6 +6,11 @@ const { Op } = require('sequelize');
 const moment = require('moment');
 const sequelize = require('../config/database/connection');
 const AdminMessage = require('../models/AdminMessage');
+const Notifications = require('../models/Notification');
+const {
+  createNotification,
+  createNotificationWithUserType,
+} = require('../helpers/notification');
 
 exports.postAnnouncement = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -24,11 +29,20 @@ exports.postAnnouncement = async (req, res, next) => {
       }
 
       const data = await AdminMessage.create(request, { transaction: t });
+
+      // Send in-app notification
+      await createNotificationWithUserType({
+        type: 'user',
+        userType: user === 'all' ? null : user,
+        message: `A message has been sent to you from the admin: ${content}`,
+      });
+
       return res.status(201).send({
         success: true,
         data,
       });
     } catch (error) {
+      console.log(error);
       t.rollback();
       return next(error);
     }
@@ -69,17 +83,24 @@ exports.allAdminMessages = async (req, res, next) => {
   try {
     const { userType } = req.query;
     const where = {
-      expiredAt: {
-        [Op.gte]: moment().format('YYYY-MM-DD HH:mm:ss'),
+      [Op.or]: [
+        {
+          expiredAt: {
+            [Op.gte]: moment().format('YYYY-MM-DD HH:mm:ss'),
+          },
+        },
+        { expiredAt: null },
+      ],
+      [Op.and]: {
+        [Op.or]: [{ user: 'all' }, { user: userType }],
       },
-      [Op.or]: [{ user: 'all' }, { user: userType }],
     };
 
     const messages = await AdminMessage.findAll({
       where,
       order: [['createdAt', 'DESC']],
     });
-    console.log(messages);
+
     return res.status(200).send({
       success: true,
       data: messages,

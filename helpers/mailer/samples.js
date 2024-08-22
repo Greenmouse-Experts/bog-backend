@@ -2179,4 +2179,9 @@ module.exports = {
   //       return Promise.reject(err);
   //     });
   // },
+  /**
+   * Disapproval message for kyc document
+   * @param {*} user
+   * @param {*} issue
+   */
 };

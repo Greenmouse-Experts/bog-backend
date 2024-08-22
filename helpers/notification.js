@@ -20,6 +20,26 @@ exports.createNotification = async ({ userId, type, message }) => {
   }
 };
 
+exports.createNotificationWithUserType = async ({
+  type,
+  userType,
+  message,
+}) => {
+  try {
+    const request = {
+      type,
+      userType,
+      message,
+    };
+    await Notification.create(request);
+
+    console.log('Notification sent');
+    return true;
+  } catch (error) {
+    return error;
+  }
+};
+
 exports.fetchUserNotification = async ({ userId }) => {
   try {
     const notifications = await Notification.findAll({
