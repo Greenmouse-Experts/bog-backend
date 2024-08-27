@@ -1158,12 +1158,12 @@ exports.verificationForGeotechnicalInvestigation = async (req, res, next) => {
       console.log(total_amt);
       console.log(total);
 
-      // if (total_amt !== parseInt(total)) {
-      //   return res.status(400).send({
-      //     success: false,
-      //     message: 'Total is not correct.',
-      //   });
-      // }
+      if (total_amt !== parseInt(total)) {
+        return res.status(400).send({
+          success: false,
+          message: 'Total is not correct.',
+        });
+      }
 
       return res.status(200).send({
         success: true,

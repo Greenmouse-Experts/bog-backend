@@ -525,13 +525,18 @@ exports.createKycWorkExperience = async (req, res, next) => {
       const { userType } = req.body;
       const userId = req.user.id;
       const profile = await getUserTypeProfile(userType, userId);
-      const url = `${process.env.APP_URL}/${req.file.path}`;
+
+      const urls = req.files.map((file) => {
+        return `${process.env.APP_URL}/file.path`;
+      });
+      const url = urls.join(', ');
 
       const data = {
         ...req.body,
         userId: profile.id,
         fileUrl: url,
       };
+
       const experiences = await KycWorkExperience.create(data, {
         transaction: t,
       });
@@ -541,6 +546,7 @@ exports.createKycWorkExperience = async (req, res, next) => {
         data: experiences,
       });
     } catch (error) {
+      console.log(error);
       return next(error);
     }
   });

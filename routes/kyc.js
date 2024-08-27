@@ -77,7 +77,7 @@ router.route('/kyc-tax-permits/fetch').get(Auth, ReadKycTaxPermits);
 // kyc_work_experience
 router
   .route('/kyc-work-experience/create')
-  .post(Auth, upload.single('document'), createKycWorkExperience);
+  .post(Auth, upload.array('document'), createKycWorkExperience);
 
 router.route('/kyc-work-experience/fetch').get(Auth, ReadKycWorkExperience);
 

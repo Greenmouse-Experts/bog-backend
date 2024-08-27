@@ -1,48 +1,52 @@
-const Sequelize = require("sequelize");
-const sequelise = require("../config/database/connection");
+const Sequelize = require('sequelize');
+const sequelise = require('../config/database/connection');
 
 const KycJobExperience = sequelise.define(
-  "kyc_work_experiences",
+  'kyc_work_experiences',
   {
     id: {
       type: Sequelize.UUID,
       defaultValue: Sequelize.UUIDV4,
       unique: true,
-      primaryKey: true
+      primaryKey: true,
     },
     userType: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     userId: {
       // i.e profileId,
       type: Sequelize.UUID,
-      allowNull: true
+      allowNull: true,
     },
     name: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
+    },
+    currency: {
+      type: Sequelize.STRING,
+      allowNull: true,
     },
     value: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     date: {
       type: Sequelize.DATE,
-      allowNull: true
+      allowNull: true,
     },
     fileUrl: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     years_of_experience: {
       type: Sequelize.STRING,
-      allowNull: true
+      allowNull: true,
     },
     company_involvement: {
       type: Sequelize.STRING,
-      allowNull: true
-    }
+      allowNull: true,
+    },
   },
   { paranoid: true }
 );

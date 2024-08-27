@@ -103,16 +103,16 @@ exports.registerUser = async (req, res, next) => {
     try {
       const { email, phone, userType, name, captcha, company_name } = req.body;
 
-      if (!req.body.platform && userType !== 'admin') {
-        const validateCaptcha = await UserService.validateCaptcha(captcha);
-        if (!validateCaptcha) {
-          return res.status(400).send({
-            success: false,
-            message: 'Please answer the captcha correctly',
-            validateCaptcha,
-          });
-        }
-      }
+      // if (!req.body.platform && userType !== 'admin') {
+      //   const validateCaptcha = await UserService.validateCaptcha(captcha);
+      //   if (!validateCaptcha) {
+      //     return res.status(400).send({
+      //       success: false,
+      //       message: 'Please answer the captcha correctly',
+      //       validateCaptcha,
+      //     });
+      //   }
+      // }
 
       const isUserType = UserService.validateUserType(userType);
       if (!isUserType) {
@@ -125,6 +125,13 @@ exports.registerUser = async (req, res, next) => {
       let user = await UserService.findUser({ email });
 
       if (user) {
+        // if (user.userType ===  ) {
+        //   return res.status(400).send({
+        //     success: false,
+        //     message: 'Account not found.',
+        //   });
+        // }
+
         if (company_name) {
           const profileFound = await UserService.getProfile({
             company_name,
@@ -139,12 +146,16 @@ exports.registerUser = async (req, res, next) => {
         }
       }
 
-      user_found = await User.findOne({ where: { phone } });
+      let user_found = await User.findOne({
+        where: { phone },
+      });
       if (user_found) {
-        return res.status(400).send({
-          success: false,
-          message: 'Phone number exists.',
-        });
+        if (user_found.email !== email) {
+          return res.status(400).send({
+            success: false,
+            message: 'Phone number exists.',
+          });
+        }
       }
 
       let user_exists = user;

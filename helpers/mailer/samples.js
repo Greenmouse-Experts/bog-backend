@@ -1831,7 +1831,7 @@ module.exports = {
    * @param {{first_name:string, email:string}} client
    */
   clientWelcomeMessage: async (client) => {
-    const { first_name, email } = client;
+    const { fname: first_name, name, email } = client;
 
     // setup mail credentials
     let params = {};
@@ -1843,7 +1843,7 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
       process.env.APP_NAME
-    }, ${!first_name ? 'user' : first_name}</b></p>`;
+    }, ${!first_name ? name : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
                   <p style="font-size: 1.4em;">You can proceed to <a href="${link}">placing your orders</a>, <a href="${link2}">requesting for a service</a> etc.</p>
@@ -1877,7 +1877,7 @@ module.exports = {
    * @param {{first_name:string, email:string}} partner
    */
   servicePartnerWelcomeMessage: async (partner) => {
-    const { first_name, email } = partner;
+    const { fname: first_name, name, email } = partner;
 
     // setup mail credentials
     let params = {};
@@ -1890,7 +1890,7 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
       process.env.APP_NAME
-    }, ${!first_name ? 'user' : first_name}</b></p>`;
+    }, ${!first_name ? name : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
                   <p style="font-size: 1.4em;">You can proceed to <a href="${link}">completing your KYC</a>, <a href="${link2}">subscribing,</a> <a href="${link3}">bid for projects</a> etc.</p>
@@ -1924,7 +1924,7 @@ module.exports = {
    * @param {{first_name:string, email:string}} partner
    */
   productPartnerWelcomeMessage: async (partner) => {
-    const { first_name, email } = partner;
+    const { fname: first_name, name, email } = partner;
 
     // setup mail credentials
     let params = {};
@@ -1938,7 +1938,7 @@ module.exports = {
 
     params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
       process.env.APP_NAME
-    }, ${!first_name ? 'user' : first_name}</b></p>`;
+    }, ${!first_name ? name : first_name}</b></p>`;
     params.body += `
                   <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
                   <p style="font-size: 1.4em;">You can proceed to <a href="${link}">completing your KYC</a>, <a href="${link2}">subscribing,</a> <a href="${link3}">listing products</a>, <a href="${link4}">tracking orders</a> etc.</p>

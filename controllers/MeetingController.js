@@ -132,7 +132,7 @@ exports.createMeeting = async (req, res, next) => {
         attributes: ['email', 'name', 'fname', 'lname'],
       });
 
-      const mesg = `${user.fname} ${user.lname} requested for a meeting on Project`;
+      const mesg = `${user.fname} ${user.lname} requested for a meeting on project`;
       const notifyType = 'admin';
       const { io } = req.app;
       await Notification.createNotification({

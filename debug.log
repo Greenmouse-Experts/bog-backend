@@ -1,3 +1,26 @@
 server started on port 3001
 Connection to database establised
 Connected to email server
+Notification sent
+Notification sent
+{
+  accepted: [ 'greenmouseapp+pry@test.com' ],
+  rejected: [],
+  ehlo: [
+    'SIZE 52428800',
+    '8BITMIME',
+    'PIPELINING',
+    'PIPECONNECT',
+    'AUTH PLAIN LOGIN',
+    'HELP'
+  ],
+  envelopeTime: 1076,
+  messageTime: 589,
+  messageSize: 19688,
+  response: '250 OK id=1sixdP-0005op-0i',
+  envelope: {
+    from: 'no-reply@buildonthego.com',
+    to: [ 'greenmouseapp+pry@test.com' ]
+  },
+  messageId: '<baf9636b-dff0-c303-a5ee-d62096d7c5d5@buildonthego.com>'
+}

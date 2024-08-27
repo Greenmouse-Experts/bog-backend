@@ -90,6 +90,7 @@ exports.allAdminMessages = async (req, res, next) => {
           },
         },
         { expiredAt: null },
+        { expiredAt: '0000-00-00 00:00:00' },
       ],
       [Op.and]: {
         [Op.or]: [{ user: 'all' }, { user: userType }],
