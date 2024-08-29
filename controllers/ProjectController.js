@@ -1140,16 +1140,16 @@ exports.verificationForGeotechnicalInvestigation = async (req, res, next) => {
       }
 
       let total_amt =
-        setup_dismantle_rig_amt * setup_dismantle_rig_qty +
-        drilling_spt_amt * drilling_spt_qty +
-        setup_dismantle_cpt_amt * setup_dismantle_cpt_qty +
-        dutch_cpt_amt * dutch_cpt_qty +
-        chemical_analysis_of_ground_water_amt *
-          chemical_analysis_of_ground_water_qty +
-        mobilization +
-        demobilization +
-        lab_test +
-        report;
+        +setup_dismantle_rig_amt * +setup_dismantle_rig_qty +
+        +drilling_spt_amt * +drilling_spt_qty +
+        +setup_dismantle_cpt_amt * +setup_dismantle_cpt_qty +
+        +dutch_cpt_amt * +dutch_cpt_qty +
+        +chemical_analysis_of_ground_water_amt *
+          +chemical_analysis_of_ground_water_qty +
+        +mobilization +
+        +demobilization +
+        +lab_test +
+        +report;
 
       const vat = total_amt * (7.5 / 100);
       total_amt += vat;
@@ -1218,22 +1218,22 @@ exports.orderForGeotechnicalInvestigation = async (req, res, next) => {
       }
 
       let total_amt =
-        setup_dismantle_rig_amt * setup_dismantle_rig_qty +
-        drilling_spt_amt * drilling_spt_qty +
-        setup_dismantle_cpt_amt * setup_dismantle_cpt_qty +
-        dutch_cpt_amt * dutch_cpt_qty +
-        chemical_analysis_of_ground_water_amt *
-          chemical_analysis_of_ground_water_qty +
-        mobilization +
-        demobilization +
-        lab_test +
-        report;
+        +setup_dismantle_rig_amt * +setup_dismantle_rig_qty +
+        +drilling_spt_amt * +drilling_spt_qty +
+        +setup_dismantle_cpt_amt * +setup_dismantle_cpt_qty +
+        +dutch_cpt_amt * +dutch_cpt_qty +
+        +chemical_analysis_of_ground_water_amt *
+          +chemical_analysis_of_ground_water_qty +
+        +mobilization +
+        +demobilization +
+        +lab_test +
+        +report;
 
       const vat = total_amt * (7.5 / 100);
       total_amt += vat;
       total_amt = Math.round(total_amt);
 
-      if (total_amt !== total) {
+      if (total_amt !== +total) {
         return res.status(400).send({
           success: false,
           message: 'Total is not correct.',

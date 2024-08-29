@@ -110,3 +110,50 @@ exports.allAdminMessages = async (req, res, next) => {
     return next(error);
   }
 };
+
+/**
+ * Mark message as read
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
+ */
+exports.markMessageAsRead = async (req, res, next) => {
+  try {
+    const { id } = req._credentials;
+
+    const { messageId } = req.params;
+
+    // Get message details
+    const messageDetails = await AdminMessage.findOne({
+      where: { id: messageId },
+    });
+
+    let updatedUnreadData = null;
+    if (messageDetails.unread) {
+      const unreadData = JSON.parse(messageDetails.unread);
+
+      // Check if user has marked this message as read
+      const _markedAsRead = unreadData.filter((userId) => userId === id);
+      if (_markedAsRead.length) {
+        throw new Error('Message has been marked as read.');
+      }
+
+      unreadData.push(id);
+      updatedUnreadData = unreadData;
+    } else {
+      updatedUnreadData = [id];
+    }
+
+    // mark message as read for this user
+    messageDetails.unread = JSON.stringify(updatedUnreadData);
+    await messageDetails.save();
+
+    return res.status(200).send({
+      success: true,
+      message: 'Message marked as read successfully.',
+    });
+  } catch (error) {
+    return next(error);
+  }
+};

@@ -1,30 +1,37 @@
-const express = require("express");
+const express = require('express');
 
 const router = express.Router();
-const Auth = require("../middleware/auth");
-const Access = require("../middleware/access");
-const AdminMessageController = require("../controllers/AdminMessageController");
+const Auth = require('../middleware/auth');
+const Access = require('../middleware/access');
+const AdminMessageController = require('../controllers/AdminMessageController');
 
-const upload = require("../helpers/upload");
+const upload = require('../helpers/upload');
 
 router
-  .route("/announcements/all")
+  .route('/announcements/all')
   .get(AdminMessageController.viewAnnouncements);
 
 router
-  .route("/announcements")
+  .route('/announcements')
   .get([Auth, Access.verifyAccess], AdminMessageController.allAdminMessages);
 
 router
-  .route("/announcements/delete-message/:id")
-  .delete([Auth, Access.verifyAccess], AdminMessageController.deleteAnnouncement);
+  .route('/announcements/delete-message/:id')
+  .delete(
+    [Auth, Access.verifyAccess],
+    AdminMessageController.deleteAnnouncement
+  );
 
 router
-  .route("/announcements/new-announcement")
+  .route('/announcements/new-announcement')
   .post(
     [Auth, Access.verifyAccess],
-    upload.single("supportingDocument"),
+    upload.single('supportingDocument'),
     AdminMessageController.postAnnouncement
   );
+
+router
+  .route('/announcements/mark-as-read/:messageId')
+  .post([Auth, Access.verifyAccess], AdminMessageController.markMessageAsRead);
 
 module.exports = router;

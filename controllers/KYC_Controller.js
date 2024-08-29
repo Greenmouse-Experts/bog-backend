@@ -527,7 +527,7 @@ exports.createKycWorkExperience = async (req, res, next) => {
       const profile = await getUserTypeProfile(userType, userId);
 
       const urls = req.files.map((file) => {
-        return `${process.env.APP_URL}/file.path`;
+        return `${process.env.APP_URL}/${file.path}`;
       });
       const url = urls.join(', ');
 
@@ -932,6 +932,14 @@ exports.getUserKycDetails = async (req, res, next) => {
         });
       }
       const profile = await getUserTypeProfile(userType, userId);
+
+      if (!profile) {
+        return res.status(400).send({
+          success: false,
+          message: 'Profile info not found',
+        });
+      }
+
       const suppyCategory = await SupplyCategory.findOne({
         where: { userId: profile.id },
       });
@@ -992,6 +1000,7 @@ exports.getUserKycDetails = async (req, res, next) => {
         kycWorkExperience,
         kycDocuments,
       };
+
       return res.status(200).send({
         success: true,
         data,

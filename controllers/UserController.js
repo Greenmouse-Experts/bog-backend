@@ -49,6 +49,7 @@ const {
 
 const axios = require('axios');
 const SupportSocial = require('../models/supportsocial');
+const AdminMessage = require('../models/AdminMessage');
 
 // const Client = require("../helpers/storage")
 
@@ -1307,9 +1308,19 @@ exports.getLoggedInUser = async (req, res) => {
           })
         : undefined;
 
+    const [[{ unread_messages }]] = await sequelize.query(
+      `SELECT COUNT(*) as unread_messages FROM admin_messages where (user = 'all' OR user = :userType) AND (unread NOT LIKE :userId OR unread IS NULL)`,
+      {
+        replacements: {
+          userType: req.query.userType,
+          userId: `%${user.id}%`,
+        },
+      }
+    );
+
     return res.status(200).send({
       success: true,
-      user: { ...data, rating },
+      user: { ...data, rating, unread_messages },
     });
   } catch (error) {
     console.log(error);
