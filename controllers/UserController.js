@@ -735,7 +735,12 @@ exports.googleSignin = async (req, res) => {
 exports.registerAdmin = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { email, userType, name } = req.body;
+      let { email, userType, name, password } = req.body;
+
+      // Generate password if not passed
+      if (!password) {
+        password = randomstring.generate(12);
+      }
 
       const isUserType = UserService.validateUserType(userType);
       if (!isUserType) {
@@ -755,16 +760,26 @@ exports.registerAdmin = async (req, res, next) => {
       const userData = {
         name: req.body.name,
         email: req.body.email,
-        password: bcrypt.hashSync(req.body.password, 10),
+        password: bcrypt.hashSync(password, 10),
         userType: req.body.userType,
         level: req.body.level,
       };
 
       const admin = await UserService.createNewUser(userData, t);
 
+      let token = helpers.generateWebToken();
+      const encodeEmail = encodeURIComponent(email);
+      let message = helpers.verifyEmailMessageForAdmin(
+        name,
+        encodeEmail,
+        token,
+        password
+      );
+      await EmailService.sendMail(email, message, 'Verify Email');
+
       return res.status(201).send({
         success: true,
-        message: 'User Created Successfully',
+        message: 'Account created Successfully',
         admin,
       });
     } catch (error) {

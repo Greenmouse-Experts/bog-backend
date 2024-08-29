@@ -39,10 +39,9 @@ const adminValidation = () => {
     check('email', 'Please use a valid Email').isEmail(),
     check('userType', 'Enter The user type').notEmpty(),
     check('level', 'Enter The user type').isInt(),
-    check(
-      'password',
-      'Please enter a password with 5 or more characters'
-    ).isLength({ min: 5 }),
+    check('password', 'Please enter a password with 5 or more characters')
+      .isLength({ min: 5 })
+      .optional(),
   ];
 };
 

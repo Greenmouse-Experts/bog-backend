@@ -104,7 +104,7 @@ exports.servicePartnerMeetings = async (req, res, next) => {
 exports.createMeeting = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { userType, projectSlug, date } = req.body;
+      const { userType, projectSlug, date, time } = req.body;
       const userId = req.user.id;
       const project = await ProjectModel.findOne({
         where: { projectSlug },
@@ -121,9 +121,8 @@ exports.createMeeting = async (req, res, next) => {
         meetingData.userId = profile.id;
       }
 
-      if (new Date(date).getTime() < new Date().getTime()) {
-        throw new Error('Meeting time cannot be lesser than the current date');
-      }
+      // Verify
+      await this.verifyMeeting(date, time);
 
       const myMeetings = await MeetingModel.create(meetingData, {
         transaction: t,
@@ -150,6 +149,55 @@ exports.createMeeting = async (req, res, next) => {
       return next(error);
     }
   });
+};
+
+exports.verifyMeeting = async (date, time) => {
+  if (new Date(`${date} ${time}`).getTime() < new Date().getTime()) {
+    throw new Error('Meeting time cannot be lesser than the current date');
+  }
+
+  // Check meeting date and time
+  const meetingPeriod = await MeetingModel.findOne({
+    where: {
+      date: {
+        [Op.eq]: new Date(date),
+      },
+      time,
+    },
+  });
+
+  if (meetingPeriod) {
+    throw new Error('Meeting has already been scheduled for this time');
+  }
+};
+
+exports.updateMeeting = async (req, res, next) => {
+  try {
+    const { id: userId } = req._credentials;
+    const { id: meetingId } = req.params;
+
+    const { userType, projectSlug, date, time } = req.body;
+
+    // Check meeting
+    const meeting = await MeetingModel.findOne({
+      where: { id: meetingId, userId },
+    });
+
+    // Verify
+    if (date && time) {
+      await this.verifyMeeting(date, time);
+    }
+
+    // Update
+    await MeetingModel.update(req.body, { where: { id: meetingId } });
+
+    return res.status(200).send({
+      success: true,
+      message: 'Meeting updated successfully.',
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.meetingAction = async (req, res, next) => {

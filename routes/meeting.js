@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 const Auth = require('../middleware/auth');
-// const Access = require("../middleware/access");
+const Access = require('../middleware/access');
 
 const MeetingController = require('../controllers/MeetingController');
 
@@ -27,6 +27,10 @@ router
 router
   .route('/meeting/create')
   .post(meetingValidation(), validate, Auth, MeetingController.createMeeting);
+
+router
+  .route('/meeting/update/:id')
+  .put(validate, Auth, Access.verifyAccess, MeetingController.updateMeeting);
 
 router
   .route('/meeting/delete/:meetingId')
