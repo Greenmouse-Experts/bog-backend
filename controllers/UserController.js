@@ -1335,7 +1335,7 @@ exports.getLoggedInUser = async (req, res) => {
       `SELECT COUNT(*) as unread_messages FROM admin_messages where (user = 'all' OR user = :userType) AND (unread NOT LIKE :userId OR unread IS NULL)`,
       {
         replacements: {
-          userType: req.query.userType,
+          userType: req.query.userType ? req.query.userType : null,
           userId: `%${user.id}%`,
         },
       }
