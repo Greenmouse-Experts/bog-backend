@@ -769,12 +769,20 @@ exports.registerAdmin = async (req, res, next) => {
 
       let token = helpers.generateWebToken();
       const encodeEmail = encodeURIComponent(email);
+
+      const data = {
+        token,
+        id: admin.id,
+      };
+      await UserService.updateUser(data, t);
+
       let message = helpers.verifyEmailMessageForAdmin(
         name,
         encodeEmail,
         token,
         password
       );
+
       await EmailService.sendMail(email, message, 'Verify Email');
 
       return res.status(201).send({
@@ -1351,7 +1359,9 @@ exports.verifyUser = async (req, res, next) => {
     try {
       const { email, token } = req.body;
 
-      const user = await UserService.findUser({ email, token });
+      const user = await UserService.findUser({ email });
+
+      console.log(user);
 
       if (!user) {
         return res.status(404).send({
@@ -1360,12 +1370,12 @@ exports.verifyUser = async (req, res, next) => {
         });
       }
 
-      const data = {
-        id: user.id,
-        isActive: true,
-        token: null,
-      };
-      await UserService.updateUser(data, transaction);
+      // const data = {
+      //   id: user.id,
+      //   isActive: true,
+      //   token: null,
+      // };
+      // await UserService.updateUser(data, transaction);
       return res.status(200).send({
         success: true,
         message: 'Account Activated Successfully',
@@ -1386,7 +1396,6 @@ exports.verifyUserEmail = async (req, res, next) => {
 
       const user = await UserService.findUser({ email, token });
 
-      console.log(user);
       if (!user) {
         return res.status(404).send({
           success: false,
@@ -1407,7 +1416,8 @@ exports.verifyUserEmail = async (req, res, next) => {
         email: user.email,
       });
     } catch (error) {
-      transaction.rollback();
+      console.log(error);
+      // transaction.rollback();
       return next(error);
     }
   });

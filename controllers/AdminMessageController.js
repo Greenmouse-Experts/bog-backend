@@ -129,6 +129,10 @@ exports.markMessageAsRead = async (req, res, next) => {
       where: { id: messageId },
     });
 
+    if (!messageDetails) {
+      throw new Error('Message not found.');
+    }
+
     let updatedUnreadData = null;
     if (messageDetails.unread) {
       const unreadData = JSON.parse(messageDetails.unread);
