@@ -2132,6 +2132,57 @@ module.exports = {
   },
 
   /**
+   * Email to admin for kyc update request
+   * @param {*} user
+   * @param {*} issue
+   */
+  KycUpdateRequestMailer: async (admin_emails, user) => {
+    const { name, fname, lname } = user;
+
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = 'white';
+
+    const link = `${process.env.SITE_URL}/admin`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Dear administrator,</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">This is to inform you that a user has requested an access to update their KYC information.</p><br/>
+                  `;
+
+    params.body += `<p style="font-size: 1.4em;">Name: ${
+      name ? name : `${fname} ${lname}`
+    }</p>
+                    `;
+
+    params.body += `
+                  <p style="margin-top:30px; font-size: 1em;">
+                  <a href="${link}" target="_BLANK" title="Visit dashboard" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">Visit Dashboard</a>
+              </p>
+              `;
+
+    params.footer = '';
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email: admin_emails,
+      subject: `Kyc information update request`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve('Successful!');
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
+
+  /**
    * Mailer of complaint to admin
    * @param {{first_name:string, email:string}} user
    * @param {{issue_type, issue_no, title, description, status}} issue

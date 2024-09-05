@@ -24,7 +24,10 @@ const {
 } = require('../helpers/utility');
 const ServicePartner = require('../models/ServicePartner');
 const User = require('../models/User');
-const { ProviderMailerForKycDocument } = require('../helpers/mailer/samples');
+const {
+  ProviderMailerForKycDocument,
+  KycUpdateRequestMailer,
+} = require('../helpers/mailer/samples');
 const { Op } = require('sequelize');
 
 /**
@@ -1004,6 +1007,54 @@ exports.getUserKycDetails = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         data,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+};
+
+/**
+ * Request for access to  update kyc
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+exports.requestKycUpdate = async (req, res, next) => {
+  sequelize.transaction(async (t) => {
+    try {
+      const { name, fname, lname } = req._credentials;
+
+      // Fetch admins
+      const admins = await User.findAll({
+        where: { userType: 'admin', level: 1 },
+        attributes: ['email'],
+        raw: true,
+      });
+
+      if (!Boolean(admins.length)) {
+        throw new Error('Admins are not available.');
+      }
+
+      const admin_emails = admins.map((admin) => {
+        return admin.email;
+      });
+
+      // Send email notification
+      await KycUpdateRequestMailer(admin_emails, { name, fname, lname });
+
+      // Send in-app notification to admin
+      await Notification.createNotification({
+        userId: null,
+        type: 'admin',
+        message:
+          'A user has requested an access to update their KYC information.',
+      });
+
+      // return
+      return res.status(200).send({
+        success: true,
+        message: 'Request sent successfully.',
       });
     } catch (error) {
       return next(error);

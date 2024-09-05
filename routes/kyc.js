@@ -39,6 +39,7 @@ const {
   approveKycVerification,
   getUserKycDetails,
   approveDisapproveKycDocument,
+  requestKycUpdate,
 } = KYC_Controller;
 
 router
@@ -105,5 +106,9 @@ router
   .patch([Auth, verifyAccess, verifyAdmin], approveDisapproveKycDocument);
 
 router.route('/kyc/user-kyc/:userId').get(Auth, getUserKycDetails);
+
+router
+  .route('/kyc/request-kyc-update')
+  .post([Auth, verifyAccess], requestKycUpdate);
 
 module.exports = router;

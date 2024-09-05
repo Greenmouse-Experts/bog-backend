@@ -50,6 +50,7 @@ const {
 const axios = require('axios');
 const SupportSocial = require('../models/supportsocial');
 const AdminMessage = require('../models/AdminMessage');
+const UserProfile = require('../models/UserProfile');
 
 // const Client = require("../helpers/storage")
 
@@ -136,8 +137,23 @@ exports.registerUser = async (req, res, next) => {
         if (company_name) {
           const profileFound = await UserService.getProfile({
             company_name,
-            userId: { [Op.ne]: user.id },
           });
+
+          if (profileFound) {
+            if (profileFound.userId !== user.id) {
+              return res.status(400).send({
+                success: false,
+                message: 'Company name exists',
+              });
+            }
+          }
+        }
+      } else {
+        if (company_name) {
+          const profileFound = await UserService.getProfile({
+            company_name,
+          });
+
           if (profileFound) {
             return res.status(400).send({
               success: false,
@@ -228,7 +244,7 @@ exports.registerUser = async (req, res, next) => {
         if (isUser) {
           return res.status(400).send({
             success: false,
-            message: 'This Email is already in Use for this user entity',
+            message: 'This Email is already in use for this user entity',
           });
         }
 
