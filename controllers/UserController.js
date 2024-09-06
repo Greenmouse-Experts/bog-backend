@@ -1386,12 +1386,12 @@ exports.verifyUser = async (req, res, next) => {
         });
       }
 
-      // const data = {
-      //   id: user.id,
-      //   isActive: true,
-      //   token: null,
-      // };
-      // await UserService.updateUser(data, transaction);
+      const data = {
+        id: user.id,
+        isActive: true,
+        token: null,
+      };
+      await UserService.updateUser(data, transaction);
       return res.status(200).send({
         success: true,
         message: 'Account Activated Successfully',
@@ -1672,7 +1672,7 @@ exports.resendCode = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: 'Token Sent check email or mobile number',
+      message: 'Token sent check email or mobile number',
     });
   } catch (error) {
     return res.status(500).send({
