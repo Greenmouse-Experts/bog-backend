@@ -261,6 +261,7 @@ const ServiceTypeValidation = () => {
     check('title', 'Title is required').notEmpty(),
     check('description', 'No category selected').notEmpty(),
     check('serviceId', 'Service Type is required').isUUID(),
+    check('commitment_fee', 'Service Type is required').optional(),
   ];
 };
 

@@ -3267,81 +3267,87 @@ exports.getQualifiedProvidersOnlyByRating = async (
   rating,
   transaction
 ) => {
-  // check project type
-  const { projectTypes, title } = project;
-  // console.log(project)
-  // get service types for project types
-  const serviceTypes = await ServiceType.findOne({
-    where: { slug: projectTypes, title },
-  });
-  // query all service partners with service type id
-  // kyc point greater than the passed score
-  // user is verified
-  // user has active subscription
+  try {
+    // check project type
+    const { projectTypes, title } = project;
+    // console.log(project)
+    // get service types for project types
+    const serviceTypes = await ServiceType.findOne({
+      where: { slug: projectTypes, title },
+    });
+    // query all service partners with service type id
+    // kyc point greater than the passed score
+    // user is verified
+    // user has active subscription
 
-  if (serviceTypes === null) {
-    return Promise.reject({ message: 'Service Type does not exist!' });
-  }
-
-  const wherePartner = {
-    serviceTypeId: serviceTypes.id,
-    hasActiveSubscription: true,
-    rating: {
-      [Op.gte]: rating,
-    },
-    isVerified: true,
-  };
-  const servicePartners = JSON.parse(
-    JSON.stringify(
-      await ServicePartner.findAll({
-        include: [{ model: User, as: 'service_user' }],
-        where: wherePartner,
-        order: [[Sequelize.literal('RAND()')]],
-      })
-    )
-  );
-
-  console.log('display service providers');
-  console.log({ servicePartners });
-  if (servicePartners.length === 0) {
-    return {
-      message: 'Not enough service providers',
-      providerData: [],
-    };
-  }
-
-  // remove service partners with ongoing projects
-  const where = {
-    status: 'ongoing',
-    approvalStatus: 'approved',
-    serviceProviderId: {
-      [Op.ne]: null,
-    },
-  };
-  const ongoingProjects = await Project.findAll({
-    where,
-    attributes: ['serviceProviderId'],
-  });
-
-  const partnersWithProjects = ongoingProjects.map((p) => p.serviceProviderId);
-  // console.log(partnersWithProjects)
-  const filteredServicePartners = servicePartners.filter((partner) => {
-    if (!partnersWithProjects.includes(partner.id)) {
-      return partner;
+    if (serviceTypes === null) {
+      return Promise.reject({ message: 'Service Type does not exist!' });
     }
-    return null;
-  });
 
-  const qualifiedPartners = filteredServicePartners.filter(
-    (pat) => pat !== null
-  );
+    const wherePartner = {
+      serviceTypeId: serviceTypes.id,
+      hasActiveSubscription: true,
+      rating: {
+        [Op.gte]: rating,
+      },
+      isVerified: true,
+    };
+    const servicePartners = JSON.parse(
+      JSON.stringify(
+        await ServicePartner.findAll({
+          include: [{ model: User, as: 'service_user' }],
+          where: wherePartner,
+          order: [[Sequelize.literal('RAND()')]],
+        })
+      )
+    );
 
-  let providers = [...qualifiedPartners];
+    console.log('display service providers');
+    console.log({ servicePartners });
+    if (servicePartners.length === 0) {
+      return {
+        message: 'Not enough service providers',
+        providerData: [],
+      };
+    }
 
-  return {
-    message: 'Competent Service Providers',
-    providerData: providers,
-  };
+    // remove service partners with ongoing projects
+    const where = {
+      status: 'ongoing',
+      approvalStatus: 'approved',
+      serviceProviderId: {
+        [Op.ne]: null,
+      },
+    };
+    const ongoingProjects = await Project.findAll({
+      where,
+      attributes: ['serviceProviderId'],
+    });
+
+    const partnersWithProjects = ongoingProjects.map(
+      (p) => p.serviceProviderId
+    );
+    // console.log(partnersWithProjects)
+    const filteredServicePartners = servicePartners.filter((partner) => {
+      if (!partnersWithProjects.includes(partner.id)) {
+        return partner;
+      }
+      return null;
+    });
+
+    const qualifiedPartners = filteredServicePartners.filter(
+      (pat) => pat !== null
+    );
+
+    let providers = [...qualifiedPartners];
+
+    return {
+      message: 'Competent Service Providers',
+      providerData: providers,
+    };
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 /**
