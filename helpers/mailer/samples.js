@@ -1,3 +1,4 @@
+const { capitalize } = require('lodash');
 const { mailer_template, Mailer, Logo } = require('./Engine');
 
 module.exports = {
@@ -1845,7 +1846,7 @@ module.exports = {
       process.env.APP_NAME
     }, ${!first_name ? name : first_name}</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
+                  <p style="font-size: 1.4em;">We are glad to have you onboard and can't wait for you to start enjoying the amazing features we offer.</p><br/>
                   <p style="font-size: 1.4em;">You can proceed to <a href="${link}">placing your orders</a>, <a href="${link2}">requesting for a service</a> etc.</p>
                   <p style="font-size: 1.4em;">Thanks for registering with us.</p><br/>
                   <p style="font-size: 1.4em;">Regards, <br/></p>
@@ -1892,7 +1893,7 @@ module.exports = {
       process.env.APP_NAME
     }, ${!first_name ? name : first_name}</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
+                  <p style="font-size: 1.4em;">We are glad to have you onboard and can't wait for you to start enjoying the amazing features we offer.</p><br/>
                   <p style="font-size: 1.4em;">You can proceed to <a href="${link}">completing your KYC</a>, <a href="${link2}">subscribing,</a> <a href="${link3}">bid for projects</a> etc.</p>
                   <p style="font-size: 1.4em;">Thanks for registering with us.</p><br/>
                   <p style="font-size: 1.4em;">Regards, <br/></p>
@@ -1940,7 +1941,7 @@ module.exports = {
       process.env.APP_NAME
     }, ${!first_name ? name : first_name}</b></p>`;
     params.body += `
-                  <p style="font-size: 1.4em;">We are glad to have on board and can't wait for you to start enjoying the amazing features we offer.</p><br/>
+                  <p style="font-size: 1.4em;">We are glad to have you onboard and can't wait for you to start enjoying the amazing features we offer.</p><br/>
                   <p style="font-size: 1.4em;">You can proceed to <a href="${link}">completing your KYC</a>, <a href="${link2}">subscribing,</a> <a href="${link3}">listing products</a>, <a href="${link4}">tracking orders</a> etc.</p>
                   <p style="font-size: 1.4em;">Thanks for registering with us.</p><br/>
                   <p style="font-size: 1.4em;">Regards, <br/></p>
@@ -2168,6 +2169,53 @@ module.exports = {
     let params2 = {
       email: admin_emails,
       subject: `Kyc information update request`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve('Successful!');
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
+
+  /**
+   * Email to create an account profile
+   * @param {*} user
+   * @param {*} issue
+   */
+  AccountProfileCreationMailer: async (user) => {
+    const { name, fname, userType, email } = user;
+
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = 'white';
+
+    const link = `${process.env.SITE_URL}/login`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Dear ${fname ||
+      name},</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">This is to inform you that you have created a ${userType} profile and it has been added to your account collection.</p><br/>
+                  `;
+
+    params.body += `
+                  <p style="margin-top:30px; font-size: 1em;">
+                  <a href="${link}" target="_BLANK" title="Visit dashboard" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">Visit Dashboard</a>
+              </p>
+              `;
+
+    params.footer = '';
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Account profile creation [${userType}]`,
     };
 
     const template = mailer_template(params);

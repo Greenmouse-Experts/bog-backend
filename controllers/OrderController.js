@@ -1,26 +1,26 @@
 /* eslint-disable no-unused-vars */
-require("dotenv").config();
-const { Op } = require("sequelize");
-const sequelize = require("../config/database/connection");
-const User = require("../models/User");
-const Order = require("../models/Order");
-const utility = require("../helpers/utility");
-const Product = require("../models/Product");
-const Payment = require("../models/Payment");
-const OrderItem = require("../models/OrderItem");
+require('dotenv').config();
+const { Op } = require('sequelize');
+const sequelize = require('../config/database/connection');
+const User = require('../models/User');
+const Order = require('../models/Order');
+const utility = require('../helpers/utility');
+const Product = require('../models/Product');
+const Payment = require('../models/Payment');
+const OrderItem = require('../models/OrderItem');
 // services
-const UserService = require("../service/UserService");
-const invoiceService = require("../service/invoiceService2");
-const { sendMail } = require("../service/attachmentEmailService");
-const helpers = require("../helpers/message");
-const helpTransaction = require("../helpers/transactions");
-const ContactDetails = require("../models/ContactDetails");
-const ProductReview = require("../models/Reviews");
-const OrderReview = require("../models/order_reviews");
-const Notification = require("../helpers/notification");
-const Project = require("../models/Project");
-const Transaction = require("../models/Transaction");
-const Addresses = require("../models/addresses");
+const UserService = require('../service/UserService');
+const invoiceService = require('../service/invoiceService2');
+const { sendMail } = require('../service/attachmentEmailService');
+const helpers = require('../helpers/message');
+const helpTransaction = require('../helpers/transactions');
+const ContactDetails = require('../models/ContactDetails');
+const ProductReview = require('../models/Reviews');
+const OrderReview = require('../models/order_reviews');
+const Notification = require('../helpers/notification');
+const Project = require('../models/Project');
+const Transaction = require('../models/Transaction');
+const Addresses = require('../models/addresses');
 const {
   AdminNewOrderMailer,
   ClientUpdateOrderMailer,
@@ -29,10 +29,10 @@ const {
   AdminOrderRefundRequestMailer,
   ClientOrderRefundMailer,
   AdminOrderRefundMailer,
-} = require("../helpers/mailer/samples");
-const ProductEarning = require("../models/ProductEarnings");
-const ProductCategory = require("../models/ProductCategory");
-const DeliveryAddresses = require("../models/delivery_addresses");
+} = require('../helpers/mailer/samples');
+const ProductEarning = require('../models/ProductEarnings');
+const ProductCategory = require('../models/ProductCategory');
+const DeliveryAddresses = require('../models/delivery_addresses');
 
 exports.getMyOrders = async (req, res, next) => {
   try {
@@ -50,20 +50,20 @@ exports.getMyOrders = async (req, res, next) => {
 
     const orders = await Order.findAll({
       where,
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
       include: [
         {
           model: ContactDetails,
-          as: "contact",
+          as: 'contact',
         },
         {
           model: OrderItem,
-          as: "order_items",
+          as: 'order_items',
           include: [
             {
               model: User,
-              as: "product_owner",
-              attributes: ["id", "fname", "lname", "email", "phone"],
+              as: 'product_owner',
+              attributes: ['id', 'fname', 'lname', 'email', 'phone'],
             },
           ],
         },
@@ -90,27 +90,27 @@ exports.getOrderDetails = async (req, res, next) => {
       include: [
         {
           model: ContactDetails,
-          as: "contact",
+          as: 'contact',
         },
         {
           model: OrderItem,
-          as: "order_items",
+          as: 'order_items',
           include: [
             {
               model: User,
-              as: "product_owner",
-              attributes: ["id", "fname", "lname", "email", "phone"],
+              as: 'product_owner',
+              attributes: ['id', 'fname', 'lname', 'email', 'phone'],
             },
           ],
         },
         {
           model: User,
-          as: "client",
-          attributes: ["id", "fname", "lname", "email", "phone", "photo"],
+          as: 'client',
+          attributes: ['id', 'fname', 'lname', 'email', 'phone', 'photo'],
         },
         {
           model: OrderReview,
-          as: "orderReview",
+          as: 'orderReview',
         },
       ],
     });
@@ -135,20 +135,20 @@ exports.getOrderRequest = async (req, res, next) => {
 
     const orders = await OrderItem.findAll({
       where,
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
       include: [
         {
           model: User,
-          as: "user",
-          attributes: ["id", "fname", "lname", "email", "phone", "photo"],
+          as: 'user',
+          attributes: ['id', 'fname', 'lname', 'email', 'phone', 'photo'],
         },
         {
           model: Order,
-          as: "order",
+          as: 'order',
           include: [
             {
               model: ContactDetails,
-              as: "contact",
+              as: 'contact',
             },
           ],
         },
@@ -171,17 +171,17 @@ exports.createOrder = async (req, res, next) => {
       const ownerId = req.user.id;
       const user = await User.findByPk(userId, {
         attributes: [
-          "id",
-          "email",
-          "name",
-          "fname",
-          "lname",
-          "userType",
-          "phone",
-          "address",
-          "state",
-          "city",
-          "street",
+          'id',
+          'email',
+          'name',
+          'fname',
+          'lname',
+          'userType',
+          'phone',
+          'address',
+          'state',
+          'city',
+          'street',
         ],
       });
       let {
@@ -199,7 +199,7 @@ exports.createOrder = async (req, res, next) => {
       if (!user.address && !user.city && !user.state) {
         return res.status(400).send({
           success: false,
-          message: "Home address has not been added.",
+          message: 'Home address has not been added.',
         });
       }
 
@@ -215,10 +215,10 @@ exports.createOrder = async (req, res, next) => {
         where: { id: deliveryaddressId },
       });
       if (deliveryaddress == null) {
-        deliveryaddress = "No address";
+        deliveryaddress = 'No address';
       }
 
-      if (userType == null || userType == "undefined") {
+      if (userType == null || userType == 'undefined') {
         userType = user.userType;
       }
       shippingAddress.deliveryaddress = deliveryaddress;
@@ -238,7 +238,7 @@ exports.createOrder = async (req, res, next) => {
         userId,
         payment_reference: paymentInfo.reference,
         amount: totalAmount,
-        payment_category: "Order",
+        payment_category: 'Order',
       };
 
       const profile = await UserService.getUserTypeProfile(userType, userId);
@@ -254,24 +254,24 @@ exports.createOrder = async (req, res, next) => {
           const prodData = await Product.findOne({
             where: { id: product.productId },
             attributes: [
-              "id",
-              "name",
-              "creatorId",
-              "price",
-              "unit",
-              "image",
-              "description",
-              "min_qty",
-              "max_qty",
+              'id',
+              'name',
+              'creatorId',
+              'price',
+              'unit',
+              'image',
+              'description',
+              'min_qty',
+              'max_qty',
             ],
-            include: [{ model: ProductCategory, as: "category" }],
+            include: [{ model: ProductCategory, as: 'category' }],
           });
 
           // console.log(prodData);
           if (prodData === null) {
             return res.status(404).send({
               success: false,
-              message: "Product not found!",
+              message: `Product with the ID of ${product.productId} not found!`,
             });
           }
 
@@ -284,7 +284,7 @@ exports.createOrder = async (req, res, next) => {
             return res.status(422).send({
               success: false,
               message:
-                "The quantity of item requested for cannot be processed.",
+                'The quantity of item requested for cannot be processed.',
             });
           }
 
@@ -308,27 +308,27 @@ exports.createOrder = async (req, res, next) => {
           // Notify product partner
           const mesg = `A user just bought ${product.quantity} of your product - ${prodData.name}`;
           const notifyType =
-            userDetails.userType === "vendor" ? "user" : "admin";
+            userDetails.userType === 'vendor' ? 'user' : 'admin';
           const { io } = req.app;
           const partner_profile = await UserService.getUserTypeProfile(
-            "product_partner",
+            'product_partner',
             prodData.creatorId
           );
           await Notification.createNotification({
             type: notifyType,
             message: mesg,
             userId:
-              userDetails.userType === "vendor"
+              userDetails.userType === 'vendor'
                 ? partner_profile.id
                 : undefined,
           });
           io.emit(
-            "getNotifications",
+            'getNotifications',
             await Notification.fetchUserNotificationApi()
           );
 
           return {
-            status: "paid",
+            status: 'paid',
             trackingId,
             userId,
 
@@ -359,7 +359,7 @@ exports.createOrder = async (req, res, next) => {
         include: [
           {
             model: OrderItem,
-            as: "order_items",
+            as: 'order_items',
             // include: [
             //   {
             //     model: ProductEarning,
@@ -369,7 +369,7 @@ exports.createOrder = async (req, res, next) => {
           },
           {
             model: ContactDetails,
-            as: "contact",
+            as: 'contact',
           },
         ],
         transaction: t,
@@ -386,7 +386,7 @@ exports.createOrder = async (req, res, next) => {
       }
 
       orderData.slug = orderSlug;
-      await helpTransaction.saveTxn(orderData, "Products");
+      await helpTransaction.saveTxn(orderData, 'Products');
       orderData.orderSlug = slug;
       const invoice = await invoiceService.createInvoice(orderData, user);
       if (invoice) {
@@ -396,24 +396,24 @@ exports.createOrder = async (req, res, next) => {
             filename: `${slug}.pdf`,
           },
         ];
-        let deliveryTime = "Not stated";
+        let deliveryTime = 'Not stated';
         if (
           orderData.order_items[0].shippingAddress.deliveryaddress !==
-          "No address"
+          'No address'
         ) {
           deliveryTime =
             orderData.order_items[0].shippingAddress.deliveryaddress
               .delivery_time;
         }
         const message = helpers.invoiceMessage(user.name, deliveryTime);
-        sendMail(user.email, message, "BOG Invoice", files);
+        sendMail(user.email, message, 'BOG Invoice', files);
 
         // Get active product admins
         const product_admins = await User.findAll({
-          where: { userType: "admin", level: 4, isActive: 1, isSuspended: 0 },
+          where: { userType: 'admin', level: 4, isActive: 1, isSuspended: 0 },
         });
         const super_admins = await User.findAll({
-          where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+          where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
         });
         const _admins = [...product_admins, ...super_admins];
 
@@ -424,9 +424,9 @@ exports.createOrder = async (req, res, next) => {
 
       // Notify buyer (client)
       const mesgUser = `You just ordered for ${orders.length} item${
-        orders.length > 1 ? "s" : ""
+        orders.length > 1 ? 's' : ''
       } [${orderSlug}]`;
-      const notifyTypeU = "user";
+      const notifyTypeU = 'user';
       const { io } = req.app;
 
       await Notification.createNotification({
@@ -435,7 +435,7 @@ exports.createOrder = async (req, res, next) => {
         userId: profile.id,
       });
       io.emit(
-        "getNotifications",
+        'getNotifications',
         await Notification.fetchUserNotificationApi()
       );
 
@@ -443,20 +443,20 @@ exports.createOrder = async (req, res, next) => {
       const mesg = `A new order was made by ${
         user.name ? user.name : `${user.fname} ${user.lname}`
       }`;
-      const notifyType = "admin";
+      const notifyType = 'admin';
       await Notification.createNotification({
         type: notifyType,
         message: mesg,
       });
       io.emit(
-        "getNotifications",
+        'getNotifications',
         await Notification.fetchAdminNotification({ userId })
       );
 
       // save the details of the transaction
       return res.status(200).send({
         success: true,
-        message: "Order Request submitted",
+        message: 'Order Request submitted',
         order,
       });
     } catch (error) {
@@ -496,14 +496,14 @@ exports.removeDeliveryAddress = async (req, res, next) => {
       if (!d_address) {
         return res
           .status(404)
-          .send({ success: false, message: "Delivery address not found." });
+          .send({ success: false, message: 'Delivery address not found.' });
       }
 
       await DeliveryAddresses.destroy({ where: { id: deliveryId } });
 
       return res
         .status(200)
-        .send({ success: true, message: "Delivery address has been deleted." });
+        .send({ success: true, message: 'Delivery address has been deleted.' });
     } catch (error) {
       return next(error);
     }
@@ -521,17 +521,15 @@ exports.updateDeliveryAddress = async (req, res, next) => {
       if (!d_address) {
         return res
           .status(404)
-          .send({ success: false, message: "Delivery address not found." });
+          .send({ success: false, message: 'Delivery address not found.' });
       }
 
       await DeliveryAddresses.update(req.body, { where: { id: deliveryId } });
 
-      return res
-        .status(200)
-        .send({
-          success: true,
-          message: "Delivery address has been updated successfully.",
-        });
+      return res.status(200).send({
+        success: true,
+        message: 'Delivery address has been updated successfully.',
+      });
     } catch (error) {
       return next(error);
     }
@@ -541,7 +539,7 @@ exports.updateDeliveryAddress = async (req, res, next) => {
 
 exports.generateOrderInvoice = async (orders, res, next) => {
   try {
-    invoiceService.createInvoice(orders, "Holla4550");
+    invoiceService.createInvoice(orders, 'Holla4550');
     return true;
   } catch (error) {
     return next(error);
@@ -556,7 +554,7 @@ exports.updateOrder = async (req, res, next) => {
       if (!order) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Order",
+          message: 'Invalid Order',
         });
       }
 
@@ -564,7 +562,7 @@ exports.updateOrder = async (req, res, next) => {
       if (!user_details) {
         return res.status(404).send({
           success: false,
-          message: "User account not found!",
+          message: 'User account not found!',
         });
       }
 
@@ -575,7 +573,7 @@ exports.updateOrder = async (req, res, next) => {
       if (!profile) {
         return res.status(404).send({
           success: false,
-          message: "User profile not found!",
+          message: 'User profile not found!',
         });
       }
 
@@ -587,18 +585,18 @@ exports.updateOrder = async (req, res, next) => {
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
       // Notify buyer (client)
       const mesgUser = `Your order [${order.orderSlug}] has been ${
-        status === "pending" ? "updated to pending" : status
+        status === 'pending' ? 'updated to pending' : status
       }`;
-      const notifyTypeU = "user";
+      const notifyTypeU = 'user';
       const { io } = req.app;
 
       await Notification.createNotification({
@@ -607,21 +605,21 @@ exports.updateOrder = async (req, res, next) => {
         userId: profile.id,
       });
       io.emit(
-        "getNotifications",
+        'getNotifications',
         await Notification.fetchUserNotificationApi()
       );
 
       // Notify admin
       const mesg = `${user_details.userType} ${user_details.name}'s order [${
         order.orderSlug
-      }] has been ${status === "pending" ? "updated to pending" : status}`;
-      const notifyType = "admin";
+      }] has been ${status === 'pending' ? 'updated to pending' : status}`;
+      const notifyType = 'admin';
       await Notification.createNotification({
         type: notifyType,
         message: mesg,
       });
       io.emit(
-        "getNotifications",
+        'getNotifications',
         await Notification.fetchAdminNotification({ userId: user_details.id })
       );
 
@@ -638,7 +636,7 @@ exports.updateOrder = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: "Order updated",
+        message: 'Order updated',
       });
     } catch (error) {
       console.log(error);
@@ -653,24 +651,24 @@ exports.cancelOrder = async (req, res, next) => {
   try {
     const { id } = req._credentials;
     const { orderId } = req.params;
-    const status = "cancelled";
+    const status = 'cancelled';
     const order = await Order.findOne({ where: { id: orderId } });
     if (!order) {
       return res.status(404).json({
         success: false,
-        message: "Invalid Order",
+        message: 'Invalid Order',
       });
     }
 
-    if (order.status === "cancelled") {
+    if (order.status === 'cancelled') {
       return res.status(200).json({
         success: true,
-        message: "Order has already been cancelled!",
+        message: 'Order has already been cancelled!',
       });
-    } else if (order.status !== "pending" || order.userId !== id) {
+    } else if (order.status !== 'pending' || order.userId !== id) {
       return res.status(401).json({
         success: false,
-        message: "Order cannot be cancelled!",
+        message: 'Order cannot be cancelled!',
       });
     }
 
@@ -682,28 +680,28 @@ exports.cancelOrder = async (req, res, next) => {
 
     const user = await User.findOne({
       where: { id: order.userId },
-      attributes: { exclude: ["password"] },
+      attributes: { exclude: ['password'] },
     });
 
     // Get active project admins
     const project_admins = await User.findAll({
-      where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+      where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
     });
     const super_admins = await User.findAll({
-      where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+      where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
     });
     const admins = [...project_admins, ...super_admins];
 
     // Notify admin
     const mesg = `${user.userType} ${user.name} has cancelled a ${order.status} order [${order.orderSlug}]`;
-    const notifyType = "admin";
+    const notifyType = 'admin';
     await Notification.createNotification({
       type: notifyType,
       message: mesg,
     });
     const { io } = req.app;
     io.emit(
-      "getNotifications",
+      'getNotifications',
       await Notification.fetchAdminNotification({ userId: user.id })
     );
 
@@ -730,25 +728,25 @@ exports.requestRefund = async (req, res, next) => {
     try {
       const { id } = req._credentials;
       const { orderId } = req.params;
-      const refundStatus = "request refund";
+      const refundStatus = 'request refund';
       const order = await Order.findOne({ where: { id: orderId } });
       if (!order) {
         return res.status(404).json({
           success: false,
-          message: "Invalid Order",
+          message: 'Invalid Order',
         });
       }
 
-      if (order.refundStatus === "request refund") {
+      if (order.refundStatus === 'request refund') {
         return res.status(200).json({
           success: true,
-          message: "Refund request has already been sent!",
+          message: 'Refund request has already been sent!',
         });
       }
-      if (order.status !== "cancelled" || order.userId !== id) {
+      if (order.status !== 'cancelled' || order.userId !== id) {
         return res.status(401).json({
           success: false,
-          message: "Refund request on this order cannot be performed!",
+          message: 'Refund request on this order cannot be performed!',
         });
       }
 
@@ -759,15 +757,15 @@ exports.requestRefund = async (req, res, next) => {
 
       const user = await User.findOne({
         where: { id: order.userId },
-        attributes: { exclude: ["password"] },
+        attributes: { exclude: ['password'] },
       });
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
@@ -800,28 +798,28 @@ exports.refundOrder = async (req, res, next) => {
     try {
       const { id } = req._credentials;
       const { orderId } = req.params;
-      const refundStatus = "refunded";
+      const refundStatus = 'refunded';
       const order = await Order.findOne({ where: { id: orderId } });
       if (!order) {
         return res.status(404).json({
           success: false,
-          message: "Invalid Order",
+          message: 'Invalid Order',
         });
       }
 
-      if (order.refundStatus === "refunded" && order.status === "cancelled") {
+      if (order.refundStatus === 'refunded' && order.status === 'cancelled') {
         return res.status(200).json({
           success: true,
-          message: "Order has already been refunded!",
+          message: 'Order has already been refunded!',
         });
       }
       if (
-        order.status !== "cancelled" ||
-        order.refundStatus !== "request refund"
+        order.status !== 'cancelled' ||
+        order.refundStatus !== 'request refund'
       ) {
         return res.status(401).json({
           success: false,
-          message: "Order cannot be refunded!",
+          message: 'Order cannot be refunded!',
         });
       }
 
@@ -832,15 +830,15 @@ exports.refundOrder = async (req, res, next) => {
 
       const user = await User.findOne({
         where: { id: order.userId },
-        attributes: { exclude: ["password"] },
+        attributes: { exclude: ['password'] },
       });
 
       // Get active project admins
       const project_admins = await User.findAll({
-        where: { userType: "admin", level: 5, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 5, isActive: 1, isSuspended: 0 },
       });
       const super_admins = await User.findAll({
-        where: { userType: "admin", level: 1, isActive: 1, isSuspended: 0 },
+        where: { userType: 'admin', level: 1, isActive: 1, isSuspended: 0 },
       });
       const admins = [...project_admins, ...super_admins];
 
@@ -874,12 +872,12 @@ exports.updateOrderRequest = async (req, res, next) => {
       const { requestId, status } = req.body;
       const order = await OrderItem.findOne({
         where: { id: requestId },
-        attributes: ["id"],
+        attributes: ['id'],
       });
       if (!order) {
         return res.status(404).send({
           success: false,
-          message: "Invalid Order",
+          message: 'Invalid Order',
         });
       }
 
@@ -894,7 +892,7 @@ exports.updateOrderRequest = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: "Order Request updated",
+        message: 'Order Request updated',
       });
     } catch (error) {
       t.rollback();
@@ -906,25 +904,25 @@ exports.updateOrderRequest = async (req, res, next) => {
 exports.getAllOrders = async (req, res, next) => {
   try {
     const orders = await Order.findAll({
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
       include: [
         {
           model: ContactDetails,
-          as: "contact",
+          as: 'contact',
         },
         {
           model: OrderItem,
-          as: "order_items",
+          as: 'order_items',
           include: [
             {
               model: User,
-              as: "product_owner",
-              attributes: ["id", "fname", "lname", "email", "phone"],
+              as: 'product_owner',
+              attributes: ['id', 'fname', 'lname', 'email', 'phone'],
             },
             {
               model: User,
-              as: "user",
-              attributes: ["id", "fname", "lname", "email", "phone"],
+              as: 'user',
+              attributes: ['id', 'fname', 'lname', 'email', 'phone'],
             },
           ],
         },

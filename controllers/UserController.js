@@ -45,6 +45,7 @@ const {
   clientWelcomeMessage,
   servicePartnerWelcomeMessage,
   productPartnerWelcomeMessage,
+  AccountProfileCreationMailer,
 } = require('../helpers/mailer/samples');
 
 const axios = require('axios');
@@ -244,7 +245,7 @@ exports.registerUser = async (req, res, next) => {
         if (isUser) {
           return res.status(400).send({
             success: false,
-            message: 'This Email is already in use for this user entity',
+            message: 'This email is already in use for this user entity',
           });
         }
 
@@ -289,9 +290,17 @@ exports.registerUser = async (req, res, next) => {
       });
       io.emit('getNotifications', await Notification.fetchAdminNotification());
 
+      // Email to notify user on the  created  account profile
+      await AccountProfileCreationMailer({
+        name: user.name,
+        fname: user.fname,
+        userType: user.userType,
+        email: user.email,
+      });
+
       return res.status(201).send({
         success: true,
-        message: 'User created Successfully',
+        message: 'User created successfully',
         exists: user_exists ? true : false,
       });
     } catch (error) {
