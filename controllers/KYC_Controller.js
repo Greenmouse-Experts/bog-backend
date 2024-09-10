@@ -879,8 +879,13 @@ exports.approveKycVerification = async (req, res, next) => {
       const encodeEmail = encodeURIComponent(user.email);
       let message =
         approved === undefined || approved
-          ? helpers.kycApprovalMessage(user.fname, encodeEmail)
-          : helpers.kycDisapprovalMessage(user.fname, encodeEmail, reason);
+          ? helpers.kycApprovalMessage(user.fname, encodeEmail, userType)
+          : helpers.kycDisapprovalMessage(
+              user.fname,
+              encodeEmail,
+              reason,
+              userType
+            );
       await EmailService.sendMail(
         user.email,
         message,
