@@ -245,7 +245,7 @@ exports.registerUser = async (req, res, next) => {
         if (isUser) {
           return res.status(400).send({
             success: false,
-            message: 'This email is already in use for this user entity',
+            message: 'Email address already exists',
           });
         }
 
@@ -292,9 +292,9 @@ exports.registerUser = async (req, res, next) => {
 
       // Email to notify user on the  created  account profile
       await AccountProfileCreationMailer({
-        name: user.name,
-        fname: user.fname,
-        userType: user.userType,
+        name: req.body.name,
+        fname: req.body.fname,
+        userType: UserService.getUserType(userType),
         email: user.email,
       });
 
@@ -778,7 +778,7 @@ exports.registerAdmin = async (req, res, next) => {
       if (user) {
         return res.status(400).send({
           success: false,
-          message: 'This Email is already in Use for this user entity',
+          message: 'Email address already exists.',
         });
       }
 
