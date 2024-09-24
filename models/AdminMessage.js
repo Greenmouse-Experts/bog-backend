@@ -42,6 +42,11 @@ const AdminMessage = sequelise.define(
       type: Sequelize.TEXT,
       allowNull: true,
     },
+    drafted: {
+      type: Sequelize.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+    },
   },
   { paranoid: true }
 );

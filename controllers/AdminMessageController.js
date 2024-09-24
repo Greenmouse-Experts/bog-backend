@@ -15,13 +15,14 @@ const {
 exports.postAnnouncement = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { date, title, content, user } = req.body;
+      const { date, title, content, user, drafted } = req.body;
 
       const request = {
         expiredAt: moment(date).format('YYYY-MM-DD HH:mm:ss'),
         content,
         title,
         user,
+        drafted,
       };
       if (req.file) {
         const url = `${process.env.APP_URL}/${req.file.path}`;
@@ -30,12 +31,14 @@ exports.postAnnouncement = async (req, res, next) => {
 
       const data = await AdminMessage.create(request, { transaction: t });
 
-      // Send in-app notification
-      await createNotificationWithUserType({
-        type: 'user',
-        userType: user === 'all' ? null : user,
-        message: `A message has been sent to you from the admin: ${content}`,
-      });
+      if (drafted) {
+        // Send in-app notification
+        await createNotificationWithUserType({
+          type: 'user',
+          userType: user === 'all' ? null : user,
+          message: `A message has been sent to you from the admin: ${content}`,
+        });
+      }
 
       return res.status(201).send({
         success: true,
@@ -47,6 +50,41 @@ exports.postAnnouncement = async (req, res, next) => {
       return next(error);
     }
   });
+};
+
+exports.updateAnnouncement = async (req, res, next) => {
+  try {
+    const { messageId } = req.params;
+
+    // Check announcement
+    const announcement = await AdminMessage.findOne({
+      where: { id: messageId },
+    });
+
+    if (!announcement) {
+      throw new Error('Message is not available');
+    }
+
+    // Update
+    await AdminMessage.update(req.body, { where: { id: messageId } });
+
+    if ('drafted' in req.body) {
+      // Send in-app notification
+      await createNotificationWithUserType({
+        type: 'user',
+        userType: user === 'all' ? null : user,
+        message: `A message has been sent to you from the admin: ${req.body.content}`,
+      });
+    }
+
+    return res.send({
+      success: true,
+      message: 'Message updated successfully.',
+    });
+  } catch (error) {
+    console.log(error);
+    return next(error);
+  }
 };
 
 exports.viewAnnouncements = async (req, res, next) => {
@@ -94,6 +132,44 @@ exports.allAdminMessages = async (req, res, next) => {
       ],
       [Op.and]: {
         [Op.or]: [{ user: 'all' }, { user: userType }],
+      },
+      [Op.and]: {
+        drafted: false,
+      },
+    };
+
+    const messages = await AdminMessage.findAll({
+      where,
+      order: [['createdAt', 'DESC']],
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: messages,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.draftedAdminMessages = async (req, res, next) => {
+  try {
+    const { userType } = req.query;
+    const where = {
+      [Op.or]: [
+        {
+          expiredAt: {
+            [Op.gte]: moment().format('YYYY-MM-DD HH:mm:ss'),
+          },
+        },
+        { expiredAt: null },
+        { expiredAt: '0000-00-00 00:00:00' },
+      ],
+      [Op.and]: {
+        [Op.or]: [{ user: 'all' }, { user: userType }],
+      },
+      [Op.and]: {
+        drafted: 1,
       },
     };
 

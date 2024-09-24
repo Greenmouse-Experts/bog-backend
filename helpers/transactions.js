@@ -73,11 +73,14 @@ exports.getAllTxns = async (req, res, next) => {
 
 exports.getAllUserTxns = async (req, res, next) => {
   try {
+    const { userType } = req.query;
+
     const where = { userId: req.user.id };
     const Txns = await Transaction.findAll({
       where,
       order: [['createdAt', 'DESC']],
     });
+    await sequelize.query(`SELECT * FROM transactions INNER JOIN users `);
 
     return res.status(200).send({
       success: true,

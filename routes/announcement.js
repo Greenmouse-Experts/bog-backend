@@ -9,11 +9,21 @@ const upload = require('../helpers/upload');
 
 router
   .route('/announcements/all')
-  .get(AdminMessageController.viewAnnouncements);
+  .get(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    AdminMessageController.viewAnnouncements
+  );
 
 router
   .route('/announcements')
   .get([Auth, Access.verifyAccess], AdminMessageController.allAdminMessages);
+
+router
+  .route('/announcements/drafted')
+  .get(
+    [Auth, Access.verifyAccess],
+    AdminMessageController.draftedAdminMessages
+  );
 
 router
   .route('/announcements/delete-message/:id')
@@ -25,7 +35,7 @@ router
 router
   .route('/announcements/new-announcement')
   .post(
-    [Auth, Access.verifyAccess],
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
     upload.single('supportingDocument'),
     AdminMessageController.postAnnouncement
   );
@@ -33,5 +43,12 @@ router
 router
   .route('/announcements/mark-as-read/:messageId')
   .post([Auth, Access.verifyAccess], AdminMessageController.markMessageAsRead);
+
+router
+  .route('/announcements/update/:messageId')
+  .put(
+    [Auth, Access.verifyAccess, Access.verifyAdmin],
+    AdminMessageController.updateAnnouncement
+  );
 
 module.exports = router;
