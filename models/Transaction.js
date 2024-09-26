@@ -43,6 +43,10 @@ const Transaction = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true,
     },
+    userType: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
   },
   { paranoid: true }
 );

@@ -13,6 +13,7 @@ const Subscription = require('../models/Subscription');
 const ServicePartner = require('../models/ServicePartner');
 const ProductPartner = require('../models/ProductPartner');
 const Project = require('../models/Project');
+const { Op } = require('sequelize');
 
 const generateDesc = (order_items) => {
   const data = order_items.map(
@@ -21,7 +22,7 @@ const generateDesc = (order_items) => {
   const joined = data.join(' and ');
   return `Bought ${joined}`;
 };
-exports.saveTxn = async (data, type) => {
+exports.saveTxn = async (data, type, userType = null) => {
   sequelize.transaction(async (t) => {
     const { slug, userId, order_items } = data;
     let description;
@@ -37,6 +38,7 @@ exports.saveTxn = async (data, type) => {
       description,
       paymentReference: order_items[0].paymentInfo.reference,
       status: 'successful',
+      userType,
     };
     try {
       await Transaction.create(saveThis);
@@ -75,7 +77,11 @@ exports.getAllUserTxns = async (req, res, next) => {
   try {
     const { userType } = req.query;
 
-    const where = { userId: req.user.id };
+    const where = {
+      [Op.and]: { userId: req.user.id },
+      [Op.or]: [{ userType: null }, { userType }],
+    };
+
     const Txns = await Transaction.findAll({
       where,
       order: [['createdAt', 'DESC']],

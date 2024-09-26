@@ -1386,6 +1386,7 @@ exports.approveTransferToProductPartner = async (req, res, next) => {
                 amount,
                 paymentReference,
                 description: narration,
+                userType: 'vendor',
               };
 
               const response = await Transaction.create(trxData, { t });
@@ -1542,12 +1543,10 @@ exports.checkProducts = async (req, res, next) => {
       const productsToCheck = req.body.products; // Array of objects with id and name
 
       if (!Array.isArray(productsToCheck) || productsToCheck.length === 0) {
-        return res
-          .status(400)
-          .send({
-            status: false,
-            message: 'No products selected to check availability',
-          });
+        return res.status(400).send({
+          status: false,
+          message: 'No products selected to check availability',
+        });
       }
 
       // Extract product IDs from the request

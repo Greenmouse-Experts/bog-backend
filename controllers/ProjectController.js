@@ -2054,6 +2054,9 @@ exports.requestProjectApproval = async (req, res, next) => {
       const userId = req.user.id;
       const { projectId } = req.params;
       const { amount } = req.body;
+
+      const { userType } = req.query;
+
       const project = await Project.findOne({ where: { id: projectId } });
       if (!project) {
         return res.status(404).send({
@@ -2081,6 +2084,7 @@ exports.requestProjectApproval = async (req, res, next) => {
         amount,
         paymentReference,
         description: `Commitment fee for ${project.projectSlug}`,
+        userType,
       };
 
       const response = await Transaction.create(trxData);
@@ -2153,6 +2157,8 @@ exports.requestProjectApproval = async (req, res, next) => {
 exports.payProjectInstallment = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
+      const { userType } = req.query;
+
       const userId = req.user.id;
       const { projectId } = req.params;
       const { installmentId, amount } = req.body;
@@ -2200,6 +2206,7 @@ exports.payProjectInstallment = async (req, res, next) => {
         amount,
         paymentReference,
         description: `${pr_installment.title} for ${project.projectSlug}`,
+        userType,
       };
 
       const response = await Transaction.create(trxData);
@@ -2548,6 +2555,7 @@ exports.approveTransferToServicePartner = async (req, res, next) => {
             amount,
             paymentReference,
             description: narration,
+            userType: 'professional',
           };
 
           const response = await Transaction.create(trxData, { t });
@@ -2684,6 +2692,8 @@ exports.getPendingTransfers = async (req, res, next) => {
 exports.payCommitmentFee = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
+      const { userType } = req.query;
+
       const userId = req.user.id;
       const { amount, projectSlug } = req.body;
       const project = await Project.findOne({ where: { projectSlug } });
@@ -2708,6 +2718,7 @@ exports.payCommitmentFee = async (req, res, next) => {
         amount,
         paymentReference,
         description: `Commitment fee for ${projectSlug}`,
+        userType,
       };
 
       const response = await Transaction.create(trxData);

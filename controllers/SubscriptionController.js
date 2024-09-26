@@ -1,37 +1,37 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
-require("dotenv").config();
-const moment = require("moment");
-const sequelize = require("../config/database/connection");
-const Testimony = require("../models/Testimonies");
-const User = require("../models/User");
-const Notification = require("../helpers/notification");
-const SubscriptionPlan = require("../models/SubscriptionPlan");
-const SubscriptionPlanPackage = require("../models/SubscriptionPlanPackage");
-const Subscription = require("../models/Subscription");
-const Payment = require("../models/Payment");
-const Transaction = require("../models/Transaction");
-const UserService = require("../service/UserService");
-const ServicePartner = require("../models/ServicePartner");
-const ProductPartner = require("../models/ProductPartner");
+require('dotenv').config();
+const moment = require('moment');
+const sequelize = require('../config/database/connection');
+const Testimony = require('../models/Testimonies');
+const User = require('../models/User');
+const Notification = require('../helpers/notification');
+const SubscriptionPlan = require('../models/SubscriptionPlan');
+const SubscriptionPlanPackage = require('../models/SubscriptionPlanPackage');
+const Subscription = require('../models/Subscription');
+const Payment = require('../models/Payment');
+const Transaction = require('../models/Transaction');
+const UserService = require('../service/UserService');
+const ServicePartner = require('../models/ServicePartner');
+const ProductPartner = require('../models/ProductPartner');
 
 exports.createSubscriptionPlan = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const plan = await SubscriptionPlan.create(req.body, {
         include: [
           {
             model: SubscriptionPlanPackage,
-            as: "benefits"
-          }
+            as: 'benefits',
+          },
         ],
-        transaction: t
+        transaction: t,
       });
 
       return res.status(200).send({
         success: true,
-        data: plan
+        data: plan,
       });
     } catch (error) {
       t.rollback();
@@ -41,13 +41,13 @@ exports.createSubscriptionPlan = async (req, res, next) => {
 };
 
 exports.updateSubscriptionPlan = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { benefits, planId, ...other } = req.body;
       const plan = await SubscriptionPlan.findByPk(planId);
       await plan.update(other, { transaction: t });
       await Promise.all(
-        benefits.map(async item => {
+        benefits.map(async (item) => {
           const benefit = await SubscriptionPlanPackage.findByPk(item.id);
           if (benefit) {
             await benefit.update({ benefit: item.benefit }, { transaction: t });
@@ -55,7 +55,7 @@ exports.updateSubscriptionPlan = async (req, res, next) => {
             await SubscriptionPlanPackage.create(
               {
                 benefit: item.benefit,
-                planId
+                planId,
               },
               { transaction: t }
             );
@@ -65,7 +65,7 @@ exports.updateSubscriptionPlan = async (req, res, next) => {
 
       return res.status(200).send({
         success: true,
-        message: "Subscription plan updated successfully"
+        message: 'Subscription plan updated successfully',
       });
     } catch (error) {
       t.rollback();
@@ -75,7 +75,7 @@ exports.updateSubscriptionPlan = async (req, res, next) => {
 };
 
 exports.deleteSubscriptionPlan = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { planId } = req.params;
       const plan = await SubscriptionPlan.destroy({
@@ -83,14 +83,14 @@ exports.deleteSubscriptionPlan = async (req, res, next) => {
         include: [
           {
             model: SubscriptionPlanPackage,
-            as: "benefits"
-          }
-        ]
+            as: 'benefits',
+          },
+        ],
       });
 
       return res.status(200).send({
         success: true,
-        message: "Subscription plan delete successfully"
+        message: 'Subscription plan delete successfully',
       });
     } catch (error) {
       t.rollback();
@@ -102,17 +102,17 @@ exports.deleteSubscriptionPlan = async (req, res, next) => {
 exports.getSubscriptionPlans = async (req, res, next) => {
   try {
     const plans = await SubscriptionPlan.findAll({
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
       include: [
         {
           model: SubscriptionPlanPackage,
-          as: "benefits"
-        }
-      ]
+          as: 'benefits',
+        },
+      ],
     });
     return res.status(200).send({
       success: true,
-      data: plans
+      data: plans,
     });
   } catch (error) {
     return next(error);
@@ -126,13 +126,13 @@ exports.getSingleSubscriptionPlan = async (req, res, next) => {
       include: [
         {
           model: SubscriptionPlanPackage,
-          as: "benefits"
-        }
-      ]
+          as: 'benefits',
+        },
+      ],
     });
     return res.status(200).send({
       success: true,
-      data: plan
+      data: plan,
     });
   } catch (error) {
     return next(error);
@@ -140,7 +140,7 @@ exports.getSingleSubscriptionPlan = async (req, res, next) => {
 };
 
 exports.subscribeToPlan = async (req, res, next) => {
-  sequelize.transaction(async t => {
+  sequelize.transaction(async (t) => {
     try {
       const { userId, reference, planId, userType } = req.body;
       const plan = await SubscriptionPlan.findOne({ where: { id: planId } });
@@ -152,13 +152,13 @@ exports.subscribeToPlan = async (req, res, next) => {
         userId: id,
         payment_reference: reference,
         amount,
-        payment_category: "Subscription"
+        payment_category: 'Subscription',
       };
 
       await Payment.create(paymentData, { transaction: t });
       // get user has active sub
       const sub = await Subscription.findOne({
-        where: { userId: id, status: 1 }
+        where: { userId: id, status: 1 },
       });
       const now = moment();
       let remainingDays = 0;
@@ -166,33 +166,33 @@ exports.subscribeToPlan = async (req, res, next) => {
         // get expiration Date
         const { expiredAt } = sub;
         const then = moment(expiredAt);
-        remainingDays = then.diff(now, "days");
+        remainingDays = then.diff(now, 'days');
         // console.log(expiredAt, remainingDays);
         await sub.update({ status: 0 }, { transaction: t });
       }
       const days = Number(duration) * 7 + remainingDays;
 
       // create subscription
-      const newDate = moment(now, "DD-MM-YYYY").add(days, "days");
+      const newDate = moment(now, 'DD-MM-YYYY').add(days, 'days');
       const request = {
         userId: id,
         planId,
         status: 1,
         expiredAt: newDate,
-        amount
+        amount,
       };
       await Subscription.create(request, { transaction: t });
       // update user profile
       const userData = {
         planId,
         hasActiveSubscription: true,
-        expiredAt: newDate
+        expiredAt: newDate,
       };
       await UserService.updateUserTypeProfile({
         id,
         userType,
         data: userData,
-        transaction: t
+        transaction: t,
       });
 
       // save transaction
@@ -202,11 +202,12 @@ exports.subscribeToPlan = async (req, res, next) => {
       const transaction = {
         TransactionId: txSlug,
         userId: id,
-        type: "Subscription",
+        type: 'Subscription',
         amount,
         description,
         paymentReference: reference,
-        status: "PAID"
+        status: 'PAID',
+        userType,
       };
       await Transaction.create(transaction, { transaction: t });
       const user = await User.findByPk(userId);
@@ -217,18 +218,18 @@ exports.subscribeToPlan = async (req, res, next) => {
       } just subscribed to ${name} with their ${UserService.getUserType(
         userType
       )} account`;
-      const notifyType = "admin";
+      const notifyType = 'admin';
       const { io } = req.app;
       await Notification.createNotification({
         type: notifyType,
         message: mesg,
-        userId: id
+        userId: id,
       });
-      io.emit("getNotifications", await Notification.fetchAdminNotification());
+      io.emit('getNotifications', await Notification.fetchAdminNotification());
 
       return res.send({
         success: true,
-        message: "Subscription Made Sucessfully"
+        message: 'Subscription Made Sucessfully',
       });
     } catch (error) {
       console.log(error);
@@ -241,16 +242,16 @@ exports.subscribeToPlan = async (req, res, next) => {
 exports.getSubscriptionHistory = async (req, res, next) => {
   try {
     const plans = await Subscription.findAll({
-      order: [["createdAt", "DESC"]]
+      order: [['createdAt', 'DESC']],
     });
     const subscriptions = await Promise.all(
-      plans.map(async plan => {
+      plans.map(async (plan) => {
         let user = await ServicePartner.findOne({
-          where: { id: plan.userId }
+          where: { id: plan.userId },
         });
         if (!user) {
           user = await ProductPartner.findOne({
-            where: { id: plan.userId }
+            where: { id: plan.userId },
           });
         }
         plan.user = user;
@@ -259,7 +260,7 @@ exports.getSubscriptionHistory = async (req, res, next) => {
     );
     return res.status(200).send({
       success: true,
-      data: subscriptions
+      data: subscriptions,
     });
   } catch (error) {
     return next(error);
@@ -270,12 +271,12 @@ exports.getUserSubscriptionHistory = async (req, res, next) => {
   try {
     const subscriptions = await Subscription.findAll({
       where: { userId: req.params.userId },
-      order: [["createdAt", "DESC"]]
+      order: [['createdAt', 'DESC']],
     });
 
     return res.status(200).send({
       success: true,
-      data: subscriptions
+      data: subscriptions,
     });
   } catch (error) {
     return next(error);

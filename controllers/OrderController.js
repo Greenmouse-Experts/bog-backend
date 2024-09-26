@@ -386,7 +386,7 @@ exports.createOrder = async (req, res, next) => {
       }
 
       orderData.slug = orderSlug;
-      await helpTransaction.saveTxn(orderData, 'Products');
+      await helpTransaction.saveTxn(orderData, 'Products', userType);
       orderData.orderSlug = slug;
       const invoice = await invoiceService.createInvoice(orderData, user);
       if (invoice) {
