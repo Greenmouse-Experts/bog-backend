@@ -9,9 +9,9 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.addColumn('transactions', 'userType', {
-      type: Sequelize.STRING,
-      defaultValue: null,
+    await queryInterface.addColumn('product_partners', 'kycSubmitted', {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
     });
   },
 
@@ -22,6 +22,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.removeColumn('transactions', 'userType');
+    await queryInterface.removeColumn('product_partners', 'kycSubmitted');
   },
 };

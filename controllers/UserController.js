@@ -907,6 +907,7 @@ exports.loginUser = async (req, res, next) => {
           // for product partners
           await productPartnerWelcomeMessage(user);
         }
+
         await User.update(
           { last_login: new Date() },
           { where: { id: user.id } }

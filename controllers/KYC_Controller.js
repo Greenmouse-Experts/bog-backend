@@ -640,6 +640,15 @@ exports.createKycDocuments = async (req, res, next) => {
       const documents = await KycDocuments.bulkCreate(loadFiles, {
         transaction: t,
       });
+
+      // Update  kyc submitted status
+      await updateUserTypeProfile({
+        userType,
+        id: profile.id,
+        data: { kycSubmitted: true },
+        t,
+      });
+
       return res.status(200).send({
         success: true,
         data: documents,
@@ -861,19 +870,18 @@ exports.approveKycVerification = async (req, res, next) => {
         });
       }
 
-      if (verificationStatus) {
-        const data = {
-          isVerified: verificationStatus,
-          kycPoint: verificationStatus === true ? kycPoint : 0,
-        };
+      const data = {
+        isVerified: verificationStatus,
+        kycPoint: verificationStatus === true ? kycPoint : 0,
+        kycSubmitted: !verificationStatus ? false : undefined,
+      };
 
-        await updateUserTypeProfile({
-          userType,
-          id: profile.id,
-          data,
-          transaction: t,
-        });
-      }
+      await updateUserTypeProfile({
+        userType,
+        id: profile.id,
+        data,
+        transaction: t,
+      });
 
       //send email to user
       const encodeEmail = encodeURIComponent(user.email);
