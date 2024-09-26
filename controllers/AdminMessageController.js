@@ -72,7 +72,7 @@ exports.updateAnnouncement = async (req, res, next) => {
       // Send in-app notification
       await createNotificationWithUserType({
         type: 'user',
-        userType: user === 'all' ? null : user,
+        userType: announcement.user === 'all' ? null : announcement.user,
         message: `A message has been sent to you from the admin: ${req.body.content}`,
       });
     }
