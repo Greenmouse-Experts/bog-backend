@@ -290,14 +290,6 @@ exports.registerUser = async (req, res, next) => {
       });
       io.emit('getNotifications', await Notification.fetchAdminNotification());
 
-      // Email to notify user on the  created  account profile
-      await AccountProfileCreationMailer({
-        name: req.body.name,
-        fname: req.body.fname,
-        userType: UserService.getUserType(userType),
-        email: user.email,
-      });
-
       return res.status(201).send({
         success: true,
         message: 'User created successfully',
@@ -913,6 +905,14 @@ exports.loginUser = async (req, res, next) => {
           { where: { id: user.id } }
         );
       }
+
+      // Email to notify user on the  created  account profile
+      await AccountProfileCreationMailer({
+        name: user.name,
+        fname: user.fname,
+        userType: UserService.getUserType(user.userType),
+        email: user.email,
+      });
 
       // const mesg = `Welcome back to your dashboard. Your login was successful!`;
       // const notifyType = user.userType === 'admin' ? 'admin' : 'user';
