@@ -2231,56 +2231,57 @@ module.exports = {
   },
 
   /**
-   * Mailer of complaint to admin
-   * @param {{first_name:string, email:string}} user
-   * @param {{issue_type, issue_no, title, description, status}} issue
-   */
-  // complaintMessageToUser: async (user, issue) => {
-  //   const { first_name, email } = user;
-  //   const { issue_type, issue_no, title, description, status } = issue;
-
-  //   // setup mail credentials
-  //   let params = {};
-  //   params.logo = Logo;
-  //   params.header_color = "white";
-
-  //   const link = `${process.env.SITE_URL}/dashboard/complaints`;
-
-  //   params.body = `<p style="font-size:1.7em;"><b>Welcome to ${
-  //     process.env.APP_NAME
-  //   }, ${!first_name ? "user" : first_name}</b></p>`;
-  //   params.body += `
-  //                 <p style="font-size: 1.4em;">This is to inform you that you just made a complaint for the ticket issue ${issue_type} has been sent.</p><br/>
-  //                 <p style="font-size: 1.4em;">Status: ${status}</p>
-  //                 <p style="font-size: 1.4em;">Issue No: ${issue_no}</p><br/>
-  //                 <p style="font-size: 1.4em;">Title: ${title}</p>
-  //                 <p style="font-size: 1.4em;">Description:</p>
-  //                 <p style="font-size: 1.2em;">${description}</p>
-  //                 <p style="font-size: 1.4em;">For more info, click <a href="${link}">here</a>.</p>
-  //             `;
-
-  //   params.footer = "";
-  //   params.date = new Date().getFullYear();
-
-  //   let params2 = {
-  //     email,
-  //     subject: `Complaints on ${issue_type} [${issue_no}]`,
-  //   };
-
-  //   const template = mailer_template(params);
-
-  //   // Send Mail
-  //   Mailer(template, params2)
-  //     .then((response) => {
-  //       return Promise.resolve("Successful!");
-  //     })
-  //     .catch((err) => {
-  //       return Promise.reject(err);
-  //     });
-  // },
-  /**
-   * Disapproval message for kyc document
+   * Email for sending a message to clients
    * @param {*} user
-   * @param {*} issue
+   * @param {*} message
    */
+  postMessageEmail: async (user, userType, message) => {
+    const { name, fname, email } = user;
+
+    // setup mail credentials
+    let params = {};
+    params.logo = Logo;
+    params.header_color = 'white';
+
+    const link = `${process.env.SITE_URL}/login`;
+
+    params.body = `<p style="font-size:1.7em;"><b>Hi ${fname || name},</b></p>`;
+    params.body += `
+                  <p style="font-size: 1.4em;">A message has been sent:</p><br/>
+                  <p>To: ${userType}</p><br/>`;
+
+    if (message.supportingDocument) {
+      params.body += `
+        <img src="${message.supportingDocument}" style="width: 50%;" />
+      `;
+    }
+    params.body += `
+    <p>${message.content}</p>
+    `;
+
+    params.body += `
+                  <p style="margin-top:30px; font-size: 1em;">
+                  <a href="${link}" target="_BLANK" title="Visit dashboard" style="padding: 15px;color:white;font-size:1em;background-color:#000;text-decoration:none;border-radius:5px;border:0">Visit Dashboard</a>
+              </p>
+              `;
+
+    params.footer = '';
+    params.date = new Date().getFullYear();
+
+    let params2 = {
+      email,
+      subject: `Account profile creation [${userType}]`,
+    };
+
+    const template = mailer_template(params);
+
+    // Send Mail
+    Mailer(template, params2)
+      .then((response) => {
+        return Promise.resolve('Successful!');
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+  },
 };

@@ -47,6 +47,11 @@ const AdminMessage = sequelise.define(
       allowNull: true,
       defaultValue: false,
     },
+    emailSent: {
+      type: Sequelize.BOOLEAN,
+      allowNull: true,
+      defaultValue: true,
+    },
   },
   { paranoid: true }
 );

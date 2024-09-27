@@ -11,6 +11,7 @@ const {
   createNotification,
   createNotificationWithUserType,
 } = require('../helpers/notification');
+const { postMessageEmail } = require('../helpers/mailer/samples');
 
 exports.postAnnouncement = async (req, res, next) => {
   sequelize.transaction(async (t) => {

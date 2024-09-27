@@ -763,9 +763,10 @@ exports.registerAdmin = async (req, res, next) => {
       if (!isUserType) {
         return res.status(400).send({
           success: false,
-          message: 'Invalid User Entity passed',
+          message: 'Invalid user entity passed',
         });
       }
+
       const user = await UserService.findUser({ email });
       if (user) {
         return res.status(400).send({
@@ -800,6 +801,7 @@ exports.registerAdmin = async (req, res, next) => {
         password
       );
 
+      console.log(123456);
       await EmailService.sendMail(email, message, 'Verify Email');
 
       return res.status(201).send({

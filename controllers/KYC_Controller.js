@@ -301,9 +301,7 @@ exports.createKycGeneralInfo = async (req, res, next) => {
       const profile = await getUserTypeProfile(userType, userId);
 
       // Check if kyc is approved
-      const user = await UserService.findUser({ id: userId });
-
-      if (user.kycVerified) {
+      if (profile.isVerified) {
         // Check name
         const orgName = await KycGeneralInfo.findOne({
           where: { organisation_name },
