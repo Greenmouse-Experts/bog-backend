@@ -48,6 +48,7 @@ router
   .route('/announcements/update/:messageId')
   .put(
     [Auth, Access.verifyAccess, Access.verifyAdmin],
+    upload.single('supportingDocument'),
     AdminMessageController.updateAnnouncement
   );
 

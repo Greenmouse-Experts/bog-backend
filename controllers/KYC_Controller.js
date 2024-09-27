@@ -12,6 +12,7 @@ const KycWorkExperience = require('../models/KycWorkExperience');
 const {
   getUserTypeProfile,
   updateUserTypeProfile,
+  getUserType,
 } = require('../service/UserService');
 const Notification = require('../helpers/notification');
 const helpers = require('../helpers/message');
@@ -876,8 +877,10 @@ exports.approveKycVerification = async (req, res, next) => {
         kycSubmitted: !verificationStatus ? false : undefined,
       };
 
+      const profileType = getUserType(userType);
+
       await updateUserTypeProfile({
-        userType,
+        profileType,
         id: profile.id,
         data,
         transaction: t,
@@ -887,12 +890,12 @@ exports.approveKycVerification = async (req, res, next) => {
       const encodeEmail = encodeURIComponent(user.email);
       let message =
         approved === undefined || approved
-          ? helpers.kycApprovalMessage(user.fname, encodeEmail, userType)
+          ? helpers.kycApprovalMessage(user.fname, encodeEmail, profileType)
           : helpers.kycDisapprovalMessage(
               user.fname,
               encodeEmail,
               reason,
-              userType
+              profileType
             );
       await EmailService.sendMail(
         user.email,

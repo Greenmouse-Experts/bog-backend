@@ -65,6 +65,10 @@ exports.updateAnnouncement = async (req, res, next) => {
       throw new Error('Message is not available');
     }
 
+    if ('drafted' in req.body) {
+      req.body.drafted = Boolean(Number(req.body.drafted));
+    }
+
     // Update
     await AdminMessage.update(req.body, { where: { id: messageId } });
 
