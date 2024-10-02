@@ -872,13 +872,13 @@ exports.approveKycVerification = async (req, res, next) => {
       const data = {
         isVerified: verificationStatus,
         kycPoint: verificationStatus === true ? kycPoint : 0,
-        kycSubmitted: !verificationStatus ? false : undefined,
+        kycSubmitted: !verificationStatus ? false : true,
       };
 
       const profileType = getUserType(userType);
 
       await updateUserTypeProfile({
-        profileType,
+        userType,
         id: profile.id,
         data,
         transaction: t,
