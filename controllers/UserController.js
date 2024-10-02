@@ -2406,14 +2406,6 @@ exports.adminGetSupportSocial = async (req, res, next) => {
 
 exports.userGetSupportSocial = async (req, res, next) => {
   try {
-    const user = await UserService.getUserDetails({ id: req.user.id });
-    if (!user) {
-      return res.status(404).send({
-        success: false,
-        message: 'No User Found',
-      });
-    }
-
     const supportSocials = await SupportSocial.findOne();
 
     return res.status(200).send({

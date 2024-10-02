@@ -236,6 +236,6 @@ router
 
 router
   .route('/user/get/supportsocials')
-  .get(Auth, UserController.userGetSupportSocial);
+  .get(UserController.userGetSupportSocial);
 
 module.exports = router;
