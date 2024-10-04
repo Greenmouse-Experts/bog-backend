@@ -12,6 +12,8 @@ const {
   createNotificationWithUserType,
 } = require('../helpers/notification');
 const { postMessageEmail } = require('../helpers/mailer/samples');
+const jobQueue = require('../job');
+const User = require('../models/User');
 
 exports.postAnnouncement = async (req, res, next) => {
   sequelize.transaction(async (t) => {
@@ -39,6 +41,9 @@ exports.postAnnouncement = async (req, res, next) => {
           userType: user === 'all' ? null : user,
           message: `A message has been sent to you from the admin: ${content}`,
         });
+
+        // Send / Add to queue
+        await jobQueue.now('instantJob', req.body);
       }
 
       return res.status(201).send({

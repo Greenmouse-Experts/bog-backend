@@ -628,6 +628,7 @@ exports.createKycDocuments = async (req, res, next) => {
     try {
       const { userType } = req.body;
       const userId = req.user.id;
+
       const profile = await getUserTypeProfile(userType, userId);
       const loadFiles = req.files.map((file, i) => ({
         name: file.fieldname,

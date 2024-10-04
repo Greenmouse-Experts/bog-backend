@@ -2270,7 +2270,7 @@ module.exports = {
 
     let params2 = {
       email,
-      subject: `Account profile creation [${userType}]`,
+      subject: `Message Notification [${userType.replace('_', ' ')}]`,
     };
 
     const template = mailer_template(params);

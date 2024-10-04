@@ -20,7 +20,7 @@ exports.upload = (req) => {
   });
 
   return new Promise((res, rej) => {
-    form.parse(req, function (err, fields, file) {
+    form.parse(req, function(err, fields, file) {
       try {
         if (err) throw err;
         if (!file.image) throw new CustomError('No Image provided!.', 400);
@@ -38,19 +38,66 @@ exports.upload = (req) => {
             images.map(
               (image) =>
                 new Promise((resolve, reject) => {
-                  cloudinary.uploader.upload(
-                    image.filepath,
-                    function (error, result) {
-                      if (error) return reject(error);
+                  cloudinary.uploader.upload(image.filepath, function(
+                    error,
+                    result
+                  ) {
+                    if (error) return reject(error);
 
-                      return resolve(result.secure_url);
-                    }
-                  );
+                    return resolve(result.secure_url);
+                  });
                 })
             )
           )
         );
       } catch (error) {
+        console.log(error);
+        rej(error);
+      }
+    });
+  });
+};
+
+exports.uploadFile = (req) => {
+  var form = new formidable.IncomingForm({
+    multiples: true,
+    // maxFileSize: 25 * 1024 * 1024,
+    // uploadDir: path.resolve(__dirname, '../../images')
+  });
+
+  return new Promise((res, rej) => {
+    form.parse(req, function(err, fields, file) {
+      try {
+        if (err) throw err;
+        if (!file.files) throw new CustomError('No Image provided!.', 400);
+
+        const images = Array.isArray(file.files) ? file.files : [file.files];
+
+        if (images[0].name == '')
+          throw new CustomError('Image is required!', 400);
+
+        const validationError = validateImage(images);
+        if (validationError) throw new CustomError(validationError, 400);
+
+        return res(
+          Promise.all(
+            images.map(
+              (image) =>
+                new Promise((resolve, reject) => {
+                  cloudinary.uploader.upload(image.filepath, function(
+                    error,
+                    result
+                  ) {
+                    if (error) return reject(error);
+
+                    return resolve(result.secure_url);
+                  });
+                })
+            )
+          )
+        );
+      } catch (error) {
+        console.log(error);
         rej(error);
       }
     });
@@ -67,7 +114,11 @@ const validateImage = (imageArr) => {
 
   // Check if they are all images
   const isValidFormat = imageArr.every((image) =>
-    validImageFormats.includes(image.originalFilename.split('.')[image.originalFilename.split('.').length - 1])
+    validImageFormats.includes(
+      image.originalFilename.split('.')[
+        image.originalFilename.split('.').length - 1
+      ]
+    )
   );
   if (!isValidFormat)
     return `Unsupported image format detected. Images must be in ${validImageFormats.join(
@@ -79,9 +130,8 @@ const validateImage = (imageArr) => {
     (image) => image.size <= maxUploadImageSize
   );
   if (!isValidSize)
-    return `Image max file size exceeded. Expected max file size is ${
-      maxUploadImageSize / 1024
-    } KB.`;
+    return `Image max file size exceeded. Expected max file size is ${maxUploadImageSize /
+      1024} KB.`;
 
   return null;
 };

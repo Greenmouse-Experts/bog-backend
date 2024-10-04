@@ -1,6 +1,8 @@
 require('dotenv/config');
 const Agenda = require('agenda');
 const dayjs = require('dayjs');
+const User = require('../models/User');
+const { postMessageEmail } = require('../helpers/mailer/samples');
 
 const mongoConnectionString = process.env.MONGO_AGENDA_URI;
 
@@ -13,8 +15,50 @@ jobQueue.define('instantJob', async (job) => {
   console.log(
     'This job is running as soon as it was received. This is the data that was sent:'
   );
-  console.log(data);
+
+  let where = { where: { userType: data.user } };
+  if (data.user === 'product_partner') {
+    where = { where: { userType: 'vendor' } };
+  } else if (data.user === 'all' || data.user === null) {
+    where = {};
+  }
+
+  // Fetch users by user
+  const users = await User.findAll(where);
+
+  // Process
+  await processInBatches(users, 5, processItem, data);
 });
+
+async function processInBatches(users, batchSize, processItem, data) {
+  console.log(123);
+  for (let i = 0; i < users.length; i += batchSize) {
+    const batch = users.slice(i, i + batchSize);
+    console.log(i + 1 + ' batch');
+
+    await Promise.all(
+      batch.map(
+        (item) =>
+          new Promise(async (resolve) => {
+            setTimeout(async () => {
+              // Send email
+              console.log('Sending content');
+              await postMessageEmail(item, data.user, data);
+
+              resolve();
+            }, 2000);
+            // await processItem(item, resolve, data);
+          })
+      )
+    );
+  }
+}
+
+async function processItem(item, resolve, data) {
+  // return new Promise((resolve) => {
+  // Simulating async work
+  // });
+}
 
 jobQueue.define('delayedJob', async (job) => {
   const data = job?.attrs?.data;
