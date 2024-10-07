@@ -30,8 +30,7 @@ jobQueue.define('instantJob', async (job) => {
   await processInBatches(users, 5, processItem, data);
 });
 
-async function processInBatches(users, batchSize, processItem, data) {
-  console.log(123);
+exports.processInBatches = async (users, batchSize, data) => {
   for (let i = 0; i < users.length; i += batchSize) {
     const batch = users.slice(i, i + batchSize);
     console.log(i + 1 + ' batch');
@@ -47,12 +46,11 @@ async function processInBatches(users, batchSize, processItem, data) {
 
               resolve();
             }, 2000);
-            // await processItem(item, resolve, data);
           })
       )
     );
   }
-}
+};
 
 async function processItem(item, resolve, data) {
   // return new Promise((resolve) => {

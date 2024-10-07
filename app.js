@@ -56,6 +56,10 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 
 var fs = require('fs');
 var util = require('util');
+const User = require('./models/User');
+const { processInBatches } = require('./job');
+const AdminMessage = require('./models/AdminMessage');
+const { postMessageEmail } = require('./helpers/mailer/samples');
 var log_file = fs.createWriteStream(__dirname + '/debug.log', { flags: 'w' });
 var log_stdout = process.stdout;
 
@@ -319,6 +323,59 @@ cron.schedule('* 6 * * *', () => {
     });
   // }
 });
+
+// cron.schedule('* * * * *', () => {
+//   // Fetch admin messages
+//   AdminMessage.findAll({
+//     where: { emailSent: false },
+//   }).then(async (adminMessages) => {
+//     for (let index = 0; index < adminMessages.length; index++) {
+//       const adminMessage = adminMessages[index];
+
+//       let where = { where: { userType: adminMessage.user } };
+//       if (adminMessage.user === 'product_partner') {
+//         where = { where: { userType: 'vendor' } };
+//       } else if (adminMessage.user === 'all' || adminMessage.user === null) {
+//         where = {};
+//       }
+
+//       // Fetch users by user
+//       const users = await User.findAll(where);
+
+//       console.log(users.length);
+
+//       const batchSize = 5;
+//       // await processInBatches(users, 5, adminMessage);
+//       for (let i = 0; i < users.length; i += batchSize) {
+//         const batch = users.slice(i, i + batchSize);
+//         console.log(i + 1 + ' batch');
+
+//         await Promise.all(
+//           batch.map(
+//             (item) =>
+//               new Promise(async (resolve) => {
+//                 setTimeout(async () => {
+//                   // Send email
+//                   return await postMessageEmail(
+//                     item,
+//                     adminMessage.user,
+//                     adminMessage
+//                   );
+
+//                   resolve();
+//                 }, 2000);
+//               })
+//           )
+//         );
+//       }
+
+//       await AdminMessage.update(
+//         { emailSent: true },
+//         { where: { id: adminMessage.id } }
+//       );
+//     }
+//   });
+// });
 
 // Handles all errors
 app.use((err, req, res, next) => {

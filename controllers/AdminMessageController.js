@@ -26,6 +26,7 @@ exports.postAnnouncement = async (req, res, next) => {
         title,
         user,
         drafted,
+        emailSent: false,
       };
       if (req.file) {
         const url = `${process.env.APP_URL}/${req.file.path}`;
@@ -43,7 +44,7 @@ exports.postAnnouncement = async (req, res, next) => {
         });
 
         // Send / Add to queue
-        await jobQueue.now('instantJob', req.body);
+        // await jobQueue.now('instantJob', req.body);
       }
 
       return res.status(201).send({

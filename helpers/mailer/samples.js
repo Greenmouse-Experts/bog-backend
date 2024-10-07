@@ -2281,7 +2281,8 @@ module.exports = {
         return Promise.resolve('Successful!');
       })
       .catch((err) => {
-        return Promise.reject(err);
+        console.log(err);
+        return err;
       });
   },
 };

@@ -22,6 +22,7 @@ const registerValidation = () => {
       'password',
       'Please enter a password with 5 or more characters'
     ).isLength({ min: 5 }),
+    check('referralCode').optional(),
   ];
 };
 
