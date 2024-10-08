@@ -147,7 +147,7 @@ router
 
 router
   .route('/user/update-account')
-  .patch(Auth, upload.single('photo'), UserController.updateUserAccount);
+  .patch(Auth, UserController.updateUserAccount);
 
 router
   .route('/user/update-profile')

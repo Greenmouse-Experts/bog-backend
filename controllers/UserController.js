@@ -29,6 +29,9 @@ const CorporateClient = require('../models/CorporateClient');
 const User = require('../models/User');
 const Notification = require('../helpers/notification');
 
+// const cloudinary = require('../helpers/cloudinaryMediaProvider');
+const cloudinary = require('cloudinary').v2;
+
 const {
   adminLevels,
   adminPrivileges,
@@ -1463,10 +1466,20 @@ exports.updateUserAccount = async (req, res, next) => {
           message: 'Invalid user',
         });
       }
+      console.log(req.file);
+
       if (req.file) {
-        const url = `${process.env.APP_URL}/${req.file.path}`;
+        // const url = `${process.env.APP_URL}/${req.file.path}`;
+        // data.photo = url;
+        // Upload the file to Cloudinary
+        const response = await cloudinary.uploader.upload(req.file.path);
+        const url = response.secure_url; // Get the secure URL from the response
         data.photo = url;
       }
+
+      // const response = await cloudinary.upload(req);
+      // console.log(response);
+
       data.id = userId;
       await UserService.updateUser(data, t);
       return res.status(201).send({
