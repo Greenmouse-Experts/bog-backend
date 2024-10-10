@@ -27,6 +27,7 @@ const Projects = require('../models/Project');
 const PrivateClient = require('../models/PrivateClient');
 const CorporateClient = require('../models/CorporateClient');
 const User = require('../models/User');
+const Referral = require('../models/Referral');
 const Notification = require('../helpers/notification');
 
 // const cloudinary = require('../helpers/cloudinaryMediaProvider');
@@ -37,6 +38,7 @@ const {
   adminPrivileges,
   USERTYPE,
   USERROLES,
+  generateReferralCode,
 } = require('../helpers/utility');
 const ServiceProvider = require('../models/ServiceProvider');
 
@@ -107,7 +109,15 @@ exports.findPhone = async (req, res, next) => {
 exports.registerUser = async (req, res, next) => {
   sequelize.transaction(async (t) => {
     try {
-      const { email, phone, userType, name, captcha, company_name } = req.body;
+      const {
+        email,
+        phone,
+        userType,
+        name,
+        captcha,
+        company_name,
+        referrerCode,
+      } = req.body;
 
       if (!req.body.platform && userType !== 'admin') {
         const validateCaptcha = await UserService.validateCaptcha(captcha);
@@ -194,6 +204,7 @@ exports.registerUser = async (req, res, next) => {
           level: req.body.level,
           referralId: randomstring.generate(12),
           aboutUs: req.body.aboutUs,
+          referrerCode: req.body.referrerCode,
         };
 
         USERROLES.forEach((role) => {
@@ -893,6 +904,8 @@ exports.loginUser = async (req, res, next) => {
         }
       }
 
+      let details_ = {};
+
       if (user.last_login === null) {
         if (user.userType.includes('client')) {
           // for corporate and private clients
@@ -905,13 +918,20 @@ exports.loginUser = async (req, res, next) => {
           await productPartnerWelcomeMessage(user);
         }
 
-        await User.update(
-          { last_login: new Date() },
-          { where: { id: user.id } }
-        );
+        details_.last_login = new Date();
       }
 
-      // Email to notify user on the  created  account profile
+      // Create referral code if non existent
+      if (!user.referralCode) {
+        details_.referralCode = generateReferralCode(8);
+      }
+
+      await User.update(details_, { where: { id: user.id } });
+
+      // Record referral
+      await createReferral(user.referrerCode, user.id);
+
+      // Email to notify user on the created account profile
       await AccountProfileCreationMailer({
         name: user.name,
         fname: user.fname,
@@ -919,22 +939,12 @@ exports.loginUser = async (req, res, next) => {
         email: user.email,
       });
 
-      // const mesg = `Welcome back to your dashboard. Your login was successful!`;
-      // const notifyType = user.userType === 'admin' ? 'admin' : 'user';
-      // const { io } = req.app;
-      // await Notification.createNotification({
-      //   userId: profile.id,
-      //   type: notifyType,
-      //   message: mesg,
-      // });
-      // io.emit("getNotifications", await Notification.fetchAdminNotification());
-
       return res.status(201).send({
         success: true,
         message: 'User Logged In Sucessfully',
         token,
         refresh_token,
-        user: data,
+        user: Object.assign({}, data, details_),
       });
     } catch (error) {
       console.log(error);
@@ -943,6 +953,34 @@ exports.loginUser = async (req, res, next) => {
     }
   });
 };
+
+/**
+ * Create referral
+ * @param {*} referrerId
+ * @param {*} refereeId
+ */
+async function createReferral(referrerCode, refereeId) {
+  try {
+    // Fetch referrer by id
+    const referrer = await User.findOne({ where: { referrerCode } });
+
+    if (referrer) {
+      // Check referral details
+      const referralDetails = await Referral.findOne({
+        where: { userId: referrer.id, referredId: refereeId },
+      });
+
+      if (!referralDetails) {
+        await Referral.create({
+          userId: referrer.id,
+          referredId: refereeId,
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 exports.refreshToken = async (req, res, next) => {
   try {
@@ -1372,9 +1410,13 @@ exports.getLoggedInUser = async (req, res) => {
       }
     );
 
+    const referrals = await Referral.count({
+      where: { userId: req.user.id },
+    });
+
     return res.status(200).send({
       success: true,
-      user: { ...data, rating, unread_messages },
+      user: { ...data, rating, unread_messages, referrals },
     });
   } catch (error) {
     console.log(error);
@@ -2406,6 +2448,19 @@ exports.adminGetSupportSocial = async (req, res, next) => {
       });
     }
 
+    const supportSocials = await SupportSocial.findOne();
+
+    return res.status(200).send({
+      success: true,
+      data: supportSocials,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.userGetSupportSocial = async (req, res, next) => {
+  try {
     const supportSocials = await SupportSocial.findOne();
 
     return res.status(200).send({

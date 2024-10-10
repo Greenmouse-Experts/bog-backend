@@ -85,7 +85,11 @@ const User = sequelise.define(
       type: Sequelize.STRING,
       allowNull: true,
     },
-    referralId: {
+    referralCode: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    referrerCode: {
       type: Sequelize.STRING,
       allowNull: true,
     },
