@@ -28,6 +28,7 @@ exports.postAnnouncement = async (req, res, next) => {
         drafted,
         emailSent: false,
       };
+
       if (req.file) {
         const url = `${process.env.APP_URL}/${req.file.path}`;
         request.supportingDocument = url;
