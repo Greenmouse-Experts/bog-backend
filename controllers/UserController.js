@@ -1508,7 +1508,6 @@ exports.updateUserAccount = async (req, res, next) => {
           message: 'Invalid user',
         });
       }
-      console.log(req.file);
 
       if (req.file) {
         // const url = `${process.env.APP_URL}/${req.file.path}`;
@@ -1522,6 +1521,7 @@ exports.updateUserAccount = async (req, res, next) => {
       // const response = await cloudinary.upload(req);
       // console.log(response);
 
+      console.log(data);
       data.id = userId;
       await UserService.updateUser(data, t);
       return res.status(201).send({

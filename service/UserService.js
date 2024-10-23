@@ -1,14 +1,14 @@
-require("dotenv").config();
-const axios = require("axios");
-const User = require("../models/User");
-const Profile = require("../models/UserProfile");
-const BankDetail = require("../models/BankDetail");
-const Referral = require("../models/Referral");
-const ServicePartner = require("../models/ServicePartner");
-const ProductPartner = require("../models/ProductPartner");
-const PrivateClient = require("../models/PrivateClient");
-const CorporateClient = require("../models/CorporateClient");
-const ServiceType = require("../models/ServiceType");
+require('dotenv').config();
+const axios = require('axios');
+const User = require('../models/User');
+const Profile = require('../models/UserProfile');
+const BankDetail = require('../models/BankDetail');
+const Referral = require('../models/Referral');
+const ServicePartner = require('../models/ServicePartner');
+const ProductPartner = require('../models/ProductPartner');
+const PrivateClient = require('../models/PrivateClient');
+const CorporateClient = require('../models/CorporateClient');
+const ServiceType = require('../models/ServiceType');
 
 exports.findUser = async (where) => {
   const user = await User.findOne({ where });
@@ -19,7 +19,7 @@ exports.getUserDetails = async (where) => {
   const user = await User.findOne({
     where,
     attributes: {
-      exclude: ["password", "createdAt", "updatedAt", "deletedAt"],
+      exclude: ['password', 'createdAt', 'updatedAt', 'deletedAt'],
     },
   });
   return user;
@@ -29,9 +29,9 @@ exports.getAllUsers = async (where) => {
   const user = await User.findAll({
     where,
     attributes: {
-      exclude: ["password", "deletedAt"],
+      exclude: ['password', 'deletedAt'],
     },
-    order: [["createdAt", "DESC"]],
+    order: [['createdAt', 'DESC']],
   });
   return user;
 };
@@ -40,7 +40,7 @@ exports.findUserDetail = async (where) => {
   const user = await User.findOne({
     where,
     attributes: {
-      exclude: ["password", "deletedAt"],
+      exclude: ['password', 'deletedAt'],
     },
   });
   return user;
@@ -57,7 +57,10 @@ exports.createNewUser = async (userData, transaction) => {
 };
 
 exports.updateUser = async (userData, transaction) => {
-  await User.update(userData, {
+  const _updated = Object.assign({}, userData);
+  delete _updated.id;
+
+  await User.update(_updated, {
     where: { id: userData.id },
     transaction,
   });
@@ -110,12 +113,12 @@ exports.getBankDetails = async (where) => {
 
 exports.validateUserType = (type) => {
   const userType = [
-    "professional",
-    "vendor",
-    "private_client",
-    "corporate_client",
-    "admin",
-    "none",
+    'professional',
+    'vendor',
+    'private_client',
+    'corporate_client',
+    'admin',
+    'none',
   ];
   if (!userType.includes(type)) {
     return false;
@@ -170,52 +173,52 @@ exports.validateCaptcha = async (captcha) => {
 
 exports.getUserType = (type) => {
   switch (type) {
-    case "admin":
-      return "Super Admin";
-    case "professional":
-    case "service_partner":
-      return "Service Partner";
-    case "vendor":
-    case "product_partner":
-      return "Product Partner";
-    case "private_client":
-      return "Private Client";
-    case "corporate_client":
-      return "Corporate Client";
+    case 'admin':
+      return 'Super Admin';
+    case 'professional':
+    case 'service_partner':
+      return 'Service Partner';
+    case 'vendor':
+    case 'product_partner':
+      return 'Product Partner';
+    case 'private_client':
+      return 'Private Client';
+    case 'corporate_client':
+      return 'Corporate Client';
     default:
-      return "";
+      return '';
   }
 };
 
 exports.getUserTypeProfile = async (userType, userId) => {
   try {
     const attributes = {
-      exclude: ["createdAt", "updatedAt", "deletedAt"],
+      exclude: ['createdAt', 'updatedAt', 'deletedAt'],
     };
     let profile = null;
-    if (userType === "professional" || userType === "service_partner") {
+    if (userType === 'professional' || userType === 'service_partner') {
       profile = JSON.parse(
         JSON.stringify(
           await ServicePartner.findOne({
-            include: [{ model: ServiceType, as: "service_category" }],
+            include: [{ model: ServiceType, as: 'service_category' }],
             where: { userId },
             attributes,
           })
         )
       );
-    } else if (userType === "vendor" || userType === "product_partner") {
+    } else if (userType === 'vendor' || userType === 'product_partner') {
       profile = JSON.parse(
         JSON.stringify(
           await ProductPartner.findOne({ where: { userId }, attributes })
         )
       );
-    } else if (userType === "private_client") {
+    } else if (userType === 'private_client') {
       profile = JSON.parse(
         JSON.stringify(
           await PrivateClient.findOne({ where: { userId }, attributes })
         )
       );
-    } else if (userType === "corporate_client") {
+    } else if (userType === 'corporate_client') {
       profile = JSON.parse(
         JSON.stringify(
           await CorporateClient.findOne({ where: { userId }, attributes })
@@ -229,13 +232,13 @@ exports.getUserTypeProfile = async (userType, userId) => {
 };
 
 exports.updateUserTypeProfile = async ({ userType, id, data, transaction }) => {
-  if (userType === "professional" || userType === "service_partner") {
+  if (userType === 'professional' || userType === 'service_partner') {
     await ServicePartner.update(data, { where: { id }, transaction });
-  } else if (userType === "vendor" || userType === "product_partner") {
+  } else if (userType === 'vendor' || userType === 'product_partner') {
     await ProductPartner.update(data, { where: { id }, transaction });
-  } else if (userType === "private_client") {
+  } else if (userType === 'private_client') {
     await PrivateClient.update(data, { where: { id }, transaction });
-  } else if (userType === "corporate_client") {
+  } else if (userType === 'corporate_client') {
     await CorporateClient.update(data, { where: { id }, transaction });
   }
   return true;
@@ -243,10 +246,10 @@ exports.updateUserTypeProfile = async ({ userType, id, data, transaction }) => {
 
 exports.getUserFromProfile = async (userType, id) => {
   const attributes = {
-    exclude: ["createdAt", "updatedAt", "deletedAt"],
+    exclude: ['createdAt', 'updatedAt', 'deletedAt'],
   };
   let profile;
-  if (userType === "professional" || userType === "service_partner") {
+  if (userType === 'professional' || userType === 'service_partner') {
     profile = JSON.parse(
       JSON.stringify(
         await ServicePartner.findOne({
@@ -255,23 +258,23 @@ exports.getUserFromProfile = async (userType, id) => {
           include: [
             {
               model: ServiceType,
-              as: "service_category",
+              as: 'service_category',
             },
           ],
         })
       )
     );
-  } else if (userType === "vendor" || userType === "product_partner") {
+  } else if (userType === 'vendor' || userType === 'product_partner') {
     profile = JSON.parse(
       JSON.stringify(
         await ProductPartner.findOne({ where: { id }, attributes })
       )
     );
-  } else if (userType === "private_client") {
+  } else if (userType === 'private_client') {
     profile = JSON.parse(
       JSON.stringify(await PrivateClient.findOne({ where: { id }, attributes }))
     );
-  } else if (userType === "corporate_client") {
+  } else if (userType === 'corporate_client') {
     profile = JSON.parse(
       JSON.stringify(
         await CorporateClient.findOne({ where: { id }, attributes })
